@@ -13,181 +13,94 @@ export const config = {
 
 const FREE_LIMIT = 2;
 
-const SYSTEM_PROMPT = `You are an expert skin analyst and dermatology advisor.
-Analyze the uploaded face photo and respond ONLY with a RAW JSON object.
-No markdown backticks, no introduction, no explanation.
+const SYSTEM_PROMPT = `You are an expert skin analyst.
+Analyze the photo and respond ONLY with a RAW JSON object.
+Focus on skin quality and health.
 
-IMPORTANT: Provide ALL descriptive text fields in BOTH English ("en") and French ("fr").
-
-Use this exact JSON structure:
+Structure:
 {
-  "overall": 82,
-  "summary": { "en": "Example summary.", "fr": "Résumé d'exemple." },
-  "faceShape": { "en": "Oval", "fr": "Ovale" },
-  "eyeColor": { "en": "Brown", "fr": "Marron" },
-  "skinTone": { "en": "Fair", "fr": "Claire" },
+  "overall": 85,
+  "summary": "...",
+  "faceShape": "...",
+  "eyeColor": "...",
+  "skinTone": "...",
   "metrics": [
-    { 
-      "key": "hydration",
-      "label": { "en": "Skin Hydration & Plumpness", "fr": "Hydratation & Rebond" },
-      "score": 85, 
-      "grade": "A", 
-      "detail": { "en": "English detail.", "fr": "Détail en français." }
-    },
-    { "key": "pores", "label": { "en": "Pore Size & Texture", "fr": "Pores & Texture" }, "score": 70, "grade": "B", "detail": { "en": "...", "fr": "..." } },
-    { "key": "radiance", "label": { "en": "Evenness & Radiance", "fr": "Éclat" }, "score": 75, "grade": "B", "detail": { "en": "...", "fr": "..." } },
-    { "key": "acne", "label": { "en": "Blemishes & Acne", "fr": "Acné" }, "score": 90, "grade": "A", "detail": { "en": "...", "fr": "..." } },
-    { "key": "hyperpigmentation", "label": { "en": "Dark Spots", "fr": "Taches" }, "score": 80, "grade": "A-", "detail": { "en": "...", "fr": "..." } },
-    { "key": "under_eye", "label": { "en": "Under-Eye", "fr": "Regard" }, "score": 65, "grade": "C", "detail": { "en": "...", "fr": "..." } },
-    { "key": "symmetry", "label": { "en": "Symmetry", "fr": "Symétrie" }, "score": 88, "grade": "A", "detail": { "en": "...", "fr": "..." } },
-    { "key": "harmony", "label": { "en": "Harmony", "fr": "Harmonie" }, "score": 85, "grade": "A", "detail": { "en": "...", "fr": "..." } }
+    { "label": "Hydration", "score": 80, "grade": "B", "detail": "..." },
+    { "label": "Pores", "score": 75, "grade": "B", "detail": "..." },
+    { "label": "Radiance", "score": 90, "grade": "A", "detail": "..." },
+    { "label": "Acne", "score": 95, "grade": "A", "detail": "..." },
+    { "label": "Dark Spots", "score": 85, "grade": "A", "detail": "..." },
+    { "label": "Under-Eye", "score": 70, "grade": "C", "detail": "..." },
+    { "label": "Symmetry", "score": 80, "grade": "B", "detail": "..." },
+    { "label": "Harmony", "score": 82, "grade": "B", "detail": "..." }
   ],
-  "strengths": [
-    { "title": { "en": "Title", "fr": "Titre" }, "desc": { "en": "Desc", "fr": "Description" } }
-  ],
-  "improvements": [
-    { "title": { "en": "Title", "fr": "Titre" }, "desc": { "en": "Desc", "fr": "Description" } }
-  ],
+  "strengths": [{ "title": "...", "desc": "..." }],
+  "improvements": [{ "title": "...", "desc": "..." }],
   "recommendations": [
-    { "category": { "en": "Routine", "fr": "Routine" }, "priority": "HIGH", "items": [ { "en": "Item", "fr": "Article" } ] }
+    { "category": "Morning Routine", "priority": "HIGH", "items": ["Item 1", "Item 2"] }
   ]
 }`;
 
 export default async function handler(req, res) {
-  // ── CORS ────────────────────────────────────────────────────────────────────
   if (applyCors(req, res)) return;
   if (req.method !== 'POST') return res.status(405).end();
 
   const ip = getClientIp(req);
   const supabase = createAdminClient();
 
-  // ── Rate limiting ───────────────────────────────────────────────────────────
-  const limited = await checkRateLimit(supabase, ip, 5);
-  if (limited) return res.status(429).json({ error: 'Too many requests.' });
+  const { userId, imageBase64, mimeType, lang, skinConcern, captchaToken } = req.body;
 
-  const { userId, imageBase64, mimeType, skinConcern, captchaToken } = req.body;
-
-  if (!userId) return res.status(400).json({ error: 'Invalid request.' });
-  const imageError = validateImage(imageBase64, mimeType);
-  if (imageError) return res.status(400).json({ error: imageError });
-
-  const cleanSkinConcern = sanitiseText(skinConcern, 500);
-
-  const captchaOk = await verifyCaptcha(captchaToken);
-  if (!captchaOk) return res.status(403).json({ error: 'Captcha failed.' });
-
-  const apiKey = process.env.ANTHROPIC_API_KEY;
-  if (!apiKey) return res.status(500).json({ error: 'Config error.' });
-
-  // ── Supabase: get or create user ────────────────────────────────────────────
-  let user;
   try {
-    const { data: existingUser, error: fetchError } = await supabase
-      .from('users')
-      .select('analyses_used, paid_credits')
-      .eq('id', userId)
-      .single();
+    const { data: user, error: userErr } = await supabase.from('users').select('*').eq('id', userId).single();
+    if (userErr && userErr.code !== 'PGRST116') throw userErr;
 
-    if (fetchError && fetchError.code === 'PGRST116') {
-      const { data: newUser, error: createError } = await supabase
-        .from('users')
-        .insert({ id: userId, analyses_used: 0, paid_credits: 0 })
-        .select('analyses_used, paid_credits')
-        .single();
-      if (createError) throw createError;
-      user = newUser;
-    } else if (fetchError) {
-      throw fetchError;
-    } else {
-      user = existingUser;
+    const limit = FREE_LIMIT + (user?.paid_credits || 0);
+    if (user && user.analyses_used >= limit) {
+      return res.status(402).json({ error: 'Quota exceeded' });
     }
-  } catch (dbErr) {
-    console.error('[analyze] DB error:', dbErr.message);
-    return res.status(500).json({ error: 'Database error. Please try again.' });
-  }
 
-  // ── Quota check ─────────────────────────────────────────────────────────────
-  const totalAllowed = FREE_LIMIT + (user.paid_credits || 0);
-  if (user.analyses_used >= totalAllowed) {
-    return res.status(402).json({
-      error: 'No analyses remaining.',
-      analysesUsed: user.analyses_used,
-      paidCredits: user.paid_credits,
-    });
-  }
-
-  // ── Call Claude ─────────────────────────────────────────────────────────────
-  let rawText;
-  try {
-    const anthropic = new Anthropic({ apiKey });
+    const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
     const message = await anthropic.messages.create({
       model: 'claude-3-haiku-20240307',
-      max_tokens: 2500,
+      max_tokens: 2000,
       system: [{ type: 'text', text: SYSTEM_PROMPT }],
       messages: [{
         role: 'user',
         content: [
           { type: 'image', source: { type: 'base64', media_type: mimeType, data: imageBase64 } },
-          { type: 'text', text: `Analyze the photo. User concern: ${cleanSkinConcern || 'none'}. Return dual-language JSON.` }
+          { type: 'text', text: `Analyze this skin. Response language: ${lang === 'fr' ? 'French' : 'English'}. Concern: ${skinConcern || 'none'}.` }
         ]
       }]
     });
-    rawText = message.content[0].text;
+
+    const raw = message.content[0].text;
+    const start = raw.indexOf('{');
+    const end = raw.lastIndexOf('}');
+    const data = JSON.parse(raw.substring(start, end + 1));
+
+    // Simple matching for products
+    const problemKeys = (data.metrics || [])
+      .filter(m => m.score < 80)
+      .map(m => {
+        const l = m.label.toLowerCase();
+        if (l.includes('hydrat')) return 'dryness';
+        if (l.includes('pore')) return 'pores';
+        if (l.includes('acne') || l.includes('blemish')) return 'acne';
+        return null;
+      }).filter(Boolean);
+
+    const { data: products } = await supabase.from('products').select('*').in('skin_problem', problemKeys.slice(0, 2));
+
+    await supabase.from('users').update({ analyses_used: (user?.analyses_used || 0) + 1 }).eq('id', userId);
+
+    return res.status(200).json({
+      data,
+      productRecommendations: products || [],
+      analysesUsed: (user?.analyses_used || 0) + 1,
+      paidCredits: user?.paid_credits || 0
+    });
+
   } catch (err) {
-    return res.status(500).json({ error: 'AI analysis failed.' });
-  }
-
-  // ── Parse JSON ──────────────────────────────────────────────────────────────
-  let analysisData;
-  try {
-    // Robust extraction: find the first { and last }
-    const start = rawText.indexOf('{');
-    const end = rawText.lastIndexOf('}');
-    if (start === -1 || end === -1) throw new Error('No JSON found');
-    const jsonStr = rawText.substring(start, end + 1);
-    analysisData = JSON.parse(jsonStr);
-  } catch (parseErr) {
-    console.error('[analyze] Parse error. Raw content:', rawText);
-    return res.status(500).json({ error: 'Could not parse analysis.' });
-  }
-
-  // ── Increment usage ─────────────────────────────────────────────────────────
-  const { error: updateError } = await supabase
-    .from('users')
-    .update({ analyses_used: user.analyses_used + 1, updated_at: new Date().toISOString() })
-    .eq('id', userId);
-  if (updateError) console.error('[analyze] usage update error (non-fatal):', updateError);
-
-  // ── Match weak metrics → products ───────────────────────────────────────────
-  function metricToProblem(key) {
-    const k = (key || '').toLowerCase();
-    if (['hydration', 'plumpness'].includes(k)) return 'dryness';
-    if (k === 'pores') return 'pores';
-    if (['acne', 'blemishes'].includes(k)) return 'acne';
-    if (['hyperpigmentation', 'dark_spots'].includes(k)) return 'hyperpigmentation';
-    if (['under_eye', 'fatigue'].includes(k)) return 'dark_circles';
-    if (['radiance', 'evenness'].includes(k)) return 'radiance';
-    if (k === 'texture') return 'texture';
-    return null;
-  }
-
-  const problemKeys = [...new Set(
-    (analysisData.metrics || [])
-      .filter(m => metricToProblem(m.key) && m.score < 80)
-      .sort((a, b) => a.score - b.score)
-      .slice(0, 3)
-      .map(m => metricToProblem(m.key))
-      .filter(Boolean)
-  )];
-
-  let productRecommendations = [];
-  if (problemKeys.length > 0) {
-    const { data: rows, error: productErr } = await supabase
-      .from('products')
-      .select('skin_problem, product_name, product_description, amazon_affiliate_link, sephora_affiliate_link, price_range')
-      .in('skin_problem', problemKeys);
-
-    if (productErr) {
       console.error('[analyze] products query error (non-fatal):', productErr);
     } else {
       productRecommendations = (rows || []).map(row => ({
