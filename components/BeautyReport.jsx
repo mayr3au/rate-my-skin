@@ -220,8 +220,8 @@ export default function BeautyReport({ data, products = [] }) {
           position: "absolute", inset: 0, pointerEvents: "none",
           background: "radial-gradient(ellipse 80% 100% at 50% -20%, rgba(0,0,0,0.03) 0%, transparent 100%)",
         }} />
-        <div style={{ maxWidth: 680, margin: "0 auto", position: "relative" }}>
-          <p style={{ margin: "0 0 5px", fontSize: 9.5, letterSpacing: "0.24em", textTransform: "uppercase", color: "#bbb", fontWeight: 600 }}>
+        <div className="mobile-padding" style={{ maxWidth: 680, margin: "0 auto", position: "relative" }}>
+          <p className="mobile-hide" style={{ margin: "0 0 5px", fontSize: 9.5, letterSpacing: "0.24em", textTransform: "uppercase", color: "#bbb", fontWeight: 600 }}>
             {t('aestheticAnalysis')}
           </p>
           <h1 style={{
@@ -242,12 +242,12 @@ export default function BeautyReport({ data, products = [] }) {
       <div style={{ maxWidth: 680, margin: "0 auto", padding: "0 20px" }}>
 
         {/* ── Hero score card ── */}
-        <div style={{
+        <div className="mobile-padding" style={{
           background: "#fff",
           border: "1px solid #ebebeb",
           borderRadius: 22,
           marginTop: 24,
-          padding: "32px",
+          padding: "24px",
           display: "flex", gap: 32,
           alignItems: "center", flexWrap: "wrap",
           boxShadow: "0 4px 32px rgba(0,0,0,0.07)",
@@ -325,6 +325,9 @@ export default function BeautyReport({ data, products = [] }) {
           border: "1px solid #ebebeb",
           borderRadius: 14, padding: 4,
           boxShadow: "0 2px 12px rgba(0,0,0,0.04)",
+          overflowX: "auto",
+          scrollbarWidth: "none",
+          WebkitOverflowScrolling: "touch",
         }}>
           {[
             { id: "analysis",  label: t('tabMetrics') },
@@ -342,6 +345,7 @@ export default function BeautyReport({ data, products = [] }) {
               fontSize: 10.5, fontWeight: 600, cursor: "pointer",
               letterSpacing: "0.08em", fontFamily: "'DM Sans', sans-serif",
               textTransform: "uppercase",
+              whiteSpace: "nowrap",
               transition: "all 0.3s cubic-bezier(0.4,0,0.2,1)",
               boxShadow: activeTab === tab.id ? "0 4px 20px rgba(0,0,0,0.15)" : "none",
             }}>{tab.label}</button>

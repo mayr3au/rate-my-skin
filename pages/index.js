@@ -413,6 +413,7 @@ export default function Home() {
         <title>Rate My Skin — AI Skin Analysis</title>
         <meta name="description" content="Upload a photo and get an AI-powered skin analysis in seconds." />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
       </Head>
 
       {/* ── Botanical decorations ── */}
@@ -560,23 +561,23 @@ export default function Home() {
       )}
 
       {/* ══════════════ HEADER ══════════════ */}
-      <header style={{
+      <header className="mobile-padding" style={{
         position: 'sticky', top: 0, zIndex: 100,
-        background: 'rgba(253,250,247,0.94)',
+        background: 'rgba(255,255,255,0.94)',
         backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)',
         borderBottom: `1px solid ${scrolled ? C.borderStrong : C.border}`,
-        padding: '13px 28px',
+        padding: '10px 28px',
         display: 'flex', alignItems: 'center', justifyContent: 'space-between',
         animation: 'slideDown 0.55s ease',
-        boxShadow: scrolled ? '0 6px 32px rgba(26,21,16,0.08)' : 'none',
-        transition: 'box-shadow 0.4s ease, border-color 0.4s ease',
+        boxShadow: scrolled ? '0 6px 32px rgba(0,0,0,0.06)' : 'none',
+        transition: 'all 0.4s ease',
       }}>
         <Logo />
         <div style={{ display: 'flex', alignItems: 'center', gap: 20 }}>
           <LangToggle />
           <div style={{ width: 1, height: 26, background: C.border }} />
           <div style={{ textAlign: 'right' }}>
-            <div style={{ fontSize: 9, color: C.textFaint, letterSpacing: '0.24em', textTransform: 'uppercase', fontWeight: 600, fontFamily: "'DM Sans', sans-serif", marginBottom: 2 }}>
+            <div className="mobile-hide" style={{ fontSize: 9, color: C.textFaint, letterSpacing: '0.24em', textTransform: 'uppercase', fontWeight: 600, fontFamily: "'DM Sans', sans-serif", marginBottom: 2 }}>
               {t('analysesLeft')}
             </div>
             <div style={{ fontSize: 24, fontFamily: "'Cormorant Garamond', serif", lineHeight: 1, color: remaining > 0 ? C.gold : C.textFaint, fontWeight: 300 }}>
@@ -587,7 +588,7 @@ export default function Home() {
       </header>
 
       {/* ══════════════ MAIN ══════════════ */}
-      <main style={{ maxWidth: 560, margin: '0 auto', padding: '60px 22px 96px', position: 'relative', zIndex: 1 }}>
+      <main className="mobile-padding" style={{ maxWidth: 560, margin: '0 auto', padding: '60px 22px 96px', position: 'relative', zIndex: 1 }}>
 
         {/* Payment success */}
         {paymentSuccess && (
@@ -664,7 +665,7 @@ export default function Home() {
           </h1>
 
           {/* Subtitle */}
-          <p style={{
+          <p className="mobile-compact-text" style={{
             ...appear(0.76),
             fontSize: 12.5, color: C.textLight, lineHeight: 1.8,
             maxWidth: 280, margin: '0 auto 44px',
@@ -752,30 +753,46 @@ export default function Home() {
                     <div style={{ flex: 1, height: 1, background: `linear-gradient(90deg, ${C.border}, transparent)` }}/>
                   </div>
 
-                  <div style={{ display: 'flex', gap: 10 }}>
-                    {[
-                      { label: t('uploadPhoto'), icon: <UploadIcon/>, hover: hoverUpload, setHover: setHoverUpload, ref: fileInputRef },
-                      { label: t('takeASelfie'), icon: <CameraIcon/>, hover: hoverSelfie, setHover: setHoverSelfie, ref: cameraInputRef },
-                    ].map(({ label, icon, hover, setHover, ref }) => (
-                      <button key={label}
-                        onClick={() => ref.current?.click()}
-                        onMouseEnter={() => setHover(true)}
-                        onMouseLeave={() => setHover(false)}
-                        style={{
-                          flex: 1, border: `1.5px solid ${hover ? C.dark : C.border}`,
-                          borderRadius: 14, padding: '14px 10px',
-                          fontSize: 13, fontWeight: 500,
-                          color: hover ? C.dark : C.textMid,
-                          cursor: 'pointer', fontFamily: "'DM Sans', sans-serif",
-                          background: hover ? C.surfaceAlt : C.surface,
-                          transition: 'all 0.22s ease',
-                          display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
-                          boxShadow: hover ? '0 4px 18px rgba(26,21,16,0.09)' : 'none',
-                        }}
-                      >
-                        {icon}{label}
-                      </button>
-                    ))}
+                  <div style={{ display: 'flex', gap: 12 }}>
+                    <button
+                      type="button"
+                      onClick={() => fileInputRef.current?.click()}
+                      onMouseEnter={() => setHoverUpload(true)}
+                      onMouseLeave={() => setHoverUpload(false)}
+                      style={{
+                        flex: 1, border: `1px solid ${hoverUpload ? C.gold : C.border}`,
+                        borderRadius: 14, padding: '16px 10px',
+                        fontSize: 13, fontWeight: 600,
+                        color: hoverUpload ? C.gold : C.textMid,
+                        cursor: 'pointer', fontFamily: "'DM Sans', sans-serif",
+                        background: hoverUpload ? C.surfaceAlt : C.surface,
+                        transition: 'all 0.3s ease',
+                        display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
+                        boxShadow: hoverUpload ? '0 4px 20px rgba(197, 160, 40, 0.12)' : 'none',
+                      }}
+                    >
+                      <UploadIcon />{t('uploadPhoto')}
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => cameraInputRef.current?.click()}
+                      onMouseEnter={() => setHoverSelfie(true)}
+                      onMouseLeave={() => setHoverSelfie(false)}
+                      style={{
+                        flex: 1, border: `1px solid ${hoverSelfie ? C.gold : C.border}`,
+                        borderRadius: 14, padding: '16px 10px',
+                        fontSize: 13, fontWeight: 600,
+                        color: hoverSelfie ? C.gold : C.textMid,
+                        cursor: 'pointer', fontFamily: "'DM Sans', sans-serif",
+                        background: hoverSelfie ? C.surfaceAlt : C.surface,
+                        transition: 'all 0.3s ease',
+                        display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
+                        boxShadow: hoverSelfie ? '0 4px 20px rgba(197, 160, 40, 0.12)' : 'none',
+                      }}
+                    >
+                      <CameraIcon />{t('takeASelfie')}
+                    </button>
                   </div>
                 </div>
               )}

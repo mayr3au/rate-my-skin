@@ -214,6 +214,7 @@ export default function Report() {
         <title>{t('reportTitle')}</title>
         <meta name="description" content={t('reportMetaDesc')} />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
       </Head>
 
       {/* Sticky frosted-glass nav */}

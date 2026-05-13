@@ -104,18 +104,17 @@ export default function Logo() {
         transition: 'transform 0.35s cubic-bezier(0.34,1.56,0.64,1)',
       }}
     >
-      <span style={{
+      <span className="logo-text-rate" style={{
         ...shimmerStyle,
         fontFamily: "'DM Sans', sans-serif",
         fontWeight: 500,
-        fontSize: 20,
         letterSpacing: hovered ? '0.06em' : '0.01em',
-        transition: 'letter-spacing 0.65s cubic-bezier(0.4,0,0.2,1)',
+        transition: 'all 0.65s cubic-bezier(0.4,0,0.2,1)',
       }}>
         RateMy
       </span>
 
-      <span style={{
+      <span className="logo-diamond" style={{
         fontSize: 6,
         lineHeight: 1,
         animation: 'pulse 3.5s ease-in-out infinite',
@@ -127,14 +126,13 @@ export default function Logo() {
         ◆
       </span>
 
-      <span style={{
+      <span className="logo-text-skin" style={{
         ...shimmerStyle,
         fontFamily: "'Cormorant Garamond', serif",
         fontWeight: 400,
         fontStyle: 'italic',
-        fontSize: 27,
         letterSpacing: hovered ? '0.05em' : '0.02em',
-        transition: 'letter-spacing 0.65s cubic-bezier(0.4,0,0.2,1)',
+        transition: 'all 0.65s cubic-bezier(0.4,0,0.2,1)',
       }}>
         Skin
       </span>

@@ -11,6 +11,13 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   color: #1A1510;
+  overflow-x: hidden;
+}
+
+@media (max-width: 600px) {
+  body {
+    background: #FDFBF7; /* Simpler background for mobile performance */
+  }
 }
 
 ::selection {
@@ -83,4 +90,20 @@ body {
 @keyframes logoShimmer {
   0%, 100% { background-position: 0% 50%; }
   50%       { background-position: 100% 50%; }
+}
+
+/* ── Logo sizes ── */
+.logo-text-rate { font-size: 20px; }
+.logo-text-skin { font-size: 27px; }
+
+/* ── Mobile Ergonomics ── */
+@media (max-width: 600px) {
+  .logo-text-rate { font-size: 16px; }
+  .logo-text-skin { font-size: 22px; }
+  .logo-diamond { font-size: 5px !important; }
+  
+  .mobile-hide { display: none !important; }
+  .mobile-padding { padding-left: 16px !important; padding-right: 16px !important; }
+  .mobile-compact-text { font-size: 0.9em !important; line-height: 1.5 !important; }
+  .mobile-small-title { font-size: 24px !important; }
 }
