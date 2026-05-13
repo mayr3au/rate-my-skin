@@ -5,10 +5,17 @@
 }
 
 body {
-  background: linear-gradient(150deg, #FDFAF7 0%, #F8F4EE 100%);
+  background: radial-gradient(circle at top left, #FFFFFF 0%, #FDFBF7 40%, #F8F3E9 100%);
+  background-attachment: fixed;
   min-height: 100vh;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  color: #1A1510;
+}
+
+::selection {
+  background: rgba(197, 160, 40, 0.2);
+  color: #1A1510;
 }
 
 ::-webkit-scrollbar { width: 4px; }
@@ -59,4 +66,21 @@ body {
 @keyframes trustIn {
   from { opacity: 0; transform: translateY(10px); }
   to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes bgBreath {
+  0%, 100% { background-position: 0% 0%; }
+  50%       { background-position: 100% 100%; }
+}
+@keyframes breathe {
+  0%, 100% { transform: scale(1);    opacity: 0.72; }
+  50%       { transform: scale(1.13); opacity: 1; }
+}
+@keyframes botanicalDrift {
+  0%, 100% { transform: translate(0px, 0px)   rotate(0deg); }
+  33%       { transform: translate(-4px, -6px) rotate(0.5deg); }
+  66%       { transform: translate(3px, 4px)   rotate(-0.4deg); }
+}
+@keyframes logoShimmer {
+  0%, 100% { background-position: 0% 50%; }
+  50%       { background-position: 100% 50%; }
 }

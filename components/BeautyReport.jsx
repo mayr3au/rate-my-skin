@@ -12,7 +12,7 @@ function ScoreRing({ score, size = 64 }) {
   const r = (size / 2) - 6;
   const circ = 2 * Math.PI * r;
   const dash = (animated / 100) * circ;
-  const color = score >= 78 ? "#0d0d0d" : score >= 65 ? "#555" : "#bbb";
+  const color = score >= 78 ? "#C5A028" : score >= 65 ? "#8A8580" : "#B5ADA4";
   return (
     <svg width={size} height={size} style={{ transform: "rotate(-90deg)" }}>
       <circle cx={size/2} cy={size/2} r={r} fill="none" stroke="#f0f0f0" strokeWidth="2.5"/>
@@ -57,11 +57,12 @@ function MetricCard({ m, index }) {
           </span>
           <span style={{
             fontSize: 10, fontWeight: 700, letterSpacing: "0.08em",
-            color: m.score >= 78 ? "#fff" : "#777",
+            color: m.score >= 78 ? "#fff" : "#8A8580",
             background: m.score >= 78
-              ? "linear-gradient(135deg, #0a0a0a, #2a2a2a)"
-              : "#f5f5f5",
-            borderRadius: 5, padding: "2px 9px",
+              ? "linear-gradient(135deg, #0F0F0F, #2A2A2A)"
+              : "#F8F8F5",
+            borderRadius: 6, padding: "3px 9px",
+            border: m.score >= 78 ? "none" : "1px solid #E8E4DA",
           }}>{m.grade}</span>
         </div>
         <p style={{ margin: 0, fontSize: 12, lineHeight: 1.7, color: "#777" }}>{m.detail}</p>
@@ -91,8 +92,8 @@ function ProductCard({ product, lang, t }) {
     return () => clearTimeout(timer);
   }, []);
 
-  const labelObj = PROBLEM_LABELS[product.skin_problem];
-  const label = labelObj ? (lang === 'fr' ? labelObj.fr : labelObj.en) : product.skin_problem;
+  const labelObj = PROBLEM_LABELS[product.problem_name];
+  const label = labelObj ? (lang === 'fr' ? labelObj.fr : labelObj.en) : product.problem_name;
 
   return (
     <div
@@ -130,7 +131,7 @@ function ProductCard({ product, lang, t }) {
 
       {/* Description */}
       <p style={{ margin: '0 0 18px', fontSize: 12.5, color: '#888', lineHeight: 1.75 }}>
-        {product.product_description}
+        {product.description}
       </p>
 
       {/* Price + CTA row */}
@@ -142,9 +143,9 @@ function ProductCard({ product, lang, t }) {
           {product.price_range}
         </span>
         <div style={{ display: 'flex', gap: 7 }}>
-          {product.amazon_affiliate_link && (
+          {product.affiliate_links?.amazon && (
             <a
-              href={product.amazon_affiliate_link}
+              href={product.affiliate_links.amazon}
               target="_blank" rel="noopener noreferrer"
               onMouseEnter={() => setBtnAmazonHov(true)}
               onMouseLeave={() => setBtnAmazonHov(false)}
@@ -164,9 +165,9 @@ function ProductCard({ product, lang, t }) {
               {t('buyAmazon')}
             </a>
           )}
-          {product.sephora_affiliate_link && (
+          {product.affiliate_links?.sephora && (
             <a
-              href={product.sephora_affiliate_link}
+              href={product.affiliate_links.sephora}
               target="_blank" rel="noopener noreferrer"
               onMouseEnter={() => setBtnSephoraHov(true)}
               onMouseLeave={() => setBtnSephoraHov(false)}
@@ -259,9 +260,10 @@ export default function BeautyReport({ data, products = [] }) {
               <span style={{
                 fontSize: 80, fontWeight: 300, lineHeight: 1,
                 fontFamily: "'Cormorant Garamond', serif",
-                background: "linear-gradient(160deg, #0d0d0d 0%, #3a3a3a 100%)",
+                background: "linear-gradient(160deg, #C5A028 0%, #E8C872 50%, #C5A028 100%)",
                 WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text",
                 color: "transparent",
+                textShadow: "0 2px 10px rgba(197, 160, 40, 0.15)",
               }}>
                 {overall}
               </span>
@@ -332,15 +334,16 @@ export default function BeautyReport({ data, products = [] }) {
             { id: "shop",      label: t('tabShop') },
           ].map(tab => (
             <button key={tab.id} onClick={() => setActiveTab(tab.id)} style={{
-              flex: 1, padding: "10px 4px", border: "none", borderRadius: 10,
+              flex: 1, padding: "12px 4px", border: "none", borderRadius: 10,
               background: activeTab === tab.id
-                ? "linear-gradient(135deg, #0a0a0a, #1f1f1f)"
+                ? "linear-gradient(135deg, #0F0F0F, #2A2A2A)"
                 : "transparent",
-              color: activeTab === tab.id ? "#fff" : "#aaa",
-              fontSize: 11, fontWeight: 600, cursor: "pointer",
-              letterSpacing: "0.07em", fontFamily: "'DM Sans', sans-serif",
-              transition: "all 0.22s ease",
-              boxShadow: activeTab === tab.id ? "0 2px 10px rgba(0,0,0,0.2)" : "none",
+              color: activeTab === tab.id ? "#fff" : "#8A8580",
+              fontSize: 10.5, fontWeight: 600, cursor: "pointer",
+              letterSpacing: "0.08em", fontFamily: "'DM Sans', sans-serif",
+              textTransform: "uppercase",
+              transition: "all 0.3s cubic-bezier(0.4,0,0.2,1)",
+              boxShadow: activeTab === tab.id ? "0 4px 20px rgba(0,0,0,0.15)" : "none",
             }}>{tab.label}</button>
           ))}
         </div>

@@ -1,7 +1,9 @@
 {
   "permissions": {
     "allow": [
-      "Bash(Copy-Item *)"
+      "Bash(Copy-Item *)",
+      "Bash(npm run *)",
+      "Bash(curl *)"
     ]
   }
 }

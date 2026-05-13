@@ -1,22 +1,25 @@
 import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/router';
 import Head from 'next/head';
-import Logo, { Droplet } from '../components/Logo';
+import Logo, { Flower } from '../components/Logo';
 import { useLang } from '../lib/LangContext';
 
-const FREE_LIMIT = 1;
+const FREE_LIMIT = 2;
 
 /* ── Warm palette ── */
+/* ── Luxury Gilded Palette ── */
 const C = {
-  dark:        '#1A1510',
-  bg:          '#FAF8F4',
-  surface:     '#FFFDF9',
-  surfaceAlt:  '#F6F2EC',
-  border:      '#EAE4DA',
-  borderStrong:'#D5CEC4',
-  textMid:     '#8A8078',
-  textLight:   '#B5ADA4',
-  textFaint:   '#C8C0B8',
+  dark:        '#0F0F0F',
+  gold:        '#C5A028',
+  goldLight:   '#D4B34B',
+  bg:          '#FFFFFF',
+  surface:     '#FFFFFF',
+  surfaceAlt:  '#FBF9F4',
+  border:      '#E8E4DA',
+  borderStrong:'#D8D0C4',
+  textMid:     '#5A5550',
+  textLight:   '#8A8580',
+  textFaint:   '#B5B0AA',
 };
 
 function getUserId() {
@@ -89,11 +92,12 @@ function LangToggle() {
 /* ── Botanical corner SVGs ── */
 function BotanicalBottomLeft() {
   return (
+    <div style={{ position: 'fixed', bottom: 0, left: 0, pointerEvents: 'none', zIndex: 0, animation: 'botanicalDrift 26s ease-in-out infinite' }}>
     <svg
       width="220" height="220"
       viewBox="0 0 220 220"
       fill="none"
-      style={{ position: 'fixed', bottom: 0, left: 0, pointerEvents: 'none', zIndex: 0, opacity: 0.055 }}
+      style={{ opacity: 0.055, display: 'block' }}
     >
       {/* Main stem */}
       <path d="M 5,215 C 30,185 55,160 70,125 C 82,98 88,78 92,55" stroke={C.dark} strokeWidth="1" strokeLinecap="round"/>
@@ -109,11 +113,13 @@ function BotanicalBottomLeft() {
       {/* Tiny leaf off stem */}
       <path d="M 58,144 C 45,138 42,128 50,126 C 54,132 57,139 58,144 Z" stroke={C.dark} strokeWidth="0.5" strokeLinejoin="round"/>
     </svg>
+    </div>
   );
 }
 
 function BotanicalTopRight() {
   return (
+    <div style={{ position: 'fixed', top: 0, right: 0, pointerEvents: 'none', zIndex: 0, animation: 'botanicalDrift 30s ease-in-out infinite reverse' }}>
     <svg
       width="220" height="220"
       viewBox="0 0 220 220"
@@ -132,15 +138,14 @@ function BotanicalTopRight() {
       <path d="M 172,48 C 178,38 188,40 185,50 C 179,50 175,49 172,48 Z" stroke={C.dark} strokeWidth="0.5" strokeLinejoin="round"/>
       <path d="M 143,88 C 133,82 130,72 140,72 C 141,79 142,85 143,88 Z" stroke={C.dark} strokeWidth="0.5" strokeLinejoin="round"/>
     </svg>
+    </div>
   );
 }
 
 /* ── Trust signal row ── */
 function TrustSignals({ t, visible }) {
   const signals = [
-    { num: t('trust1Num'), label: t('trust1Label') },
     { num: t('trust2Num'), label: t('trust2Label') },
-    { num: t('trust3Num'), label: t('trust3Label') },
   ];
   return (
     <div style={{
@@ -155,24 +160,25 @@ function TrustSignals({ t, visible }) {
             background: C.surface,
             border: `1px solid ${C.border}`,
             borderRadius: 16,
-            padding: '16px 14px',
+            padding: '20px 14px',
             textAlign: 'center',
-            boxShadow: '0 2px 14px rgba(26,21,16,0.05)',
+            boxShadow: '0 4px 24px rgba(0,0,0,0.03)',
             opacity: visible ? 1 : 0,
             transform: visible ? 'translateY(0)' : 'translateY(14px)',
-            transition: `opacity 0.7s ease ${0.58 + i * 0.12}s, transform 0.7s ease ${0.58 + i * 0.12}s`,
+            transition: `all 0.7s cubic-bezier(0.4,0,0.2,1) ${0.58 + i * 0.12}s`,
           }}
         >
           <div style={{
-            fontSize: 22, fontFamily: "'Cormorant Garamond', serif",
-            fontWeight: 400, color: C.dark, letterSpacing: '-0.01em',
+            fontSize: 24, fontFamily: "'Cormorant Garamond', serif",
+            fontWeight: 400, color: C.gold, letterSpacing: '-0.01em',
             marginBottom: 4, lineHeight: 1,
           }}>
             {num}
           </div>
           <div style={{
-            fontSize: 11, color: C.textMid, lineHeight: 1.5,
-            fontFamily: "'DM Sans', sans-serif", letterSpacing: '0.01em',
+            fontSize: 10, color: C.textMid, lineHeight: 1.5,
+            fontFamily: "'DM Sans', sans-serif", letterSpacing: '0.08em',
+            textTransform: 'uppercase', fontWeight: 500,
           }}>
             {label}
           </div>
@@ -196,20 +202,20 @@ function SkinConcernField({ value, onChange, placeholder }) {
         rows={3}
         style={{
           width: '100%',
-          border: `1.5px solid ${focused ? C.dark : C.border}`,
+          border: `1px solid ${focused ? C.gold : C.border}`,
           borderRadius: 16,
-          padding: '16px 18px',
-          fontSize: 13,
+          padding: '18px 20px',
+          fontSize: 13.5,
           fontFamily: "'DM Sans', sans-serif",
           color: C.dark,
           background: C.surface,
           outline: 'none',
           resize: 'none',
           lineHeight: 1.7,
-          transition: 'border-color 0.2s ease',
+          transition: 'all 0.3s ease',
           boxSizing: 'border-box',
           display: 'block',
-          boxShadow: focused ? `0 0 0 3px rgba(26,21,16,0.06)` : '0 1px 8px rgba(26,21,16,0.04)',
+          boxShadow: focused ? `0 0 0 4px rgba(197, 160, 40, 0.08)` : '0 2px 12px rgba(0,0,0,0.02)',
         }}
       />
     </div>
@@ -240,6 +246,8 @@ export default function Home() {
   const [zoneHover, setZoneHover] = useState(false);
   const [hoverUpload, setHoverUpload] = useState(false);
   const [hoverSelfie, setHoverSelfie] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+  const [ctaHovered, setCtaHovered] = useState(false);
   const [showEmailGate, setShowEmailGate] = useState(false);
   const [gateEmail, setGateEmail] = useState('');
   const [gateSubmitting, setGateSubmitting] = useState(false);
@@ -262,6 +270,12 @@ export default function Home() {
   };
 
   useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 12);
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
+
+  useEffect(() => {
     setMounted(true);
     setAnalysesUsed(parseInt(localStorage.getItem('rms_analyses_used') || '0'));
     setPaidCredits(parseInt(localStorage.getItem('rms_paid_credits') || '0'));
@@ -282,7 +296,6 @@ export default function Home() {
 
   const handleAnalyze = async () => {
     if (!file) return;
-    if (remaining <= 0) { setShowPaywall(true); return; }
     setLoading(true); setError(null);
     try {
       const compressed = await compressImage(file);
@@ -299,7 +312,7 @@ export default function Home() {
       localStorage.setItem('rms_paid_credits', String(json.paidCredits));
       setAnalysesUsed(json.analysesUsed); setPaidCredits(json.paidCredits);
       sessionStorage.setItem('rms_report', JSON.stringify(json.data));
-      sessionStorage.setItem('rms_products', JSON.stringify(json.products || []));
+      sessionStorage.setItem('rms_products', JSON.stringify(json.productRecommendations || []));
       if (json.analysesUsed === 1 && !localStorage.getItem('rms_email_captured')) {
         setShowEmailGate(true);
       } else {
@@ -362,16 +375,20 @@ export default function Home() {
 
   const darkBtn = (active = true) => ({
     background: active
-      ? `linear-gradient(135deg, ${C.dark} 0%, #2E2720 50%, ${C.dark} 100%)`
+      ? `linear-gradient(135deg, ${C.dark} 0%, #2A2A2A 50%, ${C.dark} 100%)`
       : C.border,
     backgroundSize: '200% 100%',
     animation: active ? 'shimmer 6s ease infinite' : 'none',
-    color: active ? '#FDF9F4' : C.textLight,
-    border: 'none', borderRadius: 14, fontWeight: 600,
-    fontFamily: "'DM Sans', sans-serif", letterSpacing: '0.07em',
+    color: active ? '#FFFFFF' : C.textLight,
+    border: active ? `1px solid rgba(197, 160, 40, 0.3)` : 'none',
+    borderRadius: 14, fontWeight: 600,
+    fontFamily: "'DM Sans', sans-serif",
+    letterSpacing: '0.08em',
+    textTransform: 'uppercase',
+    fontSize: 12,
     cursor: active ? 'pointer' : 'not-allowed',
-    boxShadow: active ? '0 6px 28px rgba(26,21,16,0.2)' : 'none',
-    transition: 'box-shadow 0.3s ease',
+    boxShadow: active ? '0 10px 40px rgba(0,0,0,0.12)' : 'none',
+    transition: 'all 0.3s cubic-bezier(0.4,0,0.2,1)',
   });
 
   const modalOverlay = {
@@ -422,7 +439,7 @@ export default function Home() {
                 pointerEvents: 'none',
               }}/>
             ))}
-            <Droplet width={60} height={93} animated={true} heroMode={true}/>
+            <Flower width={56} height={56} speed={7}/>
           </div>
           <div style={{ textAlign: 'center' }}>
             <p style={{
@@ -446,7 +463,7 @@ export default function Home() {
         <div style={modalOverlay}>
           <div style={modalCard}>
             <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 22 }}>
-              <Droplet width={28} height={43} animated={true}/>
+              <Flower width={38} height={38} speed={12}/>
             </div>
             <p style={{ fontSize: 9, letterSpacing: '0.3em', textTransform: 'uppercase', color: C.textFaint, fontWeight: 600, marginBottom: 14 }}>
               {t('reward')}
@@ -547,20 +564,22 @@ export default function Home() {
         position: 'sticky', top: 0, zIndex: 100,
         background: 'rgba(253,250,247,0.94)',
         backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)',
-        borderBottom: `1px solid ${C.border}`,
+        borderBottom: `1px solid ${scrolled ? C.borderStrong : C.border}`,
         padding: '13px 28px',
         display: 'flex', alignItems: 'center', justifyContent: 'space-between',
         animation: 'slideDown 0.55s ease',
+        boxShadow: scrolled ? '0 6px 32px rgba(26,21,16,0.08)' : 'none',
+        transition: 'box-shadow 0.4s ease, border-color 0.4s ease',
       }}>
         <Logo />
         <div style={{ display: 'flex', alignItems: 'center', gap: 20 }}>
           <LangToggle />
           <div style={{ width: 1, height: 26, background: C.border }} />
           <div style={{ textAlign: 'right' }}>
-            <div style={{ fontSize: 8.5, color: C.textFaint, letterSpacing: '0.2em', textTransform: 'uppercase', fontWeight: 600, fontFamily: "'DM Sans', sans-serif", marginBottom: 1 }}>
+            <div style={{ fontSize: 9, color: C.textFaint, letterSpacing: '0.24em', textTransform: 'uppercase', fontWeight: 600, fontFamily: "'DM Sans', sans-serif", marginBottom: 2 }}>
               {t('analysesLeft')}
             </div>
-            <div style={{ fontSize: 21, fontFamily: "'Cormorant Garamond', serif", lineHeight: 1, color: remaining > 0 ? C.dark : C.textFaint }}>
+            <div style={{ fontSize: 24, fontFamily: "'Cormorant Garamond', serif", lineHeight: 1, color: remaining > 0 ? C.gold : C.textFaint, fontWeight: 300 }}>
               {remaining}
             </div>
           </div>
@@ -592,9 +611,10 @@ export default function Home() {
             display: 'flex', justifyContent: 'center', marginBottom: 36,
             opacity: mounted ? 1 : 0, transition: 'opacity 1.1s ease 0.05s',
           }}>
-            <svg width="38" height="38" viewBox="0 0 38 38" fill="none" aria-hidden="true">
-              <circle cx="19" cy="19" r="17.5" stroke="#1A1510" strokeWidth="0.5"/>
-              <circle cx="19" cy="19" r="1.3" fill="#1A1510"/>
+            <svg width="38" height="38" viewBox="0 0 38 38" fill="none" aria-hidden="true"
+              style={{ animation: 'breathe 5s ease-in-out infinite' }}>
+              <circle cx="19" cy="19" r="17.5" stroke={C.gold} strokeWidth="0.5"/>
+              <circle cx="19" cy="19" r="1.3" fill={C.gold}/>
             </svg>
           </div>
 
@@ -714,7 +734,7 @@ export default function Home() {
                       margin: '0 auto 20px',
                       boxShadow: '0 4px 16px rgba(26,21,16,0.07)',
                     }}>
-                      <Droplet width={22} height={34} animated={true}/>
+                      <Flower width={26} height={26} speed={10}/>
                     </div>
                     <p style={{ fontSize: 15.5, color: C.dark, fontWeight: 500, marginBottom: 6, fontFamily: "'DM Sans', sans-serif" }}>
                       {t('dragDrop')}
@@ -788,10 +808,17 @@ export default function Home() {
           <button
             onClick={handleAnalyze}
             disabled={!file || loading}
+            onMouseEnter={() => setCtaHovered(true)}
+            onMouseLeave={() => setCtaHovered(false)}
             style={{
               ...darkBtn(!!file),
               width: '100%', padding: '18px',
               fontSize: 14, borderRadius: 14, marginBottom: 24,
+              transform: (ctaHovered && !!file) ? 'translateY(-3px)' : 'translateY(0)',
+              boxShadow: (ctaHovered && !!file)
+                ? '0 16px 48px rgba(26,21,16,0.32)'
+                : '0 6px 28px rgba(26,21,16,0.20)',
+              transition: 'transform 0.25s ease, box-shadow 0.25s ease',
             }}
           >
             {remaining <= 0 ? t('getMoreAnalyses') : t('analyseNow')}
