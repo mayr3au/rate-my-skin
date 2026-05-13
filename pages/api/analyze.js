@@ -79,8 +79,8 @@ Use this exact structure:
   "recommendations": [
     { "category": { "en": "Morning Routine", "fr": "Routine du Matin" }, "priority": "HIGH", "items": [ { "en": "...", "fr": "..." } ] },
     { "category": { "en": "Evening Routine", "fr": "Routine du Soir" }, "priority": "HIGH", "items": [ { "en": "...", "fr": "..." } ] },
-    { "category": { "en": "Treatments & Actives", "priority": "MEDIUM", "items": [ { "en": "...", "fr": "..." } ] },
-    { "category": { "en": "Lifestyle & Diet", "priority": "MEDIUM", "items": [ { "en": "...", "fr": "..." } ] }
+    { "category": { "en": "Treatments & Actives", "fr": "Traitements & Actifs" }, "priority": "MEDIUM", "items": [ { "en": "...", "fr": "..." } ] },
+    { "category": { "en": "Lifestyle & Diet", "fr": "Mode de Vie & Alimentation" }, "priority": "MEDIUM", "items": [ { "en": "...", "fr": "..." } ] }
   ]
 }`;
 
