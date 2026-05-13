@@ -4,7 +4,6 @@ import {
   applyCors, getClientIp,
   checkRateLimit, verifyCaptcha,
   validateImage, sanitiseText,
-  logSecurityEvent,
 } from '../../lib/security';
 
 export const config = {
@@ -47,18 +46,17 @@ export default async function handler(req, res) {
 
   const ip = getClientIp(req);
   const supabase = createAdminClient();
-
   const { userId, imageBase64, mimeType, lang, skinConcern, captchaToken } = req.body;
 
   try {
-    const { data: user, error: userErr } = await supabase.from('users').select('*').eq('id', userId).single();
-    if (userErr && userErr.code !== 'PGRST116') throw userErr;
-
+    // 1. Quota check
+    const { data: user } = await supabase.from('users').select('*').eq('id', userId).single();
     const limit = FREE_LIMIT + (user?.paid_credits || 0);
     if (user && user.analyses_used >= limit) {
       return res.status(402).json({ error: 'Quota exceeded' });
     }
 
+    // 2. Call Claude
     const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
     const message = await anthropic.messages.create({
       model: 'claude-3-haiku-20240307',
@@ -68,7 +66,7 @@ export default async function handler(req, res) {
         role: 'user',
         content: [
           { type: 'image', source: { type: 'base64', media_type: mimeType, data: imageBase64 } },
-          { type: 'text', text: `Analyze this skin. Response language: ${lang === 'fr' ? 'French' : 'English'}. Concern: ${skinConcern || 'none'}.` }
+          { type: 'text', text: `Analyze skin in ${lang === 'fr' ? 'French' : 'English'}. Concern: ${skinConcern || 'none'}.` }
         ]
       }]
     });
@@ -76,10 +74,10 @@ export default async function handler(req, res) {
     const raw = message.content[0].text;
     const start = raw.indexOf('{');
     const end = raw.lastIndexOf('}');
-    const data = JSON.parse(raw.substring(start, end + 1));
+    const analysisData = JSON.parse(raw.substring(start, end + 1));
 
-    // Simple matching for products
-    const problemKeys = (data.metrics || [])
+    // 3. Simple product matching
+    const problemKeys = (analysisData.metrics || [])
       .filter(m => m.score < 80)
       .map(m => {
         const l = m.label.toLowerCase();
@@ -91,36 +89,18 @@ export default async function handler(req, res) {
 
     const { data: products } = await supabase.from('products').select('*').in('skin_problem', problemKeys.slice(0, 2));
 
+    // 4. Update usage
     await supabase.from('users').update({ analyses_used: (user?.analyses_used || 0) + 1 }).eq('id', userId);
 
     return res.status(200).json({
-      data,
+      data: analysisData,
       productRecommendations: products || [],
       analysesUsed: (user?.analyses_used || 0) + 1,
       paidCredits: user?.paid_credits || 0
     });
 
   } catch (err) {
-      console.error('[analyze] products query error (non-fatal):', productErr);
-    } else {
-      productRecommendations = (rows || []).map(row => ({
-        problem_name: row.skin_problem,
-        product_name: row.product_name,
-        description: row.product_description,
-        price_range: row.price_range,
-        affiliate_links: {
-          amazon: row.amazon_affiliate_link,
-          sephora: row.sephora_affiliate_link
-        }
-      }));
-    }
+    console.error('[analyze] error:', err.message);
+    return res.status(500).json({ error: 'Analysis failed: ' + err.message });
   }
-
-  console.log('[analyze] done');
-  return res.status(200).json({
-    data: analysisData,
-    productRecommendations,
-    analysesUsed: user.analyses_used + 1,
-    paidCredits: user.paid_credits,
-  });
 }
