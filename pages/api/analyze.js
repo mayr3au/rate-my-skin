@@ -16,40 +16,71 @@ const FREE_LIMIT = 2;
 const SYSTEM_PROMPT = `You are an expert skin analyst and dermatology advisor.
 Analyze the uploaded face photo and respond ONLY with a valid JSON object.
 No markdown, no explanation, just raw JSON.
-Focus primarily on skin quality, condition, and health — not general facial aesthetics.
-The overall score should reflect skin health above all else.
+
+IMPORTANT: Provide ALL descriptive text fields in BOTH English ("en") and French ("fr").
+
 Use this exact structure:
 {
   "overall": <number 0-100>,
-  "summary": "<2 sentence honest summary focused on skin health and condition>",
-  "faceShape": "<e.g. Oval, Round, Square>",
-  "eyeColor": "<e.g. Brown, Blue-Grey>",
-  "skinTone": "<e.g. Fair / Fitzpatrick Type II>",
+  "summary": { "en": "...", "fr": "..." },
+  "faceShape": { "en": "...", "fr": "..." },
+  "eyeColor": { "en": "...", "fr": "..." },
+  "skinTone": { "en": "...", "fr": "..." },
   "metrics": [
-    { "label": "Skin Hydration & Plumpness", "score": <0-100>, "grade": "<A/B/C+/etc>", "detail": "<1-2 sentence analysis of moisture levels, plumpness, and dehydration signs>" },
-    { "label": "Pore Size & Texture", "score": <0-100>, "grade": "...", "detail": "<assess visible pore size, skin texture smoothness, and roughness>" },
-    { "label": "Evenness & Radiance", "score": <0-100>, "grade": "...", "detail": "<assess skin tone uniformity, glow, and dullness>" },
-    { "label": "Blemishes & Acne", "score": <0-100>, "grade": "...", "detail": "<assess active breakouts, blackheads, scarring from acne>" },
-    { "label": "Dark Spots & Hyperpigmentation", "score": <0-100>, "grade": "...", "detail": "<assess sun spots, post-inflammatory marks, melasma, or uneven pigmentation>" },
-    { "label": "Under-Eye & Fatigue Signs", "score": <0-100>, "grade": "...", "detail": "<assess dark circles, puffiness, fine lines under eyes, and signs of tiredness>" },
-    { "label": "Facial Symmetry", "score": <0-100>, "grade": "...", "detail": "<secondary metric: brief assessment of facial symmetry>" },
-    { "label": "Overall Harmony", "score": <0-100>, "grade": "...", "detail": "<secondary metric: brief assessment of facial balance and proportion>" }
+    { 
+      "key": "hydration",
+      "label": { "en": "Skin Hydration & Plumpness", "fr": "Hydratation & Rebond de la peau" },
+      "score": <0-100>, 
+      "grade": "...", 
+      "detail": { "en": "...", "fr": "..." }
+    },
+    { 
+      "key": "pores",
+      "label": { "en": "Pore Size & Texture", "fr": "Taille des Pores & Texture" },
+      "score": <0-100>, "grade": "...", "detail": { "en": "...", "fr": "..." } 
+    },
+    { 
+      "key": "radiance",
+      "label": { "en": "Evenness & Radiance", "fr": "Uniformité & Éclat" },
+      "score": <0-100>, "grade": "...", "detail": { "en": "...", "fr": "..." } 
+    },
+    { 
+      "key": "acne",
+      "label": { "en": "Blemishes & Acne", "fr": "Imperfections & Acné" },
+      "score": <0-100>, "grade": "...", "detail": { "en": "...", "fr": "..." } 
+    },
+    { 
+      "key": "hyperpigmentation",
+      "label": { "en": "Dark Spots & Hyperpigmentation", "fr": "Taches Brunes & Hyperpigmentation" },
+      "score": <0-100>, "grade": "...", "detail": { "en": "...", "fr": "..." } 
+    },
+    { 
+      "key": "under_eye",
+      "label": { "en": "Under-Eye & Fatigue Signs", "fr": "Regard & Signes de Fatigue" },
+      "score": <0-100>, "grade": "...", "detail": { "en": "...", "fr": "..." } 
+    },
+    { 
+      "key": "symmetry",
+      "label": { "en": "Facial Symmetry", "fr": "Symétrie Faciale" },
+      "score": <0-100>, "grade": "...", "detail": { "en": "...", "fr": "..." } 
+    },
+    { 
+      "key": "harmony",
+      "label": { "en": "Overall Harmony", "fr": "Harmonie Globale" },
+      "score": <0-100>, "grade": "...", "detail": { "en": "...", "fr": "..." } 
+    }
   ],
   "strengths": [
-    { "title": "...", "desc": "..." },
-    { "title": "...", "desc": "..." },
-    { "title": "...", "desc": "..." }
+    { "title": { "en": "...", "fr": "..." }, "desc": { "en": "...", "fr": "..." } }
   ],
   "improvements": [
-    { "title": "...", "desc": "..." },
-    { "title": "...", "desc": "..." },
-    { "title": "...", "desc": "..." }
+    { "title": { "en": "...", "fr": "..." }, "desc": { "en": "...", "fr": "..." } }
   ],
   "recommendations": [
-    { "category": "Morning Routine", "priority": "HIGH", "items": ["<specific product type or ingredient, e.g. Vitamin C serum>", "<SPF 30-50 broad-spectrum sunscreen>", "..."] },
-    { "category": "Evening Routine", "priority": "HIGH", "items": ["<e.g. gentle double cleanse>", "<e.g. retinol or retinoid>", "..."] },
-    { "category": "Treatments & Actives", "priority": "MEDIUM", "items": ["<e.g. AHA/BHA exfoliant 2x per week>", "<targeted serum for identified concern>", "..."] },
-    { "category": "Lifestyle & Diet", "priority": "MEDIUM", "items": ["<e.g. increase water intake>", "<e.g. reduce sugar for acne>", "..."] }
+    { "category": { "en": "Morning Routine", "fr": "Routine du Matin" }, "priority": "HIGH", "items": [ { "en": "...", "fr": "..." } ] },
+    { "category": { "en": "Evening Routine", "fr": "Routine du Soir" }, "priority": "HIGH", "items": [ { "en": "...", "fr": "..." } ] },
+    { "category": { "en": "Treatments & Actives", "priority": "MEDIUM", "items": [ { "en": "...", "fr": "..." } ] },
+    { "category": { "en": "Lifestyle & Diet", "priority": "MEDIUM", "items": [ { "en": "...", "fr": "..." } ] }
   ]
 }`;
 
@@ -158,7 +189,7 @@ export default async function handler(req, res) {
             type: 'text',
             text: [
               'Analyze this face photo and return the JSON report.',
-              `Write ALL text fields in ${lang === 'fr' ? 'French' : 'English'}.`,
+              'Fill ALL descriptive text fields in BOTH English ("en") and French ("fr") as per the schema.',
               cleanSkinConcern
                 ? `The user's stated skin concern is: "${cleanSkinConcern}". Factor this throughout your analysis: reference it explicitly in the summary, weight the most relevant metrics accordingly, and make sure the improvements and recommendations directly address this concern.`
                 : '',
@@ -193,24 +224,24 @@ export default async function handler(req, res) {
   if (updateError) console.error('[analyze] usage update error (non-fatal):', updateError);
 
   // ── Match weak metrics → products ───────────────────────────────────────────
-  function metricToProblem(label) {
-    const l = label.toLowerCase();
-    if (l.includes('hydrat') || l.includes('plump')) return 'dryness';
-    if (l.includes('pore'))                           return 'pores';
-    if (l.includes('acne') || l.includes('blemish')) return 'acne';
-    if (l.includes('dark spot') || l.includes('hyperpigment') || l.includes('pigment')) return 'hyperpigmentation';
-    if (l.includes('under-eye') || l.includes('fatigue') || l.includes('dark circle')) return 'dark_circles';
-    if (l.includes('radianc') || l.includes('even')) return 'radiance';
-    if (l.includes('texture'))                        return 'texture';
+  function metricToProblem(key) {
+    const k = (key || '').toLowerCase();
+    if (['hydration', 'plumpness'].includes(k)) return 'dryness';
+    if (k === 'pores')                          return 'pores';
+    if (['acne', 'blemishes'].includes(k))      return 'acne';
+    if (['hyperpigmentation', 'dark_spots'].includes(k)) return 'hyperpigmentation';
+    if (['under_eye', 'fatigue'].includes(k))   return 'dark_circles';
+    if (['radiance', 'evenness'].includes(k))   return 'radiance';
+    if (k === 'texture')                        return 'texture';
     return null;
   }
 
   const problemKeys = [...new Set(
     (analysisData.metrics || [])
-      .filter(m => metricToProblem(m.label) && m.score < 80)
+      .filter(m => metricToProblem(m.key) && m.score < 80)
       .sort((a, b) => a.score - b.score)
       .slice(0, 3)
-      .map(m => metricToProblem(m.label))
+      .map(m => metricToProblem(m.key))
       .filter(Boolean)
   )];
 

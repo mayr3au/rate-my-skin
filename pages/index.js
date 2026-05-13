@@ -590,6 +590,12 @@ export default function Home() {
       {/* ══════════════ MAIN ══════════════ */}
       <main className="mobile-padding" style={{ maxWidth: 560, margin: '0 auto', padding: '60px 22px 96px', position: 'relative', zIndex: 1 }}>
 
+        {/* Hidden inputs moved to top level for reliability */}
+        <input ref={fileInputRef} type="file" accept="image/*" style={{ display: 'none' }}
+          onChange={(e) => handleFile(e.target.files[0])}/>
+        <input ref={cameraInputRef} type="file" accept="image/*" capture="user" style={{ display: 'none' }}
+          onChange={(e) => handleFile(e.target.files[0])}/>
+
         {/* Payment success */}
         {paymentSuccess && (
           <div style={{
@@ -701,11 +707,6 @@ export default function Home() {
                 overflow: 'hidden', transition: 'background 0.2s ease',
               }}
             >
-              <input ref={fileInputRef} type="file" accept="image/*" style={{ display: 'none' }}
-                onChange={(e) => handleFile(e.target.files[0])}/>
-              <input ref={cameraInputRef} type="file" accept="image/*" capture="user" style={{ display: 'none' }}
-                onChange={(e) => handleFile(e.target.files[0])}/>
-
               {preview ? (
                 <div style={{ padding: '26px', textAlign: 'center' }}>
                   <div style={{ borderRadius: 18, overflow: 'hidden', display: 'inline-block', boxShadow: '0 10px 40px rgba(26,21,16,0.12)', marginBottom: 20 }}>
@@ -756,7 +757,7 @@ export default function Home() {
                   <div style={{ display: 'flex', gap: 12 }}>
                     <button
                       type="button"
-                      onClick={() => fileInputRef.current?.click()}
+                      onClick={(e) => { e.stopPropagation(); fileInputRef.current?.click(); }}
                       onMouseEnter={() => setHoverUpload(true)}
                       onMouseLeave={() => setHoverUpload(false)}
                       style={{
@@ -776,7 +777,7 @@ export default function Home() {
 
                     <button
                       type="button"
-                      onClick={() => cameraInputRef.current?.click()}
+                      onClick={(e) => { e.stopPropagation(); cameraInputRef.current?.click(); }}
                       onMouseEnter={() => setHoverSelfie(true)}
                       onMouseLeave={() => setHoverSelfie(false)}
                       style={{

@@ -53,7 +53,7 @@ function MetricCard({ m, index }) {
       <div style={{ flex: 1 }}>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 7 }}>
           <span style={{ fontSize: 10.5, fontWeight: 600, letterSpacing: "0.13em", textTransform: "uppercase", color: "#1a1a1a" }}>
-            {m.label}
+            {m.label[lang] || m.label.en || m.label}
           </span>
           <span style={{
             fontSize: 10, fontWeight: 700, letterSpacing: "0.08em",
@@ -65,7 +65,9 @@ function MetricCard({ m, index }) {
             border: m.score >= 78 ? "none" : "1px solid #E8E4DA",
           }}>{m.grade}</span>
         </div>
-        <p style={{ margin: 0, fontSize: 12, lineHeight: 1.7, color: "#777" }}>{m.detail}</p>
+        <p style={{ margin: 0, fontSize: 12, lineHeight: 1.7, color: "#777" }}>
+          {m.detail[lang] || m.detail.en || m.detail}
+        </p>
       </div>
     </div>
   );
@@ -281,14 +283,14 @@ export default function BeautyReport({ data, products = [] }) {
             </div>
 
             <p style={{ margin: "0 0 18px", fontSize: 15.5, lineHeight: 1.8, color: "#666", fontStyle: "italic", fontFamily: "'Cormorant Garamond', serif" }}>
-              {summary}
+              {summary[lang] || summary.en || summary}
             </p>
 
             <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
               {[
-                { k: t('faceShape'), v: faceShape },
-                { k: t('eyeColor'), v: eyeColor },
-                { k: t('skinTone'), v: skinTone },
+                { k: t('faceShape'), v: faceShape[lang] || faceShape.en || faceShape },
+                { k: t('eyeColor'), v: eyeColor[lang] || eyeColor.en || eyeColor },
+                { k: t('skinTone'), v: skinTone[lang] || skinTone.en || skinTone },
               ].map(tag => (
                 <div key={tag.k} style={{
                   background: "linear-gradient(135deg, #f8f8f8, #f2f2f2)",
@@ -304,15 +306,17 @@ export default function BeautyReport({ data, products = [] }) {
 
           {/* Score rings — top 3 */}
           <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
-            {(metrics || []).slice(0, 3).map(m => (
-              <div key={m.label} style={{ display: "flex", alignItems: "center", gap: 14 }}>
+              {(metrics || []).slice(0, 3).map(m => (
+              <div key={m.key || m.label} style={{ display: "flex", alignItems: "center", gap: 14 }}>
                 <div style={{ position: "relative" }}>
                   <ScoreRing score={m.score} size={50}/>
                   <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center" }}>
                     <span style={{ fontSize: 11, fontWeight: 700, color: "#1a1a1a" }}>{m.score}</span>
                   </div>
                 </div>
-                <span style={{ fontSize: 11, color: "#888", width: 110, lineHeight: 1.4 }}>{m.label}</span>
+                <span style={{ fontSize: 11, color: "#888", width: 110, lineHeight: 1.4 }}>
+                  {m.label[lang] || m.label.en || m.label}
+                </span>
               </div>
             ))}
           </div>
@@ -357,7 +361,7 @@ export default function BeautyReport({ data, products = [] }) {
 
           {activeTab === "analysis" && (
             <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-              {(metrics || []).map((m, i) => <MetricCard key={m.label} m={m} index={i}/>)}
+              {(metrics || []).map((m, i) => <MetricCard key={m.key || i} m={m} index={i}/>)}
               <div style={{
                 background: "#fff", border: "1px solid #ebebeb", borderRadius: 14,
                 padding: "16px 22px", display: "flex", gap: 20, flexWrap: "wrap",
@@ -392,8 +396,12 @@ export default function BeautyReport({ data, products = [] }) {
                     boxShadow: "0 2px 10px rgba(0,0,0,0.2)",
                   }}>{ICONS[i] || "✦"}</div>
                   <div>
-                    <div style={{ fontSize: 12, fontWeight: 600, color: "#0d0d0d", marginBottom: 7, letterSpacing: "0.05em" }}>{s.title}</div>
-                    <p style={{ margin: 0, fontSize: 13, lineHeight: 1.75, color: "#777" }}>{s.desc}</p>
+                    <div style={{ fontSize: 12, fontWeight: 600, color: "#0d0d0d", marginBottom: 7, letterSpacing: "0.05em" }}>
+                      {s.title[lang] || s.title.en || s.title}
+                    </div>
+                    <p style={{ margin: 0, fontSize: 13, lineHeight: 1.75, color: "#777" }}>
+                      {s.desc[lang] || s.desc.en || s.desc}
+                    </p>
                   </div>
                 </div>
               ))}
@@ -417,8 +425,12 @@ export default function BeautyReport({ data, products = [] }) {
                     fontFamily: "'Cormorant Garamond', serif",
                   }}>{i + 1}</div>
                   <div>
-                    <div style={{ fontSize: 12, fontWeight: 600, color: "#0d0d0d", marginBottom: 7, letterSpacing: "0.05em" }}>{s.title}</div>
-                    <p style={{ margin: 0, fontSize: 13, lineHeight: 1.75, color: "#777" }}>{s.desc}</p>
+                    <div style={{ fontSize: 12, fontWeight: 600, color: "#0d0d0d", marginBottom: 7, letterSpacing: "0.05em" }}>
+                      {s.title[lang] || s.title.en || s.title}
+                    </div>
+                    <p style={{ margin: 0, fontSize: 13, lineHeight: 1.75, color: "#777" }}>
+                      {s.desc[lang] || s.desc.en || s.desc}
+                    </p>
                   </div>
                 </div>
               ))}
@@ -434,7 +446,9 @@ export default function BeautyReport({ data, products = [] }) {
                   boxShadow: "0 1px 8px rgba(0,0,0,0.04)",
                 }}>
                   <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
-                    <span style={{ fontSize: 11.5, fontWeight: 600, letterSpacing: "0.1em", textTransform: "uppercase", color: "#0d0d0d" }}>{r.category}</span>
+                    <span style={{ fontSize: 11.5, fontWeight: 600, letterSpacing: "0.1em", textTransform: "uppercase", color: "#0d0d0d" }}>
+                      {r.category[lang] || r.category.en || r.category}
+                    </span>
                     <span style={{
                       fontSize: 9, fontWeight: 700, letterSpacing: "0.14em",
                       color: r.priority === "HIGH" ? "#fff" : "#777",
@@ -448,7 +462,9 @@ export default function BeautyReport({ data, products = [] }) {
                     {(r.items || []).map((item, j) => (
                       <div key={j} style={{ display: "flex", gap: 12, alignItems: "flex-start" }}>
                         <div style={{ width: 4, height: 4, borderRadius: "50%", background: "#ccc", flexShrink: 0, marginTop: 7 }}/>
-                        <span style={{ fontSize: 13, color: "#666", lineHeight: 1.6 }}>{item}</span>
+                        <span style={{ fontSize: 13, color: "#666", lineHeight: 1.6 }}>
+                          {item[lang] || item.en || item}
+                        </span>
                       </div>
                     ))}
                   </div>
