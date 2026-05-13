@@ -79,14 +79,41 @@ export default async function handler(req, res) {
   const apiKey = process.env.ANTHROPIC_API_KEY;
   if (!apiKey) return res.status(500).json({ error: 'Config error.' });
 
-  let { data: user, error: fetchError } = await supabase.from('users').select('*').eq('id', userId).single();
-  if (!user) {
-    const { data: n } = await supabase.from('users').insert({ id: userId }).select().single();
-    user = n;
+  // ── Supabase: get or create user ────────────────────────────────────────────
+  let user;
+  try {
+    const { data: existingUser, error: fetchError } = await supabase
+      .from('users')
+      .select('analyses_used, paid_credits')
+      .eq('id', userId)
+      .single();
+
+    if (fetchError && fetchError.code === 'PGRST116') {
+      const { data: newUser, error: createError } = await supabase
+        .from('users')
+        .insert({ id: userId, analyses_used: 0, paid_credits: 0 })
+        .select('analyses_used, paid_credits')
+        .single();
+      if (createError) throw createError;
+      user = newUser;
+    } else if (fetchError) {
+      throw fetchError;
+    } else {
+      user = existingUser;
+    }
+  } catch (dbErr) {
+    console.error('[analyze] DB error:', dbErr.message);
+    return res.status(500).json({ error: 'Database error. Please try again.' });
   }
 
-  if (user.analyses_used >= (FREE_LIMIT + user.paid_credits)) {
-    return res.status(402).json({ error: 'Quota exceeded' });
+  // ── Quota check ─────────────────────────────────────────────────────────────
+  const totalAllowed = FREE_LIMIT + (user.paid_credits || 0);
+  if (user.analyses_used >= totalAllowed) {
+    return res.status(402).json({
+      error: 'No analyses remaining.',
+      analysesUsed: user.analyses_used,
+      paidCredits: user.paid_credits,
+    });
   }
 
   // ── Call Claude ─────────────────────────────────────────────────────────────
@@ -135,12 +162,12 @@ export default async function handler(req, res) {
   function metricToProblem(key) {
     const k = (key || '').toLowerCase();
     if (['hydration', 'plumpness'].includes(k)) return 'dryness';
-    if (k === 'pores')                          return 'pores';
-    if (['acne', 'blemishes'].includes(k))      return 'acne';
+    if (k === 'pores') return 'pores';
+    if (['acne', 'blemishes'].includes(k)) return 'acne';
     if (['hyperpigmentation', 'dark_spots'].includes(k)) return 'hyperpigmentation';
-    if (['under_eye', 'fatigue'].includes(k))   return 'dark_circles';
-    if (['radiance', 'evenness'].includes(k))   return 'radiance';
-    if (k === 'texture')                        return 'texture';
+    if (['under_eye', 'fatigue'].includes(k)) return 'dark_circles';
+    if (['radiance', 'evenness'].includes(k)) return 'radiance';
+    if (k === 'texture') return 'texture';
     return null;
   }
 
@@ -159,7 +186,7 @@ export default async function handler(req, res) {
       .from('products')
       .select('skin_problem, product_name, product_description, amazon_affiliate_link, sephora_affiliate_link, price_range')
       .in('skin_problem', problemKeys);
-    
+
     if (productErr) {
       console.error('[analyze] products query error (non-fatal):', productErr);
     } else {
