@@ -3,10 +3,39 @@ import { useRouter } from 'next/router';
 import Head from 'next/head';
 import BeautyReport from '../components/BeautyReport';
 import Logo from '../components/Logo';
+import { useLang } from '../lib/LangContext';
+
+function LangToggle() {
+  const { lang, setLang } = useLang();
+  return (
+    <div style={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+      {['en', 'fr'].map((l, i) => (
+        <span key={l} style={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+          {i > 0 && <span style={{ color: '#ddd', fontSize: 11, lineHeight: 1 }}>|</span>}
+          <button
+            onClick={() => setLang(l)}
+            style={{
+              background: 'none', border: 'none',
+              fontSize: 11, fontWeight: lang === l ? 700 : 400,
+              color: lang === l ? '#0d0d0d' : '#bbb',
+              cursor: 'pointer', padding: '2px 5px',
+              fontFamily: "'DM Sans', sans-serif",
+              letterSpacing: '0.1em',
+              textTransform: 'uppercase',
+            }}
+          >
+            {l.toUpperCase()}
+          </button>
+        </span>
+      ))}
+    </div>
+  );
+}
 
 function NewsletterSection() {
+  const { t } = useLang();
   const [email, setEmail] = useState('');
-  const [status, setStatus] = useState(null); // null | 'loading' | 'success' | 'error'
+  const [status, setStatus] = useState(null);
   const [message, setMessage] = useState('');
   const [focused, setFocused] = useState(false);
 
@@ -21,13 +50,13 @@ function NewsletterSection() {
       });
       const data = await res.json();
       if (!res.ok) {
-        setMessage(data.error || 'Something went wrong.');
+        setMessage(data.error || t('somethingWentWrong'));
         setStatus('error');
       } else {
         setStatus('success');
       }
     } catch {
-      setMessage('Something went wrong. Please try again.');
+      setMessage(t('somethingWentWrong'));
       setStatus('error');
     }
   };
@@ -46,7 +75,7 @@ function NewsletterSection() {
           fontSize: 9.5, letterSpacing: '0.24em', textTransform: 'uppercase',
           color: '#ccc', fontWeight: 600, marginBottom: 14,
         }}>
-          Free · Weekly
+          {t('freeWeekly')}
         </p>
 
         <h2 style={{
@@ -54,14 +83,14 @@ function NewsletterSection() {
           fontFamily: "'Cormorant Garamond', serif",
           marginBottom: 12, letterSpacing: '0.01em',
         }}>
-          Get weekly skin tips
+          {t('weeklyTipsTitle')}
         </h2>
 
         <p style={{
           fontSize: 13, color: '#aaa', lineHeight: 1.8,
           maxWidth: 320, margin: '0 auto 32px',
         }}>
-          Evidence-based skincare, grooming, and aesthetic insights — straight to your inbox.
+          {t('weeklyTipsDesc')}
         </p>
 
         {status === 'success' ? (
@@ -75,7 +104,7 @@ function NewsletterSection() {
               fontSize: 15, color: '#0d0d0d',
               fontFamily: "'Cormorant Garamond', serif", fontWeight: 400,
             }}>
-              You're in. Weekly tips coming your way.
+              {t('subscribed')}
             </p>
           </div>
         ) : (
@@ -121,7 +150,7 @@ function NewsletterSection() {
                 letterSpacing: '0.04em',
               }}
             >
-              {status === 'loading' ? '…' : 'Subscribe →'}
+              {status === 'loading' ? t('subscribeLoading') : t('subscribe')}
             </button>
           </form>
         )}
@@ -131,7 +160,7 @@ function NewsletterSection() {
         )}
 
         <p style={{ fontSize: 11, color: '#ddd', marginTop: 20 }}>
-          No spam. Unsubscribe anytime.
+          {t('noSpam')}
         </p>
       </div>
     </div>
@@ -140,7 +169,9 @@ function NewsletterSection() {
 
 export default function Report() {
   const router = useRouter();
+  const { t } = useLang();
   const [data, setData] = useState(null);
+  const [products, setProducts] = useState([]);
   const [notFound, setNotFound] = useState(false);
 
   useEffect(() => {
@@ -148,6 +179,8 @@ export default function Report() {
     if (!stored) { setNotFound(true); return; }
     try {
       setData(JSON.parse(stored));
+      const storedProducts = sessionStorage.getItem('rms_products');
+      if (storedProducts) setProducts(JSON.parse(storedProducts));
     } catch {
       setNotFound(true);
     }
@@ -160,7 +193,7 @@ export default function Report() {
         justifyContent: 'center', minHeight: '100vh',
         fontFamily: "'DM Sans', sans-serif", gap: 16,
       }}>
-        <p style={{ fontSize: 14, color: '#aaa' }}>No report found.</p>
+        <p style={{ fontSize: 14, color: '#aaa' }}>{t('noReportFound')}</p>
         <button
           onClick={() => router.push('/')}
           style={{
@@ -169,7 +202,7 @@ export default function Report() {
             fontWeight: 600, cursor: 'pointer', fontFamily: "'DM Sans', sans-serif",
           }}
         >
-          Start New Analysis
+          {t('startNewAnalysis')}
         </button>
       </div>
     );
@@ -178,35 +211,40 @@ export default function Report() {
   return (
     <>
       <Head>
-        <title>Your Facial Report — Rate My Skin</title>
-        <meta name="description" content="Your AI-powered facial aesthetics report from Rate My Skin." />
+        <title>{t('reportTitle')}</title>
+        <meta name="description" content={t('reportMetaDesc')} />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
       </Head>
 
       {/* Sticky frosted-glass nav */}
       <div style={{
         position: 'sticky', top: 0, zIndex: 100,
-        background: 'rgba(250,250,250,0.88)',
-        backdropFilter: 'blur(12px)',
-        WebkitBackdropFilter: 'blur(12px)',
-        borderBottom: '1px solid #ebebeb',
-        padding: '14px 24px',
+        background: 'rgba(247,247,245,0.92)',
+        backdropFilter: 'blur(18px)',
+        WebkitBackdropFilter: 'blur(18px)',
+        borderBottom: '1px solid rgba(0,0,0,0.07)',
+        padding: '13px 26px',
         display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+        animation: 'slideDown 0.55s ease',
       }}>
         <Logo />
-        <button
-          onClick={() => router.push('/')}
-          style={{
-            background: 'none', border: '1px solid #e0e0e0', borderRadius: 8,
-            padding: '8px 16px', fontSize: 12, color: '#666', cursor: 'pointer',
-            fontFamily: "'DM Sans', sans-serif", fontWeight: 500,
-          }}
-        >
-          ← New Analysis
-        </button>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+          <LangToggle />
+          <button
+            onClick={() => router.push('/')}
+            style={{
+              background: 'none', border: '1px solid #E8E8E4', borderRadius: 10,
+              padding: '9px 18px', fontSize: 12, color: '#888', cursor: 'pointer',
+              fontFamily: "'DM Sans', sans-serif", fontWeight: 500,
+              letterSpacing: '0.02em',
+            }}
+          >
+            {t('newAnalysis')}
+          </button>
+        </div>
       </div>
 
-      <BeautyReport data={data} />
+      <BeautyReport data={data} products={products} />
 
       <NewsletterSection />
     </>

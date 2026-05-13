@@ -64,7 +64,7 @@ export default async function handler(req, res) {
   }
   console.log('[analyze] API key present, length:', apiKey.length);
 
-  const { userId, imageBase64, mimeType } = req.body;
+  const { userId, imageBase64, mimeType, lang, skinConcern } = req.body;
 
   if (!userId || !imageBase64) {
     console.error('[analyze] missing fields — userId:', !!userId, 'imageBase64:', !!imageBase64);
@@ -143,7 +143,13 @@ export default async function handler(req, res) {
             },
             {
               type: 'text',
-              text: 'Analyze this face photo and return the JSON report.',
+              text: [
+                `Analyze this face photo and return the JSON report.`,
+                `Write ALL text fields in ${lang === 'fr' ? 'French' : 'English'}.`,
+                skinConcern
+                  ? `The user's stated skin concern is: "${skinConcern}". Factor this throughout your analysis: reference it explicitly in the summary, weight the most relevant metrics accordingly, and make sure the improvements and recommendations directly address this concern.`
+                  : '',
+              ].filter(Boolean).join('\n\n'),
             },
           ],
         },
@@ -182,9 +188,42 @@ export default async function handler(req, res) {
     console.log('[analyze] usage updated to', user.analyses_used + 1);
   }
 
+  // Match weak metrics → products
+  function metricToProblem(label) {
+    const l = label.toLowerCase();
+    if (l.includes('hydrat') || l.includes('plump')) return 'dryness';
+    if (l.includes('pore'))                           return 'pores';
+    if (l.includes('acne') || l.includes('blemish')) return 'acne';
+    if (l.includes('dark spot') || l.includes('hyperpigment') || l.includes('pigment')) return 'hyperpigmentation';
+    if (l.includes('under-eye') || l.includes('fatigue') || l.includes('dark circle')) return 'dark_circles';
+    if (l.includes('radianc') || l.includes('even')) return 'radiance';
+    if (l.includes('texture'))                        return 'texture';
+    return null;
+  }
+
+  const weakMetrics = (analysisData.metrics || [])
+    .filter(m => metricToProblem(m.label) && m.score < 80)
+    .sort((a, b) => a.score - b.score)
+    .slice(0, 3);
+
+  const problemKeys = [...new Set(weakMetrics.map(m => metricToProblem(m.label)).filter(Boolean))];
+
+  let products = [];
+  if (problemKeys.length > 0) {
+    console.log('[analyze] querying products for problems:', problemKeys);
+    const { data: productRows, error: productErr } = await supabase
+      .from('products')
+      .select('skin_problem, product_name, product_description, amazon_affiliate_link, sephora_affiliate_link, price_range')
+      .in('skin_problem', problemKeys);
+    if (productErr) console.error('[analyze] products query error (non-fatal):', productErr);
+    else products = productRows || [];
+    console.log('[analyze] matched', products.length, 'products');
+  }
+
   console.log('[analyze] done, sending response');
   return res.status(200).json({
     data: analysisData,
+    products,
     analysesUsed: user.analyses_used + 1,
     paidCredits: user.paid_credits,
   });
