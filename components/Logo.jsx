@@ -98,12 +98,14 @@ export default function Logo() {
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
       style={{
-        display: 'inline-flex', alignItems: 'center', gap: 7,
+        display: 'inline-flex', alignItems: 'center', gap: 10,
         cursor: 'default', userSelect: 'none',
         transform: hovered ? 'scale(1.03)' : 'scale(1)',
         transition: 'transform 0.35s cubic-bezier(0.34,1.56,0.64,1)',
       }}
     >
+      <Flower width={22} height={22} speed={12} />
+
       <span className="logo-text-rate" style={{
         ...shimmerStyle,
         fontFamily: "'DM Sans', sans-serif",
