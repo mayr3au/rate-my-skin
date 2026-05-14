@@ -4,7 +4,7 @@ import Head from 'next/head';
 import Logo, { Flower } from '../components/Logo';
 import { useLang } from '../lib/LangContext';
 
-const FREE_LIMIT = 2;
+const FREE_LIMIT = 1;
 
 /* ── Warm palette ── */
 /* ── Luxury Gilded Palette ── */
@@ -325,13 +325,13 @@ export default function Home() {
     }
   };
 
-  const handleCheckout = async () => {
-    setCheckingOut(true);
+  const handleCheckout = async (planId) => {
+    setCheckingOut(planId);
     try {
       const userId = getUserId();
       const res = await fetch('/api/checkout', {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ userId }),
+        body: JSON.stringify({ userId, planId }),
       });
       const { url, error: err } = await res.json();
       if (err) throw new Error(err);
@@ -502,12 +502,6 @@ export default function Home() {
                 {gateSubmitting ? t('saving') : t('claimFreeAnalysis')}
               </button>
             </form>
-            <button onClick={() => {
-              localStorage.setItem('rms_email_captured', 'skipped');
-              setShowEmailGate(false); router.push('/report');
-            }} style={{ background: 'none', border: 'none', color: C.textFaint, fontSize: 12, cursor: 'pointer', fontFamily: "'DM Sans', sans-serif" }}>
-              {t('skipToResults')}
-            </button>
           </div>
         </div>
       )}
@@ -515,7 +509,7 @@ export default function Home() {
       {/* ── Paywall modal ── */}
       {showPaywall && (
         <div style={modalOverlay}>
-          <div style={{ ...modalCard, maxWidth: 430 }}>
+          <div style={{ ...modalCard, maxWidth: 600, padding: '40px 30px' }}>
             <p style={{ fontSize: 9, letterSpacing: '0.3em', textTransform: 'uppercase', color: C.textFaint, fontWeight: 600, marginBottom: 14 }}>
               {t('freeAnalysesUsed')}
             </p>
@@ -525,31 +519,66 @@ export default function Home() {
             }}>
               {t('unlockMoreReports')}
             </h2>
-            <p style={{ fontSize: 13, color: C.textMid, lineHeight: 1.85, marginBottom: 28, whiteSpace: 'pre-line' }}>
+            <p style={{ fontSize: 13, color: C.textMid, lineHeight: 1.85, marginBottom: 32 }}>
               {t('paywallDesc', FREE_LIMIT)}
             </p>
+
             <div style={{
-              background: `linear-gradient(160deg, ${C.dark} 0%, #2A241E 100%)`,
-              borderRadius: 20, padding: '30px 26px', marginBottom: 18, textAlign: 'left',
-              boxShadow: '0 12px 48px rgba(26,21,16,0.28)',
+              display: 'flex', gap: 20, flexWrap: 'wrap', justifyContent: 'center', marginBottom: 24
             }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 22 }}>
-                <span style={{ fontSize: 44, fontFamily: "'Cormorant Garamond', serif", fontWeight: 300, color: '#FDF9F4', letterSpacing: '-0.02em' }}>
-                  €4.99
-                </span>
-                <span style={{ fontSize: 10.5, color: '#5A5048', letterSpacing: '0.08em' }}>{t('fiveAnalyses')}</span>
-              </div>
-              {[t('feature1'), t('feature2'), t('feature3')].map(f => (
-                <div key={f} style={{ display: 'flex', alignItems: 'center', gap: 12, fontSize: 12, color: '#6A6058', marginBottom: 10 }}>
-                  <span style={{ color: '#4A4038', fontSize: 7 }}>✦</span>{f}
+              {/* Single Plan */}
+              <div style={{
+                flex: '1 1 240px', background: C.surfaceAlt, border: `1px solid ${C.border}`,
+                borderRadius: 20, padding: '28px 24px', textAlign: 'left',
+                display: 'flex', flexDirection: 'column',
+              }}>
+                <div style={{ fontSize: 10, color: C.textFaint, letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: 8 }}>{t('planSingle')}</div>
+                <div style={{ fontSize: 32, fontFamily: "'Cormorant Garamond', serif", color: C.dark, marginBottom: 20 }}>{t('priceSingle')}</div>
+                <div style={{ flex: 1, marginBottom: 24 }}>
+                   {[t('feature1'), t('feature2')].map(f => (
+                     <div key={f} style={{ fontSize: 11, color: C.textMid, marginBottom: 6, display: 'flex', gap: 8 }}>
+                       <span style={{ color: C.gold }}>✦</span>{f}
+                     </div>
+                   ))}
                 </div>
-              ))}
+                <button onClick={() => handleCheckout('single')} disabled={checkingOut} style={{
+                  ...darkBtn(!checkingOut), width: '100%', padding: '12px', fontSize: 12,
+                  background: C.surface, color: C.dark, border: `1px solid ${C.border}`,
+                }}>
+                  {checkingOut === 'single' ? t('redirecting') : t('continueToPayment')}
+                </button>
+              </div>
+
+              {/* Pack Plan */}
+              <div style={{
+                flex: '1 1 240px', background: `linear-gradient(160deg, ${C.dark} 0%, #2A241E 100%)`,
+                borderRadius: 20, padding: '28px 24px', textAlign: 'left',
+                display: 'flex', flexDirection: 'column', position: 'relative',
+                boxShadow: '0 12px 40px rgba(0,0,0,0.15)',
+              }}>
+                <div style={{
+                  position: 'absolute', top: 12, right: 12, background: C.gold, color: '#FFF',
+                  fontSize: 8, padding: '3px 8px', borderRadius: 20, fontWeight: 700, letterSpacing: '0.05em',
+                }}>
+                  {t('bestValue')}
+                </div>
+                <div style={{ fontSize: 10, color: '#8A8580', letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: 8 }}>{t('planPack')}</div>
+                <div style={{ fontSize: 32, fontFamily: "'Cormorant Garamond', serif", color: '#FDF9F4', marginBottom: 20 }}>{t('pricePack')}</div>
+                <div style={{ flex: 1, marginBottom: 24 }}>
+                   {[t('feature1'), t('feature2'), t('feature3')].map(f => (
+                     <div key={f} style={{ fontSize: 11, color: '#8A8580', marginBottom: 6, display: 'flex', gap: 8 }}>
+                       <span style={{ color: C.gold }}>✦</span>{f}
+                     </div>
+                   ))}
+                </div>
+                <button onClick={() => handleCheckout('pack')} disabled={checkingOut} style={{
+                  ...darkBtn(!checkingOut), width: '100%', padding: '12px', fontSize: 12,
+                }}>
+                  {checkingOut === 'pack' ? t('redirecting') : t('continueToPayment')}
+                </button>
+              </div>
             </div>
-            <button onClick={handleCheckout} disabled={checkingOut} style={{
-              ...darkBtn(!checkingOut), width: '100%', padding: '16px', fontSize: 13, marginBottom: 14,
-            }}>
-              {checkingOut ? t('redirecting') : t('continueToPayment')}
-            </button>
+
             <button onClick={() => setShowPaywall(false)} style={{
               background: 'none', border: 'none', color: C.textFaint, fontSize: 12,
               cursor: 'pointer', fontFamily: "'DM Sans', sans-serif",

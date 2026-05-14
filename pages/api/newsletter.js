@@ -35,35 +35,8 @@ export default async function handler(req, res) {
     console.log('[newsletter] email saved:', cleanEmail);
   }
 
-  // Grant 1 bonus credit as reward for submitting email
-  let paidCredits = null;
-  if (userId) {
-    const { data: user, error: fetchError } = await supabase
-      .from('users')
-      .select('paid_credits')
-      .eq('id', userId)
-      .single();
-
-    if (fetchError) {
-      console.error('[newsletter] failed to fetch user for bonus credit:', fetchError.message);
-    } else {
-      const newCredits = user.paid_credits + 1;
-      const { error: updateError } = await supabase
-        .from('users')
-        .update({ paid_credits: newCredits, updated_at: new Date().toISOString() })
-        .eq('id', userId);
-
-      if (updateError) {
-        console.error('[newsletter] failed to grant bonus credit:', updateError.message);
-      } else {
-        paidCredits = newCredits;
-        console.log('[newsletter] bonus credit granted — paid_credits now:', paidCredits, 'for user:', userId);
-      }
-    }
-  }
-
+  // No bonus credit granted anymore
   return res.status(200).json({
     message: 'Subscribed successfully.',
-    ...(paidCredits !== null && { paidCredits }),
   });
 }

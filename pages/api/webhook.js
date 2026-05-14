@@ -60,12 +60,13 @@ export default async function handler(req, res) {
       return res.status(200).json({ received: true });
     }
 
-    console.log('[webhook] user found — current paid_credits:', user.paid_credits);
+    const creditsToAdd = parseInt(session.metadata?.credits || '5');
+    console.log('[webhook] user found — current paid_credits:', user.paid_credits, '| adding:', creditsToAdd);
 
     const { error: updateError } = await supabase
       .from('users')
       .update({
-        paid_credits: user.paid_credits + 5,
+        paid_credits: user.paid_credits + creditsToAdd,
         updated_at: new Date().toISOString(),
       })
       .eq('id', userId);
@@ -73,7 +74,7 @@ export default async function handler(req, res) {
     if (updateError) {
       console.error('[webhook] failed to update paid_credits:', updateError.message);
     } else {
-      console.log('[webhook] paid_credits updated to', user.paid_credits + 5, 'for user:', userId);
+      console.log('[webhook] paid_credits updated to', user.paid_credits + creditsToAdd, 'for user:', userId);
     }
   } else {
     console.log('[webhook] ignoring event type:', event.type);

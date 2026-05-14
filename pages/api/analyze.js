@@ -10,7 +10,7 @@ export const config = {
   api: { bodyParser: { sizeLimit: '10mb' } },
 };
 
-const FREE_LIMIT = 2;
+const FREE_LIMIT = 1;
 
 const SYSTEM_PROMPT = `You are an expert skin analyst.
 Analyze the photo and respond ONLY with a RAW JSON object.
