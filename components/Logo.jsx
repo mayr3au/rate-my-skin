@@ -165,18 +165,18 @@ export function LuxuryFlower({ width = 36, height = 36 }) {
 
 /* ── Header Logo ── */
 // A 3D "Bevel" gradient: dark edges with a bright, creamy center highlight sweeping through the letters
-const VELVET_GRAD = 'linear-gradient(180deg, #3A2E26 0%, #A87449 15%, #FDFBF9 50%, #A87449 85%, #3A2E26 100%)';
+const VELVET_GRAD = 'linear-gradient(180deg, #3A2E26 0%, #A87449 10%, #D4A574 50%, #A87449 90%, #3A2E26 100%)';
 
 export default function Logo() {
   const [hovered, setHovered] = useState(false);
 
   const creamyStyle = {
     background: VELVET_GRAD,
-    backgroundSize: '100% 200%',
+    backgroundSize: '100% 150%',
     WebkitBackgroundClip: 'text',
     WebkitTextFillColor: 'transparent',
     backgroundClip: 'text',
-    animation: `logoShimmer ${hovered ? '6s' : '12s'} ease-in-out infinite`,
+    animation: `logoShimmer ${hovered ? '8s' : '20s'} ease-in-out infinite`,
     // Removed text-shadow because it renders ON TOP of transparent text in some browsers, ruining visibility.
   };
 

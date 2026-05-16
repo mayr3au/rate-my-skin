@@ -55,6 +55,11 @@ export default function Home() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [userId, setUserId] = useState(null);
+  const [loadingStep, setLoadingStep] = useState(0);
+
+  const loadingMessages = lang === 'fr' 
+    ? ["Anatomie & Texture...", "Analyse des proportions...", "IA en cours de traitement...", "Génération du rapport..."]
+    : ["Anatomy & Texture...", "Mapping proportions...", "AI Processing...", "Finalizing report..."];
 
   useEffect(() => {
     const captured = localStorage.getItem('rms_email_captured') === '1';
@@ -65,6 +70,18 @@ export default function Home() {
       .then(({ userId: uid }) => setUserId(uid))
       .catch(() => {});
   }, []);
+
+  useEffect(() => {
+    let interval;
+    if (loading) {
+      interval = setInterval(() => {
+        setLoadingStep(s => (s + 1) % loadingMessages.length);
+      }, 3500);
+    } else {
+      setLoadingStep(0);
+    }
+    return () => clearInterval(interval);
+  }, [loading, loadingMessages.length]);
 
   /* ── Email submit ── */
   const handleEmailSubmit = async (e) => {
@@ -604,7 +621,74 @@ export default function Home() {
         </div>
       )}
 
+      {/* ── Full-screen Analysis Loading Page ── */}
+      {loading && (
+        <div style={{
+          position: 'fixed', inset: 0, zIndex: 1000,
+          background: '#FDFBF9',
+          display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
+          padding: 32, textAlign: 'center',
+          animation: 'fadeIn 0.5s ease-out forwards',
+        }}>
+          {/* Reuse the silk texture for the loading page too */}
+          <div style={{
+            position: 'absolute', inset: 0, opacity: 0.4, pointerEvents: 'none',
+            background: 'url("data:image/svg+xml,%3Csvg viewBox=\'0 0 1000 1000\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cfilter id=\'silk\'%3E%3CfeTurbulence type=\'fractalNoise\' baseFrequency=\'0.005\' numOctaves=\'2\' stitchTiles=\'stitch\'/%3E%3CfeColorMatrix type=\'saturate\' values=\'0\'/%3E%3CfeComponentTransfer%3E%3CfeFuncA type=\'linear\' slope=\'0.03\'/%3E%3C/feComponentTransfer%3E%3C/filter%3E%3Crect width=\'100%25\' height=\'100%25\' filter=\'url(%23silk)\'/%3E%3C/svg%3E")',
+          }} />
+
+          <div style={{ position: 'relative', marginBottom: 40 }}>
+            <LuxuryFlower width={100} height={100} />
+            <div style={{
+              position: 'absolute', inset: -20,
+              border: '1px solid rgba(168, 116, 73, 0.1)',
+              borderRadius: '50%',
+              animation: 'spin 20s linear infinite',
+            }} />
+          </div>
+
+          <h2 style={{
+            fontFamily: "'Cormorant Garamond', serif",
+            fontSize: 'clamp(24px, 5vw, 32px)', fontWeight: 300,
+            color: '#2C241D', margin: '0 0 16px', letterSpacing: '0.02em',
+          }}>
+            {t('analysingFeatures')}
+          </h2>
+
+          <div style={{ height: 20 }}>
+            <p style={{
+              fontFamily: "'DM Sans', sans-serif",
+              fontSize: 12, letterSpacing: '0.15em', textTransform: 'uppercase',
+              color: '#A87449', fontWeight: 600, margin: 0,
+              animation: 'pulse 2s ease-in-out infinite',
+            }}>
+              {loadingMessages[loadingStep]}
+            </p>
+          </div>
+
+          <div style={{
+            marginTop: 48, width: '100%', maxWidth: 200, height: 1,
+            background: 'rgba(168, 116, 73, 0.1)', position: 'relative', overflow: 'hidden'
+          }}>
+            <div style={{
+              position: 'absolute', inset: 0,
+              background: 'linear-gradient(90deg, transparent, #A87449, transparent)',
+              width: '50%',
+              animation: 'loadingProgress 2s ease-in-out infinite',
+            }} />
+          </div>
+
+          <p style={{ marginTop: 24, fontSize: 11, color: '#B9AC9E', fontFamily: "'DM Sans', sans-serif" }}>
+            {t('analysisTime')}
+          </p>
+        </div>
+      )}
+
       <style>{`
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes loadingProgress {
+          0% { transform: translateX(-100%); }
+          100% { transform: translateX(200%); }
+        }
         @keyframes spin { to { transform: rotate(360deg); } }
         @keyframes logoShimmer {
           0% { background-position: 50% 100%; }
