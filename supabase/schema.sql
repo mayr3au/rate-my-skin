@@ -25,3 +25,17 @@ alter table public.newsletter enable row level security;
 create policy "allow_insert_newsletter"
   on public.newsletter for insert
   with check (true);
+
+-- ── Freemium v2 migration ──────────────────────────────────────
+ALTER TABLE public.users ADD COLUMN IF NOT EXISTS paid_unlocks integer NOT NULL DEFAULT 0;
+
+CREATE TABLE IF NOT EXISTS public.analyses (
+  id          uuid         PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id     text         REFERENCES public.users(id),
+  skin_concern text,
+  report_json  jsonb,
+  is_paid     boolean      NOT NULL DEFAULT false,
+  created_at  timestamptz  NOT NULL DEFAULT now()
+);
+
+ALTER TABLE public.analyses ENABLE ROW LEVEL SECURITY;

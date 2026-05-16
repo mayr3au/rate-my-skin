@@ -5,14 +5,17 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).end();
 
-  const { userId, planId } = req.body;
+  const { userId, analysisId, planId } = req.body;
 
   if (!userId) return res.status(400).json({ error: 'Missing userId.' });
+  if (!analysisId) return res.status(400).json({ error: 'Missing analysisId.' });
 
   const isPack = planId === 'pack';
-  const amount = isPack ? 499 : 299;
-  const credits = isPack ? 5 : 1;
-  const name = isPack ? '5 Facial Analyses — Rate My Skin' : '1 Facial Analysis — Rate My Skin';
+  const amount = isPack ? 499 : 199;
+  const name = isPack
+    ? '5 Full Skin Reports — Rate My Skin'
+    : '1 Full Skin Report — Rate My Skin';
+  const product_type = isPack ? 'five_analyses' : 'single_analysis';
 
   const origin = `https://${req.headers.host}`;
 
@@ -25,7 +28,7 @@ export default async function handler(req, res) {
             currency: 'eur',
             product_data: {
               name,
-              description: 'Full AI-powered aesthetic analysis across 8 facial metrics.',
+              description: 'Full AI-powered skin analysis: 8 metrics, personalised routine & product recommendations.',
             },
             unit_amount: amount,
           },
@@ -34,9 +37,12 @@ export default async function handler(req, res) {
       ],
       mode: 'payment',
       client_reference_id: userId,
-      metadata: { credits: String(credits) },
-      success_url: `${origin}/?payment=success`,
-      cancel_url: `${origin}/`,
+      metadata: {
+        product_type,
+        analysisId,
+      },
+      success_url: `${origin}/report?payment=success`,
+      cancel_url: `${origin}/report`,
     });
 
     return res.status(200).json({ url: session.url });

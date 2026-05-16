@@ -32,159 +32,100 @@ function LangToggle() {
   );
 }
 
-function NewsletterSection() {
-  const { t } = useLang();
-  const [email, setEmail] = useState('');
-  const [status, setStatus] = useState(null);
-  const [message, setMessage] = useState('');
-  const [focused, setFocused] = useState(false);
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setStatus('loading');
-    try {
-      const res = await fetch('/api/newsletter', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email }),
-      });
-      const data = await res.json();
-      if (!res.ok) {
-        setMessage(data.error || t('somethingWentWrong'));
-        setStatus('error');
-      } else {
-        setStatus('success');
-      }
-    } catch {
-      setMessage(t('somethingWentWrong'));
-      setStatus('error');
-    }
-  };
-
-  return (
-    <div style={{ maxWidth: 680, margin: '0 auto', padding: '0 20px 72px' }}>
-      <div style={{
-        background: '#fff',
-        border: '1px solid #e8e8e8',
-        borderRadius: 20,
-        padding: '44px 36px',
-        textAlign: 'center',
-        fontFamily: "'DM Sans', sans-serif",
-      }}>
-        <p style={{
-          fontSize: 9.5, letterSpacing: '0.24em', textTransform: 'uppercase',
-          color: '#ccc', fontWeight: 600, marginBottom: 14,
-        }}>
-          {t('freeWeekly')}
-        </p>
-
-        <h2 style={{
-          fontSize: 30, fontWeight: 300, color: '#0d0d0d',
-          fontFamily: "'Cormorant Garamond', serif",
-          marginBottom: 12, letterSpacing: '0.01em',
-        }}>
-          {t('weeklyTipsTitle')}
-        </h2>
-
-        <p style={{
-          fontSize: 13, color: '#aaa', lineHeight: 1.8,
-          maxWidth: 320, margin: '0 auto 32px',
-        }}>
-          {t('weeklyTipsDesc')}
-        </p>
-
-        {status === 'success' ? (
-          <div style={{
-            background: '#fafafa', borderRadius: 14,
-            padding: '24px', display: 'inline-flex',
-            flexDirection: 'column', alignItems: 'center', gap: 8,
-          }}>
-            <span style={{ fontSize: 16, color: '#0d0d0d' }}>✦</span>
-            <p style={{
-              fontSize: 15, color: '#0d0d0d',
-              fontFamily: "'Cormorant Garamond', serif", fontWeight: 400,
-            }}>
-              {t('subscribed')}
-            </p>
-          </div>
-        ) : (
-          <form
-            onSubmit={handleSubmit}
-            style={{ display: 'flex', gap: 8, maxWidth: 400, margin: '0 auto' }}
-          >
-            <input
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              onFocus={() => setFocused(true)}
-              onBlur={() => setFocused(false)}
-              placeholder="your@email.com"
-              required
-              style={{
-                flex: 1,
-                border: `1px solid ${focused ? '#0d0d0d' : '#e0e0e0'}`,
-                borderRadius: 10,
-                padding: '12px 16px',
-                fontSize: 13,
-                fontFamily: "'DM Sans', sans-serif",
-                outline: 'none',
-                color: '#0d0d0d',
-                background: '#fafafa',
-                transition: 'border-color 0.18s ease',
-              }}
-            />
-            <button
-              type="submit"
-              disabled={status === 'loading'}
-              style={{
-                background: '#0d0d0d',
-                color: '#fff',
-                border: 'none',
-                borderRadius: 10,
-                padding: '12px 22px',
-                fontSize: 13,
-                fontWeight: 600,
-                cursor: status === 'loading' ? 'not-allowed' : 'pointer',
-                fontFamily: "'DM Sans', sans-serif",
-                whiteSpace: 'nowrap',
-                letterSpacing: '0.04em',
-              }}
-            >
-              {status === 'loading' ? t('subscribeLoading') : t('subscribe')}
-            </button>
-          </form>
-        )}
-
-        {status === 'error' && (
-          <p style={{ fontSize: 12, color: '#c00', marginTop: 12 }}>{message}</p>
-        )}
-
-        <p style={{ fontSize: 11, color: '#ddd', marginTop: 20 }}>
-          {t('noSpam')}
-        </p>
-      </div>
-    </div>
-  );
-}
-
 export default function Report() {
   const router = useRouter();
   const { t } = useLang();
+
   const [data, setData] = useState(null);
-  const [products, setProducts] = useState([]);
+  const [analysisId, setAnalysisId] = useState(null);
+  const [isPaid, setIsPaid] = useState(false);
+  const [userId, setUserId] = useState(null);
   const [notFound, setNotFound] = useState(false);
+  const [checkingPayment, setCheckingPayment] = useState(false);
 
   useEffect(() => {
+    // 1. Read from sessionStorage
     const stored = sessionStorage.getItem('rms_report');
     if (!stored) { setNotFound(true); return; }
     try {
       setData(JSON.parse(stored));
-      const storedProducts = sessionStorage.getItem('rms_products');
-      if (storedProducts) setProducts(JSON.parse(storedProducts));
     } catch {
       setNotFound(true);
+      return;
     }
+
+    const storedAnalysisId = sessionStorage.getItem('rms_analysis_id');
+    if (storedAnalysisId) setAnalysisId(storedAnalysisId);
+
+    const storedIsPaid = sessionStorage.getItem('rms_is_paid');
+    if (storedIsPaid === 'true') setIsPaid(true);
+
+    // 2. Fetch identity
+    fetch('/api/identity')
+      .then(r => r.json())
+      .then(({ userId: uid }) => setUserId(uid))
+      .catch(() => {});
   }, []);
+
+  // 3. Handle payment=success query param
+  useEffect(() => {
+    if (!router.isReady) return;
+    if (router.query.payment !== 'success') return;
+
+    const storedAnalysisId = sessionStorage.getItem('rms_analysis_id');
+    if (!storedAnalysisId) return;
+
+    setCheckingPayment(true);
+    // Remove query param from URL
+    router.replace('/report', undefined, { shallow: true });
+
+    // Poll analysis status
+    const checkStatus = async () => {
+      try {
+        const res = await fetch(`/api/analysis-status?id=${storedAnalysisId}`);
+        const { isPaid: paid } = await res.json();
+        if (paid) {
+          sessionStorage.setItem('rms_is_paid', 'true');
+          setIsPaid(true);
+          setCheckingPayment(false);
+        } else {
+          // Retry once after 2 seconds
+          setTimeout(async () => {
+            try {
+              const res2 = await fetch(`/api/analysis-status?id=${storedAnalysisId}`);
+              const { isPaid: paid2 } = await res2.json();
+              if (paid2) {
+                sessionStorage.setItem('rms_is_paid', 'true');
+                setIsPaid(true);
+              }
+            } catch {}
+            setCheckingPayment(false);
+          }, 2000);
+        }
+      } catch {
+        setCheckingPayment(false);
+      }
+    };
+
+    checkStatus();
+  }, [router.isReady, router.query.payment]);
+
+  // 4. handleUnlock: calls checkout, redirects to Stripe
+  const handleUnlock = async (planId) => {
+    if (!userId || !analysisId) return;
+    try {
+      const res = await fetch('/api/checkout', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId, analysisId, planId }),
+      });
+      const { url, error: err } = await res.json();
+      if (err) throw new Error(err);
+      window.location.href = url;
+    } catch (err) {
+      console.error('Checkout error:', err.message);
+    }
+  };
 
   if (notFound) {
     return (
@@ -217,6 +158,25 @@ export default function Report() {
         <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
       </Head>
 
+      {/* Payment checking overlay */}
+      {checkingPayment && (
+        <div style={{
+          position: 'fixed', inset: 0,
+          background: 'rgba(253,250,247,0.97)',
+          backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)',
+          display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
+          zIndex: 2000, gap: 16,
+          fontFamily: "'DM Sans', sans-serif",
+        }}>
+          <div style={{
+            width: 32, height: 32,
+            border: '2px solid #0d0d0d', borderTopColor: 'transparent',
+            borderRadius: '50%', animation: 'spin 0.7s linear infinite',
+          }}/>
+          <p style={{ fontSize: 14, color: '#0d0d0d' }}>{t('checkingPayment')}</p>
+        </div>
+      )}
+
       {/* Sticky frosted-glass nav */}
       <div style={{
         position: 'sticky', top: 0, zIndex: 100,
@@ -245,9 +205,13 @@ export default function Report() {
         </div>
       </div>
 
-      <BeautyReport data={data} products={products} />
+      <BeautyReport data={data} isPaid={isPaid} onUnlock={handleUnlock} />
 
-      <NewsletterSection />
+      <style>{`
+        @keyframes spin {
+          to { transform: rotate(360deg); }
+        }
+      `}</style>
     </>
   );
 }

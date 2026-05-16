@@ -73,16 +73,6 @@ function MetricCard({ m, index }) {
   );
 }
 
-const PROBLEM_LABELS = {
-  acne:             { en: 'Acne & Blemishes',  fr: 'Acné & Imperfections' },
-  hyperpigmentation:{ en: 'Dark Spots',         fr: 'Taches sombres' },
-  dryness:          { en: 'Hydration',          fr: 'Hydratation' },
-  pores:            { en: 'Pores & Texture',    fr: 'Pores & Texture' },
-  dark_circles:     { en: 'Under-Eye',          fr: 'Contour des yeux' },
-  radiance:         { en: 'Radiance',           fr: 'Éclat' },
-  texture:          { en: 'Skin Texture',       fr: 'Texture' },
-};
-
 function ProductCard({ product, lang, t }) {
   const [hovered, setHovered] = useState(false);
   const [btnAmazonHov, setBtnAmazonHov] = useState(false);
@@ -94,8 +84,8 @@ function ProductCard({ product, lang, t }) {
     return () => clearTimeout(timer);
   }, []);
 
-  const labelObj = PROBLEM_LABELS[product.problem_name];
-  const label = labelObj ? (lang === 'fr' ? labelObj.fr : labelObj.en) : product.problem_name;
+  const amazonUrl = `https://www.amazon.fr/s?k=${encodeURIComponent(product.productName)}&tag=ratemyskin-21`;
+  const sephoraUrl = `https://www.sephora.fr/search/?q=${encodeURIComponent(product.productName)}`;
 
   return (
     <div
@@ -120,7 +110,7 @@ function ProductCard({ product, lang, t }) {
         border: '1px solid #F5DADA',
         borderRadius: 6, padding: '3px 9px',
       }}>
-        {label}
+        {product.skinProblem}
       </span>
 
       {/* Product name */}
@@ -128,7 +118,7 @@ function ProductCard({ product, lang, t }) {
         fontSize: 16, fontWeight: 400, color: '#0d0d0d', marginBottom: 7,
         fontFamily: "'Cormorant Garamond', serif", letterSpacing: '0.01em', lineHeight: 1.3,
       }}>
-        {product.product_name}
+        {product.productName}
       </div>
 
       {/* Description */}
@@ -142,59 +132,111 @@ function ProductCard({ product, lang, t }) {
           fontSize: 18, fontWeight: 300, color: '#0d0d0d',
           fontFamily: "'Cormorant Garamond', serif",
         }}>
-          {product.price_range}
+          {product.price}
         </span>
         <div style={{ display: 'flex', gap: 7 }}>
-          {product.affiliate_links?.amazon && (
-            <a
-              href={product.affiliate_links.amazon}
-              target="_blank" rel="noopener noreferrer"
-              onMouseEnter={() => setBtnAmazonHov(true)}
-              onMouseLeave={() => setBtnAmazonHov(false)}
-              style={{
-                display: 'inline-block', textDecoration: 'none',
-                background: btnAmazonHov
-                  ? 'linear-gradient(135deg, #1a1a1a, #333)'
-                  : 'linear-gradient(135deg, #0a0a0a, #1f1f1f)',
-                color: '#fff', border: 'none', borderRadius: 9,
-                padding: '8px 15px', fontSize: 11.5, fontWeight: 600,
-                cursor: 'pointer', letterSpacing: '0.04em',
-                fontFamily: "'DM Sans', sans-serif",
-                boxShadow: btnAmazonHov ? '0 4px 16px rgba(0,0,0,0.25)' : '0 2px 8px rgba(0,0,0,0.15)',
-                transition: 'box-shadow 0.2s ease, background 0.2s ease',
-              }}
-            >
-              {t('buyAmazon')}
-            </a>
-          )}
-          {product.affiliate_links?.sephora && (
-            <a
-              href={product.affiliate_links.sephora}
-              target="_blank" rel="noopener noreferrer"
-              onMouseEnter={() => setBtnSephoraHov(true)}
-              onMouseLeave={() => setBtnSephoraHov(false)}
-              style={{
-                display: 'inline-block', textDecoration: 'none',
-                background: btnSephoraHov ? '#f5f5f5' : '#fff',
-                color: '#0d0d0d', border: '1.5px solid #0d0d0d', borderRadius: 9,
-                padding: '8px 15px', fontSize: 11.5, fontWeight: 600,
-                cursor: 'pointer', letterSpacing: '0.04em',
-                fontFamily: "'DM Sans', sans-serif",
-                transition: 'background 0.2s ease',
-              }}
-            >
-              {t('buySephora')}
-            </a>
-          )}
+          <a
+            href={amazonUrl}
+            target="_blank" rel="noopener noreferrer"
+            onMouseEnter={() => setBtnAmazonHov(true)}
+            onMouseLeave={() => setBtnAmazonHov(false)}
+            style={{
+              display: 'inline-block', textDecoration: 'none',
+              background: btnAmazonHov
+                ? 'linear-gradient(135deg, #1a1a1a, #333)'
+                : 'linear-gradient(135deg, #0a0a0a, #1f1f1f)',
+              color: '#fff', border: 'none', borderRadius: 9,
+              padding: '8px 15px', fontSize: 11.5, fontWeight: 600,
+              cursor: 'pointer', letterSpacing: '0.04em',
+              fontFamily: "'DM Sans', sans-serif",
+              boxShadow: btnAmazonHov ? '0 4px 16px rgba(0,0,0,0.25)' : '0 2px 8px rgba(0,0,0,0.15)',
+              transition: 'box-shadow 0.2s ease, background 0.2s ease',
+            }}
+          >
+            {t('buyAmazon')}
+          </a>
+          <a
+            href={sephoraUrl}
+            target="_blank" rel="noopener noreferrer"
+            onMouseEnter={() => setBtnSephoraHov(true)}
+            onMouseLeave={() => setBtnSephoraHov(false)}
+            style={{
+              display: 'inline-block', textDecoration: 'none',
+              background: btnSephoraHov ? '#f5f5f5' : '#fff',
+              color: '#0d0d0d', border: '1.5px solid #0d0d0d', borderRadius: 9,
+              padding: '8px 15px', fontSize: 11.5, fontWeight: 600,
+              cursor: 'pointer', letterSpacing: '0.04em',
+              fontFamily: "'DM Sans', sans-serif",
+              transition: 'background 0.2s ease',
+            }}
+          >
+            {t('buySephora')}
+          </a>
         </div>
       </div>
     </div>
   );
 }
 
-export default function BeautyReport({ data, products = [] }) {
+/* ── Severity badge ── */
+function SeverityBadge({ severity, t }) {
+  const configs = {
+    mild:        { color: '#6B7280', bg: '#F3F4F6', border: '#D1D5DB', label: t('severityMild') },
+    moderate:    { color: '#92400E', bg: '#FFFBEB', border: '#FCD34D', label: t('severityModerate') },
+    significant: { color: '#991B1B', bg: '#FEF2F2', border: '#FCA5A5', label: t('severitySignificant') },
+  };
+  const cfg = configs[severity] || configs.mild;
+  return (
+    <span style={{
+      display: 'inline-block',
+      fontSize: 9, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase',
+      color: cfg.color, background: cfg.bg, border: `1px solid ${cfg.border}`,
+      borderRadius: 6, padding: '3px 9px',
+    }}>
+      {cfg.label}
+    </span>
+  );
+}
+
+/* ── Report header block (shared between free/paid) ── */
+function ReportHeader({ t }) {
+  return (
+    <div style={{
+      background: "#fff",
+      borderBottom: "1px solid #ebebeb",
+      padding: "36px 28px 28px",
+      position: "relative",
+      overflow: "hidden",
+    }}>
+      <div style={{
+        position: "absolute", inset: 0, pointerEvents: "none",
+        background: "radial-gradient(ellipse 80% 100% at 50% -20%, rgba(0,0,0,0.03) 0%, transparent 100%)",
+      }} />
+      <div className="mobile-padding" style={{ maxWidth: 680, margin: "0 auto", position: "relative" }}>
+        <p className="mobile-hide" style={{ margin: "0 0 5px", fontSize: 9.5, letterSpacing: "0.24em", textTransform: "uppercase", color: "#bbb", fontWeight: 600 }}>
+          {t('aestheticAnalysis')}
+        </p>
+        <h1 style={{
+          margin: "0 0 4px", fontSize: 30, fontWeight: 300,
+          fontFamily: "'Cormorant Garamond', serif", letterSpacing: "0.01em",
+          background: "linear-gradient(135deg, #0d0d0d 0%, #3a3a3a 100%)",
+          WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text",
+          color: "transparent",
+        }}>
+          {t('yourFacialReport')}
+        </h1>
+        <p style={{ margin: 0, fontSize: 12, color: "#bbb", letterSpacing: "0.02em" }}>
+          {t('notMedicalAdvice')}
+        </p>
+      </div>
+    </div>
+  );
+}
+
+export default function BeautyReport({ data, isPaid, onUnlock }) {
   const { lang, t } = useLang();
   const [activeTab, setActiveTab] = useState("analysis");
+  const [unlocking, setUnlocking] = useState(false);
 
   if (!data) {
     return (
@@ -204,42 +246,245 @@ export default function BeautyReport({ data, products = [] }) {
     );
   }
 
-  const { overall, summary, faceShape, eyeColor, skinTone, metrics, strengths, improvements, recommendations } = data;
+  const { overall, summary, faceShape, eyeColor, skinTone } = data;
+
+  const handleUnlock = async (planId) => {
+    setUnlocking(true);
+    try {
+      await onUnlock(planId);
+    } finally {
+      setUnlocking(false);
+    }
+  };
+
+  /* ══════════════ FREE VIEW ══════════════ */
+  if (!isPaid) {
+    const freeData = data.free_version || {};
+    const mainProblems = freeData.mainProblems || [];
+    const basicSummary = freeData.basicSummary || summary || '';
+
+    return (
+      <div style={{ background: "#f8f8f8", minHeight: "100vh", fontFamily: "'DM Sans', sans-serif", padding: "0 0 60px" }}>
+        <ReportHeader t={t} />
+
+        <div style={{ maxWidth: 680, margin: "0 auto", padding: "0 20px" }}>
+
+          {/* ── Free label ── */}
+          <div style={{ textAlign: 'center', marginTop: 20, marginBottom: 6 }}>
+            <span style={{
+              fontSize: 9, fontWeight: 700, letterSpacing: '0.2em', textTransform: 'uppercase',
+              color: '#8A8580', background: '#F8F8F5', border: '1px solid #E8E4DA',
+              borderRadius: 20, padding: '4px 14px',
+            }}>
+              {t('freeReportLabel')}
+            </span>
+          </div>
+
+          {/* ── Simplified hero card ── */}
+          <div className="mobile-padding" style={{
+            background: "#fff",
+            border: "1px solid #ebebeb",
+            borderRadius: 22,
+            marginTop: 12,
+            padding: "24px",
+            boxShadow: "0 4px 32px rgba(0,0,0,0.07)",
+          }}>
+            <p style={{ margin: "0 0 6px", fontSize: 9.5, letterSpacing: "0.2em", textTransform: "uppercase", color: "#bbb", fontWeight: 600 }}>
+              {t('overallScore')}
+            </p>
+            <div style={{ display: "flex", alignItems: "baseline", gap: 8, marginBottom: 12 }}>
+              <span style={{
+                fontSize: 80, fontWeight: 300, lineHeight: 1,
+                fontFamily: "'Cormorant Garamond', serif",
+                background: "linear-gradient(160deg, #C5A028 0%, #E8C872 50%, #C5A028 100%)",
+                WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text",
+                color: "transparent",
+                textShadow: "0 2px 10px rgba(197, 160, 40, 0.15)",
+              }}>
+                {overall}
+              </span>
+              <span style={{ fontSize: 26, color: "#d0d0d0", fontFamily: "'Cormorant Garamond', serif" }}>/100</span>
+            </div>
+
+            {/* Score bar */}
+            <div style={{ background: "#f0f0f0", borderRadius: 100, height: 3, marginBottom: 18, overflow: "hidden" }}>
+              <div style={{
+                background: "linear-gradient(90deg, #0d0d0d 0%, #444 100%)",
+                borderRadius: 100, height: "100%", width: `${overall}%`,
+                transition: "width 1.8s cubic-bezier(0.4,0,0.2,1)",
+                boxShadow: "0 0 8px rgba(0,0,0,0.2)",
+              }}/>
+            </div>
+
+            <p style={{ margin: "0 0 18px", fontSize: 15.5, lineHeight: 1.8, color: "#666", fontStyle: "italic", fontFamily: "'Cormorant Garamond', serif" }}>
+              {basicSummary}
+            </p>
+
+            <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+              {[
+                { k: t('faceShape'), v: faceShape },
+                { k: t('eyeColor'), v: eyeColor },
+                { k: t('skinTone'), v: skinTone },
+              ].map(tag => (
+                <div key={tag.k} style={{
+                  background: "linear-gradient(135deg, #f8f8f8, #f2f2f2)",
+                  borderRadius: 10, padding: "7px 14px",
+                  border: "1px solid #ebebeb",
+                }}>
+                  <div style={{ fontSize: 8.5, letterSpacing: "0.14em", textTransform: "uppercase", color: "#bbb", fontWeight: 600 }}>{tag.k}</div>
+                  <div style={{ fontSize: 12, color: "#1a1a1a", fontWeight: 600, marginTop: 2, letterSpacing: "0.02em" }}>{tag.v}</div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* ── 3 Main Issues ── */}
+          <div style={{ marginTop: 24 }}>
+            <div style={{ padding: "0 4px 12px" }}>
+              <p style={{ margin: "0 0 3px", fontSize: 9.5, letterSpacing: "0.22em", textTransform: "uppercase", color: "#bbb", fontWeight: 600 }}>
+                {t('mainProblemsHeading')}
+              </p>
+            </div>
+            <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+              {mainProblems.map((problem, i) => (
+                <div key={i} style={{
+                  background: "#fff",
+                  border: "1px solid #ebebeb",
+                  borderRadius: 18,
+                  padding: "20px 22px",
+                  boxShadow: "0 1px 8px rgba(0,0,0,0.04)",
+                }}>
+                  <div style={{ marginBottom: 8 }}>
+                    <SeverityBadge severity={problem.severity} t={t} />
+                  </div>
+                  <div style={{
+                    fontSize: 16, fontWeight: 400, color: "#0d0d0d", marginBottom: 8,
+                    fontFamily: "'Cormorant Garamond', serif", letterSpacing: "0.01em",
+                  }}>
+                    {problem.title}
+                  </div>
+                  <p style={{ margin: 0, fontSize: 13, lineHeight: 1.75, color: "#777" }}>
+                    {problem.description}
+                  </p>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* ── Paywall card ── */}
+          <div style={{
+            marginTop: 24,
+            background: "linear-gradient(145deg, #0a0a0a 0%, #1f1f1f 100%)",
+            borderRadius: 22,
+            padding: "36px 32px",
+            boxShadow: "0 12px 48px rgba(0,0,0,0.2)",
+          }}>
+            <p style={{
+              margin: "0 0 10px",
+              fontSize: 9, fontWeight: 700, letterSpacing: '0.24em', textTransform: 'uppercase',
+              color: '#8A8580',
+            }}>
+              {t('paywallCardLabel')}
+            </p>
+            <h2 style={{
+              margin: "0 0 14px", fontSize: 28, fontWeight: 300,
+              fontFamily: "'Cormorant Garamond', serif", color: "#fff", lineHeight: 1.2,
+            }}>
+              {t('paywallCardTitle')}
+            </h2>
+            <p style={{ margin: "0 0 22px", fontSize: 13, color: "#8A8580", lineHeight: 1.8 }}>
+              {t('paywallCardDesc')}
+            </p>
+
+            {/* Perks */}
+            <div style={{ marginBottom: 28, display: "flex", flexDirection: "column", gap: 10 }}>
+              {[t('paywallPerk1'), t('paywallPerk2'), t('paywallPerk3')].map((perk, i) => (
+                <div key={i} style={{ display: "flex", gap: 12, alignItems: "flex-start" }}>
+                  <span style={{ color: "#C5A028", fontSize: 12, flexShrink: 0, marginTop: 2 }}>✦</span>
+                  <span style={{ fontSize: 13, color: "#D4D4D4", lineHeight: 1.5 }}>{perk}</span>
+                </div>
+              ))}
+            </div>
+
+            {/* Buttons */}
+            <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+              <button
+                onClick={() => handleUnlock('single')}
+                disabled={unlocking}
+                style={{
+                  width: "100%", padding: "15px",
+                  background: unlocking ? "#333" : "rgba(255,255,255,0.96)",
+                  color: "#0d0d0d", border: "none", borderRadius: 12,
+                  fontSize: 13, fontWeight: 700, cursor: unlocking ? "not-allowed" : "pointer",
+                  fontFamily: "'DM Sans', sans-serif", letterSpacing: "0.04em",
+                  display: "flex", alignItems: "center", justifyContent: "center", gap: 8,
+                  transition: "opacity 0.2s ease",
+                  opacity: unlocking ? 0.7 : 1,
+                }}
+              >
+                {unlocking ? (
+                  <>
+                    <span style={{
+                      display: 'inline-block', width: 14, height: 14,
+                      border: '2px solid #0d0d0d', borderTopColor: 'transparent',
+                      borderRadius: '50%', animation: 'spin 0.7s linear infinite',
+                    }}/>
+                    {t('redirecting')}
+                  </>
+                ) : t('unlockSingle')}
+              </button>
+              <button
+                onClick={() => handleUnlock('pack')}
+                disabled={unlocking}
+                style={{
+                  width: "100%", padding: "15px",
+                  background: "transparent", color: "#fff",
+                  border: "1.5px solid rgba(255,255,255,0.2)", borderRadius: 12,
+                  fontSize: 13, fontWeight: 600, cursor: unlocking ? "not-allowed" : "pointer",
+                  fontFamily: "'DM Sans', sans-serif", letterSpacing: "0.04em",
+                  transition: "border-color 0.2s ease",
+                  opacity: unlocking ? 0.5 : 1,
+                }}
+              >
+                {t('unlockPack')}
+              </button>
+            </div>
+
+            <p style={{
+              margin: "16px 0 0", fontSize: 11, color: "#555",
+              textAlign: "center", fontFamily: "'DM Sans', sans-serif",
+            }}>
+              {t('noThanks')}
+            </p>
+          </div>
+
+          <div style={{ marginTop: 24, padding: "0 4px" }}>
+            <p style={{ fontSize: 10, color: "#ccc", lineHeight: 1.8, textAlign: "center", letterSpacing: "0.02em" }}>
+              {t('disclaimer')}
+            </p>
+          </div>
+        </div>
+
+        <style>{`
+          @keyframes spin {
+            to { transform: rotate(360deg); }
+          }
+        `}</style>
+      </div>
+    );
+  }
+
+  /* ══════════════ PAID VIEW ══════════════ */
+  const paid = data.paid_version || {};
+  const metrics = paid.metrics || [];
+  const strengths = paid.strengths || [];
+  const improvements = paid.improvements || [];
+  const recommendations = paid.recommendations || [];
+  const products = paid.products || [];
 
   return (
     <div style={{ background: "#f8f8f8", minHeight: "100vh", fontFamily: "'DM Sans', sans-serif", padding: "0 0 60px" }}>
-
-      {/* ── Report header with gradient accent ── */}
-      <div style={{
-        background: "#fff",
-        borderBottom: "1px solid #ebebeb",
-        padding: "36px 28px 28px",
-        position: "relative",
-        overflow: "hidden",
-      }}>
-        {/* Subtle background gradient */}
-        <div style={{
-          position: "absolute", inset: 0, pointerEvents: "none",
-          background: "radial-gradient(ellipse 80% 100% at 50% -20%, rgba(0,0,0,0.03) 0%, transparent 100%)",
-        }} />
-        <div className="mobile-padding" style={{ maxWidth: 680, margin: "0 auto", position: "relative" }}>
-          <p className="mobile-hide" style={{ margin: "0 0 5px", fontSize: 9.5, letterSpacing: "0.24em", textTransform: "uppercase", color: "#bbb", fontWeight: 600 }}>
-            {t('aestheticAnalysis')}
-          </p>
-          <h1 style={{
-            margin: "0 0 4px", fontSize: 30, fontWeight: 300,
-            fontFamily: "'Cormorant Garamond', serif", letterSpacing: "0.01em",
-            background: "linear-gradient(135deg, #0d0d0d 0%, #3a3a3a 100%)",
-            WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text",
-            color: "transparent",
-          }}>
-            {t('yourFacialReport')}
-          </h1>
-          <p style={{ margin: 0, fontSize: 12, color: "#bbb", letterSpacing: "0.02em" }}>
-            {t('notMedicalAdvice')}
-          </p>
-        </div>
-      </div>
+      <ReportHeader t={t} />
 
       <div style={{ maxWidth: 680, margin: "0 auto", padding: "0 20px" }}>
 
@@ -306,7 +551,7 @@ export default function BeautyReport({ data, products = [] }) {
 
           {/* Score rings — top 3 */}
           <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
-              {(metrics || []).slice(0, 3).map(m => (
+            {metrics.slice(0, 3).map(m => (
               <div key={m.label} style={{ display: "flex", alignItems: "center", gap: 14 }}>
                 <div style={{ position: "relative" }}>
                   <ScoreRing score={m.score} size={50}/>
@@ -361,7 +606,7 @@ export default function BeautyReport({ data, products = [] }) {
 
           {activeTab === "analysis" && (
             <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-              {(metrics || []).map((m, i) => <MetricCard key={i} m={m} index={i}/>)}
+              {metrics.map((m, i) => <MetricCard key={i} m={m} index={i}/>)}
               <div style={{
                 background: "#fff", border: "1px solid #ebebeb", borderRadius: 14,
                 padding: "16px 22px", display: "flex", gap: 20, flexWrap: "wrap",
@@ -382,7 +627,7 @@ export default function BeautyReport({ data, products = [] }) {
 
           {activeTab === "strengths" && (
             <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-              {(strengths || []).map((s, i) => (
+              {strengths.map((s, i) => (
                 <div key={i} style={{
                   background: "#fff", border: "1px solid #ebebeb", borderRadius: 18,
                   padding: "24px", display: "flex", gap: 16, alignItems: "flex-start",
@@ -410,7 +655,7 @@ export default function BeautyReport({ data, products = [] }) {
 
           {activeTab === "improve" && (
             <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-              {(improvements || []).map((s, i) => (
+              {improvements.map((s, i) => (
                 <div key={i} style={{
                   background: "#fff", border: "1px solid #ebebeb", borderRadius: 18,
                   padding: "24px", display: "flex", gap: 16, alignItems: "flex-start",
@@ -439,7 +684,7 @@ export default function BeautyReport({ data, products = [] }) {
 
           {activeTab === "recs" && (
             <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-              {(recommendations || []).map((r, i) => (
+              {recommendations.map((r, i) => (
                 <div key={i} style={{
                   background: "#fff", border: "1px solid #ebebeb", borderRadius: 18,
                   padding: "24px",
@@ -472,7 +717,6 @@ export default function BeautyReport({ data, products = [] }) {
               ))}
             </div>
           )}
-        </div>
 
           {activeTab === "shop" && (
             <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
@@ -510,6 +754,7 @@ export default function BeautyReport({ data, products = [] }) {
               </p>
             </div>
           )}
+        </div>
 
         {/* ── Share CTA ── */}
         <div style={{
