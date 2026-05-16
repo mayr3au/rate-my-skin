@@ -3,7 +3,13 @@
     "allow": [
       "Bash(Copy-Item *)",
       "Bash(npm run *)",
-      "Bash(curl *)"
+      "Bash(curl *)",
+      "Bash(npx next *)",
+      "Bash(git add *)",
+      "Bash(git commit -m ' *)",
+      "Bash(git push *)",
+      "Bash(wmic logicaldisk *)",
+      "Bash(npm install *)"
     ]
   }
 }

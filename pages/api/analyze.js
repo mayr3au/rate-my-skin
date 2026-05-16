@@ -94,35 +94,36 @@ export default async function handler(req, res) {
     // 2. Generate analysis ID
     const analysisId = crypto.randomUUID();
 
-    // 3. Upsert user (create if not exists, increment analyses_used)
-    const { data: existingUser } = await supabase
-      .from('users')
-      .select('analyses_used')
-      .eq('id', userId)
-      .single();
+    // 3. Upsert user and insert analysis row (skip if no userId)
+    if (userId) {
+      const { data: existingUser } = await supabase
+        .from('users')
+        .select('analyses_used')
+        .eq('id', userId)
+        .single();
 
-    if (existingUser) {
-      await supabase
-        .from('users')
-        .update({
-          analyses_used: existingUser.analyses_used + 1,
-          updated_at: new Date().toISOString(),
-        })
-        .eq('id', userId);
-    } else {
-      await supabase
-        .from('users')
-        .insert({ id: userId, analyses_used: 1, paid_credits: 0, paid_unlocks: 0 });
+      if (existingUser) {
+        await supabase
+          .from('users')
+          .update({
+            analyses_used: existingUser.analyses_used + 1,
+            updated_at: new Date().toISOString(),
+          })
+          .eq('id', userId);
+      } else {
+        await supabase
+          .from('users')
+          .insert({ id: userId, analyses_used: 1, paid_credits: 0, paid_unlocks: 0 });
+      }
+
+      await supabase.from('analyses').insert({
+        id: analysisId,
+        user_id: userId,
+        skin_concern: skinConcern || null,
+        report_json: analysisData,
+        is_paid: false,
+      });
     }
-
-    // 4. Insert row into analyses table
-    await supabase.from('analyses').insert({
-      id: analysisId,
-      user_id: userId,
-      skin_concern: skinConcern || null,
-      report_json: analysisData,
-      is_paid: false,
-    });
 
     return res.status(200).json({ data: analysisData, analysisId });
 
