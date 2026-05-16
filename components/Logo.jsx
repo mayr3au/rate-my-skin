@@ -165,18 +165,18 @@ export function LuxuryFlower({ width = 36, height = 36 }) {
 
 /* ── Header Logo ── */
 // A 3D "Bevel" gradient: dark edges with a bright, creamy center highlight sweeping through the letters
-const VELVET_GRAD = 'linear-gradient(135deg, #3A2E26 0%, #A87449 35%, #FDFBF9 50%, #A87449 65%, #3A2E26 100%)';
+const VELVET_GRAD = 'linear-gradient(180deg, #3A2E26 0%, #A87449 15%, #FDFBF9 50%, #A87449 85%, #3A2E26 100%)';
 
 export default function Logo() {
   const [hovered, setHovered] = useState(false);
 
   const creamyStyle = {
     background: VELVET_GRAD,
-    backgroundSize: '200% 100%',
+    backgroundSize: '100% 200%',
     WebkitBackgroundClip: 'text',
     WebkitTextFillColor: 'transparent',
     backgroundClip: 'text',
-    animation: `logoShimmer ${hovered ? '4s' : '10s'} ease-in-out infinite`,
+    animation: `logoShimmer ${hovered ? '6s' : '12s'} ease-in-out infinite`,
     // Removed text-shadow because it renders ON TOP of transparent text in some browsers, ruining visibility.
   };
 
@@ -219,10 +219,7 @@ export default function Logo() {
         </span>
 
         <span className="logo-text-skin" style={{
-          background: 'linear-gradient(90deg, #A87449 0%, #D4A574 100%)',
-          WebkitBackgroundClip: 'text',
-          WebkitTextFillColor: 'transparent',
-          backgroundClip: 'text',
+          ...creamyStyle,
           fontFamily: "'Cormorant Garamond', serif",
           fontWeight: 500,
           fontStyle: 'italic',
@@ -235,9 +232,9 @@ export default function Logo() {
       </span>
       <style>{`
         @keyframes logoShimmer {
-          0% { background-position: 0% 50%; }
-          50% { background-position: 100% 50%; }
-          100% { background-position: 0% 50%; }
+          0% { background-position: 50% 0%; }
+          50% { background-position: 50% 100%; }
+          100% { background-position: 50% 0%; }
         }
       `}</style>
     </span>

@@ -14,13 +14,13 @@ function LangToggle() {
     <div style={{ display: 'flex', alignItems: 'center', gap: 2 }}>
       {['en', 'fr'].map((l, i) => (
         <span key={l} style={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-          {i > 0 && <span style={{ color: '#ddd', fontSize: 11, lineHeight: 1 }}>|</span>}
+          {i > 0 && <span style={{ color: '#E0DDD8', fontSize: 11, lineHeight: 1 }}>|</span>}
           <button
             onClick={() => setLang(l)}
             style={{
               background: 'none', border: 'none',
               fontSize: 11, fontWeight: lang === l ? 700 : 400,
-              color: lang === l ? '#0d0d0d' : '#bbb',
+              color: lang === l ? '#2C241D' : '#B9AC9E',
               cursor: 'pointer', padding: '2px 5px',
               fontFamily: "'DM Sans', sans-serif",
               letterSpacing: '0.1em', textTransform: 'uppercase',
@@ -44,7 +44,7 @@ export default function Home() {
   const [emailCaptured, setEmailCaptured] = useState(false);
   const [email, setEmail] = useState('');
   const [emailLoading, setEmailLoading] = useState(false);
-  const [overlayVisible, setOverlayVisible] = useState(true);
+  const [overlayVisible, setOverlayVisible] = useState(false);
 
   const [image, setImage] = useState(null);
   const [imageUrl, setImageUrl] = useState(null);
@@ -59,7 +59,7 @@ export default function Home() {
   useEffect(() => {
     const captured = localStorage.getItem('rms_email_captured') === '1';
     setEmailCaptured(captured);
-    setOverlayVisible(!captured);
+    // Overlay stays false until triggered by button
     fetch('/api/identity')
       .then(r => r.json())
       .then(({ userId: uid }) => setUserId(uid))
@@ -81,8 +81,16 @@ export default function Home() {
     localStorage.setItem('rms_email_captured', '1');
     localStorage.setItem('rms_email', email.trim());
     setEmailCaptured(true);
-    setTimeout(() => setOverlayVisible(false), 650);
-    setEmailLoading(false);
+    
+    // Smooth transition: close overlay then start analysis automatically
+    setTimeout(() => {
+      setOverlayVisible(false);
+      setEmailLoading(false);
+      // We call handleAnalyse after a short delay so the overlay close animation finishes
+      setTimeout(() => {
+        handleAnalyse(true); // pass flag to bypass email check
+      }, 300);
+    }, 650);
   };
 
   /* ── File handling ── */
@@ -121,8 +129,15 @@ export default function Home() {
   };
 
   /* ── Analyse ── */
-  const handleAnalyse = async () => {
+  const handleAnalyse = async (bypassEmailCheck = false) => {
     if (!image) return;
+
+    // Trigger email gate if not captured yet
+    if (!emailCaptured && !bypassEmailCheck) {
+      setOverlayVisible(true);
+      return;
+    }
+
     setLoading(true);
     setError('');
     try {
@@ -194,10 +209,10 @@ export default function Home() {
           minHeight: 'calc(100vh - 60px)',
           background: 'transparent',
           fontFamily: "'DM Sans', sans-serif",
-          filter: emailCaptured ? 'none' : 'blur(1.5px)',
-          pointerEvents: emailCaptured ? 'auto' : 'none',
+          filter: (overlayVisible && !emailCaptured) ? 'blur(8px)' : 'none',
+          pointerEvents: (overlayVisible && !emailCaptured) ? 'none' : 'auto',
           transition: 'filter 0.65s ease',
-          userSelect: emailCaptured ? 'auto' : 'none',
+          userSelect: (overlayVisible && !emailCaptured) ? 'none' : 'auto',
         }}
       >
         {/* Hero */}
@@ -217,11 +232,11 @@ export default function Home() {
             {t('heroLine1')}<br />
             <em>{t('heroLine2')}</em>
           </h1>
-          <p style={{ fontSize: 13, color: '#888', margin: '14px 0 0', lineHeight: 1.6, fontFamily: "'DM Sans', sans-serif" }}>
+          <p style={{ fontSize: 13, color: '#8C7A6B', margin: '14px 0 0', lineHeight: 1.6, fontFamily: "'DM Sans', sans-serif" }}>
             {t('heroLine3')}
           </p>
           <p style={{
-            fontSize: 13, color: '#aaa', margin: '6px auto 0',
+            fontSize: 13, color: '#A2968B', margin: '6px auto 0',
             maxWidth: 420, lineHeight: 1.6, fontFamily: "'DM Sans', sans-serif",
           }}>
             {t('heroDesc')}
@@ -327,11 +342,11 @@ export default function Home() {
             ) : (
               <>
                 <CreamDrop width={110} height={55} />
-                <p style={{ margin: '14px 0 4px', fontSize: 14, color: '#555', fontWeight: 500, fontFamily: "'DM Sans', sans-serif" }}>
+                <p style={{ margin: '14px 0 4px', fontSize: 14, color: '#6F6156', fontWeight: 500, fontFamily: "'DM Sans', sans-serif" }}>
                   {t('dragDrop')}
                 </p>
-                <p style={{ margin: 0, fontSize: 11, color: '#bbb', fontFamily: "'DM Sans', sans-serif" }}>{t('fileTypes')}</p>
-                <p style={{ margin: '16px 0 0', fontSize: 11, color: '#ccc', letterSpacing: '0.08em', textTransform: 'uppercase', fontFamily: "'DM Sans', sans-serif" }}>
+                <p style={{ margin: 0, fontSize: 11, color: '#B9AC9E', fontFamily: "'DM Sans', sans-serif" }}>{t('fileTypes')}</p>
+                <p style={{ margin: '16px 0 0', fontSize: 11, color: '#CBAA8D', letterSpacing: '0.08em', textTransform: 'uppercase', fontFamily: "'DM Sans', sans-serif" }}>
                   {t('or')}
                 </p>
                 <div style={{ display: 'flex', gap: 10, justifyContent: 'center', marginTop: 14, flexWrap: 'wrap' }}>
@@ -343,7 +358,7 @@ export default function Home() {
                   </button>
                   <button
                     onClick={(e) => { e.stopPropagation(); cameraInputRef.current?.click(); }}
-                    style={{ ...btnStyle, background: 'none', color: '#555', border: '1.5px solid #E0DDD8', boxShadow: 'none' }}
+                    style={{ ...btnStyle, background: 'none', color: '#6F6156', border: '1.5px solid #E0DDD8', boxShadow: 'none' }}
                   >
                     {t('takeASelfie')}
                   </button>
@@ -362,11 +377,11 @@ export default function Home() {
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 8, flexWrap: 'wrap', gap: 4 }}>
               <label style={{
                 fontFamily: "'Cormorant Garamond', serif",
-                fontSize: 17, color: '#2a2a2a', fontWeight: 500,
+                fontSize: 17, color: '#3A2E26', fontWeight: 500,
               }}>
                 {t('skinConcernLabel')}
               </label>
-              <span style={{ fontSize: 11, color: '#bbb', fontFamily: "'DM Sans', sans-serif" }}>{t('skinConcernOptional')}</span>
+              <span style={{ fontSize: 11, color: '#B9AC9E', fontFamily: "'DM Sans', sans-serif" }}>{t('skinConcernOptional')}</span>
             </div>
 
             {/* Quick-select chips */}
@@ -426,7 +441,7 @@ export default function Home() {
               />
               <span style={{
                 position: 'absolute', bottom: 9, right: 12,
-                fontSize: 11, color: skinConcern.length >= SKIN_CONCERN_MAX ? '#c0392b' : '#ccc',
+                fontSize: 11, color: skinConcern.length >= SKIN_CONCERN_MAX ? '#c0392b' : '#B9AC9E',
                 fontFamily: "'DM Sans', sans-serif",
               }}>
                 {t('skinConcernCounter', skinConcern.length, SKIN_CONCERN_MAX)}
@@ -465,7 +480,7 @@ export default function Home() {
           </button>
 
           {loading && (
-            <p style={{ textAlign: 'center', fontSize: 12, color: '#aaa', marginTop: 10, fontFamily: "'DM Sans', sans-serif" }}>
+            <p style={{ textAlign: 'center', fontSize: 12, color: '#8C7A6B', marginTop: 10, fontFamily: "'DM Sans', sans-serif" }}>
               {t('analysisTime')}
             </p>
           )}
@@ -473,7 +488,7 @@ export default function Home() {
           {/* Footer trust */}
           <div style={{ display: 'flex', justifyContent: 'center', gap: 20, marginTop: 20, flexWrap: 'wrap' }}>
             {[t('noAccountNeeded'), t('resultsIn20s')].map((txt) => (
-              <span key={txt} style={{ fontSize: 11, color: '#ccc', display: 'flex', alignItems: 'center', gap: 5, fontFamily: "'DM Sans', sans-serif" }}>
+              <span key={txt} style={{ fontSize: 11, color: '#CBAA8D', display: 'flex', alignItems: 'center', gap: 5, fontFamily: "'DM Sans', sans-serif" }}>
                 <span style={{ color: GOLD }}>✓</span> {txt}
               </span>
             ))}
@@ -505,8 +520,8 @@ export default function Home() {
             transition: 'transform 0.65s cubic-bezier(0.4,0,0.2,1)',
             textAlign: 'center',
           }}>
-            <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 18 }}>
-              <CreamDrop width={120} height={60} />
+            <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 22 }}>
+              <LuxuryFlower width={72} height={72} />
             </div>
 
             <p style={{
@@ -520,14 +535,14 @@ export default function Home() {
             <h2 style={{
               fontFamily: "'Cormorant Garamond', serif",
               fontSize: 'clamp(22px, 5vw, 30px)', fontWeight: 400,
-              color: '#0d0d0d', margin: '0 0 10px', lineHeight: 1.2,
+              color: '#2C241D', margin: '0 0 10px', lineHeight: 1.2,
             }}>
               {t('unlock2ndFree')}
             </h2>
 
             <p style={{
               fontFamily: "'DM Sans', sans-serif",
-              fontSize: 13, color: '#888', lineHeight: 1.6,
+              fontSize: 13, color: '#8C7A6B', lineHeight: 1.6,
               margin: '0 0 24px',
             }}>
               {t('emailGateDesc')}
@@ -582,7 +597,7 @@ export default function Home() {
               </button>
             </form>
 
-            <p style={{ marginTop: 14, fontSize: 11, color: '#ccc', lineHeight: 1.5, fontFamily: "'DM Sans', sans-serif" }}>
+            <p style={{ marginTop: 14, fontSize: 11, color: '#CBAA8D', lineHeight: 1.5, fontFamily: "'DM Sans', sans-serif" }}>
               {t('heroLine3')}
             </p>
           </div>
@@ -592,9 +607,9 @@ export default function Home() {
       <style>{`
         @keyframes spin { to { transform: rotate(360deg); } }
         @keyframes logoShimmer {
-          0% { background-position: 100% 50%; }
-          50% { background-position: 0% 50%; }
-          100% { background-position: 100% 50%; }
+          0% { background-position: 50% 100%; }
+          50% { background-position: 50% 0%; }
+          100% { background-position: 50% 100%; }
         }
         @keyframes pulse {
           0%, 100% { opacity: 0.6; transform: scale(1); }
