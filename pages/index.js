@@ -44,12 +44,13 @@ export default function Home() {
   const [emailCaptured, setEmailCaptured] = useState(false);
   const [email, setEmail] = useState('');
   const [emailLoading, setEmailLoading] = useState(false);
+  const [newsletterConsent, setNewsletterConsent] = useState(true);
   const [overlayVisible, setOverlayVisible] = useState(false);
 
   const [image, setImage] = useState(null);
   const [imageUrl, setImageUrl] = useState(null);
   const [skinConcern, setSkinConcern] = useState('');
-  const [activeChip, setActiveChip] = useState(null);
+  const [activeChips, setActiveChips] = useState([]);
   const [dragOver, setDragOver] = useState(false);
 
   const [loading, setLoading] = useState(false);
@@ -92,7 +93,7 @@ export default function Home() {
       await fetch('/api/newsletter', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: email.trim() }),
+        body: JSON.stringify({ email: email.trim(), newsletter: newsletterConsent }),
       });
     } catch {}
     localStorage.setItem('rms_email_captured', '1');
@@ -130,19 +131,22 @@ export default function Home() {
   const quickConcerns = [
     { key: 'Acne', label: t('quickConcernAcne') },
     { key: 'Dryness', label: t('quickConcernDryness') },
-    { key: 'Sensitivity', label: t('quickConcernSensitivity') },
     { key: 'Oily', label: t('quickConcernOily') },
+    { key: 'Sensitivity', label: t('quickConcernSensitivity') },
     { key: 'Aging', label: t('quickConcernAging') },
+    { key: 'DarkSpots', label: t('quickConcernDarkSpots') },
+    { key: 'LargePores', label: t('quickConcernPores') },
+    { key: 'Redness', label: t('quickConcernRedness') },
+    { key: 'DarkCircles', label: t('quickConcernDarkCircles') },
   ];
 
   const handleChip = (key, label) => {
-    if (activeChip === key) {
-      setActiveChip(null);
-      setSkinConcern('');
-    } else {
-      setActiveChip(key);
-      setSkinConcern(label);
-    }
+    setActiveChips(prev => {
+      const next = prev.includes(key) ? prev.filter(k => k !== key) : [...prev, key];
+      const labels = next.map(k => quickConcerns.find(c => c.key === k)?.label ?? k);
+      setSkinConcern(labels.join(', '));
+      return next;
+    });
   };
 
   /* ── Analyse ── */
@@ -408,14 +412,14 @@ export default function Home() {
                   key={key}
                   onClick={() => handleChip(key, label)}
                   style={{
-                    border: activeChip === key ? `1.5px solid ${GOLD}` : '1.5px solid rgba(224,221,216,0.6)',
-                    background: activeChip === key ? 'rgba(197,160,40,0.06)' : '#FCFAF6',
-                    color: activeChip === key ? '#8B6914' : '#887E75',
+                    border: activeChips.includes(key) ? `1.5px solid ${GOLD}` : '1.5px solid rgba(224,221,216,0.6)',
+                    background: activeChips.includes(key) ? 'rgba(197,160,40,0.06)' : '#FCFAF6',
+                    color: activeChips.includes(key) ? '#8B6914' : '#887E75',
                     borderRadius: 30, padding: '6px 16px',
                     fontSize: 12, cursor: 'pointer',
                     fontFamily: "'DM Sans', sans-serif",
-                    fontWeight: activeChip === key ? 600 : 400,
-                    boxShadow: activeChip === key ? '0 2px 8px rgba(197,160,40,0.15)' : 'inset 0 2px 4px rgba(0,0,0,0.02)',
+                    fontWeight: activeChips.includes(key) ? 600 : 400,
+                    boxShadow: activeChips.includes(key) ? '0 2px 8px rgba(197,160,40,0.15)' : 'inset 0 2px 4px rgba(0,0,0,0.02)',
                     transition: 'all 0.25s ease',
                   }}
                 >
@@ -430,7 +434,7 @@ export default function Home() {
                 onChange={(e) => {
                   if (e.target.value.length <= SKIN_CONCERN_MAX) {
                     setSkinConcern(e.target.value);
-                    setActiveChip(null);
+                    setActiveChips([]);
                   }
                 }}
                 placeholder={t('skinConcernPlaceholder')}
@@ -591,6 +595,27 @@ export default function Home() {
                   e.target.style.background = 'rgba(245, 240, 235, 0.6)';
                 }}
               />
+              <label style={{
+                display: 'flex', alignItems: 'flex-start', gap: 10,
+                cursor: 'pointer', padding: '2px 0',
+              }}>
+                <input
+                  type="checkbox"
+                  checked={newsletterConsent}
+                  onChange={(e) => setNewsletterConsent(e.target.checked)}
+                  style={{
+                    marginTop: 2, width: 15, height: 15, flexShrink: 0,
+                    accentColor: '#A87449', cursor: 'pointer',
+                  }}
+                />
+                <span style={{
+                  fontSize: 11, color: '#8C7A6B', lineHeight: 1.5,
+                  fontFamily: "'DM Sans', sans-serif",
+                }}>
+                  {t('newsletterConsent')}
+                </span>
+              </label>
+
               <button
                 type="submit"
                 disabled={emailLoading}
@@ -680,11 +705,21 @@ export default function Home() {
           <p style={{ marginTop: 24, fontSize: 11, color: '#B9AC9E', fontFamily: "'DM Sans', sans-serif" }}>
             {t('analysisTime')}
           </p>
+
+          <p style={{
+            marginTop: 16, fontSize: 12, color: '#C4A882',
+            fontFamily: "'DM Sans', sans-serif", fontStyle: 'italic',
+            maxWidth: 280, lineHeight: 1.5,
+            animation: 'fadeInUp 0.8s ease-out 1.5s both',
+          }}>
+            {t('funnyLoadingNote')}
+          </p>
         </div>
       )}
 
       <style>{`
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes fadeInUp { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
         @keyframes loadingProgress {
           0% { transform: translateX(-100%); }
           100% { transform: translateX(200%); }
