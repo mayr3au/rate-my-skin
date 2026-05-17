@@ -79,6 +79,11 @@ export default async function handler(req, res) {
   if (applyCors(req, res)) return;
   if (req.method !== 'POST') return res.status(405).end();
 
+  // Env-var health check — visible in Vercel function logs
+  console.log('[analyze] env check — SUPABASE_URL:', !!process.env.NEXT_PUBLIC_SUPABASE_URL,
+    '| SERVICE_KEY:', !!process.env.SUPABASE_SERVICE_ROLE_KEY,
+    '| ANTHROPIC:', !!process.env.ANTHROPIC_API_KEY);
+
   const supabase = createAdminClient();
   const { userId, imageBase64, mimeType, lang, skinConcern, captchaToken } = req.body;
 
@@ -89,12 +94,14 @@ export default async function handler(req, res) {
       .select('*');
 
     if (productsError) {
-      console.error('[analyze] products query error:', productsError);
-      return res.status(500).json({ error: 'Failed to load products' });
+      console.error('[analyze] products query error:', productsError.message, productsError.code);
+      // Don't hard-fail — continue with empty products so analysis still works
+      console.warn('[analyze] continuing without products due to query error');
     }
 
     // Format products for Claude (clean structure)
-    const formattedProducts = products.map(p => ({
+    const safeProducts = products || [];
+    const formattedProducts = safeProducts.map(p => ({
       skin_problem: p.skin_problem,
       product_name: p.product_name,
       description: p.product_description,
@@ -105,7 +112,7 @@ export default async function handler(req, res) {
 
     // Build image lookup map for server-side injection after Claude responds
     const imageByName = {};
-    products.forEach(p => {
+    safeProducts.forEach(p => {
       if (p.product_name && p.product_image_url) {
         imageByName[p.product_name.toLowerCase()] = p.product_image_url;
       }

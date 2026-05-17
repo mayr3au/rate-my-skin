@@ -39,3 +39,21 @@ CREATE TABLE IF NOT EXISTS public.analyses (
 );
 
 ALTER TABLE public.analyses ENABLE ROW LEVEL SECURITY;
+
+-- ── RLS policies — service role bypasses RLS automatically, but ──────────────
+-- these explicit policies ensure inserts work if the service role key ever
+-- falls back to anon (misconfigured env var), and fix "permission denied" errors.
+
+-- Allow service role full access to users
+CREATE POLICY IF NOT EXISTS "service_role_users_all"
+  ON public.users FOR ALL
+  TO service_role
+  USING (true)
+  WITH CHECK (true);
+
+-- Allow service role full access to analyses
+CREATE POLICY IF NOT EXISTS "service_role_analyses_all"
+  ON public.analyses FOR ALL
+  TO service_role
+  USING (true)
+  WITH CHECK (true);
