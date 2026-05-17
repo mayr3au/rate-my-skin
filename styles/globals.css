@@ -15,33 +15,41 @@ body {
   position: relative;
 }
 
-/* Luxury Silk / Pearlescent Texture Overlay */
+/* Luxury Silk / Pearlescent Texture Overlay — static, no animation */
 body::after {
   content: "";
   position: fixed;
-  top: -50%; left: -50%; width: 200%; height: 200%;
+  inset: 0;
   background: url("data:image/svg+xml,%3Csvg viewBox='0 0 1000 1000' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='silk'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.005' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3CfeComponentTransfer%3E%3CfeFuncA type='linear' slope='0.03'/%3E%3C/feComponentTransfer%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23silk)'/%3E%3C/svg%3E");
   pointer-events: none;
-  animation: silkMove 60s linear infinite;
   z-index: -1;
-  opacity: 0.6;
+  opacity: 0.5;
 }
 
-@keyframes silkMove {
-  from { transform: translate(0, 0); }
-  to { transform: translate(-5%, -5%); }
-}
-
-/* Elegant Grain Overlay (on top of everything) */
+/* Grain overlay — desktop only */
 body::before {
   content: "";
   position: fixed;
-  top: -50%; left: -50%; right: -50%; bottom: -50%;
-  width: 200%; height: 200%;
+  inset: 0;
   background: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
-  opacity: 0.04;
+  opacity: 0.035;
   pointer-events: none;
   z-index: 9999;
+}
+
+@media (max-width: 600px) {
+  body::after, body::before { display: none; }
+
+  /* Kill all backdrop-filter on mobile — huge GPU cost, not visible anyway */
+  * {
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+  }
+
+  /* Compensate with solid backgrounds where blur was hiding transparency */
+  .nav-blur  { background: rgba(253, 251, 249, 0.97) !important; }
+  .card-blur { background: #fff !important; }
+  .overlay-blur { background: rgba(253, 251, 249, 0.97) !important; }
 }
 
 ::selection {

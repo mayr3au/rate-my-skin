@@ -208,10 +208,10 @@ export default function Home() {
       </Head>
 
       {/* ── Sticky nav ── */}
-      <div style={{
+      <div className="nav-blur" style={{
         position: 'sticky', top: 0, zIndex: 200,
         background: 'rgba(255, 253, 250, 0.55)',
-        backdropFilter: 'blur(24px) saturate(1.2)', WebkitBackdropFilter: 'blur(24px) saturate(1.2)',
+        backdropFilter: 'blur(16px)', WebkitBackdropFilter: 'blur(16px)',
         borderBottom: '1px solid rgba(255, 255, 255, 0.6)',
         boxShadow: '0 4px 20px rgba(180, 160, 140, 0.04)',
         padding: '13px 26px',
@@ -283,9 +283,9 @@ export default function Home() {
               flex: '1 1 110px',
               textAlign: 'center',
               padding: '12px 14px',
-              background: 'rgba(255, 253, 251, 0.4)',
-              backdropFilter: 'blur(12px)',
-              WebkitBackdropFilter: 'blur(12px)',
+              background: 'rgba(255, 253, 251, 0.9)',
+              backdropFilter: 'none',
+              WebkitBackdropFilter: 'none',
               border: '1px solid rgba(212, 165, 116, 0.2)',
               borderRadius: 24,
               boxShadow: '0 4px 16px rgba(168, 116, 73, 0.04)',
@@ -351,10 +351,9 @@ export default function Home() {
                   onClick={(e) => { e.stopPropagation(); fileInputRef.current?.click(); }}
                   style={{
                     position: 'absolute', bottom: 12, right: 12,
-                    background: 'rgba(13,13,13,0.75)', color: '#fff',
+                    background: 'rgba(13,13,13,0.82)', color: '#fff',
                     border: 'none', borderRadius: 8, padding: '7px 14px',
                     fontSize: 12, cursor: 'pointer', fontFamily: "'DM Sans', sans-serif",
-                    backdropFilter: 'blur(8px)',
                   }}
                 >
                   {t('changePhoto')}
@@ -445,9 +444,8 @@ export default function Home() {
                   padding: '16px 18px 32px', fontSize: 13, color: '#3A2E26',
                   fontFamily: "'DM Sans', sans-serif",
                   resize: 'vertical', outline: 'none',
-                  background: 'rgba(255, 255, 255, 0.45)',
+                  background: 'rgba(255, 255, 255, 0.92)',
                   boxShadow: 'inset 0 2px 6px rgba(180, 160, 140, 0.12), 0 1px 0 rgba(255, 255, 255, 0.8)',
-                  backdropFilter: 'blur(10px)',
                   transition: 'all 0.3s ease',
                   lineHeight: 1.6,
                 }}
@@ -522,7 +520,7 @@ export default function Home() {
         <div style={{
           position: 'fixed', inset: 0, zIndex: 300,
           background: 'rgba(255, 253, 248, 0.4)',
-          backdropFilter: 'blur(16px) saturate(1.1)', WebkitBackdropFilter: 'blur(16px) saturate(1.1)',
+          backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)',
           display: 'flex', alignItems: 'center', justifyContent: 'center',
           padding: '24px',
           opacity: emailCaptured ? 0 : 1,
@@ -530,8 +528,8 @@ export default function Home() {
           transition: 'opacity 0.65s ease',
         }}>
           <div style={{
-            background: 'rgba(255, 255, 255, 0.85)',
-            backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)',
+            background: 'rgba(255, 255, 255, 0.97)',
+            backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)',
             border: '1px solid rgba(255, 255, 255, 0.8)',
             borderRadius: 32,
             padding: 'clamp(32px, 6vw, 48px)',
