@@ -70,26 +70,56 @@ function ProductCard({ product, lang, t }) {
   const [hov, setHov] = useState(false);
   const [vis, setVis] = useState(false);
   useEffect(() => { const t = setTimeout(() => setVis(true), 60); return () => clearTimeout(t); }, []);
-  const amazonUrl = `https://www.amazon.fr/s?k=${encodeURIComponent(product.productName)}&tag=ratemyskin-21`;
-  const sephoraUrl = `https://www.sephora.fr/search/?q=${encodeURIComponent(product.productName)}`;
+  const amazonUrl = product.amazonLink || `https://www.amazon.fr/s?k=${encodeURIComponent(product.productName)}&tag=ratemyskin-21`;
+  const sephoraUrl = product.sephoraLink || `https://www.sephora.fr/search/?q=${encodeURIComponent(product.productName)}`;
+  const primaryLink = amazonUrl;
+
   return (
     <div onMouseEnter={() => setHov(true)} onMouseLeave={() => setHov(false)} style={{
-      ...CARD, padding: "20px 22px",
+      ...CARD, padding: "18px 20px",
       border: `1px solid ${hov ? "rgba(168,116,73,0.4)" : "rgba(212,165,116,0.18)"}`,
       boxShadow: hov ? "0 8px 28px rgba(168,116,73,0.1)" : CARD.boxShadow,
       opacity: vis ? 1 : 0, transform: vis ? "translateY(0)" : "translateY(12px)",
       transition: "opacity 0.45s ease, transform 0.45s ease, border-color 0.2s, box-shadow 0.2s",
+      display: "flex", gap: 16, alignItems: "flex-start",
     }}>
-      <span style={{ display: "inline-block", marginBottom: 10, fontSize: 9, fontWeight: 700, letterSpacing: "0.14em", textTransform: "uppercase", color: "#7C2D2D", background: "#FDF2F2", border: "1px solid #F5DADA", borderRadius: 6, padding: "3px 9px" }}>
-        {product.skinProblem}
-      </span>
-      <div style={{ fontSize: 16, fontWeight: 400, color: "#2C241D", marginBottom: 6, fontFamily: "'Cormorant Garamond', serif", lineHeight: 1.3 }}>{product.productName}</div>
-      <p style={{ margin: "0 0 16px", fontSize: 12.5, color: "#8C7A6B", lineHeight: 1.7 }}>{product.description}</p>
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 10 }}>
-        <span style={{ fontSize: 18, fontWeight: 300, color: "#2C241D", fontFamily: "'Cormorant Garamond', serif" }}>{product.price}</span>
-        <div className="rpt-product-btns" style={{ display: "flex", gap: 7 }}>
-          <a href={amazonUrl} target="_blank" rel="noopener noreferrer" style={{ textDecoration: "none", background: "#2C241D", color: "#fff", borderRadius: 9, padding: "9px 16px", fontSize: 12, fontWeight: 600, letterSpacing: "0.04em", fontFamily: "'DM Sans', sans-serif" }}>{t('buyAmazon')}</a>
-          <a href={sephoraUrl} target="_blank" rel="noopener noreferrer" style={{ textDecoration: "none", background: "#fff", color: "#2C241D", border: "1.5px solid #2C241D", borderRadius: 9, padding: "9px 16px", fontSize: 12, fontWeight: 600, letterSpacing: "0.04em", fontFamily: "'DM Sans', sans-serif" }}>{t('buySephora')}</a>
+
+      {/* Product image */}
+      {product.imageUrl && (
+        <a href={primaryLink} target="_blank" rel="noopener noreferrer" style={{ flexShrink: 0, display: "block" }}>
+          <img
+            src={product.imageUrl}
+            alt={product.productName}
+            width={100}
+            height={100}
+            style={{
+              width: 100, height: 100,
+              objectFit: "contain",
+              borderRadius: 12,
+              background: "rgba(245,240,235,0.5)",
+              border: "1px solid rgba(212,165,116,0.15)",
+              padding: 6,
+              display: "block",
+              transition: "opacity 0.2s",
+              opacity: hov ? 0.85 : 1,
+            }}
+          />
+        </a>
+      )}
+
+      {/* Content */}
+      <div style={{ flex: 1, minWidth: 0 }}>
+        <span style={{ display: "inline-block", marginBottom: 8, fontSize: 9, fontWeight: 700, letterSpacing: "0.14em", textTransform: "uppercase", color: "#7C2D2D", background: "#FDF2F2", border: "1px solid #F5DADA", borderRadius: 6, padding: "3px 9px" }}>
+          {product.skinProblem}
+        </span>
+        <div style={{ fontSize: 15.5, fontWeight: 400, color: "#2C241D", marginBottom: 5, fontFamily: "'Cormorant Garamond', serif", lineHeight: 1.3 }}>{product.productName}</div>
+        <p style={{ margin: "0 0 14px", fontSize: 12, color: "#8C7A6B", lineHeight: 1.65 }}>{product.description}</p>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 8 }}>
+          <span style={{ fontSize: 17, fontWeight: 300, color: "#2C241D", fontFamily: "'Cormorant Garamond', serif" }}>{product.price}</span>
+          <div className="rpt-product-btns" style={{ display: "flex", gap: 7 }}>
+            <a href={amazonUrl} target="_blank" rel="noopener noreferrer" style={{ textDecoration: "none", background: "#2C241D", color: "#fff", borderRadius: 9, padding: "8px 14px", fontSize: 11.5, fontWeight: 600, letterSpacing: "0.04em", fontFamily: "'DM Sans', sans-serif" }}>{t('buyAmazon')}</a>
+            <a href={sephoraUrl} target="_blank" rel="noopener noreferrer" style={{ textDecoration: "none", background: "#fff", color: "#2C241D", border: "1.5px solid #2C241D", borderRadius: 9, padding: "8px 14px", fontSize: 11.5, fontWeight: 600, letterSpacing: "0.04em", fontFamily: "'DM Sans', sans-serif" }}>{t('buySephora')}</a>
+          </div>
         </div>
       </div>
     </div>
