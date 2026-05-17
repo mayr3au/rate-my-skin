@@ -374,56 +374,9 @@ export default function BeautyReport({ data, isPaid, onUnlock }) {
           )}
         </div>
 
-        {/* ── Blurred paid content preview ── */}
+        {/* ── Paywall section ── */}
         <div style={{
-          maxWidth: 680, margin: "24px auto 0", padding: "0 20px 80px",
-          filter: "blur(5px)",
-          opacity: 0.38,
-          pointerEvents: "none",
-          userSelect: "none",
-          transition: "filter 0.9s ease, opacity 0.9s ease",
-        }}>
-          {/* Fake tab bar */}
-          <div style={{
-            display: "flex", gap: 4, background: "rgba(255, 255, 255, 0.8)", border: "1px solid rgba(212, 165, 116, 0.15)",
-            borderRadius: 14, padding: 4, boxShadow: "0 4px 16px rgba(168, 116, 73, 0.04)",
-          }}>
-            {[t('tabMetrics'), t('tabStrengths'), t('tabImprove'), t('tabRoutine'), t('tabShop')].map((label, i) => (
-              <div key={label} style={{
-                flex: 1, padding: "12px 4px", borderRadius: 10, textAlign: "center",
-                background: i === 0 ? "linear-gradient(135deg, #2C241D, #3A2E26)" : "transparent",
-                color: i === 0 ? "#fff" : "#B9AC9E",
-                fontSize: 10.5, fontWeight: 600, letterSpacing: "0.08em",
-                fontFamily: "'DM Sans', sans-serif", textTransform: "uppercase",
-              }}>{label}</div>
-            ))}
-          </div>
-
-          {/* Preview metrics */}
-          <div style={{ display: "flex", flexDirection: "column", gap: 10, marginTop: 14 }}>
-            {previewMetrics.map((m, i) => <MetricCard key={i} m={m} index={i} />)}
-          </div>
-
-          {/* Preview strengths */}
-          {previewStrengths.length > 0 && (
-            <div style={{ display: "flex", flexDirection: "column", gap: 10, marginTop: 10 }}>
-              {previewStrengths.map((s, i) => (
-                <div key={i} style={{ background: "rgba(255, 255, 255, 0.8)", border: "1px solid rgba(212, 165, 116, 0.15)", borderRadius: 18, padding: "24px", display: "flex", gap: 16, alignItems: "flex-start" }}>
-                  <div style={{ width: 34, height: 34, borderRadius: 10, background: "linear-gradient(135deg, #2C241D, #3A2E26)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, color: "#fff", fontSize: 14 }}>{ICONS[i] || "✦"}</div>
-                  <div>
-                    <div style={{ fontSize: 12, fontWeight: 600, color: "#2C241D", marginBottom: 7 }}>{s.title}</div>
-                    <p style={{ margin: 0, fontSize: 13, lineHeight: 1.75, color: "#8C7A6B" }}>{s.desc}</p>
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
-
-        </div>
-
-        {/* ── Paywall section (replaces the fixed overlay to keep score visible) ── */}
-        <div style={{
-          maxWidth: 680, margin: "-40px auto 40px", padding: "0 20px",
+          maxWidth: 680, margin: "24px auto 0", padding: "0 20px",
           position: "relative", zIndex: 310,
         }}>
           <div style={{
@@ -517,6 +470,47 @@ export default function BeautyReport({ data, isPaid, onUnlock }) {
               {lang === 'fr' ? 'Paiement unique · Sans abonnement' : 'One-time payment · No subscription'}
             </p>
           </div>
+        </div>
+
+        {/* ── Blurred paid content preview ── */}
+        <div style={{
+          maxWidth: 680, margin: "24px auto 0", padding: "0 20px 60px",
+          filter: "blur(5px)",
+          opacity: 0.35,
+          pointerEvents: "none",
+          userSelect: "none",
+          transition: "filter 0.9s ease, opacity 0.9s ease",
+        }}>
+          <div style={{
+            display: "flex", gap: 4, background: "rgba(255, 255, 255, 0.8)", border: "1px solid rgba(212, 165, 116, 0.15)",
+            borderRadius: 14, padding: 4, boxShadow: "0 4px 16px rgba(168, 116, 73, 0.04)",
+          }}>
+            {[t('tabMetrics'), t('tabStrengths'), t('tabImprove'), t('tabRoutine'), t('tabShop')].map((label, i) => (
+              <div key={label} style={{
+                flex: 1, padding: "12px 4px", borderRadius: 10, textAlign: "center",
+                background: i === 0 ? "linear-gradient(135deg, #2C241D, #3A2E26)" : "transparent",
+                color: i === 0 ? "#fff" : "#B9AC9E",
+                fontSize: 10.5, fontWeight: 600, letterSpacing: "0.08em",
+                fontFamily: "'DM Sans', sans-serif", textTransform: "uppercase",
+              }}>{label}</div>
+            ))}
+          </div>
+          <div style={{ display: "flex", flexDirection: "column", gap: 10, marginTop: 14 }}>
+            {previewMetrics.map((m, i) => <MetricCard key={i} m={m} index={i} />)}
+          </div>
+          {previewStrengths.length > 0 && (
+            <div style={{ display: "flex", flexDirection: "column", gap: 10, marginTop: 10 }}>
+              {previewStrengths.map((s, i) => (
+                <div key={i} style={{ background: "rgba(255, 255, 255, 0.8)", border: "1px solid rgba(212, 165, 116, 0.15)", borderRadius: 18, padding: "24px", display: "flex", gap: 16, alignItems: "flex-start" }}>
+                  <div style={{ width: 34, height: 34, borderRadius: 10, background: "linear-gradient(135deg, #2C241D, #3A2E26)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, color: "#fff", fontSize: 14 }}>{ICONS[i] || "✦"}</div>
+                  <div>
+                    <div style={{ fontSize: 12, fontWeight: 600, color: "#2C241D", marginBottom: 7 }}>{s.title}</div>
+                    <p style={{ margin: 0, fontSize: 13, lineHeight: 1.75, color: "#8C7A6B" }}>{s.desc}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
 
         <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
