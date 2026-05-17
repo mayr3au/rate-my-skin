@@ -79,8 +79,9 @@ export default function Report() {
     // Remove query param from URL
     router.replace('/report', undefined, { shallow: true });
 
-    // Poll analysis status
-    const checkStatus = async () => {
+    // Poll analysis status — up to 10 attempts × 2s = 20s coverage for slow webhooks
+    let attempts = 0;
+    const poll = async () => {
       try {
         const res = await fetch(`/api/analysis-status?id=${storedAnalysisId}`);
         const { isPaid: paid } = await res.json();
@@ -88,26 +89,18 @@ export default function Report() {
           sessionStorage.setItem('rms_is_paid', 'true');
           setIsPaid(true);
           setCheckingPayment(false);
-        } else {
-          // Retry once after 2 seconds
-          setTimeout(async () => {
-            try {
-              const res2 = await fetch(`/api/analysis-status?id=${storedAnalysisId}`);
-              const { isPaid: paid2 } = await res2.json();
-              if (paid2) {
-                sessionStorage.setItem('rms_is_paid', 'true');
-                setIsPaid(true);
-              }
-            } catch {}
-            setCheckingPayment(false);
-          }, 2000);
+          return;
         }
-      } catch {
+      } catch {}
+      attempts++;
+      if (attempts < 10) {
+        setTimeout(poll, 2000);
+      } else {
         setCheckingPayment(false);
       }
     };
 
-    checkStatus();
+    poll();
   }, [router.isReady, router.query.payment]);
 
   // 4. handleUnlock: calls checkout, redirects to Stripe
