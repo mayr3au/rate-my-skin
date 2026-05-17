@@ -266,9 +266,9 @@ export default function BeautyReport({ data, isPaid, onUnlock }) {
         <div style={{ maxWidth: 680, margin: "32px auto 0", padding: "0 20px" }}>
           <div style={{
             background: "linear-gradient(160deg, #fff 0%, #FDFAF6 100%)",
-            border: "1px solid rgba(212,165,116,0.25)",
+            border: "1.5px solid #C5A028",
             borderRadius: 24, padding: "clamp(28px,5vw,40px)",
-            boxShadow: "0 20px 56px rgba(168,116,73,0.1)",
+            boxShadow: "0 20px 56px rgba(168,116,73,0.1), 0 0 0 1px rgba(197,160,40,0.15)",
             textAlign: "center",
           }}>
             <div style={{ width: 36, height: 3, background: "linear-gradient(90deg, #C5A028, #E8C872)", borderRadius: 2, margin: "0 auto 18px" }} />
