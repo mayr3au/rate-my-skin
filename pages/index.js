@@ -247,6 +247,8 @@ export default function Home() {
       sessionStorage.setItem('rms_report', JSON.stringify(json.data));
       sessionStorage.setItem('rms_analysis_id', json.analysisId);
       sessionStorage.setItem('rms_is_paid', 'false');
+      // Sync userId from server response in case it was server-generated
+      if (json.userId && !userId) setUserId(json.userId);
       router.push('/report');
     } catch (err) {
       setError(err.message || t('analysisFailed'));

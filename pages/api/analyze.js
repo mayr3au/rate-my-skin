@@ -144,38 +144,55 @@ export default async function handler(req, res) {
     // 3. Generate analysis ID
     const analysisId = crypto.randomUUID();
 
-    // 4. Upsert user and insert analysis row
-    if (userId) {
-      const { data: existingUser } = await supabase
-        .from('users')
-        .select('analyses_used')
-        .eq('id', userId)
-        .single();
+    // 4. Resolve userId — fall back to server-generated UUID if client didn't send one
+    const effectiveUserId = userId || crypto.randomUUID();
+    console.log('[analyze] userId from client:', userId, '| effectiveUserId:', effectiveUserId);
 
-      if (existingUser) {
-        await supabase
-          .from('users')
-          .update({
-            analyses_used: existingUser.analyses_used + 1,
-            updated_at: new Date().toISOString(),
-          })
-          .eq('id', userId);
-      } else {
-        await supabase
-          .from('users')
-          .insert({ id: userId, analyses_used: 1, paid_credits: 0, paid_unlocks: 0 });
-      }
+    // 5. Upsert user row
+    const { data: existingUser, error: fetchUserError } = await supabase
+      .from('users')
+      .select('analyses_used')
+      .eq('id', effectiveUserId)
+      .single();
 
-      await supabase.from('analyses').insert({
-        id: analysisId,
-        user_id: userId,
-        skin_concern: skinConcern || null,
-        report_json: analysisData,
-        is_paid: false,
-      });
+    if (fetchUserError && fetchUserError.code !== 'PGRST116') {
+      // PGRST116 = row not found, which is fine for new users
+      console.error('[analyze] error fetching user:', fetchUserError.message, fetchUserError.code);
     }
 
-    return res.status(200).json({ data: analysisData, analysisId });
+    if (existingUser) {
+      const { error: updateErr } = await supabase
+        .from('users')
+        .update({
+          analyses_used: (existingUser.analyses_used || 0) + 1,
+          updated_at: new Date().toISOString(),
+        })
+        .eq('id', effectiveUserId);
+      if (updateErr) console.error('[analyze] error updating user analyses_used:', updateErr.message);
+    } else {
+      const { error: insertUserErr } = await supabase
+        .from('users')
+        .insert({ id: effectiveUserId, analyses_used: 1, paid_credits: 0, paid_unlocks: 0 });
+      if (insertUserErr) console.error('[analyze] error inserting new user:', insertUserErr.message, insertUserErr.code);
+    }
+
+    // 6. Insert analysis row
+    console.log('[analyze] inserting analysis — id:', analysisId, 'user_id:', effectiveUserId);
+    const { error: analysisInsertErr } = await supabase.from('analyses').insert({
+      id: analysisId,
+      user_id: effectiveUserId,
+      skin_concern: skinConcern || null,
+      report_json: analysisData,
+      is_paid: false,
+    });
+
+    if (analysisInsertErr) {
+      console.error('[analyze] ❌ analysis insert failed:', analysisInsertErr.message, '| code:', analysisInsertErr.code, '| details:', analysisInsertErr.details);
+    } else {
+      console.log('[analyze] ✅ analysis saved — id:', analysisId);
+    }
+
+    return res.status(200).json({ data: analysisData, analysisId, userId: effectiveUserId });
 
   } catch (err) {
     console.error('[analyze] error:', err.message);
