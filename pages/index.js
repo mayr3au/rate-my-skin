@@ -45,6 +45,7 @@ export default function Home() {
   const streamRef = useRef(null);
 
   const [showCamera, setShowCamera] = useState(false);
+  const [screenFlash, setScreenFlash] = useState(false);
 
   const [emailCaptured, setEmailCaptured] = useState(false);
   const [email, setEmail] = useState('');
@@ -184,19 +185,24 @@ export default function Home() {
   };
 
   const capturePhoto = () => {
-    const video = videoRef.current;
-    const canvas = canvasRef.current;
-    if (!video || !canvas) return;
-    canvas.width = video.videoWidth;
-    canvas.height = video.videoHeight;
-    const ctx = canvas.getContext('2d');
-    ctx.translate(canvas.width, 0);
-    ctx.scale(-1, 1);
-    ctx.drawImage(video, 0, 0);
-    canvas.toBlob(blob => {
-      if (blob) processFile(new File([blob], 'selfie.jpg', { type: 'image/jpeg' }));
-    }, 'image/jpeg', 0.92);
-    stopCamera();
+    // Screen flash — illuminate face for 200ms then capture
+    setScreenFlash(true);
+    setTimeout(() => {
+      setScreenFlash(false);
+      const video = videoRef.current;
+      const canvas = canvasRef.current;
+      if (!video || !canvas) return;
+      canvas.width = video.videoWidth;
+      canvas.height = video.videoHeight;
+      const ctx = canvas.getContext('2d');
+      ctx.translate(canvas.width, 0);
+      ctx.scale(-1, 1);
+      ctx.drawImage(video, 0, 0);
+      canvas.toBlob(blob => {
+        if (blob) processFile(new File([blob], 'selfie.jpg', { type: 'image/jpeg' }));
+      }, 'image/jpeg', 0.92);
+      stopCamera();
+    }, 200);
   };
 
   /* ── Analyse ── */
@@ -777,6 +783,11 @@ export default function Home() {
       {/* ── Camera overlay ── */}
       {showCamera && (
         <div style={{ position: 'fixed', inset: 0, zIndex: 600, background: '#000', display: 'flex', flexDirection: 'column' }}>
+          {/* Screen flash overlay */}
+          {screenFlash && (
+            <div style={{ position: 'absolute', inset: 0, background: '#fff', zIndex: 10, pointerEvents: 'none' }} />
+          )}
+
           {/* Live video — mirrored for selfie */}
           <video
             ref={videoRef}
