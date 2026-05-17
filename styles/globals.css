@@ -253,3 +253,43 @@ body::before {
   .mobile-compact-text { font-size: 0.9em !important; line-height: 1.5 !important; }
   .mobile-small-title { font-size: 24px !important; }
 }
+
+/* ── Report responsive ── */
+@media (max-width: 600px) {
+  /* Score hero: vertical stack on mobile */
+  .rpt-hero-inner {
+    flex-direction: column !important;
+    gap: 16px !important;
+  }
+  .rpt-score-block {
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    gap: 16px !important;
+    width: 100% !important;
+  }
+  .rpt-score-number { font-size: 64px !important; }
+  .rpt-score-bar { width: 100% !important; margin: 6px 0 0 !important; }
+  .rpt-hero-summary { min-width: 0 !important; width: 100% !important; }
+
+  /* Tabs: scrollable, don't shrink labels */
+  .rpt-tabs { overflow-x: auto !important; -webkit-overflow-scrolling: touch !important; padding-bottom: 2px !important; }
+  .rpt-tab-btn { flex-shrink: 0 !important; min-width: 62px !important; padding: 10px 6px !important; }
+
+  /* Mini metrics strip */
+  .rpt-mini-metric { padding: 0 8px !important; }
+
+  /* Product buy buttons: stack vertically */
+  .rpt-product-btns { flex-direction: column !important; width: 100% !important; gap: 8px !important; }
+  .rpt-product-btns a { text-align: center !important; display: block !important; }
+
+  /* Metric card: smaller ring */
+  .rpt-metric-ring svg { width: 48px !important; height: 48px !important; }
+
+  /* Section heading badge: hide on mobile to save space */
+  .rpt-section-badge { display: none !important; }
+
+  /* Card padding reduction */
+  .rpt-card-compact { padding: 16px !important; }
+  .rpt-card-hero { padding: 20px 16px !important; }
+}

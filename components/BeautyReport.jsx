@@ -45,7 +45,7 @@ function MetricCard({ m, index }) {
       opacity: vis ? 1 : 0, transform: vis ? "translateY(0)" : "translateY(14px)",
       transition: "opacity 0.55s ease, transform 0.55s ease",
     }}>
-      <div style={{ position: "relative", flexShrink: 0 }}>
+      <div className="rpt-metric-ring" style={{ position: "relative", flexShrink: 0 }}>
         <ScoreRing score={m.score} size={58}/>
         <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center" }}>
           <span style={{ fontSize: 13, fontWeight: 700, color: "#2C241D", fontFamily: "'Cormorant Garamond', serif" }}>{m.score}</span>
@@ -87,9 +87,9 @@ function ProductCard({ product, lang, t }) {
       <p style={{ margin: "0 0 16px", fontSize: 12.5, color: "#8C7A6B", lineHeight: 1.7 }}>{product.description}</p>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 10 }}>
         <span style={{ fontSize: 18, fontWeight: 300, color: "#2C241D", fontFamily: "'Cormorant Garamond', serif" }}>{product.price}</span>
-        <div style={{ display: "flex", gap: 7 }}>
-          <a href={amazonUrl} target="_blank" rel="noopener noreferrer" style={{ textDecoration: "none", background: "#2C241D", color: "#fff", borderRadius: 9, padding: "8px 15px", fontSize: 11.5, fontWeight: 600, letterSpacing: "0.04em", fontFamily: "'DM Sans', sans-serif" }}>{t('buyAmazon')}</a>
-          <a href={sephoraUrl} target="_blank" rel="noopener noreferrer" style={{ textDecoration: "none", background: "#fff", color: "#2C241D", border: "1.5px solid #2C241D", borderRadius: 9, padding: "8px 15px", fontSize: 11.5, fontWeight: 600, letterSpacing: "0.04em", fontFamily: "'DM Sans', sans-serif" }}>{t('buySephora')}</a>
+        <div className="rpt-product-btns" style={{ display: "flex", gap: 7 }}>
+          <a href={amazonUrl} target="_blank" rel="noopener noreferrer" style={{ textDecoration: "none", background: "#2C241D", color: "#fff", borderRadius: 9, padding: "9px 16px", fontSize: 12, fontWeight: 600, letterSpacing: "0.04em", fontFamily: "'DM Sans', sans-serif" }}>{t('buyAmazon')}</a>
+          <a href={sephoraUrl} target="_blank" rel="noopener noreferrer" style={{ textDecoration: "none", background: "#fff", color: "#2C241D", border: "1.5px solid #2C241D", borderRadius: 9, padding: "9px 16px", fontSize: 12, fontWeight: 600, letterSpacing: "0.04em", fontFamily: "'DM Sans', sans-serif" }}>{t('buySephora')}</a>
         </div>
       </div>
     </div>
@@ -192,28 +192,27 @@ export default function BeautyReport({ data, isPaid, onUnlock }) {
         <div style={{ maxWidth: 680, margin: "0 auto", padding: "24px 20px 0" }}>
 
           {/* ── Score hero ── */}
-          <div style={{ ...CARD, padding: "28px 24px", marginBottom: 12 }}>
-            {/* Top row: badge */}
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
+          <div className="rpt-card-hero" style={{ ...CARD, padding: "24px", marginBottom: 12 }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 18 }}>
               <p style={{ ...LABEL_STYLE, margin: 0 }}>{t('overallScore')}</p>
               <span style={{ fontSize: 9, fontWeight: 700, letterSpacing: "0.2em", textTransform: "uppercase", color: "#8C7A6B", background: "rgba(212,165,116,0.08)", border: "1px solid rgba(212,165,116,0.2)", borderRadius: 20, padding: "4px 12px", fontFamily: "'DM Sans', sans-serif" }}>
                 {t('freeReportLabel')}
               </span>
             </div>
-
-            {/* Score + summary */}
-            <div style={{ display: "flex", alignItems: "flex-start", gap: 24, flexWrap: "wrap" }}>
-              <div style={{ textAlign: "center", flexShrink: 0 }}>
-                <div style={{ display: "flex", alignItems: "baseline", gap: 4, justifyContent: "center" }}>
-                  <span style={{ fontSize: 88, fontWeight: 200, lineHeight: 1, fontFamily: "'Cormorant Garamond', serif", background: "linear-gradient(160deg, #A87449 0%, #D4A574 50%, #A87449 100%)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text", color: "transparent" }}>{overall}</span>
-                  <span style={{ fontSize: 22, color: "#D4C4B8", fontFamily: "'Cormorant Garamond', serif", alignSelf: "flex-end", paddingBottom: 10 }}>/100</span>
-                </div>
-                <div style={{ height: 3, background: "rgba(212,165,116,0.12)", borderRadius: 10, overflow: "hidden", width: 100, margin: "0 auto" }}>
-                  <div style={{ height: "100%", width: `${overall}%`, background: "linear-gradient(90deg, #2C241D, #A87449)", borderRadius: 10, transition: "width 1.8s cubic-bezier(0.4,0,0.2,1)" }}/>
+            <div className="rpt-hero-inner" style={{ display: "flex", alignItems: "flex-start", gap: 24 }}>
+              <div className="rpt-score-block" style={{ flexShrink: 0 }}>
+                <div>
+                  <div style={{ display: "flex", alignItems: "baseline", gap: 4 }}>
+                    <span className="rpt-score-number" style={{ fontSize: 88, fontWeight: 200, lineHeight: 1, fontFamily: "'Cormorant Garamond', serif", background: "linear-gradient(160deg, #A87449 0%, #D4A574 50%, #A87449 100%)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text", color: "transparent" }}>{overall}</span>
+                    <span style={{ fontSize: 20, color: "#D4C4B8", fontFamily: "'Cormorant Garamond', serif", alignSelf: "flex-end", paddingBottom: 8 }}>/100</span>
+                  </div>
+                  <div className="rpt-score-bar" style={{ height: 3, background: "rgba(212,165,116,0.12)", borderRadius: 10, overflow: "hidden", width: 110, marginTop: 6 }}>
+                    <div style={{ height: "100%", width: `${overall}%`, background: "linear-gradient(90deg, #2C241D, #A87449)", borderRadius: 10, transition: "width 1.8s cubic-bezier(0.4,0,0.2,1)" }}/>
+                  </div>
                 </div>
               </div>
-              <div style={{ flex: 1, minWidth: 160 }}>
-                <p style={{ margin: "0 0 16px", fontSize: 15, lineHeight: 1.75, color: "#6F6156", fontStyle: "italic", fontFamily: "'Cormorant Garamond', serif" }}>{basicSummary}</p>
+              <div className="rpt-hero-summary" style={{ flex: 1, minWidth: 160 }}>
+                <p style={{ margin: "0 0 14px", fontSize: 14.5, lineHeight: 1.75, color: "#6F6156", fontStyle: "italic", fontFamily: "'Cormorant Garamond', serif" }}>{basicSummary}</p>
                 <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
                   {[{ k: t('faceShape'), v: faceShape }, { k: t('eyeColor'), v: eyeColor }, { k: t('skinTone'), v: skinTone }].map(tag => (
                     <TraitTag key={tag.k} label={tag.k} value={tag.v} />
@@ -309,9 +308,9 @@ export default function BeautyReport({ data, isPaid, onUnlock }) {
           <p style={{ ...LABEL_STYLE, textAlign: "center", marginBottom: 10 }}>
             {lang === "fr" ? "Aperçu du rapport complet" : "Preview of full report"}
           </p>
-          <div style={{ display: "flex", gap: 4, background: "#fff", border: "1px solid rgba(212,165,116,0.2)", borderRadius: 14, padding: 4, boxShadow: "0 4px 16px rgba(168,116,73,0.05)" }}>
+          <div className="rpt-tabs" style={{ display: "flex", gap: 4, background: "#fff", border: "1px solid rgba(212,165,116,0.2)", borderRadius: 14, padding: 4, boxShadow: "0 4px 16px rgba(168,116,73,0.05)", scrollbarWidth: "none" }}>
             {TABS.map((label, i) => (
-              <button key={label} onClick={() => setPreviewTab(i)} style={{
+              <button key={label} onClick={() => setPreviewTab(i)} className="rpt-tab-btn" style={{
                 flex: 1, padding: "11px 4px", borderRadius: 10, textAlign: "center",
                 background: previewTab === i ? "linear-gradient(135deg, #2C241D, #3A2E26)" : "transparent",
                 color: previewTab === i ? "#fff" : "#B9AC9E",
@@ -388,23 +387,20 @@ export default function BeautyReport({ data, isPaid, onUnlock }) {
       <div style={{ maxWidth: 680, margin: "0 auto", padding: "24px 20px 0" }}>
 
         {/* ── Score hero ── */}
-        <div style={{ ...CARD, padding: "28px 24px", marginBottom: 20 }}>
-          <div style={{ display: "flex", gap: 28, alignItems: "flex-start", flexWrap: "wrap" }}>
-            {/* Score */}
-            <div style={{ flexShrink: 0 }}>
+        <div className="rpt-card-hero" style={{ ...CARD, padding: "24px", marginBottom: 20 }}>
+          <div className="rpt-hero-inner" style={{ display: "flex", gap: 24, alignItems: "flex-start" }}>
+            <div className="rpt-score-block" style={{ flexShrink: 0 }}>
               <p style={{ ...LABEL_STYLE, marginBottom: 6 }}>{t('overallScore')}</p>
               <div style={{ display: "flex", alignItems: "baseline", gap: 4 }}>
-                <span style={{ fontSize: 88, fontWeight: 200, lineHeight: 1, fontFamily: "'Cormorant Garamond', serif", background: "linear-gradient(160deg, #A87449 0%, #D4A574 50%, #A87449 100%)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text", color: "transparent" }}>{overall}</span>
-                <span style={{ fontSize: 22, color: "#D4C4B8", fontFamily: "'Cormorant Garamond', serif", alignSelf: "flex-end", paddingBottom: 10 }}>/100</span>
+                <span className="rpt-score-number" style={{ fontSize: 88, fontWeight: 200, lineHeight: 1, fontFamily: "'Cormorant Garamond', serif", background: "linear-gradient(160deg, #A87449 0%, #D4A574 50%, #A87449 100%)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text", color: "transparent" }}>{overall}</span>
+                <span style={{ fontSize: 20, color: "#D4C4B8", fontFamily: "'Cormorant Garamond', serif", alignSelf: "flex-end", paddingBottom: 8 }}>/100</span>
               </div>
-              <div style={{ height: 3, background: "rgba(212,165,116,0.12)", borderRadius: 10, overflow: "hidden", width: 110 }}>
+              <div className="rpt-score-bar" style={{ height: 3, background: "rgba(212,165,116,0.12)", borderRadius: 10, overflow: "hidden", width: 110, marginTop: 6 }}>
                 <div style={{ height: "100%", width: `${overall}%`, background: "linear-gradient(90deg, #2C241D, #A87449)", borderRadius: 10, transition: "width 1.8s cubic-bezier(0.4,0,0.2,1)" }}/>
               </div>
             </div>
-
-            {/* Summary + traits */}
-            <div style={{ flex: 1, minWidth: 160 }}>
-              <p style={{ margin: "0 0 16px", fontSize: 15, lineHeight: 1.75, color: "#6F6156", fontStyle: "italic", fontFamily: "'Cormorant Garamond', serif" }}>{summary}</p>
+            <div className="rpt-hero-summary" style={{ flex: 1, minWidth: 160 }}>
+              <p style={{ margin: "0 0 14px", fontSize: 14.5, lineHeight: 1.75, color: "#6F6156", fontStyle: "italic", fontFamily: "'Cormorant Garamond', serif" }}>{summary}</p>
               <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
                 {[{ k: t('faceShape'), v: faceShape }, { k: t('eyeColor'), v: eyeColor }, { k: t('skinTone'), v: skinTone }].map(tag => (
                   <TraitTag key={tag.k} label={tag.k} value={tag.v} />
@@ -415,11 +411,11 @@ export default function BeautyReport({ data, isPaid, onUnlock }) {
 
           {/* Top 3 mini-metrics strip */}
           {metrics.slice(0, 3).length > 0 && (
-            <div style={{ marginTop: 20, paddingTop: 18, borderTop: "1px solid rgba(212,165,116,0.12)", display: "flex", gap: 0 }}>
+            <div style={{ marginTop: 20, paddingTop: 16, borderTop: "1px solid rgba(212,165,116,0.1)", display: "flex" }}>
               {metrics.slice(0, 3).map((m, i) => (
-                <div key={m.label} style={{ flex: 1, textAlign: "center", padding: "0 12px", borderRight: i < 2 ? "1px solid rgba(212,165,116,0.12)" : "none" }}>
-                  <div style={{ fontSize: 22, fontWeight: 300, color: "#2C241D", fontFamily: "'Cormorant Garamond', serif", lineHeight: 1 }}>{m.score}</div>
-                  <div style={{ fontSize: 9, letterSpacing: "0.12em", textTransform: "uppercase", color: "#B9AC9E", fontWeight: 600, marginTop: 4, fontFamily: "'DM Sans', sans-serif" }}>{m.label}</div>
+                <div key={m.label} className="rpt-mini-metric" style={{ flex: 1, textAlign: "center", padding: "0 12px", borderRight: i < 2 ? "1px solid rgba(212,165,116,0.1)" : "none" }}>
+                  <div style={{ fontSize: 24, fontWeight: 300, color: "#2C241D", fontFamily: "'Cormorant Garamond', serif", lineHeight: 1 }}>{m.score}</div>
+                  <div style={{ fontSize: 9, letterSpacing: "0.1em", textTransform: "uppercase", color: "#B9AC9E", fontWeight: 600, marginTop: 4, fontFamily: "'DM Sans', sans-serif" }}>{m.label}</div>
                 </div>
               ))}
             </div>
@@ -427,9 +423,9 @@ export default function BeautyReport({ data, isPaid, onUnlock }) {
         </div>
 
         {/* ── Tabs ── */}
-        <div style={{ display: "flex", gap: 4, background: "#fff", border: "1px solid rgba(212,165,116,0.18)", borderRadius: 14, padding: 4, boxShadow: "0 4px 16px rgba(168,116,73,0.04)", overflowX: "auto", scrollbarWidth: "none", WebkitOverflowScrolling: "touch" }}>
+        <div className="rpt-tabs" style={{ display: "flex", gap: 4, background: "#fff", border: "1px solid rgba(212,165,116,0.18)", borderRadius: 14, padding: 4, boxShadow: "0 4px 16px rgba(168,116,73,0.04)", scrollbarWidth: "none", WebkitOverflowScrolling: "touch" }}>
           {TABS_PAID.map(tab => (
-            <button key={tab.id} onClick={() => setActiveTab(tab.id)} style={{
+            <button key={tab.id} onClick={() => setActiveTab(tab.id)} className="rpt-tab-btn" style={{
               flex: 1, padding: "12px 4px", border: "none", borderRadius: 10,
               background: activeTab === tab.id ? "linear-gradient(135deg, #2C241D, #3A2E26)" : "transparent",
               color: activeTab === tab.id ? "#fff" : "#B9AC9E",
