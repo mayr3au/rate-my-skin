@@ -40,6 +40,11 @@ export default function Home() {
   const { lang, t } = useLang();
   const fileInputRef = useRef(null);
   const cameraInputRef = useRef(null);
+  const videoRef = useRef(null);
+  const canvasRef = useRef(null);
+  const streamRef = useRef(null);
+
+  const [showCamera, setShowCamera] = useState(false);
 
   const [emailCaptured, setEmailCaptured] = useState(false);
   const [email, setEmail] = useState('');
@@ -147,6 +152,51 @@ export default function Home() {
       setSkinConcern(labels.join(', '));
       return next;
     });
+  };
+
+  /* ── Camera overlay ── */
+  const startCamera = async () => {
+    if (!navigator.mediaDevices?.getUserMedia) {
+      cameraInputRef.current?.click();
+      return;
+    }
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: { facingMode: 'user', width: { ideal: 1280 }, height: { ideal: 720 } },
+      });
+      streamRef.current = stream;
+      setShowCamera(true);
+      setTimeout(() => {
+        if (videoRef.current) {
+          videoRef.current.srcObject = stream;
+          videoRef.current.play();
+        }
+      }, 80);
+    } catch {
+      cameraInputRef.current?.click();
+    }
+  };
+
+  const stopCamera = () => {
+    streamRef.current?.getTracks().forEach(t => t.stop());
+    streamRef.current = null;
+    setShowCamera(false);
+  };
+
+  const capturePhoto = () => {
+    const video = videoRef.current;
+    const canvas = canvasRef.current;
+    if (!video || !canvas) return;
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
+    const ctx = canvas.getContext('2d');
+    ctx.translate(canvas.width, 0);
+    ctx.scale(-1, 1);
+    ctx.drawImage(video, 0, 0);
+    canvas.toBlob(blob => {
+      if (blob) processFile(new File([blob], 'selfie.jpg', { type: 'image/jpeg' }));
+    }, 'image/jpeg', 0.92);
+    stopCamera();
   };
 
   /* ── Analyse ── */
@@ -324,6 +374,15 @@ export default function Home() {
         {/* Upload + skin concern */}
         <div style={{ maxWidth: 480, margin: '32px auto 0', padding: '0 20px 60px' }}>
 
+          {/* Photo tip */}
+          <p style={{
+            margin: '0 0 12px', fontSize: 12, color: '#A87449',
+            fontFamily: "'DM Sans', sans-serif", textAlign: 'center',
+            lineHeight: 1.5, letterSpacing: '0.01em',
+          }}>
+            {t('photoTip')}
+          </p>
+
           {/* Upload zone */}
           <div
             onClick={() => !imageUrl && fileInputRef.current?.click()}
@@ -377,7 +436,7 @@ export default function Home() {
                     {t('uploadPhoto')}
                   </button>
                   <button
-                    onClick={(e) => { e.stopPropagation(); cameraInputRef.current?.click(); }}
+                    onClick={(e) => { e.stopPropagation(); startCamera(); }}
                     style={{ ...btnStyle, background: 'none', color: '#6F6156', border: '1.5px solid #E0DDD8', boxShadow: 'none' }}
                   >
                     {t('takeASelfie')}
@@ -714,6 +773,52 @@ export default function Home() {
           </p>
         </div>
       )}
+
+      {/* ── Camera overlay ── */}
+      {showCamera && (
+        <div style={{ position: 'fixed', inset: 0, zIndex: 600, background: '#000', display: 'flex', flexDirection: 'column' }}>
+          {/* Live video — mirrored for selfie */}
+          <video
+            ref={videoRef}
+            autoPlay playsInline muted
+            style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', transform: 'scaleX(-1)' }}
+          />
+
+          {/* Face oval guide overlay */}
+          <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', pointerEvents: 'none' }}>
+            <svg viewBox="0 0 300 420" style={{ width: '78vw', maxWidth: 300, height: 'auto' }}>
+              <defs>
+                <mask id="faceMask">
+                  <rect width="300" height="420" fill="white"/>
+                  <ellipse cx="150" cy="200" rx="108" ry="150" fill="black"/>
+                </mask>
+              </defs>
+              {/* Dark vignette outside oval */}
+              <rect width="300" height="420" fill="rgba(0,0,0,0.52)" mask="url(#faceMask)"/>
+              {/* Oval border */}
+              <ellipse cx="150" cy="200" rx="108" ry="150" fill="none" stroke="rgba(255,255,255,0.75)" strokeWidth="2.5" strokeDasharray="10 6"/>
+            </svg>
+          </div>
+
+          {/* Instruction */}
+          <div style={{ position: 'absolute', top: 56, left: 0, right: 0, textAlign: 'center', padding: '0 24px' }}>
+            <p style={{ color: '#fff', fontSize: 14, fontFamily: "'DM Sans', sans-serif", margin: 0, fontWeight: 500, textShadow: '0 1px 6px rgba(0,0,0,0.7)' }}>
+              {t('alignFace')}
+            </p>
+          </div>
+
+          {/* Controls */}
+          <div style={{ position: 'absolute', bottom: 56, left: 0, right: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 40 }}>
+            {/* Cancel */}
+            <button onClick={stopCamera} style={{ width: 48, height: 48, borderRadius: '50%', background: 'rgba(255,255,255,0.18)', border: '1.5px solid rgba(255,255,255,0.4)', color: '#fff', fontSize: 20, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>✕</button>
+            {/* Capture shutter */}
+            <button onClick={capturePhoto} style={{ width: 72, height: 72, borderRadius: '50%', background: '#fff', border: '4px solid rgba(255,255,255,0.35)', cursor: 'pointer', boxShadow: '0 0 0 2px rgba(255,255,255,0.2)' }} aria-label={t('capture')} />
+          </div>
+        </div>
+      )}
+
+      {/* Hidden canvas for capture */}
+      <canvas ref={canvasRef} style={{ display: 'none' }} />
 
       <style>{`
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
