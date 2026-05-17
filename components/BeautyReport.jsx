@@ -237,6 +237,7 @@ export default function BeautyReport({ data, isPaid, onUnlock }) {
   const { lang, t } = useLang();
   const [activeTab, setActiveTab] = useState("analysis");
   const [unlocking, setUnlocking] = useState(false);
+  const [previewTab, setPreviewTab] = useState(0);
 
   if (!data) {
     return (
@@ -265,7 +266,9 @@ export default function BeautyReport({ data, isPaid, onUnlock }) {
     const paid = data.paid_version || {};
     const previewMetrics = (paid.metrics || []).slice(0, 4);
     const previewStrengths = (paid.strengths || []).slice(0, 2);
-    const allProducts = paid.products || [];
+    const previewImprovements = (paid.improvements || []).slice(0, 2);
+    const previewRoutine = (paid.recommendations || []).slice(0, 3);
+    const allProducts = (paid.products || []).slice(0, 3);
 
     return (
       <div style={{ background: "#FDFBF9", minHeight: "100vh", fontFamily: "'DM Sans', sans-serif", padding: "0 0 60px" }}>
@@ -472,43 +475,82 @@ export default function BeautyReport({ data, isPaid, onUnlock }) {
           </div>
         </div>
 
-        {/* ── Blurred paid content preview ── */}
+        {/* ── Clickable tab bar (visible, not blurred) ── */}
+        <div style={{ maxWidth: 680, margin: "24px auto 0", padding: "0 20px" }}>
+          <div style={{
+            display: "flex", gap: 4, background: "rgba(255, 255, 255, 0.9)",
+            border: "1px solid rgba(212, 165, 116, 0.2)",
+            borderRadius: 14, padding: 4,
+            boxShadow: "0 4px 16px rgba(168, 116, 73, 0.06)",
+          }}>
+            {[t('tabMetrics'), t('tabStrengths'), t('tabImprove'), t('tabRoutine'), t('tabShop')].map((label, i) => (
+              <button key={label} onClick={() => setPreviewTab(i)} style={{
+                flex: 1, padding: "12px 4px", borderRadius: 10, textAlign: "center",
+                background: previewTab === i ? "linear-gradient(135deg, #2C241D, #3A2E26)" : "transparent",
+                color: previewTab === i ? "#fff" : "#B9AC9E",
+                fontSize: 10.5, fontWeight: 600, letterSpacing: "0.08em",
+                fontFamily: "'DM Sans', sans-serif", textTransform: "uppercase",
+                border: "none", cursor: "pointer",
+                transition: "all 0.2s ease",
+              }}>{label}</button>
+            ))}
+          </div>
+        </div>
+
+        {/* ── Blurred tab content ── */}
         <div style={{
-          maxWidth: 680, margin: "24px auto 0", padding: "0 20px 60px",
+          maxWidth: 680, margin: "10px auto 0", padding: "0 20px 60px",
           filter: "blur(5px)",
           opacity: 0.35,
           pointerEvents: "none",
           userSelect: "none",
-          transition: "filter 0.9s ease, opacity 0.9s ease",
         }}>
-          <div style={{
-            display: "flex", gap: 4, background: "rgba(255, 255, 255, 0.8)", border: "1px solid rgba(212, 165, 116, 0.15)",
-            borderRadius: 14, padding: 4, boxShadow: "0 4px 16px rgba(168, 116, 73, 0.04)",
-          }}>
-            {[t('tabMetrics'), t('tabStrengths'), t('tabImprove'), t('tabRoutine'), t('tabShop')].map((label, i) => (
-              <div key={label} style={{
-                flex: 1, padding: "12px 4px", borderRadius: 10, textAlign: "center",
-                background: i === 0 ? "linear-gradient(135deg, #2C241D, #3A2E26)" : "transparent",
-                color: i === 0 ? "#fff" : "#B9AC9E",
-                fontSize: 10.5, fontWeight: 600, letterSpacing: "0.08em",
-                fontFamily: "'DM Sans', sans-serif", textTransform: "uppercase",
-              }}>{label}</div>
-            ))}
-          </div>
-          <div style={{ display: "flex", flexDirection: "column", gap: 10, marginTop: 14 }}>
-            {previewMetrics.map((m, i) => <MetricCard key={i} m={m} index={i} />)}
-          </div>
-          {previewStrengths.length > 0 && (
-            <div style={{ display: "flex", flexDirection: "column", gap: 10, marginTop: 10 }}>
+          {/* Metrics */}
+          {previewTab === 0 && (
+            <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+              {previewMetrics.map((m, i) => <MetricCard key={i} m={m} index={i} />)}
+            </div>
+          )}
+          {/* Strengths */}
+          {previewTab === 1 && (
+            <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
               {previewStrengths.map((s, i) => (
-                <div key={i} style={{ background: "rgba(255, 255, 255, 0.8)", border: "1px solid rgba(212, 165, 116, 0.15)", borderRadius: 18, padding: "24px", display: "flex", gap: 16, alignItems: "flex-start" }}>
+                <div key={i} style={{ background: "#fff", border: "1px solid rgba(212,165,116,0.15)", borderRadius: 18, padding: "24px", display: "flex", gap: 16, alignItems: "flex-start" }}>
                   <div style={{ width: 34, height: 34, borderRadius: 10, background: "linear-gradient(135deg, #2C241D, #3A2E26)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, color: "#fff", fontSize: 14 }}>{ICONS[i] || "✦"}</div>
                   <div>
                     <div style={{ fontSize: 12, fontWeight: 600, color: "#2C241D", marginBottom: 7 }}>{s.title}</div>
-                    <p style={{ margin: 0, fontSize: 13, lineHeight: 1.75, color: "#8C7A6B" }}>{s.desc}</p>
+                    <p style={{ margin: 0, fontSize: 13, lineHeight: 1.75, color: "#8C7A6B" }}>{s.description}</p>
                   </div>
                 </div>
               ))}
+            </div>
+          )}
+          {/* Improvements */}
+          {previewTab === 2 && (
+            <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+              {previewImprovements.map((item, i) => (
+                <div key={i} style={{ background: "#fff", border: "1px solid rgba(212,165,116,0.15)", borderRadius: 18, padding: "24px" }}>
+                  <div style={{ fontSize: 13, fontWeight: 600, color: "#2C241D", marginBottom: 6 }}>{item.title}</div>
+                  <p style={{ margin: 0, fontSize: 13, lineHeight: 1.75, color: "#8C7A6B" }}>{item.description}</p>
+                </div>
+              ))}
+            </div>
+          )}
+          {/* Routine */}
+          {previewTab === 3 && (
+            <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+              {previewRoutine.map((rec, i) => (
+                <div key={i} style={{ background: "#fff", border: "1px solid rgba(212,165,116,0.15)", borderRadius: 18, padding: "20px 24px", display: "flex", gap: 12, alignItems: "flex-start" }}>
+                  <span style={{ color: "#A87449", fontSize: 11, marginTop: 2 }}>✦</span>
+                  <p style={{ margin: 0, fontSize: 13, lineHeight: 1.7, color: "#8C7A6B" }}>{rec}</p>
+                </div>
+              ))}
+            </div>
+          )}
+          {/* Shop */}
+          {previewTab === 4 && (
+            <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+              {allProducts.map((p, i) => <ProductCard key={i} product={p} lang={lang} t={t} />)}
             </div>
           )}
         </div>
