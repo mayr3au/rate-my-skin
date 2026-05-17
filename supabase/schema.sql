@@ -40,9 +40,9 @@ CREATE TABLE IF NOT EXISTS public.analyses (
 
 ALTER TABLE public.analyses ENABLE ROW LEVEL SECURITY;
 
--- ── RLS policies — service role bypasses RLS automatically, but ──────────────
--- these explicit policies ensure inserts work if the service role key ever
--- falls back to anon (misconfigured env var), and fix "permission denied" errors.
+-- ── RLS policies (run these in Supabase SQL editor) ──────────────────────────
+-- Service role bypasses RLS automatically, but explicit policies ensure
+-- inserts work even in edge cases and show clearly in the policy list.
 
 -- Allow service role full access to users
 CREATE POLICY IF NOT EXISTS "service_role_users_all"
@@ -57,3 +57,14 @@ CREATE POLICY IF NOT EXISTS "service_role_analyses_all"
   TO service_role
   USING (true)
   WITH CHECK (true);
+
+-- ── FK safety: drop the FK constraint on analyses.user_id ────────────────────
+-- This prevents a failed user-row insert from cascading into a failed
+-- analysis insert. analyses.user_id remains a text column; we just lose
+-- the DB-level referential integrity check (acceptable for this use case).
+--
+-- Run this if analyses rows are still not saving:
+--
+--   ALTER TABLE public.analyses DROP CONSTRAINT IF EXISTS analyses_user_id_fkey;
+--
+-- After dropping the FK, inserts with user_id = NULL or any text value will work.

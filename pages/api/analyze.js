@@ -80,9 +80,17 @@ export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).end();
 
   // Env-var health check — visible in Vercel function logs
-  console.log('[analyze] env check — SUPABASE_URL:', !!process.env.NEXT_PUBLIC_SUPABASE_URL,
-    '| SERVICE_KEY:', !!process.env.SUPABASE_SERVICE_ROLE_KEY,
-    '| ANTHROPIC:', !!process.env.ANTHROPIC_API_KEY);
+  const hasUrl = !!process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const hasServiceKey = !!process.env.SUPABASE_SERVICE_ROLE_KEY;
+  const hasAnthropicKey = !!process.env.ANTHROPIC_API_KEY;
+  console.log('[analyze] START — SUPABASE_URL:', hasUrl, '| SERVICE_KEY:', hasServiceKey, '| ANTHROPIC:', hasAnthropicKey);
+
+  if (!hasServiceKey) {
+    console.error('[analyze] ❌ FATAL: SUPABASE_SERVICE_ROLE_KEY is not set — DB inserts will fail');
+  }
+  if (!hasUrl) {
+    console.error('[analyze] ❌ FATAL: NEXT_PUBLIC_SUPABASE_URL is not set');
+  }
 
   const supabase = createAdminClient();
   const { userId, imageBase64, mimeType, lang, skinConcern, captchaToken } = req.body;
@@ -148,55 +156,50 @@ export default async function handler(req, res) {
         }));
     }
 
-    // 3. Generate analysis ID
+    // 3. Generate IDs
     const analysisId = crypto.randomUUID();
-
-    // 4. Resolve userId — fall back to server-generated UUID if client didn't send one
     const effectiveUserId = userId || crypto.randomUUID();
-    console.log('[analyze] userId from client:', userId, '| effectiveUserId:', effectiveUserId);
+    console.log('[analyze] userId from client:', userId || 'null (server-generated)', '| effectiveUserId:', effectiveUserId);
 
-    // 5. Upsert user row
-    const { data: existingUser, error: fetchUserError } = await supabase
+    // 4. Upsert user row — single atomic operation, no select-then-insert race
+    let userSaved = false;
+    const { error: upsertUserErr } = await supabase
       .from('users')
-      .select('analyses_used')
-      .eq('id', effectiveUserId)
-      .single();
+      .upsert(
+        { id: effectiveUserId, analyses_used: 1, paid_credits: 0, paid_unlocks: 0 },
+        { onConflict: 'id', ignoreDuplicates: false }
+      );
 
-    if (fetchUserError && fetchUserError.code !== 'PGRST116') {
-      // PGRST116 = row not found, which is fine for new users
-      console.error('[analyze] error fetching user:', fetchUserError.message, fetchUserError.code);
-    }
-
-    if (existingUser) {
-      const { error: updateErr } = await supabase
-        .from('users')
-        .update({
-          analyses_used: (existingUser.analyses_used || 0) + 1,
-          updated_at: new Date().toISOString(),
-        })
-        .eq('id', effectiveUserId);
-      if (updateErr) console.error('[analyze] error updating user analyses_used:', updateErr.message);
+    if (upsertUserErr) {
+      console.error('[analyze] ❌ user upsert failed:', upsertUserErr.message, '| code:', upsertUserErr.code, '| hint:', upsertUserErr.hint);
     } else {
-      const { error: insertUserErr } = await supabase
-        .from('users')
-        .insert({ id: effectiveUserId, analyses_used: 1, paid_credits: 0, paid_unlocks: 0 });
-      if (insertUserErr) console.error('[analyze] error inserting new user:', insertUserErr.message, insertUserErr.code);
+      userSaved = true;
+      console.log('[analyze] ✅ user upserted:', effectiveUserId);
     }
 
-    // 6. Insert analysis row
-    console.log('[analyze] inserting analysis — id:', analysisId, 'user_id:', effectiveUserId);
-    const { error: analysisInsertErr } = await supabase.from('analyses').insert({
-      id: analysisId,
-      user_id: effectiveUserId,
-      skin_concern: skinConcern || null,
-      report_json: analysisData,
-      is_paid: false,
-    });
+    // 5. Insert analysis row
+    // If user upsert failed, use null for user_id to bypass the FK constraint
+    // (analysis is still saved; it just won't be linked to a user)
+    const analysisUserId = userSaved ? effectiveUserId : null;
+    console.log('[analyze] inserting analysis — id:', analysisId, '| user_id:', analysisUserId);
+
+    const { error: analysisInsertErr } = await supabase
+      .from('analyses')
+      .insert({
+        id: analysisId,
+        user_id: analysisUserId,
+        skin_concern: skinConcern || null,
+        report_json: analysisData,
+        is_paid: false,
+      });
 
     if (analysisInsertErr) {
-      console.error('[analyze] ❌ analysis insert failed:', analysisInsertErr.message, '| code:', analysisInsertErr.code, '| details:', analysisInsertErr.details);
+      console.error('[analyze] ❌ analysis insert failed:', analysisInsertErr.message,
+        '| code:', analysisInsertErr.code,
+        '| details:', analysisInsertErr.details,
+        '| hint:', analysisInsertErr.hint);
     } else {
-      console.log('[analyze] ✅ analysis saved — id:', analysisId);
+      console.log('[analyze] ✅ analysis saved — id:', analysisId, '| user_id:', analysisUserId);
     }
 
     return res.status(200).json({ data: analysisData, analysisId, userId: effectiveUserId });
