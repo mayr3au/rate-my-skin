@@ -784,21 +784,20 @@ export default function Home() {
             style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', transform: 'scaleX(-1)' }}
           />
 
-          {/* Face oval guide overlay */}
-          <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', pointerEvents: 'none' }}>
-            <svg viewBox="0 0 300 420" style={{ width: '78vw', maxWidth: 300, height: 'auto' }}>
-              <defs>
-                <mask id="faceMask">
-                  <rect width="300" height="420" fill="white"/>
-                  <ellipse cx="150" cy="200" rx="108" ry="150" fill="black"/>
-                </mask>
-              </defs>
-              {/* Dark vignette outside oval */}
-              <rect width="300" height="420" fill="rgba(0,0,0,0.52)" mask="url(#faceMask)"/>
-              {/* Oval border */}
-              <ellipse cx="150" cy="200" rx="108" ry="150" fill="none" stroke="rgba(255,255,255,0.75)" strokeWidth="2.5" strokeDasharray="10 6"/>
-            </svg>
-          </div>
+          {/* Face oval guide overlay — full screen SVG */}
+          <svg
+            viewBox="0 0 100 100" preserveAspectRatio="none"
+            style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', pointerEvents: 'none' }}
+          >
+            <defs>
+              <mask id="faceMask">
+                <rect width="100" height="100" fill="white"/>
+                <ellipse cx="50" cy="46" rx="36" ry="44" fill="black"/>
+              </mask>
+            </defs>
+            <rect width="100" height="100" fill="rgba(0,0,0,0.48)" mask="url(#faceMask)"/>
+            <ellipse cx="50" cy="46" rx="36" ry="44" fill="none" stroke="rgba(255,255,255,0.8)" strokeWidth="0.6" strokeDasharray="2.5 1.8"/>
+          </svg>
 
           {/* Instruction */}
           <div style={{ position: 'absolute', top: 56, left: 0, right: 0, textAlign: 'center', padding: '0 24px' }}>
