@@ -242,6 +242,7 @@ export default function Home() {
       });
       const json = await res.json();
 
+      if (json.error === 'no_face') throw new Error(json.message || (lang === 'fr' ? "Aucun visage détecté. Veuillez télécharger une photo de visage claire." : "No face detected. Please upload a clear face photo."));
       if (!res.ok || json.error) throw new Error(json.error || t('analysisFailed'));
 
       sessionStorage.setItem('rms_report', JSON.stringify(json.data));
