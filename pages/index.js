@@ -867,10 +867,15 @@ export default function Home() {
       {/* ── Full-screen Analysis Loading Page ── */}
       {loading && (
         <div style={{
-          position: 'fixed', inset: 0, zIndex: 1000,
+          position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, zIndex: 1000,
           background: 'linear-gradient(to bottom, #FFFFFF 0%, #FBF6F0 40%, #EEDCD0 75%, #E3C9B5 100%)',
           display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
-          padding: 32, textAlign: 'center',
+          padding: '32px 32px env(safe-area-inset-bottom, 32px)',
+          paddingTop: 'max(32px, env(safe-area-inset-top))',
+          textAlign: 'center',
+          overflow: 'hidden',
+          WebkitOverflowScrolling: 'none',
+          touchAction: 'none',
           animation: 'fadeIn 0.5s ease-out forwards',
         }}>
           {/* Reuse the silk texture for the loading page too */}
