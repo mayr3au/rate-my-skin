@@ -392,7 +392,7 @@ export default function Home() {
             { num: t('trust2Num'), label: t('trust2Label') },
             { num: t('trust3Num'), label: t('trust3Label') },
           ].map(({ num, label }) => (
-            <div key={label} className="card-blur" style={{ 
+            <div key={label} className="bubble-nacré" style={{ 
               flex: '1 1 110px',
               textAlign: 'center',
               padding: '12px 14px',
@@ -560,26 +560,14 @@ export default function Home() {
                 }}
                 placeholder={t('skinConcernPlaceholder')}
                 rows={3}
+                className="input-nacré"
                 style={{
                   width: '100%', boxSizing: 'border-box',
-                  border: '1px solid rgba(255, 255, 255, 0.45)', borderRadius: 18,
+                  borderRadius: 18,
                   padding: '16px 18px 32px', fontSize: 13, color: '#3A2E26',
                   fontFamily: "'DM Sans', sans-serif",
                   resize: 'vertical', outline: 'none',
-                  background: 'rgba(255, 255, 255, 0.45)',
-                  backdropFilter: 'blur(12px)',
-                  WebkitBackdropFilter: 'blur(12px)',
-                  boxShadow: 'inset 0 1px 1px rgba(255, 255, 255, 0.5), 0 4px 12px rgba(180, 160, 140, 0.05)',
-                  transition: 'all 0.3s ease',
                   lineHeight: 1.6,
-                }}
-                onFocus={(e) => {
-                  e.target.style.boxShadow = 'inset 0 1px 1px rgba(255, 255, 255, 0.8), 0 0 0 2px rgba(197, 160, 40, 0.15)';
-                  e.target.style.background = 'rgba(255, 255, 255, 0.65)';
-                }}
-                onBlur={(e) => {
-                  e.target.style.boxShadow = 'inset 0 1px 1px rgba(255, 255, 255, 0.5), 0 4px 12px rgba(180, 160, 140, 0.05)';
-                  e.target.style.background = 'rgba(255, 255, 255, 0.45)';
                 }}
               />
               <span style={{
@@ -609,24 +597,12 @@ export default function Home() {
                   value={age}
                   onChange={(e) => setAge(e.target.value)}
                   placeholder={t('agePlaceholder')}
+                  className="input-nacré"
                   style={{
                     width: '100%', boxSizing: 'border-box',
-                    border: '1px solid rgba(255, 255, 255, 0.45)', borderRadius: 18,
+                    borderRadius: 18,
                     padding: '14px 18px', fontSize: 13, color: '#3A2E26',
                     fontFamily: "'DM Sans', sans-serif", outline: 'none',
-                    background: 'rgba(255, 255, 255, 0.45)',
-                    backdropFilter: 'blur(12px)',
-                    WebkitBackdropFilter: 'blur(12px)',
-                    boxShadow: 'inset 0 1px 1px rgba(255, 255, 255, 0.5), 0 4px 12px rgba(180, 160, 140, 0.05)',
-                    transition: 'all 0.3s ease',
-                  }}
-                  onFocus={(e) => {
-                    e.target.style.boxShadow = 'inset 0 1px 1px rgba(255, 255, 255, 0.8), 0 0 0 2px rgba(197, 160, 40, 0.15)';
-                    e.target.style.background = 'rgba(255, 255, 255, 0.65)';
-                  }}
-                  onBlur={(e) => {
-                    e.target.style.boxShadow = 'inset 0 1px 1px rgba(255, 255, 255, 0.5), 0 4px 12px rgba(180, 160, 140, 0.05)';
-                    e.target.style.background = 'rgba(255, 255, 255, 0.45)';
                   }}
                 />
               </div>
@@ -646,25 +622,13 @@ export default function Home() {
                   <select
                     value={climate}
                     onChange={(e) => setClimate(e.target.value)}
+                    className="input-nacré"
                     style={{
                       width: '100%', boxSizing: 'border-box',
-                      border: '1px solid rgba(255, 255, 255, 0.45)', borderRadius: 18,
+                      borderRadius: 18,
                       padding: '14px 18px', fontSize: 13, color: climate ? '#3A2E26' : '#887E75',
                       fontFamily: "'DM Sans', sans-serif", outline: 'none',
-                      background: 'rgba(255, 255, 255, 0.45)',
-                      backdropFilter: 'blur(12px)',
-                      WebkitBackdropFilter: 'blur(12px)',
-                      boxShadow: 'inset 0 1px 1px rgba(255, 255, 255, 0.5), 0 4px 12px rgba(180, 160, 140, 0.05)',
-                      transition: 'all 0.3s ease',
                       appearance: 'none', cursor: 'pointer',
-                    }}
-                    onFocus={(e) => {
-                      e.target.style.boxShadow = 'inset 0 1px 1px rgba(255, 255, 255, 0.8), 0 0 0 2px rgba(197, 160, 40, 0.15)';
-                      e.target.style.background = 'rgba(255, 255, 255, 0.65)';
-                    }}
-                    onBlur={(e) => {
-                      e.target.style.boxShadow = 'inset 0 1px 1px rgba(255, 255, 255, 0.5), 0 4px 12px rgba(180, 160, 140, 0.05)';
-                      e.target.style.background = 'rgba(255, 255, 255, 0.45)';
                     }}
                   >
                     <option value="" disabled>{t('climateOptionSelect')}</option>
@@ -697,24 +661,12 @@ export default function Home() {
                   value={allergies}
                   onChange={(e) => setAllergies(e.target.value)}
                   placeholder={t('allergiesPlaceholder')}
+                  className="input-nacré"
                   style={{
                     width: '100%', boxSizing: 'border-box',
-                    border: '1px solid rgba(255, 255, 255, 0.45)', borderRadius: 18,
+                    borderRadius: 18,
                     padding: '14px 18px', fontSize: 13, color: '#3A2E26',
                     fontFamily: "'DM Sans', sans-serif", outline: 'none',
-                    background: 'rgba(255, 255, 255, 0.45)',
-                    backdropFilter: 'blur(12px)',
-                    WebkitBackdropFilter: 'blur(12px)',
-                    boxShadow: 'inset 0 1px 1px rgba(255, 255, 255, 0.5), 0 4px 12px rgba(180, 160, 140, 0.05)',
-                    transition: 'all 0.3s ease',
-                  }}
-                  onFocus={(e) => {
-                    e.target.style.boxShadow = 'inset 0 1px 1px rgba(255, 255, 255, 0.8), 0 0 0 2px rgba(197, 160, 40, 0.15)';
-                    e.target.style.background = 'rgba(255, 255, 255, 0.65)';
-                  }}
-                  onBlur={(e) => {
-                    e.target.style.boxShadow = 'inset 0 1px 1px rgba(255, 255, 255, 0.5), 0 4px 12px rgba(180, 160, 140, 0.05)';
-                    e.target.style.background = 'rgba(255, 255, 255, 0.45)';
                   }}
                 />
               </div>
@@ -830,24 +782,13 @@ export default function Home() {
                 placeholder="your@email.com"
                 required
                 autoFocus
+                className="input-nacré"
                 style={{
-                  border: '1px solid rgba(255, 255, 255, 0.45)', borderRadius: 16,
+                  borderRadius: 16,
                   padding: '14px 18px', fontSize: 14,
                   fontFamily: "'DM Sans', sans-serif",
                   outline: 'none', width: '100%', boxSizing: 'border-box',
-                  background: 'rgba(255, 255, 255, 0.35)', color: '#3A2E26',
-                  backdropFilter: 'blur(10px)',
-                  WebkitBackdropFilter: 'blur(10px)',
-                  boxShadow: 'inset 0 1px 1px rgba(255, 255, 255, 0.5), 0 4px 12px rgba(180, 160, 140, 0.04)',
-                  transition: 'all 0.3s ease',
-                }}
-                onFocus={(e) => {
-                  e.target.style.boxShadow = 'inset 0 1px 1px rgba(255, 255, 255, 0.8), 0 0 0 2px rgba(197, 160, 40, 0.15)';
-                  e.target.style.background = 'rgba(255, 255, 255, 0.55)';
-                }}
-                onBlur={(e) => {
-                  e.target.style.boxShadow = 'inset 0 1px 1px rgba(255, 255, 255, 0.5), 0 4px 12px rgba(180, 160, 140, 0.04)';
-                  e.target.style.background = 'rgba(255, 255, 255, 0.35)';
+                  color: '#3A2E26',
                 }}
               />
               <label style={{
