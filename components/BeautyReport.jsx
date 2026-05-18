@@ -492,11 +492,11 @@ export default function BeautyReport({ data, isPaid, onUnlock }) {
           {activeTab === "strengths" && (
             <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
               {strengths.map((s, i) => (
-                <div key={i} style={{ ...CARD, padding: "20px 22px", display: "flex", gap: 14, alignItems: "flex-start" }}>
+                <div key={i} style={{ ...CARD, padding: "20px 22px", display: "flex", gap: 14, alignItems: "flex-start", overflow: "hidden" }}>
                   <div style={{ width: 36, height: 36, borderRadius: 11, background: "rgba(168,116,73,0.1)", border: "1px solid rgba(168,116,73,0.2)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, fontSize: 15, color: GOLD }}>{ICONS[i] || "✦"}</div>
-                  <div>
-                    <div style={{ fontSize: 12.5, fontWeight: 600, color: "#2C241D", marginBottom: 6, letterSpacing: "0.04em" }}>{s.title}</div>
-                    <p style={{ margin: 0, fontSize: 13, lineHeight: 1.7, color: "#8C7A6B" }}>{s.desc}</p>
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div style={{ fontSize: 12.5, fontWeight: 600, color: "#2C241D", marginBottom: 6, letterSpacing: "0.04em", wordBreak: "break-word" }}>{s.title}</div>
+                    <p style={{ margin: 0, fontSize: 13, lineHeight: 1.7, color: "#8C7A6B", wordBreak: "break-word", overflowWrap: "break-word" }}>{s.desc}</p>
                   </div>
                 </div>
               ))}
@@ -507,11 +507,11 @@ export default function BeautyReport({ data, isPaid, onUnlock }) {
           {activeTab === "improve" && (
             <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
               {improvements.map((s, i) => (
-                <div key={i} style={{ ...CARD, padding: "20px 22px", display: "flex", gap: 14, alignItems: "flex-start" }}>
+                <div key={i} style={{ ...CARD, padding: "20px 22px", display: "flex", gap: 14, alignItems: "flex-start", overflow: "hidden" }}>
                   <div style={{ width: 30, height: 30, borderRadius: "50%", background: "rgba(212,165,116,0.1)", border: "1px solid rgba(212,165,116,0.25)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, fontSize: 13, fontWeight: 600, color: GOLD, fontFamily: "'Cormorant Garamond', serif" }}>{i + 1}</div>
-                  <div>
-                    <div style={{ fontSize: 12.5, fontWeight: 600, color: "#2C241D", marginBottom: 6, letterSpacing: "0.04em" }}>{s.title}</div>
-                    <p style={{ margin: 0, fontSize: 13, lineHeight: 1.7, color: "#8C7A6B" }}>{s.desc}</p>
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div style={{ fontSize: 12.5, fontWeight: 600, color: "#2C241D", marginBottom: 6, letterSpacing: "0.04em", wordBreak: "break-word" }}>{s.title}</div>
+                    <p style={{ margin: 0, fontSize: 13, lineHeight: 1.7, color: "#8C7A6B", wordBreak: "break-word", overflowWrap: "break-word" }}>{s.desc}</p>
                   </div>
                 </div>
               ))}
