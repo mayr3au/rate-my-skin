@@ -444,7 +444,7 @@ export default function Home() {
           {/* Upload zone */}
           <div
             onClick={() => !imageUrl && fileInputRef.current?.click()}
-            className="card-blur"
+            className="card-nacré"
             style={{
               border: dragOver ? `1.5px solid ${GOLD}` : undefined,
               boxShadow: dragOver 
