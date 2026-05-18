@@ -115,7 +115,7 @@ export default async function handler(req, res) {
   }
 
   const supabase = createAdminClient();
-  const { userId, imageBase64, mimeType, lang, skinConcern, captchaToken, email } = req.body;
+  const { userId, imageBase64, mimeType, lang, skinConcern, age, climate, allergies, captchaToken, email } = req.body;
   const normalizedEmail = email && typeof email === 'string' && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())
     ? email.trim().toLowerCase()
     : null;
@@ -162,9 +162,11 @@ export default async function handler(req, res) {
         role: 'user',
         content: [
           { type: 'image', source: { type: 'base64', media_type: mimeType, data: imageBase64 } },
-          { type: 'text', text: skinConcern
-            ? `User's stated skin concern (secondary context only): ${skinConcern}`
-            : 'No stated skin concern — base analysis entirely on the photo.' },
+          { type: 'text', text: `Additional Context (secondary only, use to inform clinical rationale but never override visual evidence):
+- Stated concern: ${skinConcern || 'None'}
+- Age: ${age || 'Unknown'}
+- Climate/Environment: ${climate || 'Unknown'}
+- Allergies/Sensitivities: ${allergies || 'None'}` },
         ]
       }]
     });

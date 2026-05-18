@@ -3,7 +3,15 @@ import { useLang } from "../lib/LangContext";
 import { shareScore } from "../lib/shareImage";
 
 const GOLD = "#A87449";
-const CARD = { background: "#fff", border: "1px solid rgba(212,165,116,0.18)", borderRadius: 20, boxShadow: "0 4px 20px rgba(168,116,73,0.05)" };
+const CARD = {
+  background: "rgba(255, 255, 255, 0.45)",
+  backdropFilter: "blur(20px) saturate(160%)",
+  WebkitBackdropFilter: "blur(20px) saturate(160%)",
+  border: "1px solid rgba(255, 255, 255, 0.55)",
+  borderRadius: 20,
+  boxShadow: "0 8px 32px rgba(168, 116, 73, 0.04), inset 0 1px 1px rgba(255, 255, 255, 0.85)",
+  transition: "all 0.3s ease"
+};
 const LABEL_STYLE = { margin: "0 0 4px", fontSize: 9.5, letterSpacing: "0.22em", textTransform: "uppercase", color: "#B9AC9E", fontWeight: 600, fontFamily: "'DM Sans', sans-serif" };
 const TITLE_STYLE = { margin: "0 0 16px", fontSize: 22, fontWeight: 300, fontFamily: "'Cormorant Garamond', serif", color: "#2C241D" };
 
@@ -21,11 +29,7 @@ function ScoreHeroCard({ score, summary, faceShape, eyeColor, skinTone, badge, m
   const r = SIZE / 2 - 11;
   const circ = 2 * Math.PI * r;
   const dash = (animated / 100) * circ;
-  const statusLabel = score >= 78
-    ? (lang === "fr" ? "Excellent" : "Excellent")
-    : score >= 65
-    ? (lang === "fr" ? "Bon" : "Good")
-    : (lang === "fr" ? "À améliorer" : "Needs work");
+  const statusLabel = score >= 78 ? t("scoreExcellent") : score >= 65 ? t("scoreGood") : t("scoreNeedsWork");
   const arcColor = score >= 78 ? "#D4A574" : score >= 65 ? "#A87449" : "#8C7A6B";
 
   return (
@@ -245,10 +249,10 @@ function ProductCard({ product, lang, t }) {
   return (
     <div onMouseEnter={() => setHov(true)} onMouseLeave={() => setHov(false)} style={{
       ...CARD, padding: "18px 20px",
-      border: `1px solid ${hov ? "rgba(168,116,73,0.4)" : "rgba(212,165,116,0.18)"}`,
-      boxShadow: hov ? "0 8px 28px rgba(168,116,73,0.1)" : CARD.boxShadow,
+      border: hov ? "1px solid rgba(168,116,73,0.6)" : "1px solid rgba(255, 255, 255, 0.55)",
+      boxShadow: hov ? "0 12px 40px rgba(168,116,73,0.08), inset 0 1px 1px rgba(255, 255, 255, 0.95)" : CARD.boxShadow,
       opacity: vis ? 1 : 0, transform: vis ? "translateY(0)" : "translateY(12px)",
-      transition: "opacity 0.45s ease, transform 0.45s ease, border-color 0.2s, box-shadow 0.2s",
+      transition: "opacity 0.45s ease, transform 0.45s ease, border-color 0.2s, box-shadow 0.2s, background-color 0.2s",
       display: "flex", gap: 16, alignItems: "flex-start", overflow: "hidden",
     }}>
 
@@ -286,8 +290,8 @@ function ProductCard({ product, lang, t }) {
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 8 }}>
           <span style={{ fontSize: 17, fontWeight: 300, color: "#2C241D", fontFamily: "'Cormorant Garamond', serif" }}>{product.price}</span>
           <div className="rpt-product-btns" style={{ display: "flex", gap: 7 }}>
-            <a href={amazonUrl} target="_blank" rel="noopener noreferrer" style={{ textDecoration: "none", background: "#2C241D", color: "#fff", borderRadius: 9, padding: "8px 14px", fontSize: 11.5, fontWeight: 600, letterSpacing: "0.04em", fontFamily: "'DM Sans', sans-serif" }}>{t('buyAmazon')}</a>
-            <a href={sephoraUrl} target="_blank" rel="noopener noreferrer" style={{ textDecoration: "none", background: "#fff", color: "#2C241D", border: "1.5px solid #2C241D", borderRadius: 9, padding: "8px 14px", fontSize: 11.5, fontWeight: 600, letterSpacing: "0.04em", fontFamily: "'DM Sans', sans-serif" }}>{t('buySephora')}</a>
+            <a href={amazonUrl} target="_blank" rel="noopener noreferrer" className="btn-liquid-glass-dark" style={{ padding: "8px 14px", fontSize: 11.5, borderRadius: 12, border: "none" }}>{t('buyAmazon')}</a>
+            <a href={sephoraUrl} target="_blank" rel="noopener noreferrer" className="btn-liquid-glass" style={{ padding: "8px 14px", fontSize: 11.5, borderRadius: 12, border: "none" }}>{t('buySephora')}</a>
           </div>
         </div>
       </div>
@@ -315,7 +319,15 @@ const SEVERITY_ACCENT = { mild: "#D1D5DB", moderate: "#FCD34D", significant: "#F
 /* ── Shared report header ── */
 function ReportHeader({ t }) {
   return (
-    <div style={{ background: "#fff", borderBottom: "1px solid rgba(212,165,116,0.12)", padding: "32px 28px 24px", position: "relative", overflow: "hidden" }}>
+    <div style={{
+      background: "rgba(255, 255, 255, 0.45)",
+      backdropFilter: "blur(18px) saturate(120%)",
+      WebkitBackdropFilter: "blur(18px) saturate(120%)",
+      borderBottom: "1px solid rgba(255, 255, 255, 0.5)",
+      padding: "32px 28px 24px",
+      position: "relative",
+      overflow: "hidden"
+    }}>
       <div style={{ position: "absolute", inset: 0, pointerEvents: "none", background: "radial-gradient(ellipse 80% 100% at 50% -20%, rgba(0,0,0,0.025) 0%, transparent 100%)" }} />
       <div className="mobile-padding" style={{ maxWidth: 680, margin: "0 auto", position: "relative" }}>
         <p className="mobile-hide" style={{ ...LABEL_STYLE, margin: "0 0 4px" }}>{t('aestheticAnalysis')}</p>
@@ -363,12 +375,12 @@ export default function BeautyReport({ data, isPaid, onUnlock }) {
     try {
       const result = await shareScore(data, lang);
       if (result === "downloaded") {
-        setShareMsg(lang === "fr" ? "Image téléchargée — partagez-la sur Instagram ou TikTok !" : "Image downloaded — share it on Instagram or TikTok!");
+        setShareMsg(t("shareDownloaded"));
         setTimeout(() => setShareMsg(""), 4000);
       }
     } catch (err) {
       console.error("[share]", err.message);
-      setShareMsg(lang === "fr" ? "Impossible de générer l'image." : "Could not generate image.");
+      setShareMsg(t("shareError"));
       setTimeout(() => setShareMsg(""), 3000);
     } finally {
       setSharing(false);
@@ -406,7 +418,7 @@ export default function BeautyReport({ data, isPaid, onUnlock }) {
     const TABS = [t('tabMetrics'), t('tabStrengths'), t('tabImprove'), t('tabRoutine'), t('tabShop')];
 
     return (
-      <div style={{ background: "#FDFBF9", minHeight: "100vh", fontFamily: "'DM Sans', sans-serif", paddingBottom: 80 }}>
+      <div style={{ background: "linear-gradient(to bottom, #FFFFFF 0%, #FDFBFA 60%, #FAF6EE 88%, #F3ECE0 100%)", minHeight: "100vh", fontFamily: "'DM Sans', sans-serif", paddingBottom: 80 }}>
         <ReportHeader t={t} />
 
         <div style={{ maxWidth: 680, margin: "0 auto", padding: "24px 20px 0" }}>
@@ -423,7 +435,7 @@ export default function BeautyReport({ data, isPaid, onUnlock }) {
           {/* ── Main problems ── */}
           {mainProblems.length > 0 && (
             <div style={{ marginTop: 28 }}>
-              <SectionHeading label={t('mainProblemsHeading')} title={lang === "fr" ? "Points à travailler" : "Areas to address"} />
+              <SectionHeading label={t('mainProblemsHeading')} title={t('areasToAddress')} />
               <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
                 {mainProblems.map((problem, i) => (
                   <div key={i} style={{ ...CARD, padding: "0", display: "flex", overflow: "hidden" }}>
@@ -447,14 +459,14 @@ export default function BeautyReport({ data, isPaid, onUnlock }) {
               <div style={{ display: "flex", alignItems: "flex-end", justifyContent: "space-between", marginBottom: 14, gap: 8 }}>
                 <SectionHeading label={t('shopSubtitle')} title={t('shopTitle')} />
                 <span style={{ fontSize: 9, fontWeight: 700, letterSpacing: "0.16em", textTransform: "uppercase", color: "#C5A028", background: "rgba(197,160,40,0.08)", border: "1px solid rgba(197,160,40,0.25)", borderRadius: 20, padding: "4px 12px", whiteSpace: "nowrap", flexShrink: 0, fontFamily: "'DM Sans', sans-serif", marginBottom: 16 }}>
-                  {lang === "fr" ? "Inclus" : "Free"}
+                  {t('freeIncluded')}
                 </span>
               </div>
               <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
                 {allProducts.map((p, i) => <ProductCard key={i} product={p} lang={lang} t={t} />)}
               </div>
               <p style={{ fontSize: 10, color: "#C4B8AE", textAlign: "center", padding: "12px 4px 0", lineHeight: 1.7, fontFamily: "'DM Sans', sans-serif" }}>
-                {lang === "fr" ? "Liens affiliés — petite commission si vous achetez, sans surcoût." : "Affiliate links — we may earn a small commission at no extra cost to you."}
+                {t('affiliateNotice')}
               </p>
             </div>
           )}
@@ -463,10 +475,12 @@ export default function BeautyReport({ data, isPaid, onUnlock }) {
         {/* ── Paywall card ── */}
         <div style={{ maxWidth: 680, margin: "32px auto 0", padding: "0 20px" }}>
           <div style={{
-            background: "linear-gradient(160deg, #fff 0%, #FDFAF6 100%)",
-            border: "1.5px solid #C5A028",
+            background: "rgba(255, 255, 255, 0.55)",
+            backdropFilter: "blur(24px) saturate(150%)",
+            WebkitBackdropFilter: "blur(24px) saturate(150%)",
+            border: "1.5px solid rgba(197, 160, 40, 0.45)",
             borderRadius: 24, padding: "clamp(28px,5vw,40px)",
-            boxShadow: "0 20px 56px rgba(168,116,73,0.1), 0 0 0 1px rgba(197,160,40,0.15)",
+            boxShadow: "0 20px 56px rgba(168, 116, 73, 0.08), inset 0 1px 2px rgba(255, 255, 255, 0.95)",
             textAlign: "center",
           }}>
             <div style={{ width: 36, height: 3, background: "linear-gradient(90deg, #C5A028, #E8C872)", borderRadius: 2, margin: "0 auto 18px" }} />
@@ -480,7 +494,7 @@ export default function BeautyReport({ data, isPaid, onUnlock }) {
               {t('paywallCardDesc')}
             </p>
             <div style={{ display: "flex", flexDirection: "column", gap: 9, marginBottom: 24, textAlign: "left", background: "rgba(245,240,235,0.4)", borderRadius: 14, padding: "16px 18px" }}>
-              {[t('paywallPerk1'), t('paywallPerk2'), lang === "fr" ? "Plan d'amélioration détaillé & points forts" : "Detailed strengths & improvement plan"].map((perk, i) => (
+              {[t('paywallPerk1'), t('paywallPerk2'), t('paywallImprove')].map((perk, i) => (
                 <div key={i} style={{ display: "flex", gap: 10, alignItems: "flex-start" }}>
                   <span style={{ color: GOLD, fontSize: 10, flexShrink: 0, marginTop: 3 }}>✦</span>
                   <span style={{ fontSize: 12.5, color: "#6F6156", lineHeight: 1.5, fontFamily: "'DM Sans', sans-serif" }}>{perk}</span>
@@ -488,15 +502,15 @@ export default function BeautyReport({ data, isPaid, onUnlock }) {
               ))}
             </div>
             <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-              <button onClick={() => handleUnlock("single")} disabled={unlocking} style={{ width: "100%", padding: "15px", background: unlocking ? "#8C7A6B" : "#2C241D", color: "#fff", border: "none", borderRadius: 12, fontSize: 13.5, fontWeight: 700, cursor: unlocking ? "not-allowed" : "pointer", fontFamily: "'DM Sans', sans-serif", letterSpacing: "0.03em", display: "flex", alignItems: "center", justifyContent: "center", gap: 8, transition: "opacity 0.2s", opacity: unlocking ? 0.7 : 1, boxShadow: "0 8px 24px rgba(44,36,29,0.18)" }}>
+              <button onClick={() => handleUnlock("single")} disabled={unlocking} className="btn-liquid-glass-dark" style={{ width: "100%", padding: "15px", borderRadius: 12, fontSize: 13.5, fontWeight: 700, letterSpacing: "0.03em", display: "flex", alignItems: "center", justifyContent: "center", gap: 8, border: "none" }}>
                 {unlocking ? <><span style={{ display: "inline-block", width: 14, height: 14, border: "2px solid rgba(255,255,255,0.4)", borderTopColor: "#fff", borderRadius: "50%", animation: "spin 0.7s linear infinite" }} />{t('redirecting')}</> : t('unlockSingle')}
               </button>
-              <button onClick={() => handleUnlock("pack")} disabled={unlocking} style={{ width: "100%", padding: "15px", background: "transparent", color: "#2C241D", border: "1.5px solid rgba(44,36,29,0.25)", borderRadius: 12, fontSize: 13, fontWeight: 600, cursor: unlocking ? "not-allowed" : "pointer", fontFamily: "'DM Sans', sans-serif", letterSpacing: "0.03em", transition: "opacity 0.2s", opacity: unlocking ? 0.5 : 1 }}>
+              <button onClick={() => handleUnlock("pack")} disabled={unlocking} className="btn-liquid-glass" style={{ width: "100%", padding: "15px", borderRadius: 12, fontSize: 13, fontWeight: 600, letterSpacing: "0.03em", border: "none" }}>
                 {t('unlockPack')}
               </button>
             </div>
             <p style={{ marginTop: 14, fontSize: 11, color: "#C4B8AE", fontFamily: "'DM Sans', sans-serif" }}>
-              {lang === "fr" ? "Paiement unique · Sans abonnement" : "One-time payment · No subscription"}
+              {t('oneTimePayment')}
             </p>
           </div>
         </div>
@@ -506,21 +520,17 @@ export default function BeautyReport({ data, isPaid, onUnlock }) {
           <button
             onClick={handleShare}
             disabled={sharing}
+            className="btn-liquid-glass-dark"
             style={{
               width: "100%", padding: "14px", borderRadius: 14,
-              background: sharing ? "rgba(44,36,29,0.06)" : "linear-gradient(145deg, #2C241D, #3A2E26)",
-              color: sharing ? "#B9AC9E" : "#F2E8DC",
-              border: "none", cursor: sharing ? "wait" : "pointer",
               fontSize: 13, fontWeight: 600, letterSpacing: "0.04em",
-              fontFamily: "'DM Sans', sans-serif",
               display: "flex", alignItems: "center", justifyContent: "center", gap: 10,
-              boxShadow: sharing ? "none" : "0 6px 20px rgba(44,36,29,0.16)",
-              transition: "all 0.2s",
+              border: "none",
             }}
           >
             {sharing
-              ? <><span style={{ display: "inline-block", width: 12, height: 12, border: "2px solid rgba(185,172,158,0.35)", borderTopColor: "#B9AC9E", borderRadius: "50%", animation: "spin 0.7s linear infinite" }}/>{lang === "fr" ? "Génération de l'image…" : "Generating image…"}</>
-              : <>{lang === "fr" ? "Partager mon score" : "Share My Score"}<span style={{ fontSize: 11, opacity: 0.6, fontWeight: 400 }}>· Instagram / TikTok</span></>
+              ? <><span style={{ display: "inline-block", width: 12, height: 12, border: "2px solid rgba(185,172,158,0.35)", borderTopColor: "#B9AC9E", borderRadius: "50%", animation: "spin 0.7s linear infinite" }}/>{t('shareGenerating')}</>
+              : <>{t('shareScore')}<span style={{ fontSize: 11, opacity: 0.6, fontWeight: 400 }}>· Instagram / TikTok</span></>
             }
           </button>
           {shareMsg && <p style={{ margin: "10px 0 0", fontSize: 12, color: "#A87449", textAlign: "center", fontFamily: "'DM Sans', sans-serif" }}>{shareMsg}</p>}
@@ -529,17 +539,26 @@ export default function BeautyReport({ data, isPaid, onUnlock }) {
         {/* ── Clickable tab preview bar ── */}
         <div style={{ maxWidth: 680, margin: "24px auto 0", padding: "0 20px" }}>
           <p style={{ ...LABEL_STYLE, textAlign: "center", marginBottom: 10 }}>
-            {lang === "fr" ? "Aperçu du rapport complet" : "Preview of full report"}
+            {t('previewLabel')}
           </p>
-          <div className="rpt-tabs" style={{ display: "flex", gap: 4, background: "#fff", border: "1px solid rgba(212,165,116,0.2)", borderRadius: 14, padding: 4, boxShadow: "0 4px 16px rgba(168,116,73,0.05)", scrollbarWidth: "none" }}>
+          <div className="rpt-tabs" style={{
+            display: "flex", gap: 4,
+            background: "rgba(255, 255, 255, 0.4)",
+            backdropFilter: "blur(16px) saturate(120%)",
+            WebkitBackdropFilter: "blur(16px) saturate(120%)",
+            border: "1px solid rgba(255, 255, 255, 0.5)",
+            borderRadius: 14, padding: 4,
+            boxShadow: "0 8px 32px rgba(168,116,73,0.03), inset 0 1px 1px rgba(255, 255, 255, 0.8)",
+            scrollbarWidth: "none"
+          }}>
             {TABS.map((label, i) => (
               <button key={label} onClick={() => setPreviewTab(i)} className="rpt-tab-btn" style={{
                 flex: 1, padding: "11px 4px", borderRadius: 10, textAlign: "center",
-                background: previewTab === i ? "linear-gradient(135deg, #2C241D, #3A2E26)" : "transparent",
+                background: previewTab === i ? "linear-gradient(135deg, rgba(44, 36, 29, 0.85), rgba(28, 22, 17, 0.92))" : "transparent",
                 color: previewTab === i ? "#fff" : "#B9AC9E",
                 fontSize: 10, fontWeight: 600, letterSpacing: "0.08em",
                 fontFamily: "'DM Sans', sans-serif", textTransform: "uppercase",
-                border: "none", cursor: "pointer", transition: "all 0.2s ease",
+                border: previewTab === i ? "1px solid rgba(255, 255, 255, 0.15)" : "none", cursor: "pointer", transition: "all 0.25s ease",
                 boxShadow: previewTab === i ? "0 4px 14px rgba(44,36,29,0.15)" : "none",
                 whiteSpace: "nowrap",
               }}>{label}</button>
@@ -605,7 +624,7 @@ export default function BeautyReport({ data, isPaid, onUnlock }) {
   ];
 
   return (
-    <div style={{ background: "#FDFBF9", minHeight: "100vh", fontFamily: "'DM Sans', sans-serif", paddingBottom: 60 }}>
+    <div style={{ background: "linear-gradient(to bottom, #FFFFFF 0%, #FDFBFA 60%, #FAF6EE 88%, #F3ECE0 100%)", minHeight: "100vh", fontFamily: "'DM Sans', sans-serif", paddingBottom: 60 }}>
       <ReportHeader t={t} />
 
       <div style={{ maxWidth: 680, margin: "0 auto", padding: "24px 20px 0" }}>
@@ -620,11 +639,20 @@ export default function BeautyReport({ data, isPaid, onUnlock }) {
         />
 
         {/* ── Tabs ── */}
-        <div className="rpt-tabs" style={{ display: "flex", gap: 4, background: "#fff", border: "1px solid rgba(212,165,116,0.18)", borderRadius: 14, padding: 4, boxShadow: "0 4px 16px rgba(168,116,73,0.04)", scrollbarWidth: "none", WebkitOverflowScrolling: "touch" }}>
+        <div className="rpt-tabs" style={{
+          display: "flex", gap: 4,
+          background: "rgba(255, 255, 255, 0.4)",
+          backdropFilter: "blur(16px) saturate(120%)",
+          WebkitBackdropFilter: "blur(16px) saturate(120%)",
+          border: "1px solid rgba(255, 255, 255, 0.5)",
+          borderRadius: 14, padding: 4,
+          boxShadow: "0 8px 32px rgba(168,116,73,0.03), inset 0 1px 1px rgba(255, 255, 255, 0.8)",
+          scrollbarWidth: "none", WebkitOverflowScrolling: "touch"
+        }}>
           {TABS_PAID.map(tab => (
             <button key={tab.id} onClick={() => setActiveTab(tab.id)} className="rpt-tab-btn" style={{
-              flex: 1, padding: "12px 4px", border: "none", borderRadius: 10,
-              background: activeTab === tab.id ? "linear-gradient(135deg, #2C241D, #3A2E26)" : "transparent",
+              flex: 1, padding: "12px 4px", border: activeTab === tab.id ? "1px solid rgba(255, 255, 255, 0.15)" : "none", borderRadius: 10,
+              background: activeTab === tab.id ? "linear-gradient(135deg, rgba(44, 36, 29, 0.85), rgba(28, 22, 17, 0.92))" : "transparent",
               color: activeTab === tab.id ? "#fff" : "#B9AC9E",
               fontSize: 10, fontWeight: 600, cursor: "pointer", letterSpacing: "0.08em",
               fontFamily: "'DM Sans', sans-serif", textTransform: "uppercase", whiteSpace: "nowrap",
@@ -685,15 +713,15 @@ export default function BeautyReport({ data, isPaid, onUnlock }) {
           {/* Routine */}
           {activeTab === "recs" && (() => {
             const ROUTINE_SECTIONS = [
-              { key: "morning", label: lang === "fr" ? "Routine du matin" : "Morning Routine", dot: "#F6C667" },
-              { key: "evening", label: lang === "fr" ? "Routine du soir"  : "Evening Routine",  dot: "#8C7A6B" },
-              { key: "weekly",  label: lang === "fr" ? "Soins hebdomadaires" : "Weekly Treatments", dot: GOLD },
+              { key: "morning", label: t('routineMorning'), dot: "#F6C667" },
+              { key: "evening", label: t('routineEvening'), dot: "#8C7A6B" },
+              { key: "weekly",  label: t('routineWeekly'), dot: GOLD },
             ].filter(s => (paidRoutine[s.key] || []).length > 0);
 
             if (ROUTINE_SECTIONS.length === 0) {
               return (
                 <div style={{ ...CARD, padding: "32px", textAlign: "center", color: "#C4B8AE", fontSize: 13, fontFamily: "'DM Sans', sans-serif" }}>
-                  {lang === "fr" ? "Routine non disponible pour cette analyse." : "Routine not available for this analysis."}
+                  {t('routineUnavailable')}
                 </div>
               );
             }
@@ -728,7 +756,7 @@ export default function BeautyReport({ data, isPaid, onUnlock }) {
                 <div style={{ ...CARD, padding: "32px", textAlign: "center", color: "#C4B8AE", fontSize: 13 }}>{t('noProducts')}</div>
               ) : products.map((p, i) => <ProductCard key={i} product={p} lang={lang} t={t}/>)}
               <p style={{ fontSize: 10, color: "#C4B8AE", textAlign: "center", padding: "8px 4px 0", lineHeight: 1.7, fontFamily: "'DM Sans', sans-serif" }}>
-                {lang === "fr" ? "Liens affiliés — petite commission si vous achetez, sans surcoût." : "Affiliate links — we may earn a small commission at no extra cost to you."}
+                {t('affiliateNotice')}
               </p>
             </div>
           )}
@@ -743,41 +771,41 @@ export default function BeautyReport({ data, isPaid, onUnlock }) {
           textAlign: "center",
         }}>
           <p style={{ margin: "0 0 6px", fontSize: 9, letterSpacing: "0.22em", textTransform: "uppercase", color: "rgba(212,165,116,0.5)", fontFamily: "'DM Sans', sans-serif", fontWeight: 600 }}>
-            {lang === "fr" ? "PARTAGEZ VOS RÉSULTATS" : "SHARE YOUR RESULTS"}
+            {t('shareHeading')}
           </p>
           <h3 style={{ margin: "0 0 6px", fontFamily: "'Cormorant Garamond', serif", fontSize: 26, fontWeight: 300, color: "#F2E8DC", lineHeight: 1.2 }}>
-            {lang === "fr" ? `Votre score : ${overall}/100` : `Your Score: ${overall}/100`}
+            {t('shareYourScore', overall)}
           </h3>
           <p style={{ margin: "0 0 20px", fontSize: 12, color: "rgba(185,172,158,0.6)", fontFamily: "'DM Sans', sans-serif", lineHeight: 1.6 }}>
-            {lang === "fr" ? "Génère une image 1080×1920 pour Instagram Stories & TikTok" : "Generates a 1080×1920 card for Instagram Stories & TikTok"}
+            {t('shareSubtitle')}
           </p>
           <div style={{ display: "flex", gap: 10, justifyContent: "center", flexWrap: "wrap" }}>
             <button
               onClick={handleShare}
               disabled={sharing}
+              className="btn-liquid-glass"
               style={{
-                background: sharing ? "rgba(255,255,255,0.07)" : "rgba(255,255,255,0.95)",
-                color: sharing ? "rgba(255,255,255,0.35)" : "#2C241D",
-                border: "none", borderRadius: 10, padding: "12px 26px",
-                fontSize: 13, fontWeight: 600, cursor: sharing ? "wait" : "pointer",
-                letterSpacing: "0.04em", fontFamily: "'DM Sans', sans-serif",
-                boxShadow: sharing ? "none" : "0 3px 14px rgba(0,0,0,0.18)",
-                transition: "all 0.2s",
+                padding: "12px 26px",
+                borderRadius: 10,
+                fontSize: 13, fontWeight: 600,
+                letterSpacing: "0.04em",
                 display: "flex", alignItems: "center", gap: 8,
+                border: "none",
               }}
             >
               {sharing
-                ? <><span style={{ display: "inline-block", width: 12, height: 12, border: "2px solid rgba(255,255,255,0.25)", borderTopColor: "rgba(255,255,255,0.7)", borderRadius: "50%", animation: "spin 0.7s linear infinite" }}/>{lang === "fr" ? "Génération…" : "Generating…"}</>
+                ? <><span style={{ display: "inline-block", width: 12, height: 12, border: "2px solid rgba(255,255,255,0.25)", borderTopColor: "rgba(255,255,255,0.7)", borderRadius: "50%", animation: "spin 0.7s linear infinite" }}/>{t('shareGeneratingShort')}</>
                 : t("shareScore")
               }
             </button>
             <button
               onClick={() => navigator.clipboard?.writeText(t("shareText", overall))}
+              className="btn-liquid-glass"
               style={{
-                background: "transparent", color: "rgba(185,172,158,0.75)",
-                border: "1px solid rgba(185,172,158,0.2)", borderRadius: 10, padding: "12px 20px",
-                fontSize: 12, fontWeight: 500, cursor: "pointer",
-                fontFamily: "'DM Sans', sans-serif",
+                padding: "12px 20px",
+                borderRadius: 10,
+                fontSize: 12, fontWeight: 500,
+                border: "none",
               }}
             >
               {t("copyShare")}

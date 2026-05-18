@@ -97,7 +97,7 @@ export default function MesRapports() {
   return (
     <>
       <Head>
-        <title>{lang === 'fr' ? 'Mes rapports — Rate My Skin' : 'My Reports — Rate My Skin'}</title>
+        <title>{t('myReportsPageTitle')}</title>
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
       </Head>
@@ -105,9 +105,9 @@ export default function MesRapports() {
       {/* Nav */}
       <div style={{
         position: 'sticky', top: 0, zIndex: 100,
-        background: 'rgba(247,247,245,0.92)',
+        background: 'rgba(255, 255, 255, 0.45)',
         backdropFilter: 'blur(18px)', WebkitBackdropFilter: 'blur(18px)',
-        borderBottom: '1px solid rgba(0,0,0,0.07)',
+        borderBottom: '1px solid rgba(255, 255, 255, 0.5)',
         padding: '13px 26px',
         display: 'flex', alignItems: 'center', justifyContent: 'space-between',
       }}>
@@ -117,9 +117,14 @@ export default function MesRapports() {
           <button
             onClick={() => router.push('/')}
             style={{
-              background: 'none', border: '1px solid #E8E8E4', borderRadius: 10,
-              padding: '9px 18px', fontSize: 12, color: '#888', cursor: 'pointer',
+              background: 'rgba(255, 255, 255, 0.45)',
+              border: '1px solid rgba(255, 255, 255, 0.55)',
+              borderRadius: 10,
+              padding: '9px 18px', fontSize: 12, color: '#6F6156', cursor: 'pointer',
               fontFamily: "'DM Sans', sans-serif", fontWeight: 500,
+              backdropFilter: 'blur(12px)',
+              WebkitBackdropFilter: 'blur(12px)',
+              boxShadow: '0 4px 12px rgba(180, 160, 140, 0.05)',
             }}
           >
             {t('newAnalysis')}
@@ -140,7 +145,7 @@ export default function MesRapports() {
             fontSize: 11, letterSpacing: '0.2em', textTransform: 'uppercase',
             color: '#B0885E', fontWeight: 600, marginBottom: 10,
           }}>
-            {lang === 'fr' ? 'Accès à vos analyses' : 'Access your analyses'}
+            {t('myReportsAccessLabel')}
           </p>
           <h1 style={{
             fontFamily: "'Cormorant Garamond', serif",
@@ -165,25 +170,26 @@ export default function MesRapports() {
             autoFocus
             style={{
               flex: '1 1 220px',
-              border: 'none', borderRadius: 14,
+              border: '1px solid rgba(255, 255, 255, 0.45)', borderRadius: 14,
               padding: '13px 18px', fontSize: 14,
               fontFamily: "'DM Sans', sans-serif",
               outline: 'none',
-              background: 'rgba(245, 240, 235, 0.7)', color: '#3A2E26',
-              boxShadow: 'inset 0 2px 6px rgba(180,160,140,0.1)',
+              background: 'rgba(255, 255, 255, 0.35)', color: '#3A2E26',
+              backdropFilter: 'blur(10px)',
+              WebkitBackdropFilter: 'blur(10px)',
+              boxShadow: 'inset 0 1px 1px rgba(255, 255, 255, 0.5), 0 4px 12px rgba(180, 160, 140, 0.04)',
             }}
           />
           <button
             type="submit"
             disabled={loading}
+            className="btn-liquid-glass-dark"
             style={{
               flex: '0 0 auto',
-              background: '#2C241D', color: '#fff', border: 'none',
               borderRadius: 14, padding: '13px 22px',
               fontSize: 13, fontWeight: 600, cursor: loading ? 'wait' : 'pointer',
-              fontFamily: "'DM Sans', sans-serif",
-              opacity: loading ? 0.7 : 1,
               whiteSpace: 'nowrap',
+              border: 'none',
             }}
           >
             {loading ? t('myReportsLoading') : t('myReportsButton')}
@@ -203,8 +209,11 @@ export default function MesRapports() {
             {reports.length === 0 ? (
               <div style={{
                 textAlign: 'center', padding: '40px 24px',
-                background: 'rgba(245,240,235,0.5)', borderRadius: 20,
-                border: '1px solid rgba(212,165,116,0.15)',
+                background: 'rgba(255, 255, 255, 0.45)', borderRadius: 20,
+                border: '1px solid rgba(255, 255, 255, 0.55)',
+                backdropFilter: 'blur(16px)',
+                WebkitBackdropFilter: 'blur(16px)',
+                boxShadow: '0 8px 32px rgba(168, 116, 73, 0.03), inset 0 1px 1px rgba(255, 255, 255, 0.8)',
               }}>
                 <p style={{ fontSize: 14, color: '#8C7A6B', margin: 0 }}>
                   {t('myReportsEmpty')}
@@ -213,18 +222,20 @@ export default function MesRapports() {
             ) : (
               <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
                 <p style={{ fontSize: 12, color: '#B9AC9E', margin: '0 0 4px' }}>
-                  {reports.length} {lang === 'fr' ? `rapport${reports.length > 1 ? 's' : ''} trouvé${reports.length > 1 ? 's' : ''}` : `report${reports.length !== 1 ? 's' : ''} found`}
+                  {t('myReportsFound', reports.length)}
                 </p>
                 {reports.map((report) => (
                   <div
                     key={report.id}
                     style={{
-                      background: '#FDFBF8',
-                      border: '1px solid rgba(212,165,116,0.18)',
+                      background: 'rgba(255, 255, 255, 0.45)',
+                      border: '1px solid rgba(255, 255, 255, 0.55)',
                       borderRadius: 18,
                       padding: '18px 20px',
                       display: 'flex', alignItems: 'center', gap: 16,
-                      boxShadow: '0 2px 12px rgba(168,116,73,0.04)',
+                      boxShadow: '0 8px 32px rgba(168, 116, 73, 0.03), inset 0 1px 1px rgba(255, 255, 255, 0.85)',
+                      backdropFilter: 'blur(20px) saturate(140%)',
+                      WebkitBackdropFilter: 'blur(20px) saturate(140%)',
                     }}
                   >
                     {report.score !== null && <ScoreBadge score={report.score} />}
@@ -250,13 +261,13 @@ export default function MesRapports() {
 
                     <button
                       onClick={() => openReport(report)}
+                      className="btn-liquid-glass-dark"
                       style={{
                         flexShrink: 0,
-                        background: '#2C241D', color: '#fff', border: 'none',
                         borderRadius: 10, padding: '9px 16px',
-                        fontSize: 12, fontWeight: 600, cursor: 'pointer',
-                        fontFamily: "'DM Sans', sans-serif",
+                        fontSize: 12, fontWeight: 600,
                         whiteSpace: 'nowrap',
+                        border: 'none',
                       }}
                     >
                       {t('myReportsViewReport')}

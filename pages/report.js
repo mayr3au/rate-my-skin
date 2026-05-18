@@ -135,10 +135,10 @@ export default function Report() {
         <p style={{ fontSize: 14, color: '#aaa' }}>{t('noReportFound')}</p>
         <button
           onClick={() => router.push('/')}
+          className="btn-liquid-glass-dark"
           style={{
-            background: '#0d0d0d', color: '#fff', border: 'none',
             borderRadius: 10, padding: '12px 24px', fontSize: 13,
-            fontWeight: 600, cursor: 'pointer', fontFamily: "'DM Sans', sans-serif",
+            fontWeight: 600, border: 'none',
           }}
         >
           {t('startNewAnalysis')}
@@ -178,10 +178,10 @@ export default function Report() {
       {/* Sticky frosted-glass nav */}
       <div style={{
         position: 'sticky', top: 0, zIndex: 100,
-        background: 'rgba(247,247,245,0.92)',
+        background: 'rgba(255, 255, 255, 0.45)',
         backdropFilter: 'blur(18px)',
         WebkitBackdropFilter: 'blur(18px)',
-        borderBottom: '1px solid rgba(0,0,0,0.07)',
+        borderBottom: '1px solid rgba(255, 255, 255, 0.5)',
         padding: '13px 26px',
         display: 'flex', alignItems: 'center', justifyContent: 'space-between',
         animation: 'slideDown 0.55s ease',
@@ -197,7 +197,7 @@ export default function Report() {
             }}>
               <span style={{ fontSize: 7, color: '#C5A028', fontWeight: 700 }}>✦</span>
               <span style={{ fontSize: 11, color: '#8C6A3A', fontWeight: 600, fontFamily: "'DM Sans', sans-serif", whiteSpace: 'nowrap' }}>
-                {paidUnlocks} report{paidUnlocks !== 1 ? 's' : ''} left
+                {t('paidUnlocksLeft', paidUnlocks)}
               </span>
             </div>
           )}
@@ -215,11 +215,11 @@ export default function Report() {
           </button>
           <button
             onClick={() => router.push('/')}
+            className="btn-liquid-glass"
             style={{
-              background: 'none', border: '1px solid #E8E8E4', borderRadius: 10,
-              padding: '9px 18px', fontSize: 12, color: '#888', cursor: 'pointer',
-              fontFamily: "'DM Sans', sans-serif", fontWeight: 500,
-              letterSpacing: '0.02em',
+              borderRadius: 10,
+              padding: '9px 18px', fontSize: 12,
+              border: 'none',
             }}
           >
             {t('newAnalysis')}

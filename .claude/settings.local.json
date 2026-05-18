@@ -9,7 +9,10 @@
       "Bash(git commit -m ' *)",
       "Bash(git push *)",
       "Bash(wmic logicaldisk *)",
-      "Bash(npm install *)"
+      "Bash(npm install *)",
+      "Bash(git *)",
+      "Bash(node -e \"require\\('sharp'\\)\")",
+      "Bash(node *)"
     ]
   }
 }

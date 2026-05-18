@@ -56,6 +56,9 @@ export default function Home() {
   const [image, setImage] = useState(null);
   const [imageUrl, setImageUrl] = useState(null);
   const [skinConcern, setSkinConcern] = useState('');
+  const [age, setAge] = useState('');
+  const [climate, setClimate] = useState('');
+  const [allergies, setAllergies] = useState('');
   const [activeChips, setActiveChips] = useState([]);
   const [dragOver, setDragOver] = useState(false);
 
@@ -65,9 +68,7 @@ export default function Home() {
   const [paidUnlocks, setPaidUnlocks] = useState(0);
   const [loadingStep, setLoadingStep] = useState(0);
 
-  const loadingMessages = lang === 'fr' 
-    ? ["Anatomie & Texture...", "Analyse des proportions...", "IA en cours de traitement...", "Génération du rapport..."]
-    : ["Anatomy & Texture...", "Mapping proportions...", "AI Processing...", "Finalizing report..."];
+  const loadingMessages = t('loadingSteps');
 
   useEffect(() => {
     const captured = localStorage.getItem('rms_email_captured') === '1';
@@ -243,12 +244,15 @@ export default function Home() {
           userId: userId || null,
           lang,
           skinConcern: skinConcern.trim() || null,
+          age: age.trim() || null,
+          climate: climate.trim() || null,
+          allergies: allergies.trim() || null,
           email: storedEmail,
         }),
       });
       const json = await res.json();
 
-      if (json.error === 'no_face') throw new Error(json.message || (lang === 'fr' ? "Aucun visage détecté. Veuillez télécharger une photo de visage claire." : "No face detected. Please upload a clear face photo."));
+      if (json.error === 'no_face') throw new Error(json.message || t('noFaceError'));
       if (!res.ok || json.error) throw new Error(json.error || t('analysisFailed'));
 
       sessionStorage.setItem('rms_report', JSON.stringify(json.data));
@@ -295,9 +299,7 @@ export default function Home() {
             }}>
               <span style={{ fontSize: 7, color: '#C5A028', fontWeight: 700 }}>✦</span>
               <span style={{ fontSize: 11, color: '#8C6A3A', fontWeight: 600, fontFamily: "'DM Sans', sans-serif", whiteSpace: 'nowrap' }}>
-                {lang === 'fr'
-                  ? `${paidUnlocks} rapport${paidUnlocks > 1 ? 's' : ''} inclus`
-                  : `${paidUnlocks} report${paidUnlocks !== 1 ? 's' : ''} included`}
+                {t('paidUnlocksIncluded', paidUnlocks)}
               </span>
             </div>
           )}
@@ -378,12 +380,12 @@ export default function Home() {
               flex: '1 1 110px',
               textAlign: 'center',
               padding: '12px 14px',
-              background: 'rgba(255, 253, 251, 0.9)',
-              backdropFilter: 'none',
-              WebkitBackdropFilter: 'none',
-              border: '1px solid rgba(212, 165, 116, 0.2)',
+              background: 'rgba(255, 255, 255, 0.45)',
+              backdropFilter: 'blur(16px) saturate(130%)',
+              WebkitBackdropFilter: 'blur(16px) saturate(130%)',
+              border: '1px solid rgba(255, 255, 255, 0.55)',
               borderRadius: 24,
-              boxShadow: '0 4px 16px rgba(168, 116, 73, 0.04)',
+              boxShadow: '0 8px 32px rgba(168, 116, 73, 0.03), inset 0 1px 1px rgba(255, 255, 255, 0.8)',
               display: 'flex',
               flexDirection: 'column',
               justifyContent: 'center',
@@ -432,15 +434,17 @@ export default function Home() {
           <div
             onClick={() => !imageUrl && fileInputRef.current?.click()}
             style={{
-              border: 'none',
+              border: dragOver ? `1.5px solid ${GOLD}` : '1px solid rgba(255, 255, 255, 0.55)',
               boxShadow: dragOver 
                 ? 'inset 0 0 0 2px #C5A028, inset 0 4px 12px rgba(0,0,0,0.02)' 
-                : 'inset 0 4px 16px rgba(0,0,0,0.05), 0 2px 0 rgba(255,255,255,0.8)',
+                : '0 8px 32px rgba(168, 116, 73, 0.03), inset 0 1px 1px rgba(255, 255, 255, 0.85)',
               borderRadius: 24,
               padding: imageUrl ? 0 : '40px 24px',
               textAlign: 'center',
               cursor: imageUrl ? 'default' : 'pointer',
-              background: dragOver ? 'rgba(197,160,40,0.03)' : '#FCFAF6',
+              background: dragOver ? 'rgba(255, 255, 255, 0.65)' : 'rgba(255, 255, 255, 0.45)',
+              backdropFilter: 'blur(20px) saturate(140%)',
+              WebkitBackdropFilter: 'blur(20px) saturate(140%)',
               transition: 'all 0.35s cubic-bezier(0.4,0,0.2,1)',
               overflow: 'hidden',
             }}
@@ -476,13 +480,15 @@ export default function Home() {
                 <div style={{ display: 'flex', gap: 10, justifyContent: 'center', marginTop: 14, flexWrap: 'wrap' }}>
                   <button
                     onClick={(e) => { e.stopPropagation(); fileInputRef.current?.click(); }}
-                    style={btnStyle}
+                    className="btn-liquid-glass-dark"
+                    style={{ border: 'none' }}
                   >
                     {t('uploadPhoto')}
                   </button>
                   <button
                     onClick={(e) => { e.stopPropagation(); startCamera(); }}
-                    style={{ ...btnStyle, background: 'none', color: '#6F6156', border: '1.5px solid #E0DDD8', boxShadow: 'none' }}
+                    className="btn-liquid-glass"
+                    style={{ border: 'none' }}
                   >
                     {t('takeASelfie')}
                   </button>
@@ -515,15 +521,17 @@ export default function Home() {
                   key={key}
                   onClick={() => handleChip(key, label)}
                   style={{
-                    border: activeChips.includes(key) ? `1.5px solid ${GOLD}` : '1.5px solid rgba(224,221,216,0.6)',
-                    background: activeChips.includes(key) ? 'rgba(197,160,40,0.06)' : '#FCFAF6',
+                    border: activeChips.includes(key) ? `1.5px solid ${GOLD}` : '1px solid rgba(255, 255, 255, 0.55)',
+                    background: activeChips.includes(key) ? 'rgba(197,160,40,0.12)' : 'rgba(255, 255, 255, 0.45)',
                     color: activeChips.includes(key) ? '#8B6914' : '#887E75',
                     borderRadius: 30, padding: '6px 16px',
                     fontSize: 12, cursor: 'pointer',
                     fontFamily: "'DM Sans', sans-serif",
                     fontWeight: activeChips.includes(key) ? 600 : 400,
-                    boxShadow: activeChips.includes(key) ? '0 2px 8px rgba(197,160,40,0.15)' : 'inset 0 2px 4px rgba(0,0,0,0.02)',
+                    boxShadow: activeChips.includes(key) ? '0 4px 12px rgba(197,160,40,0.15)' : 'inset 0 1px 1px rgba(255,255,255,0.7)',
                     transition: 'all 0.25s ease',
+                    backdropFilter: 'blur(10px)',
+                    WebkitBackdropFilter: 'blur(10px)',
                   }}
                 >
                   {label}
@@ -544,21 +552,23 @@ export default function Home() {
                 rows={3}
                 style={{
                   width: '100%', boxSizing: 'border-box',
-                  border: 'none', borderRadius: 18,
+                  border: '1px solid rgba(255, 255, 255, 0.45)', borderRadius: 18,
                   padding: '16px 18px 32px', fontSize: 13, color: '#3A2E26',
                   fontFamily: "'DM Sans', sans-serif",
                   resize: 'vertical', outline: 'none',
-                  background: 'rgba(255, 255, 255, 0.92)',
-                  boxShadow: 'inset 0 2px 6px rgba(180, 160, 140, 0.12), 0 1px 0 rgba(255, 255, 255, 0.8)',
+                  background: 'rgba(255, 255, 255, 0.45)',
+                  backdropFilter: 'blur(12px)',
+                  WebkitBackdropFilter: 'blur(12px)',
+                  boxShadow: 'inset 0 1px 1px rgba(255, 255, 255, 0.5), 0 4px 12px rgba(180, 160, 140, 0.05)',
                   transition: 'all 0.3s ease',
                   lineHeight: 1.6,
                 }}
                 onFocus={(e) => {
-                  e.target.style.boxShadow = 'inset 0 2px 6px rgba(197, 160, 40, 0.2), 0 0 0 2px rgba(197, 160, 40, 0.1)';
+                  e.target.style.boxShadow = 'inset 0 1px 1px rgba(255, 255, 255, 0.8), 0 0 0 2px rgba(197, 160, 40, 0.15)';
                   e.target.style.background = 'rgba(255, 255, 255, 0.65)';
                 }}
                 onBlur={(e) => {
-                  e.target.style.boxShadow = 'inset 0 2px 6px rgba(180, 160, 140, 0.12), 0 1px 0 rgba(255, 255, 255, 0.8)';
+                  e.target.style.boxShadow = 'inset 0 1px 1px rgba(255, 255, 255, 0.5), 0 4px 12px rgba(180, 160, 140, 0.05)';
                   e.target.style.background = 'rgba(255, 255, 255, 0.45)';
                 }}
               />
@@ -569,6 +579,135 @@ export default function Home() {
               }}>
                 {t('skinConcernCounter', skinConcern.length, SKIN_CONCERN_MAX)}
               </span>
+            </div>
+
+            {/* Additional context fields */}
+            <div style={{ marginTop: 24, display: 'flex', flexDirection: 'column', gap: 20 }}>
+              {/* Age */}
+              <div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 8, flexWrap: 'wrap', gap: 4 }}>
+                  <label style={{
+                    fontFamily: "'Cormorant Garamond', serif",
+                    fontSize: 17, color: '#3A2E26', fontWeight: 500,
+                  }}>
+                    {t('ageLabel')}
+                  </label>
+                  <span style={{ fontSize: 11, color: '#B9AC9E', fontFamily: "'DM Sans', sans-serif" }}>{t('skinConcernOptional')}</span>
+                </div>
+                <input
+                  type="text"
+                  value={age}
+                  onChange={(e) => setAge(e.target.value)}
+                  placeholder={t('agePlaceholder')}
+                  style={{
+                    width: '100%', boxSizing: 'border-box',
+                    border: '1px solid rgba(255, 255, 255, 0.45)', borderRadius: 18,
+                    padding: '14px 18px', fontSize: 13, color: '#3A2E26',
+                    fontFamily: "'DM Sans', sans-serif", outline: 'none',
+                    background: 'rgba(255, 255, 255, 0.45)',
+                    backdropFilter: 'blur(12px)',
+                    WebkitBackdropFilter: 'blur(12px)',
+                    boxShadow: 'inset 0 1px 1px rgba(255, 255, 255, 0.5), 0 4px 12px rgba(180, 160, 140, 0.05)',
+                    transition: 'all 0.3s ease',
+                  }}
+                  onFocus={(e) => {
+                    e.target.style.boxShadow = 'inset 0 1px 1px rgba(255, 255, 255, 0.8), 0 0 0 2px rgba(197, 160, 40, 0.15)';
+                    e.target.style.background = 'rgba(255, 255, 255, 0.65)';
+                  }}
+                  onBlur={(e) => {
+                    e.target.style.boxShadow = 'inset 0 1px 1px rgba(255, 255, 255, 0.5), 0 4px 12px rgba(180, 160, 140, 0.05)';
+                    e.target.style.background = 'rgba(255, 255, 255, 0.45)';
+                  }}
+                />
+              </div>
+
+              {/* Climate */}
+              <div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 8, flexWrap: 'wrap', gap: 4 }}>
+                  <label style={{
+                    fontFamily: "'Cormorant Garamond', serif",
+                    fontSize: 17, color: '#3A2E26', fontWeight: 500,
+                  }}>
+                    {t('climateLabel')}
+                  </label>
+                  <span style={{ fontSize: 11, color: '#B9AC9E', fontFamily: "'DM Sans', sans-serif" }}>{t('skinConcernOptional')}</span>
+                </div>
+                <div style={{ position: 'relative' }}>
+                  <select
+                    value={climate}
+                    onChange={(e) => setClimate(e.target.value)}
+                    style={{
+                      width: '100%', boxSizing: 'border-box',
+                      border: '1px solid rgba(255, 255, 255, 0.45)', borderRadius: 18,
+                      padding: '14px 18px', fontSize: 13, color: climate ? '#3A2E26' : '#887E75',
+                      fontFamily: "'DM Sans', sans-serif", outline: 'none',
+                      background: 'rgba(255, 255, 255, 0.45)',
+                      backdropFilter: 'blur(12px)',
+                      WebkitBackdropFilter: 'blur(12px)',
+                      boxShadow: 'inset 0 1px 1px rgba(255, 255, 255, 0.5), 0 4px 12px rgba(180, 160, 140, 0.05)',
+                      transition: 'all 0.3s ease',
+                      appearance: 'none', cursor: 'pointer',
+                    }}
+                    onFocus={(e) => {
+                      e.target.style.boxShadow = 'inset 0 1px 1px rgba(255, 255, 255, 0.8), 0 0 0 2px rgba(197, 160, 40, 0.15)';
+                      e.target.style.background = 'rgba(255, 255, 255, 0.65)';
+                    }}
+                    onBlur={(e) => {
+                      e.target.style.boxShadow = 'inset 0 1px 1px rgba(255, 255, 255, 0.5), 0 4px 12px rgba(180, 160, 140, 0.05)';
+                      e.target.style.background = 'rgba(255, 255, 255, 0.45)';
+                    }}
+                  >
+                    <option value="" disabled>{t('climateOptionSelect')}</option>
+                    <option value="Humid & Tropical">{t('climateOptionHumid')}</option>
+                    <option value="Dry & Arid">{t('climateOptionDry')}</option>
+                    <option value="Cold & Harsh">{t('climateOptionCold')}</option>
+                    <option value="Urban (Pollution)">{t('climateOptionUrban')}</option>
+                    <option value="High Sun Exposure">{t('climateOptionSun')}</option>
+                    <option value="Temperate / Moderate">{t('climateOptionTemperate')}</option>
+                  </select>
+                  <div style={{ position: 'absolute', right: 18, top: '50%', transform: 'translateY(-50%)', pointerEvents: 'none', color: '#B9AC9E', fontSize: 10 }}>
+                    ▼
+                  </div>
+                </div>
+              </div>
+
+              {/* Allergies */}
+              <div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 8, flexWrap: 'wrap', gap: 4 }}>
+                  <label style={{
+                    fontFamily: "'Cormorant Garamond', serif",
+                    fontSize: 17, color: '#3A2E26', fontWeight: 500,
+                  }}>
+                    {t('allergiesLabel')}
+                  </label>
+                  <span style={{ fontSize: 11, color: '#B9AC9E', fontFamily: "'DM Sans', sans-serif" }}>{t('skinConcernOptional')}</span>
+                </div>
+                <input
+                  type="text"
+                  value={allergies}
+                  onChange={(e) => setAllergies(e.target.value)}
+                  placeholder={t('allergiesPlaceholder')}
+                  style={{
+                    width: '100%', boxSizing: 'border-box',
+                    border: '1px solid rgba(255, 255, 255, 0.45)', borderRadius: 18,
+                    padding: '14px 18px', fontSize: 13, color: '#3A2E26',
+                    fontFamily: "'DM Sans', sans-serif", outline: 'none',
+                    background: 'rgba(255, 255, 255, 0.45)',
+                    backdropFilter: 'blur(12px)',
+                    WebkitBackdropFilter: 'blur(12px)',
+                    boxShadow: 'inset 0 1px 1px rgba(255, 255, 255, 0.5), 0 4px 12px rgba(180, 160, 140, 0.05)',
+                    transition: 'all 0.3s ease',
+                  }}
+                  onFocus={(e) => {
+                    e.target.style.boxShadow = 'inset 0 1px 1px rgba(255, 255, 255, 0.8), 0 0 0 2px rgba(197, 160, 40, 0.15)';
+                    e.target.style.background = 'rgba(255, 255, 255, 0.65)';
+                  }}
+                  onBlur={(e) => {
+                    e.target.style.boxShadow = 'inset 0 1px 1px rgba(255, 255, 255, 0.5), 0 4px 12px rgba(180, 160, 140, 0.05)';
+                    e.target.style.background = 'rgba(255, 255, 255, 0.45)';
+                  }}
+                />
+              </div>
             </div>
           </div>
 
@@ -581,17 +720,22 @@ export default function Home() {
           <button
             onClick={handleAnalyse}
             disabled={!image || loading}
+            className={image && !loading ? "btn-liquid-glass-dark" : ""}
             style={{
               width: '100%', marginTop: 20,
-              background: image && !loading ? '#2C241D' : '#D5CFC9',
-              color: '#fff', border: 'none', borderRadius: 30,
               padding: '16px 24px', fontSize: 15, fontWeight: 600,
-              cursor: image && !loading ? 'pointer' : 'not-allowed',
-              fontFamily: "'DM Sans', sans-serif",
-              letterSpacing: '0.01em',
-              boxShadow: image && !loading ? '0 8px 24px rgba(44,36,29,0.2)' : 'none',
-              transition: 'all 0.3s cubic-bezier(0.4,0,0.2,1)',
               display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10,
+              ...(!image || loading ? {
+                background: 'rgba(255, 255, 255, 0.25)',
+                border: '1px solid rgba(255, 255, 255, 0.35)',
+                color: '#B9AC9E',
+                cursor: 'not-allowed',
+                boxShadow: 'none',
+                backdropFilter: 'blur(10px)',
+                WebkitBackdropFilter: 'blur(10px)',
+                borderRadius: 30,
+                fontFamily: "'DM Sans', sans-serif",
+              } : { border: 'none' })
             }}
           >
             {loading ? (
@@ -632,13 +776,13 @@ export default function Home() {
           transition: 'opacity 0.65s ease',
         }}>
           <div style={{
-            background: 'rgba(255, 255, 255, 0.97)',
-            backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)',
-            border: '1px solid rgba(255, 255, 255, 0.8)',
+            background: 'rgba(255, 255, 255, 0.55)',
+            backdropFilter: 'blur(24px) saturate(160%)', WebkitBackdropFilter: 'blur(24px) saturate(160%)',
+            border: '1px solid rgba(255, 255, 255, 0.55)',
             borderRadius: 32,
             padding: 'clamp(32px, 6vw, 48px)',
             maxWidth: 420, width: '100%',
-            boxShadow: '0 32px 80px rgba(130, 100, 80, 0.12), inset 0 2px 0 rgba(255, 255, 255, 1)',
+            boxShadow: '0 32px 80px rgba(130, 100, 80, 0.08), inset 0 1px 1px rgba(255, 255, 255, 0.85)',
             transform: emailCaptured ? 'translateY(16px) scale(0.97)' : 'translateY(0) scale(1)',
             transition: 'transform 0.65s cubic-bezier(0.4,0,0.2,1)',
             textAlign: 'center',
@@ -680,21 +824,23 @@ export default function Home() {
                 required
                 autoFocus
                 style={{
-                  border: 'none', borderRadius: 16,
+                  border: '1px solid rgba(255, 255, 255, 0.45)', borderRadius: 16,
                   padding: '14px 18px', fontSize: 14,
                   fontFamily: "'DM Sans', sans-serif",
                   outline: 'none', width: '100%', boxSizing: 'border-box',
-                  background: 'rgba(245, 240, 235, 0.6)', color: '#3A2E26',
-                  boxShadow: 'inset 0 2px 6px rgba(180, 160, 140, 0.08), 0 1px 0 rgba(255, 255, 255, 0.6)',
+                  background: 'rgba(255, 255, 255, 0.35)', color: '#3A2E26',
+                  backdropFilter: 'blur(10px)',
+                  WebkitBackdropFilter: 'blur(10px)',
+                  boxShadow: 'inset 0 1px 1px rgba(255, 255, 255, 0.5), 0 4px 12px rgba(180, 160, 140, 0.04)',
                   transition: 'all 0.3s ease',
                 }}
                 onFocus={(e) => {
-                  e.target.style.boxShadow = 'inset 0 2px 6px rgba(197, 160, 40, 0.15), 0 0 0 2px rgba(197, 160, 40, 0.1)';
-                  e.target.style.background = 'rgba(255, 255, 255, 0.8)';
+                  e.target.style.boxShadow = 'inset 0 1px 1px rgba(255, 255, 255, 0.8), 0 0 0 2px rgba(197, 160, 40, 0.15)';
+                  e.target.style.background = 'rgba(255, 255, 255, 0.55)';
                 }}
                 onBlur={(e) => {
-                  e.target.style.boxShadow = 'inset 0 2px 6px rgba(180, 160, 140, 0.08), 0 1px 0 rgba(255, 255, 255, 0.6)';
-                  e.target.style.background = 'rgba(245, 240, 235, 0.6)';
+                  e.target.style.boxShadow = 'inset 0 1px 1px rgba(255, 255, 255, 0.5), 0 4px 12px rgba(180, 160, 140, 0.04)';
+                  e.target.style.background = 'rgba(255, 255, 255, 0.35)';
                 }}
               />
               <label style={{
@@ -721,15 +867,13 @@ export default function Home() {
               <button
                 type="submit"
                 disabled={emailLoading}
+                className="btn-liquid-glass-dark"
                 style={{
-                  background: '#0d0d0d', color: '#fff', border: 'none',
-                  borderRadius: 11, padding: '14px 20px',
+                  padding: '14px 20px',
                   fontSize: 14, fontWeight: 600,
                   cursor: emailLoading ? 'wait' : 'pointer',
-                  fontFamily: "'DM Sans', sans-serif",
-                  letterSpacing: '0.01em',
-                  transition: 'opacity 0.2s',
-                  opacity: emailLoading ? 0.7 : 1,
+                  borderRadius: 16,
+                  border: 'none',
                 }}
               >
                 {emailLoading ? (
@@ -752,7 +896,7 @@ export default function Home() {
       {loading && (
         <div style={{
           position: 'fixed', inset: 0, zIndex: 1000,
-          background: '#FDFBF9',
+          background: 'linear-gradient(to bottom, #FFFFFF 0%, #FDFBFA 60%, #FAF6EE 88%, #F3ECE0 100%)',
           display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
           padding: 32, textAlign: 'center',
           animation: 'fadeIn 0.5s ease-out forwards',
