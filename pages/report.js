@@ -251,7 +251,7 @@ export default function Report() {
       )}
 
       {/* Sticky frosted-glass nav */}
-      <div style={{
+      <div className="rpt-nav" style={{
         position: 'sticky', top: 0, zIndex: 100,
         background: 'rgba(255, 255, 255, 0.45)',
         backdropFilter: 'blur(18px)',
@@ -262,9 +262,9 @@ export default function Report() {
         animation: 'slideDown 0.55s ease',
       }}>
         <Logo />
-        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
           {paidUnlocks > 0 && (
-            <div style={{
+            <div className="mobile-hide" style={{
               display: 'flex', alignItems: 'center', gap: 5,
               background: 'linear-gradient(135deg, rgba(197,160,40,0.08), rgba(212,165,116,0.06))',
               border: '1px solid rgba(197,160,40,0.28)',
@@ -279,6 +279,7 @@ export default function Report() {
           <LangToggle />
           <button
             onClick={() => router.push('/mes-rapports')}
+            className="mobile-hide"
             style={{
               background: 'none', border: 'none',
               padding: '9px 4px', fontSize: 12, color: '#888', cursor: 'pointer',
@@ -290,7 +291,7 @@ export default function Report() {
           </button>
           <button
             onClick={() => router.push('/')}
-            className="btn-liquid-glass"
+            className="btn-liquid-glass rpt-nav-cta"
             style={{
               borderRadius: 10,
               padding: '9px 18px', fontSize: 12,

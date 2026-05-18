@@ -17,6 +17,40 @@ const TITLE_STYLE = { margin: "0 0 16px", fontSize: 22, fontWeight: 300, fontFam
 
 const ICONS = ["✦", "◈", "◉", "▲", "◆", "●"];
 
+const PAYWALL_ICONS = [
+  /* 1 — Metrics: minimal scan lines (like a skin reader) */
+  <svg key="scan" width="17" height="17" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round">
+    <line x1="2" y1="4.5" x2="14" y2="4.5"/>
+    <line x1="2" y1="7.5" x2="11" y2="7.5"/>
+    <line x1="2" y1="10.5" x2="13" y2="10.5"/>
+    <line x1="2" y1="13.5" x2="9" y2="13.5"/>
+    <line x1="3" y1="1.5" x2="3" y2="14.5" strokeWidth="0.8" strokeOpacity="0.35"/>
+  </svg>,
+  /* 2 — Strengths: single botanical leaf */
+  <svg key="leaf" width="17" height="17" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M8 14 C8 14 2 10 3 4 C6 3 12 4 13 8 C14 12 8 14 8 14 Z"/>
+    <line x1="8" y1="14" x2="7" y2="7" strokeWidth="0.9"/>
+  </svg>,
+  /* 3 — Improvement: minimal upward trend */
+  <svg key="trend" width="17" height="17" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round">
+    <polyline points="2,12 6,8 9,10 14,4"/>
+    <polyline points="11,4 14,4 14,7"/>
+  </svg>,
+  /* 4 — Routine: crescent moon + dot (AM/PM) */
+  <svg key="moon" width="17" height="17" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round">
+    <path d="M11 3 A6 6 0 1 0 11 13 A4 4 0 1 1 11 3 Z"/>
+    <circle cx="12.5" cy="3.5" r="0.7" fill="currentColor" stroke="none"/>
+  </svg>,
+  /* 5 — Products: serum dropper bottle */
+  <svg key="bottle" width="17" height="17" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round">
+    <rect x="5.5" y="6" width="5" height="8" rx="1.5"/>
+    <path d="M7 6 L7 4 L9 4 L9 6"/>
+    <line x1="8" y1="2" x2="8" y2="4"/>
+    <line x1="6.5" y1="9.5" x2="9.5" y2="9.5" strokeWidth="0.9" strokeOpacity="0.5"/>
+    <line x1="6.5" y1="11.5" x2="9.5" y2="11.5" strokeWidth="0.9" strokeOpacity="0.5"/>
+  </svg>,
+];
+
 // Helper to solve cubic-bezier(x1, y1, x2, y2) at progress t
 function solveCubicBezier(x1, y1, x2, y2, t) {
   const cx = 3.0 * x1;
@@ -111,7 +145,7 @@ function ScoreHeroCard({ score, summary, faceShape, skinType, skinTone, badge, m
   const arcColor = score >= 78 ? "#C5A028" : score >= 65 ? "#A87449" : "#8C7A6B";
 
   return (
-    <div style={{
+    <div className="rpt-score-hero" style={{
       background: "linear-gradient(135deg, rgba(255,255,255,0.84) 0%, rgba(253,246,237,0.68) 50%, rgba(246,235,222,0.84) 100%)",
       backdropFilter: "blur(32px) saturate(170%)",
       WebkitBackdropFilter: "blur(32px) saturate(170%)",
@@ -417,9 +451,9 @@ function ProductCard({ product, lang, t }) {
 /* ── Severity badge ── */
 function SeverityBadge({ severity, t }) {
   const configs = {
-    mild:        { color: "#7BC49A", bg: "rgba(123,196,154,0.12)", border: "rgba(123,196,154,0.28)", label: t('severityMild') },
-    moderate:    { color: "#E8B86D", bg: "rgba(232,184,109,0.12)", border: "rgba(232,184,109,0.28)", label: t('severityModerate') },
-    significant: { color: "#E8907A", bg: "rgba(232,144,122,0.12)", border: "rgba(232,144,122,0.28)", label: t('severitySignificant') },
+    mild:        { color: "#7DBFA8", bg: "rgba(168,220,200,0.18)", border: "rgba(168,220,200,0.45)", label: t('severityMild') },
+    moderate:    { color: "#82B8D8", bg: "rgba(168,200,232,0.18)", border: "rgba(168,200,232,0.45)", label: t('severityModerate') },
+    significant: { color: "#D4A0BC", bg: "rgba(232,184,212,0.18)", border: "rgba(232,184,212,0.45)", label: t('severitySignificant') },
   };
   const cfg = configs[severity] || configs.mild;
   return (
@@ -429,27 +463,44 @@ function SeverityBadge({ severity, t }) {
   );
 }
 
-const SEVERITY_ACCENT = { mild: "#7BC49A", moderate: "#E8B86D", significant: "#E8907A" };
+const SEVERITY_ACCENT = { mild: "#A8DCC8", moderate: "#A8C8E8", significant: "#E8B8D4" };
 
 /* ── Shared report header ── */
 function ReportHeader({ t }) {
   return (
-    <div style={{
+    <div className="rpt-report-header" style={{
       background: "rgba(255,255,255,0.55)",
       backdropFilter: "blur(22px) saturate(150%)",
       WebkitBackdropFilter: "blur(22px) saturate(150%)",
       borderBottom: "1px solid rgba(255,255,255,0.65)",
-      padding: "32px 28px 24px",
+      padding: "28px 28px 20px",
       position: "relative",
       overflow: "hidden"
     }}>
       <div style={{ position: "absolute", inset: 0, pointerEvents: "none", background: "radial-gradient(ellipse 80% 100% at 50% -20%, rgba(168,116,73,0.02) 0%, transparent 100%)" }} />
       <div className="mobile-padding" style={{ maxWidth: 680, margin: "0 auto", position: "relative" }}>
-        <p className="mobile-hide" style={{ ...LABEL_STYLE, margin: "0 0 4px" }}>{t('aestheticAnalysis')}</p>
-        <h1 style={{ margin: "0 0 4px", fontSize: 28, fontWeight: 300, fontFamily: "'Cormorant Garamond', serif", color: "#3A2E26" }}>
+        <p className="mobile-hide" style={{
+          margin: "0 0 6px", fontSize: 10, fontWeight: 600,
+          letterSpacing: "0.18em", textTransform: "uppercase",
+          fontFamily: "'DM Sans', sans-serif", color: "#B0885E",
+        }}>{t('aestheticAnalysis')}</p>
+        <h1 style={{
+          margin: "0 0 4px",
+          fontSize: "clamp(20px, 5vw, 28px)",
+          fontWeight: 600,
+          fontFamily: "'DM Sans', sans-serif",
+          fontStyle: "normal",
+          letterSpacing: "0.01em",
+          lineHeight: 1.2,
+          background: "linear-gradient(180deg, #2C241D 0%, #6B4828 12%, #A87449 50%, #6B4828 88%, #2C241D 100%)",
+          backgroundSize: "100% 150%",
+          WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent",
+          backgroundClip: "text",
+          animation: "logoShimmer 20s ease-in-out infinite",
+        }}>
           {t('yourFacialReport')}
         </h1>
-        <p style={{ margin: 0, fontSize: 11.5, color: "#8C7A6B", letterSpacing: "0.02em", fontFamily: "'DM Sans', sans-serif" }}>{t('notMedicalAdvice')}</p>
+        <p className="mobile-hide" style={{ margin: 0, fontSize: 11.5, color: "#8C7A6B", letterSpacing: "0.02em", fontFamily: "'DM Sans', sans-serif" }}>{t('notMedicalAdvice')}</p>
       </div>
     </div>
   );
@@ -622,42 +673,99 @@ export default function BeautyReport({ data, isPaid, onUnlock }) {
         {/* ── Paywall card ── */}
         <div style={{ maxWidth: 680, margin: "32px auto 0", padding: "0 20px" }}>
           <div style={{
-            background: "linear-gradient(135deg, rgba(255,255,255,0.78) 0%, rgba(253,246,237,0.62) 50%, rgba(246,235,222,0.78) 100%)",
-            backdropFilter: "blur(28px) saturate(150%)",
-            WebkitBackdropFilter: "blur(28px) saturate(150%)",
-            border: "1px solid rgba(255,255,255,0.82)",
-            borderRadius: 24, padding: "clamp(28px,5vw,40px)",
-            boxShadow: "0 8px 40px rgba(168,116,73,0.06), inset 0 1px 0 rgba(255,255,255,0.95)",
-            textAlign: "center",
+            background: "linear-gradient(150deg, rgba(255,255,255,0.82) 0%, rgba(253,246,237,0.68) 55%, rgba(246,235,222,0.82) 100%)",
+            backdropFilter: "blur(32px) saturate(160%)",
+            WebkitBackdropFilter: "blur(32px) saturate(160%)",
+            border: "1px solid rgba(255,255,255,0.88)",
+            borderRadius: 26, padding: "clamp(28px,5vw,40px)",
+            boxShadow: "0 12px 48px rgba(168,116,73,0.09), 0 2px 0 rgba(255,255,255,0.9), inset 0 1px 0 rgba(255,255,255,0.98)",
           }}>
-            <div style={{ width: 36, height: 3, background: "linear-gradient(90deg, #C5A028, #D4A574)", borderRadius: 2, margin: "0 auto 18px" }} />
-            <p style={{ fontSize: 9, fontWeight: 700, letterSpacing: "0.24em", textTransform: "uppercase", color: "#B0885E", margin: "0 0 10px", fontFamily: "'DM Sans', sans-serif" }}>
-              {t('paywallCardLabel')}
-            </p>
-            <h2 style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: "clamp(22px,5vw,28px)", fontWeight: 400, color: "#3A2E26", margin: "0 0 10px", lineHeight: 1.2 }}>
+            {/* Label pill */}
+            <div style={{ display: "flex", justifyContent: "center", marginBottom: 20 }}>
+              <span style={{
+                display: "inline-flex", alignItems: "center", gap: 6,
+                background: "linear-gradient(135deg, rgba(197,160,40,0.12), rgba(212,165,116,0.08))",
+                border: "1px solid rgba(197,160,40,0.30)",
+                borderRadius: 30, padding: "5px 14px",
+                fontSize: 10, fontWeight: 700, letterSpacing: "0.18em", textTransform: "uppercase",
+                color: "#8B6914", fontFamily: "'DM Sans', sans-serif",
+              }}>
+                <span style={{ fontSize: 7 }}>✦</span>
+                {t('paywallCardLabel')}
+              </span>
+            </div>
+
+            {/* Headline */}
+            <h2 style={{
+              fontFamily: "'Cormorant Garamond', serif",
+              fontSize: "clamp(24px,5vw,32px)", fontWeight: 400,
+              color: "#3A2E26", margin: "0 0 12px", lineHeight: 1.18, textAlign: "center",
+            }}>
               {t('paywallCardTitle')}
             </h2>
-            <p style={{ fontSize: 13, color: "#8C7A6B", lineHeight: 1.65, margin: "0 0 22px", fontFamily: "'DM Sans', sans-serif" }}>
+
+            {/* Sub-copy */}
+            <p style={{
+              fontSize: 13.5, color: "#6F6156", lineHeight: 1.7,
+              margin: "0 0 28px", fontFamily: "'DM Sans', sans-serif", textAlign: "center",
+            }}>
               {t('paywallCardDesc')}
             </p>
-            <div style={{ display: "flex", flexDirection: "column", gap: 9, marginBottom: 24, textAlign: "left", background: "rgba(255,255,255,0.55)", backdropFilter: "blur(12px)", WebkitBackdropFilter: "blur(12px)", border: "1px solid rgba(255,255,255,0.75)", borderRadius: 14, padding: "16px 18px" }}>
-              {[t('paywallPerk1'), t('paywallPerk2'), t('paywallImprove')].map((perk, i) => (
-                <div key={i} style={{ display: "flex", gap: 10, alignItems: "flex-start" }}>
-                  <span style={{ color: GOLD, fontSize: 10, flexShrink: 0, marginTop: 3 }}>✦</span>
-                  <span style={{ fontSize: 12.5, color: "#6F6156", lineHeight: 1.5, fontFamily: "'DM Sans', sans-serif" }}>{perk}</span>
+
+            {/* Feature rows */}
+            <div style={{ display: "flex", flexDirection: "column", gap: 0, marginBottom: 24, borderRadius: 16, overflow: "hidden", border: "1px solid rgba(255,255,255,0.75)" }}>
+              {t('paywallFeatures').map((f, i, arr) => (
+                <div key={i} style={{
+                  display: "flex", gap: 14, alignItems: "flex-start",
+                  padding: "14px 18px",
+                  background: i % 2 === 0 ? "rgba(255,255,255,0.60)" : "rgba(253,248,242,0.50)",
+                  borderBottom: i < arr.length - 1 ? "1px solid rgba(255,255,255,0.65)" : "none",
+                }}>
+                  <div className="rpt-paywall-feature-icon" style={{
+                    width: 34, height: 34, borderRadius: 10, flexShrink: 0,
+                    background: "linear-gradient(135deg, rgba(197,160,40,0.13), rgba(212,165,116,0.08))",
+                    border: "1px solid rgba(197,160,40,0.20)",
+                    display: "flex", alignItems: "center", justifyContent: "center",
+                    color: "#A87449", marginTop: 1,
+                  }}>
+                    {PAYWALL_ICONS[i] || f.icon}
+                  </div>
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div className="rpt-paywall-feature-title" style={{ fontSize: 12.5, fontWeight: 700, color: "#3A2E26", marginBottom: 3, fontFamily: "'DM Sans', sans-serif", letterSpacing: "0.01em" }}>
+                      {f.title}
+                    </div>
+                    <div className="rpt-paywall-feature-desc" style={{ fontSize: 11.5, color: "#8C7A6B", lineHeight: 1.55, fontFamily: "'DM Sans', sans-serif" }}>
+                      {f.desc}
+                    </div>
+                  </div>
                 </div>
               ))}
             </div>
+
+            {/* Value framing */}
+            <p style={{
+              fontSize: 12, color: "#A87449", textAlign: "center",
+              fontFamily: "'Cormorant Garamond', serif", fontStyle: "italic",
+              fontSize: 15, margin: "0 0 22px", letterSpacing: "0.01em",
+            }}>
+              {t('paywallValueFrame')}
+            </p>
+
+            {/* CTA buttons */}
             <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-              <button onClick={() => handleUnlock("single")} disabled={unlocking} className="btn-liquid-glass-dark" style={{ width: "100%", padding: "15px", borderRadius: 12, fontSize: 13.5, fontWeight: 700, letterSpacing: "0.03em", display: "flex", alignItems: "center", justifyContent: "center", gap: 8, border: "none" }}>
-                {unlocking ? <><span style={{ display: "inline-block", width: 14, height: 14, border: "2px solid rgba(255,255,255,0.4)", borderTopColor: "#fff", borderRadius: "50%", animation: "spin 0.7s linear infinite" }} />{t('redirecting')}</> : t('unlockSingle')}
+              <button onClick={() => handleUnlock("single")} disabled={unlocking} className="btn-liquid-glass-dark" style={{ width: "100%", padding: "16px", borderRadius: 14, fontSize: 14, fontWeight: 700, letterSpacing: "0.02em", display: "flex", alignItems: "center", justifyContent: "center", gap: 8, border: "none" }}>
+                {unlocking
+                  ? <><span style={{ display: "inline-block", width: 14, height: 14, border: "2px solid rgba(255,255,255,0.4)", borderTopColor: "#fff", borderRadius: "50%", animation: "spin 0.7s linear infinite" }} />{t('redirecting')}</>
+                  : t('paywallSingleCta')}
               </button>
-              <button onClick={() => handleUnlock("pack")} disabled={unlocking} className="btn-liquid-glass" style={{ width: "100%", padding: "15px", borderRadius: 12, fontSize: 13, fontWeight: 600, letterSpacing: "0.03em", border: "none" }}>
-                {t('unlockPack')}
+              <button onClick={() => handleUnlock("pack")} disabled={unlocking} className="btn-liquid-glass" style={{ width: "100%", padding: "15px", borderRadius: 14, fontSize: 13, fontWeight: 600, letterSpacing: "0.02em", border: "none" }}>
+                {t('paywallPackCta')}
               </button>
             </div>
-            <p style={{ marginTop: 14, fontSize: 11, color: "#B9AC9E", fontFamily: "'DM Sans', sans-serif" }}>
-              {t('oneTimePayment')}
+
+            {/* Trust footer */}
+            <p style={{ marginTop: 16, fontSize: 11, color: "#B9AC9E", fontFamily: "'DM Sans', sans-serif", textAlign: "center", letterSpacing: "0.01em" }}>
+              {t('paywallTrust')}
             </p>
           </div>
         </div>
