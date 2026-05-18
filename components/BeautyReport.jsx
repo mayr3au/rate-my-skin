@@ -81,7 +81,7 @@ function ProductCard({ product, lang, t }) {
       boxShadow: hov ? "0 8px 28px rgba(168,116,73,0.1)" : CARD.boxShadow,
       opacity: vis ? 1 : 0, transform: vis ? "translateY(0)" : "translateY(12px)",
       transition: "opacity 0.45s ease, transform 0.45s ease, border-color 0.2s, box-shadow 0.2s",
-      display: "flex", gap: 16, alignItems: "flex-start",
+      display: "flex", gap: 16, alignItems: "flex-start", overflow: "hidden",
     }}>
 
       {/* Product image */}
@@ -90,10 +90,11 @@ function ProductCard({ product, lang, t }) {
           <img
             src={product.imageUrl}
             alt={product.productName}
-            width={100}
-            height={100}
+            width={88}
+            height={88}
             style={{
-              width: 100, height: 100,
+              width: "clamp(72px, 20vw, 88px)",
+              height: "clamp(72px, 20vw, 88px)",
               objectFit: "contain",
               borderRadius: 12,
               background: "rgba(245,240,235,0.5)",
@@ -108,12 +109,12 @@ function ProductCard({ product, lang, t }) {
       )}
 
       {/* Content */}
-      <div style={{ flex: 1, minWidth: 0 }}>
+      <div style={{ flex: 1, minWidth: 0, overflow: "hidden" }}>
         <span style={{ display: "inline-block", marginBottom: 8, fontSize: 9, fontWeight: 700, letterSpacing: "0.14em", textTransform: "uppercase", color: "#7C2D2D", background: "#FDF2F2", border: "1px solid #F5DADA", borderRadius: 6, padding: "3px 9px" }}>
           {product.skinProblem}
         </span>
-        <div style={{ fontSize: 15.5, fontWeight: 400, color: "#2C241D", marginBottom: 5, fontFamily: "'Cormorant Garamond', serif", lineHeight: 1.3 }}>{product.productName}</div>
-        <p style={{ margin: "0 0 14px", fontSize: 12, color: "#8C7A6B", lineHeight: 1.65 }}>{product.description}</p>
+        <div style={{ fontSize: 15.5, fontWeight: 400, color: "#2C241D", marginBottom: 5, fontFamily: "'Cormorant Garamond', serif", lineHeight: 1.3, wordBreak: "break-word" }}>{product.productName}</div>
+        <p style={{ margin: "0 0 14px", fontSize: 12, color: "#8C7A6B", lineHeight: 1.65, wordBreak: "break-word" }}>{product.description}</p>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 8 }}>
           <span style={{ fontSize: 17, fontWeight: 300, color: "#2C241D", fontFamily: "'Cormorant Garamond', serif" }}>{product.price}</span>
           <div className="rpt-product-btns" style={{ display: "flex", gap: 7 }}>
@@ -210,8 +211,9 @@ export default function BeautyReport({ data, isPaid, onUnlock }) {
     const previewMetrics = (paid.metrics || []).slice(0, 4);
     const previewStrengths = (paid.strengths || []).slice(0, 2);
     const previewImprovements = (paid.improvements || []).slice(0, 2);
-    const previewRoutine = (paid.recommendations || []).slice(0, 3);
-    const allProducts = (paid.products || []).slice(0, 3);
+    const routine = paid.routine || {};
+    const previewRoutine = [...(routine.morning || []), ...(routine.evening || [])].slice(0, 4);
+    const allProducts = (paid.productRecommendations || []).slice(0, 3);
 
     const TABS = [t('tabMetrics'), t('tabStrengths'), t('tabImprove'), t('tabRoutine'), t('tabShop')];
 
@@ -361,7 +363,7 @@ export default function BeautyReport({ data, isPaid, onUnlock }) {
               {previewStrengths.map((s, i) => (
                 <div key={i} style={{ ...CARD, padding: "20px 22px", display: "flex", gap: 14, alignItems: "flex-start" }}>
                   <div style={{ width: 34, height: 34, borderRadius: 10, background: "rgba(168,116,73,0.12)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, color: GOLD, fontSize: 14 }}>{ICONS[i] || "✦"}</div>
-                  <div><div style={{ fontSize: 12, fontWeight: 600, color: "#2C241D", marginBottom: 6 }}>{s.title}</div><p style={{ margin: 0, fontSize: 13, lineHeight: 1.7, color: "#8C7A6B" }}>{s.description}</p></div>
+                  <div><div style={{ fontSize: 12, fontWeight: 600, color: "#2C241D", marginBottom: 6 }}>{s.title}</div><p style={{ margin: 0, fontSize: 13, lineHeight: 1.7, color: "#8C7A6B" }}>{s.desc}</p></div>
                 </div>
               ))}
             </div>
@@ -371,7 +373,7 @@ export default function BeautyReport({ data, isPaid, onUnlock }) {
               {previewImprovements.map((item, i) => (
                 <div key={i} style={{ ...CARD, padding: "20px 22px", display: "flex", gap: 14, alignItems: "flex-start" }}>
                   <div style={{ width: 28, height: 28, borderRadius: "50%", background: "rgba(212,165,116,0.12)", border: "1px solid rgba(212,165,116,0.25)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, fontSize: 13, fontWeight: 600, color: GOLD, fontFamily: "'Cormorant Garamond', serif" }}>{i + 1}</div>
-                  <div><div style={{ fontSize: 12, fontWeight: 600, color: "#2C241D", marginBottom: 6 }}>{item.title}</div><p style={{ margin: 0, fontSize: 13, lineHeight: 1.7, color: "#8C7A6B" }}>{item.description}</p></div>
+                  <div><div style={{ fontSize: 12, fontWeight: 600, color: "#2C241D", marginBottom: 6 }}>{item.title}</div><p style={{ margin: 0, fontSize: 13, lineHeight: 1.7, color: "#8C7A6B" }}>{item.desc}</p></div>
                 </div>
               ))}
             </div>
@@ -399,8 +401,8 @@ export default function BeautyReport({ data, isPaid, onUnlock }) {
   const metrics = paid.metrics || [];
   const strengths = paid.strengths || [];
   const improvements = paid.improvements || [];
-  const recommendations = paid.recommendations || [];
-  const products = paid.products || [];
+  const paidRoutine = paid.routine || {};
+  const products = paid.productRecommendations || [];
 
   const TABS_PAID = [
     { id: "analysis",  label: t('tabMetrics') },
@@ -515,27 +517,43 @@ export default function BeautyReport({ data, isPaid, onUnlock }) {
             </div>
           )}
 
-          {/* Routine / Recommendations */}
-          {activeTab === "recs" && (
-            <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-              {recommendations.map((r, i) => (
-                <div key={i} style={{ ...CARD, padding: "20px 22px" }}>
-                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14 }}>
-                    <span style={{ fontSize: 11, fontWeight: 600, letterSpacing: "0.1em", textTransform: "uppercase", color: "#2C241D", fontFamily: "'DM Sans', sans-serif" }}>{r.category}</span>
-                    <span style={{ fontSize: 9, fontWeight: 700, letterSpacing: "0.12em", color: r.priority === "HIGH" ? "#fff" : "#8C7A6B", background: r.priority === "HIGH" ? "linear-gradient(135deg, #2C241D, #3A2E26)" : "rgba(245,240,235,0.7)", borderRadius: 6, padding: "3px 9px", fontFamily: "'DM Sans', sans-serif" }}>{r.priority}</span>
-                  </div>
-                  <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-                    {(r.items || []).map((item, j) => (
-                      <div key={j} style={{ display: "flex", gap: 10, alignItems: "flex-start" }}>
-                        <div style={{ width: 5, height: 5, borderRadius: "50%", background: "rgba(168,116,73,0.4)", flexShrink: 0, marginTop: 7 }}/>
-                        <span style={{ fontSize: 13, color: "#8C7A6B", lineHeight: 1.65, fontFamily: "'DM Sans', sans-serif" }}>{item}</span>
-                      </div>
-                    ))}
-                  </div>
+          {/* Routine */}
+          {activeTab === "recs" && (() => {
+            const ROUTINE_SECTIONS = [
+              { key: "morning", label: lang === "fr" ? "Routine du matin" : "Morning Routine", dot: "#F6C667" },
+              { key: "evening", label: lang === "fr" ? "Routine du soir"  : "Evening Routine",  dot: "#8C7A6B" },
+              { key: "weekly",  label: lang === "fr" ? "Soins hebdomadaires" : "Weekly Treatments", dot: GOLD },
+            ].filter(s => (paidRoutine[s.key] || []).length > 0);
+
+            if (ROUTINE_SECTIONS.length === 0) {
+              return (
+                <div style={{ ...CARD, padding: "32px", textAlign: "center", color: "#C4B8AE", fontSize: 13, fontFamily: "'DM Sans', sans-serif" }}>
+                  {lang === "fr" ? "Routine non disponible pour cette analyse." : "Routine not available for this analysis."}
                 </div>
-              ))}
-            </div>
-          )}
+              );
+            }
+
+            return (
+              <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+                {ROUTINE_SECTIONS.map(({ key, label, dot }) => (
+                  <div key={key} style={{ ...CARD, padding: "20px 22px" }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 14, paddingBottom: 12, borderBottom: "1px solid rgba(212,165,116,0.1)" }}>
+                      <div style={{ width: 8, height: 8, borderRadius: "50%", background: dot, flexShrink: 0 }}/>
+                      <span style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.12em", textTransform: "uppercase", color: "#2C241D", fontFamily: "'DM Sans', sans-serif" }}>{label}</span>
+                    </div>
+                    <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+                      {(paidRoutine[key] || []).map((step, j) => (
+                        <div key={j} style={{ display: "flex", gap: 12, alignItems: "flex-start" }}>
+                          <div style={{ minWidth: 22, height: 22, borderRadius: "50%", background: "rgba(212,165,116,0.1)", border: "1px solid rgba(212,165,116,0.22)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, fontSize: 10, fontWeight: 700, color: GOLD, fontFamily: "'Cormorant Garamond', serif", marginTop: 1 }}>{j + 1}</div>
+                          <span style={{ fontSize: 13, color: "#6F6156", lineHeight: 1.65, fontFamily: "'DM Sans', sans-serif" }}>{step}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            );
+          })()}
 
           {/* Shop */}
           {activeTab === "shop" && (
