@@ -40,6 +40,7 @@ export default function Report() {
   const [analysisId, setAnalysisId] = useState(null);
   const [isPaid, setIsPaid] = useState(false);
   const [userId, setUserId] = useState(null);
+  const [paidUnlocks, setPaidUnlocks] = useState(0);
   const [notFound, setNotFound] = useState(false);
   const [checkingPayment, setCheckingPayment] = useState(false);
 
@@ -60,10 +61,13 @@ export default function Report() {
     const storedIsPaid = sessionStorage.getItem('rms_is_paid');
     if (storedIsPaid === 'true') setIsPaid(true);
 
-    // 2. Fetch identity
+    // 2. Fetch identity + paid_unlocks
     fetch('/api/identity')
       .then(r => r.json())
-      .then(({ userId: uid }) => setUserId(uid))
+      .then(({ userId: uid, paidUnlocks: unlocks }) => {
+        setUserId(uid);
+        if (unlocks > 0) setPaidUnlocks(unlocks);
+      })
       .catch(() => {});
   }, []);
 
@@ -182,7 +186,20 @@ export default function Report() {
         animation: 'slideDown 0.55s ease',
       }}>
         <Logo />
-        <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+          {paidUnlocks > 0 && (
+            <div style={{
+              display: 'flex', alignItems: 'center', gap: 5,
+              background: 'linear-gradient(135deg, rgba(197,160,40,0.08), rgba(212,165,116,0.06))',
+              border: '1px solid rgba(197,160,40,0.28)',
+              borderRadius: 20, padding: '4px 11px',
+            }}>
+              <span style={{ fontSize: 7, color: '#C5A028', fontWeight: 700 }}>✦</span>
+              <span style={{ fontSize: 11, color: '#8C6A3A', fontWeight: 600, fontFamily: "'DM Sans', sans-serif", whiteSpace: 'nowrap' }}>
+                {paidUnlocks} report{paidUnlocks !== 1 ? 's' : ''} left
+              </span>
+            </div>
+          )}
           <LangToggle />
           <button
             onClick={() => router.push('/')}

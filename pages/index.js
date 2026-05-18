@@ -62,6 +62,7 @@ export default function Home() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [userId, setUserId] = useState(null);
+  const [paidUnlocks, setPaidUnlocks] = useState(0);
   const [loadingStep, setLoadingStep] = useState(0);
 
   const loadingMessages = lang === 'fr' 
@@ -74,7 +75,10 @@ export default function Home() {
     // Overlay stays false until triggered by button
     fetch('/api/identity')
       .then(r => r.json())
-      .then(({ userId: uid }) => setUserId(uid))
+      .then(({ userId: uid, paidUnlocks: unlocks }) => {
+        setUserId(uid);
+        if (unlocks > 0) setPaidUnlocks(unlocks);
+      })
       .catch(() => {});
   }, []);
 
@@ -247,9 +251,11 @@ export default function Home() {
 
       sessionStorage.setItem('rms_report', JSON.stringify(json.data));
       sessionStorage.setItem('rms_analysis_id', json.analysisId);
-      sessionStorage.setItem('rms_is_paid', 'false');
+      sessionStorage.setItem('rms_is_paid', json.isPaid ? 'true' : 'false');
       // Sync userId from server response in case it was server-generated
       if (json.userId && !userId) setUserId(json.userId);
+      // Update paid_unlocks counter from server response
+      if (typeof json.paidUnlocksLeft === 'number') setPaidUnlocks(json.paidUnlocksLeft);
       router.push('/report');
     } catch (err) {
       setError(err.message || t('analysisFailed'));
@@ -277,7 +283,24 @@ export default function Home() {
         display: 'flex', alignItems: 'center', justifyContent: 'space-between',
       }}>
         <Logo />
-        <LangToggle />
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+          {paidUnlocks > 0 && (
+            <div style={{
+              display: 'flex', alignItems: 'center', gap: 5,
+              background: 'linear-gradient(135deg, rgba(197,160,40,0.08), rgba(212,165,116,0.06))',
+              border: '1px solid rgba(197,160,40,0.28)',
+              borderRadius: 20, padding: '4px 11px',
+            }}>
+              <span style={{ fontSize: 7, color: '#C5A028', fontWeight: 700 }}>✦</span>
+              <span style={{ fontSize: 11, color: '#8C6A3A', fontWeight: 600, fontFamily: "'DM Sans', sans-serif", whiteSpace: 'nowrap' }}>
+                {lang === 'fr'
+                  ? `${paidUnlocks} rapport${paidUnlocks > 1 ? 's' : ''} inclus`
+                  : `${paidUnlocks} report${paidUnlocks !== 1 ? 's' : ''} included`}
+              </span>
+            </div>
+          )}
+          <LangToggle />
+        </div>
       </div>
 
       {/* ── Main content (always rendered; blurred behind overlay) ── */}

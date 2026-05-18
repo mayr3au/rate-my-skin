@@ -191,25 +191,36 @@ export default async function handler(req, res) {
     const effectiveUserId = userId || crypto.randomUUID();
     console.log('[analyze] userId from client:', userId || 'null (server-generated)', '| effectiveUserId:', effectiveUserId);
 
-    // 4. Upsert user row — single atomic operation, no select-then-insert race
-    let userSaved = false;
-    const { error: upsertUserErr } = await supabase
+    // 4. Read existing user (need paid_unlocks before touching the row)
+    const { data: existingUser } = await supabase
       .from('users')
-      .upsert(
-        { id: effectiveUserId, analyses_used: 1, paid_credits: 0, paid_unlocks: 0 },
-        { onConflict: 'id', ignoreDuplicates: false }
-      );
+      .select('analyses_used, paid_unlocks')
+      .eq('id', effectiveUserId)
+      .single();
 
-    if (upsertUserErr) {
-      console.error('[analyze] ❌ user upsert failed:', upsertUserErr.message, '| code:', upsertUserErr.code, '| hint:', upsertUserErr.hint);
+    const currentPaidUnlocks = existingUser?.paid_unlocks || 0;
+    console.log('[analyze] user exists:', !!existingUser, '| paid_unlocks:', currentPaidUnlocks);
+
+    // 5. Persist user row — update analyses_used only (never touch paid_unlocks here)
+    let userSaved = false;
+    if (existingUser) {
+      const { error: updateErr } = await supabase
+        .from('users')
+        .update({ analyses_used: (existingUser.analyses_used || 0) + 1, updated_at: new Date().toISOString() })
+        .eq('id', effectiveUserId);
+      userSaved = !updateErr;
+      if (updateErr) console.error('[analyze] ❌ user update failed:', updateErr.message, updateErr.code);
+      else console.log('[analyze] ✅ user updated:', effectiveUserId);
     } else {
-      userSaved = true;
-      console.log('[analyze] ✅ user upserted:', effectiveUserId);
+      const { error: insertErr } = await supabase
+        .from('users')
+        .insert({ id: effectiveUserId, analyses_used: 1, paid_credits: 0, paid_unlocks: 0 });
+      userSaved = !insertErr;
+      if (insertErr) console.error('[analyze] ❌ user insert failed:', insertErr.message, insertErr.code, insertErr.hint);
+      else console.log('[analyze] ✅ user created:', effectiveUserId);
     }
 
-    // 5. Insert analysis row
-    // If user upsert failed, use null for user_id to bypass the FK constraint
-    // (analysis is still saved; it just won't be linked to a user)
+    // 6. Insert analysis row (is_paid starts false; may be upgraded below)
     const analysisUserId = userSaved ? effectiveUserId : null;
     console.log('[analyze] inserting analysis — id:', analysisId, '| user_id:', analysisUserId);
 
@@ -225,14 +236,40 @@ export default async function handler(req, res) {
 
     if (analysisInsertErr) {
       console.error('[analyze] ❌ analysis insert failed:', analysisInsertErr.message,
-        '| code:', analysisInsertErr.code,
-        '| details:', analysisInsertErr.details,
-        '| hint:', analysisInsertErr.hint);
+        '| code:', analysisInsertErr.code, '| hint:', analysisInsertErr.hint);
     } else {
-      console.log('[analyze] ✅ analysis saved — id:', analysisId, '| user_id:', analysisUserId);
+      console.log('[analyze] ✅ analysis saved — id:', analysisId);
     }
 
-    return res.status(200).json({ data: analysisData, analysisId, userId: effectiveUserId });
+    // 7. Auto-unlock if user has paid_unlocks remaining
+    let isPaidOnCreate = false;
+    let paidUnlocksLeft = currentPaidUnlocks;
+
+    if (currentPaidUnlocks > 0 && !analysisInsertErr) {
+      console.log('[analyze] auto-unlock: paid_unlocks available =', currentPaidUnlocks);
+      const { error: unlockErr } = await supabase
+        .from('analyses')
+        .update({ is_paid: true })
+        .eq('id', analysisId);
+
+      if (unlockErr) {
+        console.error('[analyze] ❌ auto-unlock failed:', unlockErr.message);
+      } else {
+        const { error: decrErr } = await supabase
+          .from('users')
+          .update({ paid_unlocks: currentPaidUnlocks - 1 })
+          .eq('id', effectiveUserId);
+        if (decrErr) {
+          console.error('[analyze] ❌ paid_unlocks decrement failed:', decrErr.message);
+        } else {
+          isPaidOnCreate = true;
+          paidUnlocksLeft = currentPaidUnlocks - 1;
+          console.log('[analyze] ✅ auto-unlocked, paid_unlocks remaining:', paidUnlocksLeft);
+        }
+      }
+    }
+
+    return res.status(200).json({ data: analysisData, analysisId, userId: effectiveUserId, isPaid: isPaidOnCreate, paidUnlocksLeft });
 
   } catch (err) {
     console.error('[analyze] error:', err.message);
