@@ -334,8 +334,13 @@ export default function Home() {
         <div style={{ textAlign: 'center', padding: '52px 24px 8px' }}>
           <p style={{
             fontSize: 11, letterSpacing: '0.22em', textTransform: 'uppercase',
-            color: '#B0885E', fontWeight: 600, marginBottom: 14,
+            fontWeight: 600, marginBottom: 14,
             fontFamily: "'DM Sans', sans-serif",
+            background: 'linear-gradient(180deg, #2C241D 0%, #6B4828 12%, #A87449 50%, #6B4828 88%, #2C241D 100%)',
+            backgroundSize: '100% 150%',
+            WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent',
+            backgroundClip: 'text',
+            animation: 'logoShimmer 20s ease-in-out infinite',
           }}>
             {t('facialAestheticsAnalysis')}
           </p>
