@@ -89,8 +89,23 @@ export default function Home() {
       interval = setInterval(() => {
         setLoadingStep(s => (s + 1) % loadingMessages.length);
       }, 3500);
+      // Lock body scroll on iOS so the overlay truly fills the screen
+      const scrollY = window.scrollY;
+      document.body.style.position = 'fixed';
+      document.body.style.top = `-${scrollY}px`;
+      document.body.style.left = '0';
+      document.body.style.right = '0';
+      document.body.style.overflow = 'hidden';
     } else {
       setLoadingStep(0);
+      // Restore body scroll
+      const top = document.body.style.top;
+      document.body.style.position = '';
+      document.body.style.top = '';
+      document.body.style.left = '';
+      document.body.style.right = '';
+      document.body.style.overflow = '';
+      if (top) window.scrollTo(0, -parseInt(top || '0'));
     }
     return () => clearInterval(interval);
   }, [loading, loadingMessages.length]);
