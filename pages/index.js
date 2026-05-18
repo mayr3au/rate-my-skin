@@ -233,6 +233,7 @@ export default function Home() {
       const imageBase64 = btoa(binary);
       const mimeType = image.type;
 
+      const storedEmail = localStorage.getItem('rms_email') || null;
       const res = await fetch('/api/analyze', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -242,6 +243,7 @@ export default function Home() {
           userId: userId || null,
           lang,
           skinConcern: skinConcern.trim() || null,
+          email: storedEmail,
         }),
       });
       const json = await res.json();

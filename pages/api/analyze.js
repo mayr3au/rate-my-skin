@@ -115,7 +115,11 @@ export default async function handler(req, res) {
   }
 
   const supabase = createAdminClient();
-  const { userId, imageBase64, mimeType, lang, skinConcern, captchaToken } = req.body;
+  const { userId, imageBase64, mimeType, lang, skinConcern, captchaToken, email } = req.body;
+  const normalizedEmail = email && typeof email === 'string' && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())
+    ? email.trim().toLowerCase()
+    : null;
+  console.log('[analyze] email received:', normalizedEmail || 'none');
 
   try {
     // 1. Query available products from Supabase
@@ -245,6 +249,7 @@ export default async function handler(req, res) {
         skin_concern: skinConcern || null,
         report_json: analysisData,
         is_paid: false,
+        email: normalizedEmail,
       });
 
     if (analysisInsertErr) {
