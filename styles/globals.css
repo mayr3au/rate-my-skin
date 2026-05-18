@@ -5,7 +5,7 @@
 }
 
 body {
-  background: linear-gradient(to bottom, #FFFFFF 0%, #FDFBFA 60%, #FAF6EE 88%, #F3ECE0 100%); /* Luminous white top pushed down, fading to ultra-soft ivory cream at the very bottom */
+  background: linear-gradient(to bottom, #FFFFFF 0%, #FAF6F0 40%, #F0E2D0 75%, #E3D1BA 100%); /* Elegant white to warm sand beige top-to-bottom blend */
   background-attachment: fixed;
   min-height: 100vh;
   -webkit-font-smoothing: antialiased;

@@ -418,7 +418,7 @@ export default function BeautyReport({ data, isPaid, onUnlock }) {
     const TABS = [t('tabMetrics'), t('tabStrengths'), t('tabImprove'), t('tabRoutine'), t('tabShop')];
 
     return (
-      <div style={{ background: "linear-gradient(to bottom, #FFFFFF 0%, #FDFBFA 60%, #FAF6EE 88%, #F3ECE0 100%)", minHeight: "100vh", fontFamily: "'DM Sans', sans-serif", paddingBottom: 80 }}>
+      <div style={{ background: "linear-gradient(to bottom, #FFFFFF 0%, #FAF6F0 40%, #F0E2D0 75%, #E3D1BA 100%)", minHeight: "100vh", fontFamily: "'DM Sans', sans-serif", paddingBottom: 80 }}>
         <ReportHeader t={t} />
 
         <div style={{ maxWidth: 680, margin: "0 auto", padding: "24px 20px 0" }}>
@@ -624,7 +624,7 @@ export default function BeautyReport({ data, isPaid, onUnlock }) {
   ];
 
   return (
-    <div style={{ background: "linear-gradient(to bottom, #FFFFFF 0%, #FDFBFA 60%, #FAF6EE 88%, #F3ECE0 100%)", minHeight: "100vh", fontFamily: "'DM Sans', sans-serif", paddingBottom: 60 }}>
+    <div style={{ background: "linear-gradient(to bottom, #FFFFFF 0%, #FAF6F0 40%, #F0E2D0 75%, #E3D1BA 100%)", minHeight: "100vh", fontFamily: "'DM Sans', sans-serif", paddingBottom: 60 }}>
       <ReportHeader t={t} />
 
       <div style={{ maxWidth: 680, margin: "0 auto", padding: "24px 20px 0" }}>

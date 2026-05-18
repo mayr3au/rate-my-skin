@@ -934,7 +934,7 @@ export default function Home() {
       {loading && (
         <div style={{
           position: 'fixed', inset: 0, zIndex: 1000,
-          background: 'linear-gradient(to bottom, #FFFFFF 0%, #FDFBFA 60%, #FAF6EE 88%, #F3ECE0 100%)',
+          background: 'linear-gradient(to bottom, #FFFFFF 0%, #FAF6F0 40%, #F0E2D0 75%, #E3D1BA 100%)',
           display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
           padding: 32, textAlign: 'center',
           animation: 'fadeIn 0.5s ease-out forwards',
