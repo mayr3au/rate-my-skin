@@ -350,9 +350,28 @@ export default function Home() {
             {t('heroLine1')}<br />
             <em>{t('heroLine2')}</em>
           </h1>
-          <p style={{ fontSize: 13, color: '#8C7A6B', margin: '14px 0 0', lineHeight: 1.6, fontFamily: "'DM Sans', sans-serif" }}>
-            {t('heroLine3')}
-          </p>
+          <div style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', margin: '18px auto 0' }}>
+            <span style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: 8,
+              background: 'rgba(255, 255, 255, 0.48)',
+              border: '1px solid rgba(255, 255, 255, 0.65)',
+              borderRadius: 30,
+              padding: '6px 16px',
+              fontSize: 12,
+              fontWeight: 500,
+              color: '#6F6156',
+              backdropFilter: 'blur(12px)',
+              WebkitBackdropFilter: 'blur(12px)',
+              boxShadow: '0 6px 20px rgba(168, 116, 73, 0.02), inset 0 1px 0 rgba(255, 255, 255, 0.6)',
+              fontFamily: "'DM Sans', sans-serif",
+              letterSpacing: '0.01em',
+            }}>
+              <span style={{ fontSize: 7, color: '#C5A028' }}>✦</span>
+              {t('heroLine3')}
+            </span>
+          </div>
           <p style={{
             fontSize: 13, color: '#A2968B', margin: '6px auto 0',
             maxWidth: 420, lineHeight: 1.6, fontFamily: "'DM Sans', sans-serif",
@@ -885,9 +904,28 @@ export default function Home() {
               </button>
             </form>
 
-            <p style={{ marginTop: 14, fontSize: 11, color: '#CBAA8D', lineHeight: 1.5, fontFamily: "'DM Sans', sans-serif" }}>
-              {t('heroLine3')}
-            </p>
+            <div style={{ display: 'flex', justifyContent: 'center', marginTop: 16 }}>
+              <span style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: 8,
+                background: 'rgba(255, 255, 255, 0.25)',
+                border: '1px solid rgba(255, 255, 255, 0.3)',
+                borderRadius: 30,
+                padding: '6px 14px',
+                fontSize: 11,
+                fontWeight: 500,
+                color: '#E8DED3',
+                backdropFilter: 'blur(8px)',
+                WebkitBackdropFilter: 'blur(8px)',
+                boxShadow: 'inset 0 1px 0 rgba(255, 255, 255, 0.15)',
+                fontFamily: "'DM Sans', sans-serif",
+                letterSpacing: '0.01em',
+              }}>
+                <span style={{ fontSize: 6, color: '#E3C19C' }}>✦</span>
+                {t('heroLine3')}
+              </span>
+            </div>
           </div>
         </div>
       )}
