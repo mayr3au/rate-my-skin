@@ -19,7 +19,8 @@ export default async function handler(req, res) {
 
   const normalizedEmail = email.trim().toLowerCase();
 
-  const { data, error } = await supabase
+  // Path 1 — email stored directly on the analysis row (analyses created after the fix)
+  const { data: directRows, error: directErr } = await supabase
     .from('analyses')
     .select('id, created_at, report_json, skin_concern')
     .eq('email', normalizedEmail)
@@ -27,12 +28,38 @@ export default async function handler(req, res) {
     .order('created_at', { ascending: false })
     .limit(50);
 
-  if (error) {
-    console.error('[my-reports] query error:', error.message);
+  if (directErr) {
+    console.error('[my-reports] direct query error:', directErr.message);
     return res.status(500).json({ error: 'Failed to fetch reports.' });
   }
 
-  const reports = (data || []).map(row => ({
+  // Path 2 — email linked to users row (via newsletter email gate, covers older analyses)
+  let viaUserRows = [];
+  const { data: userRow } = await supabase
+    .from('users')
+    .select('id')
+    .eq('email', normalizedEmail)
+    .maybeSingle();
+
+  if (userRow?.id) {
+    const { data: userAnalyses } = await supabase
+      .from('analyses')
+      .select('id, created_at, report_json, skin_concern')
+      .eq('user_id', userRow.id)
+      .eq('is_paid', true)
+      .order('created_at', { ascending: false })
+      .limit(50);
+    viaUserRows = userAnalyses || [];
+  }
+
+  // Merge + deduplicate by id, sort newest first
+  const byId = new Map();
+  [...(directRows || []), ...viaUserRows].forEach(r => byId.set(r.id, r));
+  const allRows = [...byId.values()].sort(
+    (a, b) => new Date(b.created_at) - new Date(a.created_at)
+  );
+
+  const reports = allRows.map(row => ({
     id: row.id,
     createdAt: row.created_at,
     score: row.report_json?.overall ?? null,

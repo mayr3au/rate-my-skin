@@ -35,7 +35,20 @@ export default async function handler(req, res) {
     console.log('[newsletter] email saved:', cleanEmail);
   }
 
-  // No bonus credit granted anymore
+  // Link email to user row so /mes-rapports can find analyses via cookie userId
+  const cookieUserId = req.cookies['rms_uid'];
+  if (cookieUserId) {
+    try {
+      await supabase
+        .from('users')
+        .update({ email: cleanEmail })
+        .eq('id', cookieUserId);
+      console.log('[newsletter] email linked to userId:', cookieUserId);
+    } catch (err) {
+      console.error('[newsletter] failed to link email to user:', err.message);
+    }
+  }
+
   return res.status(200).json({
     message: 'Subscribed successfully.',
   });
