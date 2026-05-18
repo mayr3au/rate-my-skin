@@ -739,7 +739,7 @@ export default function Home() {
           <button
             onClick={handleAnalyse}
             disabled={!image || loading}
-            className={image && !loading ? "btn-liquid-glass-gold" : ""}
+            className={image && !loading ? "btn-liquid-glass-pearl" : ""}
             style={{
               width: '100%', marginTop: 20,
               padding: '16px 24px', fontSize: 15, fontWeight: 600,
@@ -934,7 +934,7 @@ export default function Home() {
       {loading && (
         <div style={{
           position: 'fixed', inset: 0, zIndex: 1000,
-          background: 'linear-gradient(to bottom, #FFFFFF 0%, #FAF6F0 40%, #F0E2D0 75%, #E3D1BA 100%)',
+          background: 'linear-gradient(to bottom, #FFFFFF 0%, #FBF6F0 40%, #EEDCD0 75%, #E3C9B5 100%)',
           display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
           padding: 32, textAlign: 'center',
           animation: 'fadeIn 0.5s ease-out forwards',
