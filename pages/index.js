@@ -281,9 +281,6 @@ export default function Home() {
       {/* ── Sticky nav ── */}
       <div className="nav-blur" style={{
         position: 'sticky', top: 0, zIndex: 200,
-        background: 'rgba(255, 253, 250, 0.55)',
-        backdropFilter: 'blur(16px)', WebkitBackdropFilter: 'blur(16px)',
-        borderBottom: '1px solid rgba(255, 255, 255, 0.6)',
         boxShadow: '0 4px 20px rgba(180, 160, 140, 0.04)',
         padding: '13px 26px',
         display: 'flex', alignItems: 'center', justifyContent: 'space-between',
@@ -395,16 +392,11 @@ export default function Home() {
             { num: t('trust2Num'), label: t('trust2Label') },
             { num: t('trust3Num'), label: t('trust3Label') },
           ].map(({ num, label }) => (
-            <div key={label} style={{ 
+            <div key={label} className="card-blur" style={{ 
               flex: '1 1 110px',
               textAlign: 'center',
               padding: '12px 14px',
-              background: 'rgba(255, 255, 255, 0.45)',
-              backdropFilter: 'blur(16px) saturate(130%)',
-              WebkitBackdropFilter: 'blur(16px) saturate(130%)',
-              border: '1px solid rgba(255, 255, 255, 0.55)',
               borderRadius: 24,
-              boxShadow: '0 8px 32px rgba(168, 116, 73, 0.03), inset 0 1px 1px rgba(255, 255, 255, 0.8)',
               display: 'flex',
               flexDirection: 'column',
               justifyContent: 'center',
@@ -452,18 +444,17 @@ export default function Home() {
           {/* Upload zone */}
           <div
             onClick={() => !imageUrl && fileInputRef.current?.click()}
+            className="card-blur"
             style={{
-              border: dragOver ? `1.5px solid ${GOLD}` : '1px solid rgba(255, 255, 255, 0.55)',
+              border: dragOver ? `1.5px solid ${GOLD}` : undefined,
               boxShadow: dragOver 
                 ? 'inset 0 0 0 2px #C5A028, inset 0 4px 12px rgba(0,0,0,0.02)' 
-                : '0 8px 32px rgba(168, 116, 73, 0.03), inset 0 1px 1px rgba(255, 255, 255, 0.85)',
+                : undefined,
               borderRadius: 24,
               padding: imageUrl ? 0 : '40px 24px',
               textAlign: 'center',
               cursor: imageUrl ? 'default' : 'pointer',
-              background: dragOver ? 'rgba(255, 255, 255, 0.65)' : 'rgba(255, 255, 255, 0.45)',
-              backdropFilter: 'blur(20px) saturate(140%)',
-              WebkitBackdropFilter: 'blur(20px) saturate(140%)',
+              background: dragOver ? 'rgba(255, 255, 255, 0.65)' : undefined,
               transition: 'all 0.35s cubic-bezier(0.4,0,0.2,1)',
               overflow: 'hidden',
             }}
@@ -794,10 +785,7 @@ export default function Home() {
           pointerEvents: emailCaptured ? 'none' : 'auto',
           transition: 'opacity 0.65s ease',
         }}>
-          <div style={{
-            background: 'rgba(255, 255, 255, 0.55)',
-            backdropFilter: 'blur(24px) saturate(160%)', WebkitBackdropFilter: 'blur(24px) saturate(160%)',
-            border: '1px solid rgba(255, 255, 255, 0.55)',
+          <div className="card-blur" style={{
             borderRadius: 32,
             padding: 'clamp(32px, 6vw, 48px)',
             maxWidth: 420, width: '100%',

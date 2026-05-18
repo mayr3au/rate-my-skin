@@ -41,6 +41,29 @@ body::before {
   opacity: 0.035;
   pointer-events: none;
   z-index: 9999;
+/* Premium Liquid Glass Pearl (Blanc Nacré) elements */
+.card-blur {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.72) 0%, rgba(253, 246, 237, 0.48) 50%, rgba(246, 235, 222, 0.72) 100%);
+  backdrop-filter: blur(25px) saturate(150%);
+  -webkit-backdrop-filter: blur(25px) saturate(150%);
+  border: 1px solid rgba(255, 255, 255, 0.75);
+  box-shadow: 
+    0 8px 32px rgba(168, 116, 73, 0.03), 
+    inset 0 1px 0 0 rgba(255, 255, 255, 0.75);
+  transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.nav-blur {
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.8) 0%, rgba(253, 246, 237, 0.65) 100%);
+  backdrop-filter: blur(20px) saturate(140%);
+  -webkit-backdrop-filter: blur(20px) saturate(140%);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.65);
+}
+
+.overlay-blur {
+  background: rgba(253, 250, 247, 0.75);
+  backdrop-filter: blur(20px) saturate(140%);
+  -webkit-backdrop-filter: blur(20px) saturate(140%);
 }
 
 @media (max-width: 600px) {
@@ -54,18 +77,18 @@ body::before {
 
   /* Beautiful high-end glassmorphic mobile navigation */
   .nav-blur {
-    background: rgba(255, 255, 255, 0.45) !important;
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.8) 0%, rgba(253, 246, 237, 0.65) 100%) !important;
     backdrop-filter: blur(20px) saturate(140%) !important;
     -webkit-backdrop-filter: blur(20px) saturate(140%) !important;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.4) !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.65) !important;
   }
 
   /* Beautiful translucent report cards & interactive containers on mobile */
   .card-blur {
-    background: rgba(255, 255, 255, 0.45) !important;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.72) 0%, rgba(253, 246, 237, 0.48) 50%, rgba(246, 235, 222, 0.72) 100%) !important;
     backdrop-filter: blur(20px) saturate(140%) !important;
     -webkit-backdrop-filter: blur(20px) saturate(140%) !important;
-    border: 1px solid rgba(255, 255, 255, 0.55) !important;
+    border: 1px solid rgba(255, 255, 255, 0.75) !important;
     box-shadow: 0 8px 32px rgba(168, 116, 73, 0.03), inset 0 1px 1px rgba(255, 255, 255, 0.8) !important;
   }
 
@@ -345,16 +368,16 @@ body::before {
   border-radius: 30px;
   cursor: pointer;
   outline: none;
-  border: 1px solid rgba(255, 255, 255, 0.65);
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.55) 0%, rgba(255, 255, 255, 0.25) 100%);
+  border: 1px solid rgba(255, 255, 255, 0.75);
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.78) 0%, rgba(253, 246, 237, 0.55) 50%, rgba(246, 235, 222, 0.78) 100%);
   color: #6F6156;
   backdrop-filter: blur(25px) saturate(150%);
   -webkit-backdrop-filter: blur(25px) saturate(150%);
   box-shadow: 
-    0 1px 0 0 rgba(255, 255, 255, 0.5) inset,      /* Top highlight edge */
-    0 -1px 0 0 rgba(0, 0, 0, 0.05) inset,          /* Bottom shadow edge */
-    inset 0 0 0 1px rgba(255, 255, 255, 0.2),      /* Inner border refraction */
-    inset 0 12px 18px rgba(255, 255, 255, 0.18),    /* Curved lens highlight */
+    0 1px 0 0 rgba(255, 255, 255, 0.65) inset,      /* Top highlight edge */
+    0 -1px 0 0 rgba(0, 0, 0, 0.03) inset,          /* Bottom shadow edge */
+    inset 0 0 0 1px rgba(255, 255, 255, 0.25),      /* Inner border refraction */
+    inset 0 12px 18px rgba(255, 255, 255, 0.28),    /* Curved lens highlight */
     0 8px 24px rgba(168, 116, 73, 0.04);           /* Light floating projection */
   transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
   overflow: hidden;
@@ -372,7 +395,7 @@ body::before {
     90deg,
     transparent 0%,
     rgba(255, 255, 255, 0.0) 25%,
-    rgba(255, 255, 255, 0.5) 50%,
+    rgba(255, 255, 255, 0.65) 50%,
     rgba(255, 255, 255, 0.0) 75%,
     transparent 100%
   );
@@ -388,15 +411,15 @@ body::before {
 
 .btn-liquid-glass:hover {
   transform: translateY(-2px) scale(1.02);
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.68) 0%, rgba(255, 255, 255, 0.38) 100%);
+  background: linear-gradient(135deg, rgba(255, 255, 255, 1) 0%, rgba(254, 250, 244, 0.98) 50%, rgba(250, 241, 230, 1) 100%);
   border-color: rgba(255, 255, 255, 0.95);
   box-shadow: 
-    0 1px 0 0 rgba(255, 255, 255, 0.6) inset,
-    0 -1px 0 0 rgba(0, 0, 0, 0.03) inset,
-    inset 0 0 0 1px rgba(255, 255, 255, 0.35),
-    inset 0 12px 20px rgba(255, 255, 255, 0.25),
+    0 1px 0 0 rgba(255, 255, 255, 0.9) inset,
+    0 -1px 0 0 rgba(0, 0, 0, 0.02) inset,
+    inset 0 0 0 1px rgba(255, 255, 255, 0.55),
+    inset 0 12px 20px rgba(255, 255, 255, 0.45),
     0 16px 32px rgba(168, 116, 73, 0.08),
-    0 0 24px rgba(212, 165, 116, 0.45); /* Luxury champagne gold ambient surbrillance */
+    0 0 24px rgba(255, 255, 255, 0.85); /* Pearlescent ambient hover surbrillance */
   color: #3A2E26;
 }
 

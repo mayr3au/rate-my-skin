@@ -4,13 +4,13 @@ import { shareScore } from "../lib/shareImage";
 
 const GOLD = "#A87449";
 const CARD = {
-  background: "rgba(255, 255, 255, 0.45)",
-  backdropFilter: "blur(20px) saturate(160%)",
-  WebkitBackdropFilter: "blur(20px) saturate(160%)",
-  border: "1px solid rgba(255, 255, 255, 0.55)",
+  background: "linear-gradient(135deg, rgba(255, 255, 255, 0.72) 0%, rgba(253, 246, 237, 0.48) 50%, rgba(246, 235, 222, 0.72) 100%)",
+  backdropFilter: "blur(25px) saturate(150%)",
+  WebkitBackdropFilter: "blur(25px) saturate(150%)",
+  border: "1px solid rgba(255, 255, 255, 0.75)",
   borderRadius: 20,
-  boxShadow: "0 8px 32px rgba(168, 116, 73, 0.04), inset 0 1px 1px rgba(255, 255, 255, 0.85)",
-  transition: "all 0.3s ease"
+  boxShadow: "0 8px 32px rgba(168, 116, 73, 0.03), inset 0 1px 0 0 rgba(255, 255, 255, 0.75)",
+  transition: "all 0.5s cubic-bezier(0.16, 1, 0.3, 1)"
 };
 const LABEL_STYLE = { margin: "0 0 4px", fontSize: 9.5, letterSpacing: "0.22em", textTransform: "uppercase", color: "#B9AC9E", fontWeight: 600, fontFamily: "'DM Sans', sans-serif" };
 const TITLE_STYLE = { margin: "0 0 16px", fontSize: 22, fontWeight: 300, fontFamily: "'Cormorant Garamond', serif", color: "#2C241D" };
