@@ -83,13 +83,22 @@ export default function Home() {
       .catch(() => {});
   }, []);
 
+  const unlockBody = () => {
+    const top = document.body.style.top;
+    document.body.style.position = '';
+    document.body.style.top = '';
+    document.body.style.left = '';
+    document.body.style.right = '';
+    document.body.style.overflow = '';
+    if (top) window.scrollTo(0, -parseInt(top || '0'));
+  };
+
   useEffect(() => {
     let interval;
     if (loading) {
       interval = setInterval(() => {
         setLoadingStep(s => (s + 1) % loadingMessages.length);
       }, 3500);
-      // Lock body scroll on iOS so the overlay truly fills the screen
       const scrollY = window.scrollY;
       document.body.style.position = 'fixed';
       document.body.style.top = `-${scrollY}px`;
@@ -98,16 +107,13 @@ export default function Home() {
       document.body.style.overflow = 'hidden';
     } else {
       setLoadingStep(0);
-      // Restore body scroll
-      const top = document.body.style.top;
-      document.body.style.position = '';
-      document.body.style.top = '';
-      document.body.style.left = '';
-      document.body.style.right = '';
-      document.body.style.overflow = '';
-      if (top) window.scrollTo(0, -parseInt(top || '0'));
+      unlockBody();
     }
-    return () => clearInterval(interval);
+    // Always restore body on unmount (e.g. Next.js navigates away mid-loading)
+    return () => {
+      clearInterval(interval);
+      unlockBody();
+    };
   }, [loading, loadingMessages.length]);
 
   /* ── Email submit ── */
