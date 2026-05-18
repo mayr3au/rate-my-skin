@@ -4,9 +4,15 @@
   padding: 0;
 }
 
+html {
+  background: linear-gradient(to bottom, #FFFFFF 0%, #FAF6F0 40%, #F0E2D0 75%, #E3D1BA 100%) no-repeat;
+  background-size: 100% 100%;
+  background-attachment: scroll;
+  min-height: 100%;
+}
+
 body {
-  background: linear-gradient(to bottom, #FFFFFF 0%, #FAF6F0 40%, #F0E2D0 75%, #E3D1BA 100%); /* Elegant white to warm sand beige top-to-bottom blend */
-  background-attachment: fixed;
+  background: transparent !important;
   min-height: 100vh;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
