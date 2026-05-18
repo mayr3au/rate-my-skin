@@ -8,7 +8,174 @@ const TITLE_STYLE = { margin: "0 0 16px", fontSize: 22, fontWeight: 300, fontFam
 
 const ICONS = ["✦", "◈", "◉", "▲", "◆", "●"];
 
-/* ── Animated score ring ── */
+/* ══ Score hero card — dark tech panel ══════════════════════════════════ */
+function ScoreHeroCard({ score, summary, faceShape, eyeColor, skinTone, badge, miniMetrics, t, lang }) {
+  const [animated, setAnimated] = useState(0);
+  useEffect(() => {
+    const timer = setTimeout(() => setAnimated(score), 220);
+    return () => clearTimeout(timer);
+  }, [score]);
+
+  const SIZE = 156;
+  const r = SIZE / 2 - 11;
+  const circ = 2 * Math.PI * r;
+  const dash = (animated / 100) * circ;
+  const statusLabel = score >= 78
+    ? (lang === "fr" ? "Excellent" : "Excellent")
+    : score >= 65
+    ? (lang === "fr" ? "Bon" : "Good")
+    : (lang === "fr" ? "À améliorer" : "Needs work");
+  const arcColor = score >= 78 ? "#D4A574" : score >= 65 ? "#A87449" : "#8C7A6B";
+
+  return (
+    <div style={{
+      background: "linear-gradient(150deg, #1E1810 0%, #2C241D 55%, #201A13 100%)",
+      borderRadius: 24, marginBottom: 16, position: "relative", overflow: "hidden",
+      boxShadow: "0 24px 64px rgba(0,0,0,0.3), 0 0 0 1px rgba(212,165,116,0.1)",
+      padding: "clamp(20px,5vw,32px)",
+    }}>
+      {/* Radial glow behind ring */}
+      <div style={{ position: "absolute", inset: 0, pointerEvents: "none",
+        background: "radial-gradient(ellipse 55% 60% at 50% 38%, rgba(168,116,73,0.18) 0%, transparent 68%)" }}/>
+
+      {/* Corner bracket — top-left */}
+      <div style={{ position: "absolute", top: 14, left: 14, width: 18, height: 18,
+        borderTop: "1.5px solid rgba(212,165,116,0.35)", borderLeft: "1.5px solid rgba(212,165,116,0.35)", pointerEvents: "none" }}/>
+      {/* Corner bracket — top-right */}
+      <div style={{ position: "absolute", top: 14, right: 14, width: 18, height: 18,
+        borderTop: "1.5px solid rgba(212,165,116,0.35)", borderRight: "1.5px solid rgba(212,165,116,0.35)", pointerEvents: "none" }}/>
+      {/* Corner bracket — bottom-left */}
+      <div style={{ position: "absolute", bottom: 14, left: 14, width: 18, height: 18,
+        borderBottom: "1.5px solid rgba(212,165,116,0.35)", borderLeft: "1.5px solid rgba(212,165,116,0.35)", pointerEvents: "none" }}/>
+      {/* Corner bracket — bottom-right */}
+      <div style={{ position: "absolute", bottom: 14, right: 14, width: 18, height: 18,
+        borderBottom: "1.5px solid rgba(212,165,116,0.35)", borderRight: "1.5px solid rgba(212,165,116,0.35)", pointerEvents: "none" }}/>
+
+      {/* Top label row */}
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 18, position: "relative" }}>
+        <p style={{ margin: 0, fontSize: 8.5, fontWeight: 700, letterSpacing: "0.26em", textTransform: "uppercase",
+          color: "rgba(212,165,116,0.55)", fontFamily: "'DM Sans', sans-serif" }}>
+          {t("overallScore")}
+        </p>
+        {badge && (
+          <span style={{ fontSize: 7.5, fontWeight: 700, letterSpacing: "0.18em", textTransform: "uppercase",
+            color: "rgba(185,172,158,0.6)", background: "rgba(255,255,255,0.04)",
+            border: "1px solid rgba(212,165,116,0.14)", borderRadius: 20, padding: "3px 10px",
+            fontFamily: "'DM Sans', sans-serif" }}>
+            {badge}
+          </span>
+        )}
+      </div>
+
+      {/* Centered ring */}
+      <div style={{ display: "flex", justifyContent: "center", marginBottom: 18, position: "relative" }}>
+        <div style={{ position: "relative", width: SIZE, height: SIZE, flexShrink: 0 }}>
+          {/* Decorative outer dashes */}
+          <svg width={SIZE} height={SIZE} viewBox={`0 0 ${SIZE} ${SIZE}`}
+            style={{ position: "absolute", inset: 0 }}>
+            <circle cx={SIZE/2} cy={SIZE/2} r={r + 7}
+              fill="none" stroke="rgba(212,165,116,0.07)" strokeWidth="1" strokeDasharray="2.5 8"/>
+          </svg>
+          {/* Progress ring */}
+          <svg width={SIZE} height={SIZE} viewBox={`0 0 ${SIZE} ${SIZE}`}
+            style={{ position: "absolute", inset: 0, transform: "rotate(-90deg)" }}>
+            <defs>
+              <linearGradient id="heroArcGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                <stop offset="0%" stopColor="#6B4828"/>
+                <stop offset="50%" stopColor="#D4A574"/>
+                <stop offset="100%" stopColor="#A87449"/>
+              </linearGradient>
+            </defs>
+            {/* Track */}
+            <circle cx={SIZE/2} cy={SIZE/2} r={r}
+              fill="none" stroke="rgba(255,255,255,0.04)" strokeWidth="7"/>
+            {/* Arc */}
+            <circle cx={SIZE/2} cy={SIZE/2} r={r}
+              fill="none" stroke="url(#heroArcGrad)" strokeWidth="7"
+              strokeDasharray={`${dash} ${circ}`} strokeLinecap="round"
+              style={{
+                transition: "stroke-dasharray 2s cubic-bezier(0.4,0,0.2,1)",
+                filter: `drop-shadow(0 0 7px ${arcColor}88)`,
+              }}/>
+          </svg>
+          {/* Number + status label centered */}
+          <div style={{ position: "absolute", inset: 0, display: "flex", flexDirection: "column",
+            alignItems: "center", justifyContent: "center", gap: 2 }}>
+            <div style={{ display: "flex", alignItems: "baseline", gap: 3 }}>
+              <span style={{ fontSize: 58, fontWeight: 200, lineHeight: 1,
+                fontFamily: "'Cormorant Garamond', serif", color: "#F2E8DC",
+                textShadow: "0 0 24px rgba(212,165,116,0.25)" }}>
+                {score}
+              </span>
+              <span style={{ fontSize: 15, color: "rgba(212,165,116,0.4)",
+                fontFamily: "'Cormorant Garamond', serif", paddingBottom: 7 }}>
+                /100
+              </span>
+            </div>
+            <span style={{ fontSize: 8, fontWeight: 700, letterSpacing: "0.2em", textTransform: "uppercase",
+              color: arcColor, fontFamily: "'DM Sans', sans-serif", marginTop: 1 }}>
+              {statusLabel}
+            </span>
+          </div>
+        </div>
+      </div>
+
+      {/* Summary */}
+      <p style={{ margin: "0 0 16px", fontSize: 13.5, lineHeight: 1.72, textAlign: "center", position: "relative",
+        color: "rgba(242,232,220,0.65)", fontStyle: "italic", fontFamily: "'Cormorant Garamond', serif",
+        wordBreak: "break-word" }}>
+        {summary}
+      </p>
+
+      {/* Separator */}
+      <div style={{ height: "1px", background: "linear-gradient(90deg, transparent, rgba(212,165,116,0.18), transparent)", margin: "0 0 16px" }}/>
+
+      {/* Trait tags */}
+      <div style={{ display: "flex", gap: 8, flexWrap: "wrap", justifyContent: "center", position: "relative" }}>
+        {[{ k: t("faceShape"), v: faceShape }, { k: t("eyeColor"), v: eyeColor }, { k: t("skinTone"), v: skinTone }].map(tag => tag.v ? (
+          <div key={tag.k} style={{ background: "rgba(255,255,255,0.04)", borderRadius: 10,
+            padding: "7px 14px", border: "1px solid rgba(212,165,116,0.1)" }}>
+            <div style={{ fontSize: 8, letterSpacing: "0.16em", textTransform: "uppercase",
+              color: "rgba(185,172,158,0.45)", fontWeight: 600, fontFamily: "'DM Sans', sans-serif" }}>
+              {tag.k}
+            </div>
+            <div style={{ fontSize: 12, color: "rgba(242,232,220,0.82)", fontWeight: 600,
+              marginTop: 3, fontFamily: "'DM Sans', sans-serif" }}>
+              {tag.v}
+            </div>
+          </div>
+        ) : null)}
+      </div>
+
+      {/* Mini-metrics strip (paid view only) */}
+      {miniMetrics && miniMetrics.length > 0 && (
+        <>
+          <div style={{ height: "1px", background: "linear-gradient(90deg, transparent, rgba(212,165,116,0.18), transparent)", margin: "16px 0" }}/>
+          <div style={{ display: "flex", position: "relative" }}>
+            {miniMetrics.map((m, i) => (
+              <div key={m.label} className="rpt-mini-metric" style={{
+                flex: 1, textAlign: "center", padding: "0 10px",
+                borderRight: i < miniMetrics.length - 1 ? "1px solid rgba(212,165,116,0.1)" : "none",
+              }}>
+                <div style={{ fontSize: 22, fontWeight: 200, color: "#F2E8DC",
+                  fontFamily: "'Cormorant Garamond', serif", lineHeight: 1 }}>
+                  {m.score}
+                </div>
+                <div style={{ fontSize: 8.5, letterSpacing: "0.1em", textTransform: "uppercase",
+                  color: "rgba(185,172,158,0.5)", fontWeight: 600, marginTop: 4,
+                  fontFamily: "'DM Sans', sans-serif" }}>
+                  {m.label}
+                </div>
+              </div>
+            ))}
+          </div>
+        </>
+      )}
+    </div>
+  );
+}
+
+/* ── Animated score ring (metric cards) ── */
 function ScoreRing({ score, size = 64 }) {
   const [animated, setAnimated] = useState(0);
   useEffect(() => {
@@ -224,35 +391,13 @@ export default function BeautyReport({ data, isPaid, onUnlock }) {
         <div style={{ maxWidth: 680, margin: "0 auto", padding: "24px 20px 0" }}>
 
           {/* ── Score hero ── */}
-          <div className="rpt-card-hero" style={{ ...CARD, padding: "24px", marginBottom: 12 }}>
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 18 }}>
-              <p style={{ ...LABEL_STYLE, margin: 0 }}>{t('overallScore')}</p>
-              <span style={{ fontSize: 9, fontWeight: 700, letterSpacing: "0.2em", textTransform: "uppercase", color: "#8C7A6B", background: "rgba(212,165,116,0.08)", border: "1px solid rgba(212,165,116,0.2)", borderRadius: 20, padding: "4px 12px", fontFamily: "'DM Sans', sans-serif" }}>
-                {t('freeReportLabel')}
-              </span>
-            </div>
-            <div className="rpt-hero-inner" style={{ display: "flex", alignItems: "flex-start", gap: 24 }}>
-              <div className="rpt-score-block" style={{ flexShrink: 0 }}>
-                <div>
-                  <div style={{ display: "flex", alignItems: "baseline", gap: 4 }}>
-                    <span className="rpt-score-number" style={{ fontSize: 88, fontWeight: 200, lineHeight: 1, fontFamily: "'Cormorant Garamond', serif", background: "linear-gradient(160deg, #A87449 0%, #D4A574 50%, #A87449 100%)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text", color: "transparent" }}>{overall}</span>
-                    <span style={{ fontSize: 20, color: "#D4C4B8", fontFamily: "'Cormorant Garamond', serif", alignSelf: "flex-end", paddingBottom: 8 }}>/100</span>
-                  </div>
-                  <div className="rpt-score-bar" style={{ height: 3, background: "rgba(212,165,116,0.12)", borderRadius: 10, overflow: "hidden", width: 110, marginTop: 6 }}>
-                    <div style={{ height: "100%", width: `${overall}%`, background: "linear-gradient(90deg, #2C241D, #A87449)", borderRadius: 10, transition: "width 1.8s cubic-bezier(0.4,0,0.2,1)" }}/>
-                  </div>
-                </div>
-              </div>
-              <div className="rpt-hero-summary" style={{ flex: 1, minWidth: 160 }}>
-                <p style={{ margin: "0 0 14px", fontSize: 14.5, lineHeight: 1.75, color: "#6F6156", fontStyle: "italic", fontFamily: "'Cormorant Garamond', serif" }}>{basicSummary}</p>
-                <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-                  {[{ k: t('faceShape'), v: faceShape }, { k: t('eyeColor'), v: eyeColor }, { k: t('skinTone'), v: skinTone }].map(tag => (
-                    <TraitTag key={tag.k} label={tag.k} value={tag.v} />
-                  ))}
-                </div>
-              </div>
-            </div>
-          </div>
+          <ScoreHeroCard
+            score={overall}
+            summary={basicSummary}
+            faceShape={faceShape} eyeColor={eyeColor} skinTone={skinTone}
+            badge={t("freeReportLabel")}
+            t={t} lang={lang}
+          />
 
           {/* ── Main problems ── */}
           {mainProblems.length > 0 && (
@@ -420,40 +565,13 @@ export default function BeautyReport({ data, isPaid, onUnlock }) {
       <div style={{ maxWidth: 680, margin: "0 auto", padding: "24px 20px 0" }}>
 
         {/* ── Score hero ── */}
-        <div className="rpt-card-hero" style={{ ...CARD, padding: "24px", marginBottom: 20 }}>
-          <div className="rpt-hero-inner" style={{ display: "flex", gap: 24, alignItems: "flex-start" }}>
-            <div className="rpt-score-block" style={{ flexShrink: 0 }}>
-              <p style={{ ...LABEL_STYLE, marginBottom: 6 }}>{t('overallScore')}</p>
-              <div style={{ display: "flex", alignItems: "baseline", gap: 4 }}>
-                <span className="rpt-score-number" style={{ fontSize: 88, fontWeight: 200, lineHeight: 1, fontFamily: "'Cormorant Garamond', serif", background: "linear-gradient(160deg, #A87449 0%, #D4A574 50%, #A87449 100%)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text", color: "transparent" }}>{overall}</span>
-                <span style={{ fontSize: 20, color: "#D4C4B8", fontFamily: "'Cormorant Garamond', serif", alignSelf: "flex-end", paddingBottom: 8 }}>/100</span>
-              </div>
-              <div className="rpt-score-bar" style={{ height: 3, background: "rgba(212,165,116,0.12)", borderRadius: 10, overflow: "hidden", width: 110, marginTop: 6 }}>
-                <div style={{ height: "100%", width: `${overall}%`, background: "linear-gradient(90deg, #2C241D, #A87449)", borderRadius: 10, transition: "width 1.8s cubic-bezier(0.4,0,0.2,1)" }}/>
-              </div>
-            </div>
-            <div className="rpt-hero-summary" style={{ flex: 1, minWidth: 160 }}>
-              <p style={{ margin: "0 0 14px", fontSize: 14.5, lineHeight: 1.75, color: "#6F6156", fontStyle: "italic", fontFamily: "'Cormorant Garamond', serif" }}>{summary}</p>
-              <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-                {[{ k: t('faceShape'), v: faceShape }, { k: t('eyeColor'), v: eyeColor }, { k: t('skinTone'), v: skinTone }].map(tag => (
-                  <TraitTag key={tag.k} label={tag.k} value={tag.v} />
-                ))}
-              </div>
-            </div>
-          </div>
-
-          {/* Top 3 mini-metrics strip */}
-          {metrics.slice(0, 3).length > 0 && (
-            <div style={{ marginTop: 20, paddingTop: 16, borderTop: "1px solid rgba(212,165,116,0.1)", display: "flex" }}>
-              {metrics.slice(0, 3).map((m, i) => (
-                <div key={m.label} className="rpt-mini-metric" style={{ flex: 1, textAlign: "center", padding: "0 12px", borderRight: i < 2 ? "1px solid rgba(212,165,116,0.1)" : "none" }}>
-                  <div style={{ fontSize: 24, fontWeight: 300, color: "#2C241D", fontFamily: "'Cormorant Garamond', serif", lineHeight: 1 }}>{m.score}</div>
-                  <div style={{ fontSize: 9, letterSpacing: "0.1em", textTransform: "uppercase", color: "#B9AC9E", fontWeight: 600, marginTop: 4, fontFamily: "'DM Sans', sans-serif" }}>{m.label}</div>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
+        <ScoreHeroCard
+          score={overall}
+          summary={summary}
+          faceShape={faceShape} eyeColor={eyeColor} skinTone={skinTone}
+          miniMetrics={metrics.slice(0, 3)}
+          t={t} lang={lang}
+        />
 
         {/* ── Tabs ── */}
         <div className="rpt-tabs" style={{ display: "flex", gap: 4, background: "#fff", border: "1px solid rgba(212,165,116,0.18)", borderRadius: 14, padding: 4, boxShadow: "0 4px 16px rgba(168,116,73,0.04)", scrollbarWidth: "none", WebkitOverflowScrolling: "touch" }}>
