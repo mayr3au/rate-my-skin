@@ -641,9 +641,7 @@ export default function BeautyReport({ data, isPaid, onUnlock }) {
                       boxShadow: "0 4px 12px rgba(168, 116, 73, 0.05)"
                     }}
                   >
-                    {showAllFree
-                      ? (lang === 'fr' ? 'Voir moins' : 'See less')
-                      : (lang === 'fr' ? 'Voir plus' : 'See more')}
+                    {showAllFree ? t('seeLess') : t('seeMore')}
                     <span style={{ fontSize: 9 }}>{showAllFree ? '▲' : '▼'}</span>
                   </button>
                 </div>
