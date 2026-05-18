@@ -47,19 +47,93 @@ export default function Report() {
   useEffect(() => {
     // 1. Read from sessionStorage
     const stored = sessionStorage.getItem('rms_report');
-    if (!stored) { setNotFound(true); return; }
-    try {
-      setData(JSON.parse(stored));
-    } catch {
-      setNotFound(true);
-      return;
+
+    // In local development, if no report exists, inject a beautiful mock paid report!
+    if (!stored && process.env.NODE_ENV === 'development') {
+      const mockReport = {
+        overall: 82,
+        summary: "Mild dehydration and periorbital hyperpigmentation are the dominant findings in this analysis.",
+        faceShape: "Oval",
+        eyeColor: "Hazel Brown",
+        skinTone: "Type III — Medium Beige",
+        free_version: {
+          mainProblems: [
+            { title: "Dehydration", description: "Clinical signs of moisture depletion in the epidermal layer.", severity: "mild" },
+            { title: "Periorbital Hyperpigmentation", description: "Dark circles observed under the eyes.", severity: "moderate" },
+            { title: "Sebum Production", description: "Slight shininess in the T-zone area.", severity: "mild" }
+          ],
+          basicSummary: "Your skin shows high overall resilience, with mild indicators of moisture loss."
+        },
+        paid_version: {
+          metrics: [
+            { label: "Hydration", score: 85, grade: "B", detail: "Optimal barrier function, minor dry lines on the forehead." },
+            { label: "Pores", score: 79, grade: "B", detail: "Sebaceous activity is within normal limits; minor visible pores." },
+            { label: "Radiance", score: 88, grade: "A", detail: "Excellent cellular turnover; luminous skin surface reflection." },
+            { label: "Acne", score: 92, grade: "A", detail: "No active comedones or inflammatory lesions detected." },
+            { label: "Dark Spots", score: 74, grade: "C", detail: "Slight sun spots on cheeks and hyperpigmentation." },
+            { label: "Under-Eye", score: 68, grade: "D", detail: "Mild structural pooling under orbit, visible periorbital hyperpigmentation." },
+            { label: "Symmetry", score: 85, grade: "B", detail: "Highly harmonious facial alignment; minor structural variance." },
+            { label: "Harmony", score: 90, grade: "A", detail: "Perfect spatial relationship between golden ratios." }
+          ],
+          strengths: [
+            { title: "Cellular Radiance", desc: "Luminous skin texture showing highly effective cellular turnover." },
+            { title: "Blemish Resilience", desc: "Clean skin canvas with zero active inflammatory lesions." }
+          ],
+          improvements: [
+            { title: "Orbital Hydration", desc: "Targeted active topical hydration to correct structural shadow pooling." },
+            { title: "Pigment Moderation", desc: "Antioxidant protection to prevent ultraviolet-induced spots." }
+          ],
+          routine: {
+            morning: [
+              "Cleanse with a mild, pH-balanced cleanser.",
+              "Apply Vitamin C Serum for antioxidant defence.",
+              "Use SPF 50+ broad-spectrum sunscreen."
+            ],
+            evening: [
+              "Double cleanse to remove pollution.",
+              "Apply Retinol 0.3% to boost cellular turnover.",
+              "Use a ceramide-rich barrier support cream."
+            ],
+            weekly: [
+              "AHA/BHA exfoliant twice a week to refine texture.",
+              "Soothing hydration mask once a week."
+            ]
+          },
+          productRecommendations: [
+            {
+              skinProblem: "Under-Eye Hyperpigmentation",
+              productName: "CeraVe Eye Repair Cream",
+              description: "Formulated with ceramides and hyaluronic acid to target structural dehydration lines and protect the orbital area.",
+              amazonLink: "https://www.amazon.fr/s?k=CeraVe+Eye+Repair+Cream&tag=ratemyskin-21",
+              sephoraLink: "https://www.sephora.fr/search/?q=CeraVe+Eye+Repair+Cream",
+              price: "€14.50",
+              imageUrl: "https://images.unsplash.com/photo-1608248597481-496100c80836?q=80&w=200&auto=format&fit=crop"
+            }
+          ]
+        }
+      };
+      setData(mockReport);
+      setIsPaid(true);
+    } else {
+      if (!stored) { setNotFound(true); return; }
+      try {
+        setData(JSON.parse(stored));
+      } catch {
+        setNotFound(true);
+        return;
+      }
     }
 
     const storedAnalysisId = sessionStorage.getItem('rms_analysis_id');
     if (storedAnalysisId) setAnalysisId(storedAnalysisId);
 
     const storedIsPaid = sessionStorage.getItem('rms_is_paid');
-    if (storedIsPaid === 'true') setIsPaid(true);
+    if (storedIsPaid === 'true') {
+      setIsPaid(true);
+    } else if (process.env.NODE_ENV === 'development') {
+      // In local development, always force paid state so the whole page is fully unlocked!
+      setIsPaid(true);
+    }
 
     // 2. Fetch identity + paid_unlocks
     fetch('/api/identity')
