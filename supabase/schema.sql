@@ -58,6 +58,10 @@ CREATE POLICY IF NOT EXISTS "service_role_analyses_all"
   USING (true)
   WITH CHECK (true);
 
+-- ── My Reports: add email column to analyses ─────────────────────────────────
+ALTER TABLE public.analyses ADD COLUMN IF NOT EXISTS email text;
+CREATE INDEX IF NOT EXISTS analyses_email_idx ON public.analyses (email) WHERE email IS NOT NULL;
+
 -- ── FK safety: drop the FK constraint on analyses.user_id ────────────────────
 -- This prevents a failed user-row insert from cascading into a failed
 -- analysis insert. analyses.user_id remains a text column; we just lose

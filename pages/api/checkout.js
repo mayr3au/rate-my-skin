@@ -1,11 +1,13 @@
 import Stripe from 'stripe';
+import { createAdminClient } from '../../lib/supabase';
+import { validateEmail } from '../../lib/security';
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).end();
 
-  const { userId, analysisId, planId } = req.body;
+  const { userId, analysisId, planId, email } = req.body;
 
   if (!userId) return res.status(400).json({ error: 'Missing userId.' });
   if (!analysisId) return res.status(400).json({ error: 'Missing analysisId.' });
@@ -16,6 +18,19 @@ export default async function handler(req, res) {
     ? '5 Full Skin Reports — Rate My Skin'
     : '1 Full Skin Report — Rate My Skin';
   const product_type = isPack ? 'five_analyses' : 'single_analysis';
+
+  // Save email to the analysis row so it's retrievable via /mes-rapports
+  if (email && validateEmail(email) && analysisId) {
+    try {
+      const supabase = createAdminClient();
+      await supabase
+        .from('analyses')
+        .update({ email: email.trim().toLowerCase() })
+        .eq('id', analysisId);
+    } catch (err) {
+      console.error('[checkout] failed to save email to analysis:', err.message);
+    }
+  }
 
   const origin = `https://${req.headers.host}`;
 

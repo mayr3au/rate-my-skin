@@ -130,7 +130,8 @@ export default async function handler(req, res) {
         console.error('[webhook] ❌ could not fetch user:', fetchUserErr.message, '| code:', fetchUserErr.code);
         console.warn('[webhook]   user credits NOT updated, but analysis was already marked paid above');
       } else {
-        const unlocksToAdd = product_type === 'five_analyses' ? 5 : 1;
+        // Current analysis is already unlocked by step 1 above, so credits cover the *remaining* reports
+        const unlocksToAdd = product_type === 'five_analyses' ? 4 : 0;
         const newUnlocks = (user.paid_unlocks || 0) + unlocksToAdd;
         console.log('[webhook]   paid_unlocks:', user.paid_unlocks, '→', newUnlocks);
 

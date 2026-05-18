@@ -110,11 +110,12 @@ export default function Report() {
   // 4. handleUnlock: calls checkout, redirects to Stripe
   const handleUnlock = async (planId) => {
     if (!userId || !analysisId) return;
+    const email = typeof window !== 'undefined' ? (localStorage.getItem('rms_email') || '') : '';
     try {
       const res = await fetch('/api/checkout', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ userId, analysisId, planId }),
+        body: JSON.stringify({ userId, analysisId, planId, email }),
       });
       const { url, error: err } = await res.json();
       if (err) throw new Error(err);
@@ -201,6 +202,17 @@ export default function Report() {
             </div>
           )}
           <LangToggle />
+          <button
+            onClick={() => router.push('/mes-rapports')}
+            style={{
+              background: 'none', border: 'none',
+              padding: '9px 4px', fontSize: 12, color: '#888', cursor: 'pointer',
+              fontFamily: "'DM Sans', sans-serif", fontWeight: 500,
+              letterSpacing: '0.02em',
+            }}
+          >
+            {t('myReportsNav')}
+          </button>
           <button
             onClick={() => router.push('/')}
             style={{

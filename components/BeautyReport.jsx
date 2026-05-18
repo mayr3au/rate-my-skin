@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useLang } from "../lib/LangContext";
+import { shareScore } from "../lib/shareImage";
 
 const GOLD = "#A87449";
 const CARD = { background: "#fff", border: "1px solid rgba(212,165,116,0.18)", borderRadius: 20, boxShadow: "0 4px 20px rgba(168,116,73,0.05)" };
@@ -353,6 +354,26 @@ export default function BeautyReport({ data, isPaid, onUnlock }) {
   const [activeTab, setActiveTab] = useState("analysis");
   const [unlocking, setUnlocking] = useState(false);
   const [previewTab, setPreviewTab] = useState(0);
+  const [sharing, setSharing] = useState(false);
+  const [shareMsg, setShareMsg] = useState("");
+
+  const handleShare = async () => {
+    setSharing(true);
+    setShareMsg("");
+    try {
+      const result = await shareScore(data, lang);
+      if (result === "downloaded") {
+        setShareMsg(lang === "fr" ? "Image téléchargée — partagez-la sur Instagram ou TikTok !" : "Image downloaded — share it on Instagram or TikTok!");
+        setTimeout(() => setShareMsg(""), 4000);
+      }
+    } catch (err) {
+      console.error("[share]", err.message);
+      setShareMsg(lang === "fr" ? "Impossible de générer l'image." : "Could not generate image.");
+      setTimeout(() => setShareMsg(""), 3000);
+    } finally {
+      setSharing(false);
+    }
+  };
 
   if (!data) {
     return (
@@ -478,6 +499,31 @@ export default function BeautyReport({ data, isPaid, onUnlock }) {
               {lang === "fr" ? "Paiement unique · Sans abonnement" : "One-time payment · No subscription"}
             </p>
           </div>
+        </div>
+
+        {/* ── Share button (free view) ── */}
+        <div style={{ maxWidth: 680, margin: "24px auto 0", padding: "0 20px" }}>
+          <button
+            onClick={handleShare}
+            disabled={sharing}
+            style={{
+              width: "100%", padding: "14px", borderRadius: 14,
+              background: sharing ? "rgba(44,36,29,0.06)" : "linear-gradient(145deg, #2C241D, #3A2E26)",
+              color: sharing ? "#B9AC9E" : "#F2E8DC",
+              border: "none", cursor: sharing ? "wait" : "pointer",
+              fontSize: 13, fontWeight: 600, letterSpacing: "0.04em",
+              fontFamily: "'DM Sans', sans-serif",
+              display: "flex", alignItems: "center", justifyContent: "center", gap: 10,
+              boxShadow: sharing ? "none" : "0 6px 20px rgba(44,36,29,0.16)",
+              transition: "all 0.2s",
+            }}
+          >
+            {sharing
+              ? <><span style={{ display: "inline-block", width: 12, height: 12, border: "2px solid rgba(185,172,158,0.35)", borderTopColor: "#B9AC9E", borderRadius: "50%", animation: "spin 0.7s linear infinite" }}/>{lang === "fr" ? "Génération de l'image…" : "Generating image…"}</>
+              : <>{lang === "fr" ? "Partager mon score" : "Share My Score"}<span style={{ fontSize: 11, opacity: 0.6, fontWeight: 400 }}>· Instagram / TikTok</span></>
+            }
+          </button>
+          {shareMsg && <p style={{ margin: "10px 0 0", fontSize: 12, color: "#A87449", textAlign: "center", fontFamily: "'DM Sans', sans-serif" }}>{shareMsg}</p>}
         </div>
 
         {/* ── Clickable tab preview bar ── */}
@@ -688,15 +734,60 @@ export default function BeautyReport({ data, isPaid, onUnlock }) {
           )}
         </div>
 
-        {/* ── Share CTA ── */}
-        <div style={{ background: "linear-gradient(145deg, #2C241D 0%, #3A2E26 100%)", borderRadius: 18, padding: "20px 24px", marginTop: 20, display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 14, boxShadow: "0 8px 28px rgba(44,36,29,0.18)" }}>
-          <div>
-            <p style={{ margin: 0, fontSize: 13, color: "#fff", fontWeight: 600, letterSpacing: "0.03em", fontFamily: "'DM Sans', sans-serif" }}>{t('shareScore')}</p>
-            <p style={{ margin: "3px 0 0", fontSize: 11, color: "rgba(185,172,158,0.8)", letterSpacing: "0.06em", fontFamily: "'DM Sans', sans-serif" }}>ratemyskin.ai</p>
+        {/* ── Share CTA (paid view) ── */}
+        <div style={{
+          background: "linear-gradient(145deg, #1E1810 0%, #2C241D 60%, #201A13 100%)",
+          borderRadius: 20, padding: "28px 24px", marginTop: 20,
+          border: "1px solid rgba(212,165,116,0.1)",
+          boxShadow: "0 12px 40px rgba(0,0,0,0.25)",
+          textAlign: "center",
+        }}>
+          <p style={{ margin: "0 0 6px", fontSize: 9, letterSpacing: "0.22em", textTransform: "uppercase", color: "rgba(212,165,116,0.5)", fontFamily: "'DM Sans', sans-serif", fontWeight: 600 }}>
+            {lang === "fr" ? "PARTAGEZ VOS RÉSULTATS" : "SHARE YOUR RESULTS"}
+          </p>
+          <h3 style={{ margin: "0 0 6px", fontFamily: "'Cormorant Garamond', serif", fontSize: 26, fontWeight: 300, color: "#F2E8DC", lineHeight: 1.2 }}>
+            {lang === "fr" ? `Votre score : ${overall}/100` : `Your Score: ${overall}/100`}
+          </h3>
+          <p style={{ margin: "0 0 20px", fontSize: 12, color: "rgba(185,172,158,0.6)", fontFamily: "'DM Sans', sans-serif", lineHeight: 1.6 }}>
+            {lang === "fr" ? "Génère une image 1080×1920 pour Instagram Stories & TikTok" : "Generates a 1080×1920 card for Instagram Stories & TikTok"}
+          </p>
+          <div style={{ display: "flex", gap: 10, justifyContent: "center", flexWrap: "wrap" }}>
+            <button
+              onClick={handleShare}
+              disabled={sharing}
+              style={{
+                background: sharing ? "rgba(255,255,255,0.07)" : "rgba(255,255,255,0.95)",
+                color: sharing ? "rgba(255,255,255,0.35)" : "#2C241D",
+                border: "none", borderRadius: 10, padding: "12px 26px",
+                fontSize: 13, fontWeight: 600, cursor: sharing ? "wait" : "pointer",
+                letterSpacing: "0.04em", fontFamily: "'DM Sans', sans-serif",
+                boxShadow: sharing ? "none" : "0 3px 14px rgba(0,0,0,0.18)",
+                transition: "all 0.2s",
+                display: "flex", alignItems: "center", gap: 8,
+              }}
+            >
+              {sharing
+                ? <><span style={{ display: "inline-block", width: 12, height: 12, border: "2px solid rgba(255,255,255,0.25)", borderTopColor: "rgba(255,255,255,0.7)", borderRadius: "50%", animation: "spin 0.7s linear infinite" }}/>{lang === "fr" ? "Génération…" : "Generating…"}</>
+                : t("shareScore")
+              }
+            </button>
+            <button
+              onClick={() => navigator.clipboard?.writeText(t("shareText", overall))}
+              style={{
+                background: "transparent", color: "rgba(185,172,158,0.75)",
+                border: "1px solid rgba(185,172,158,0.2)", borderRadius: 10, padding: "12px 20px",
+                fontSize: 12, fontWeight: 500, cursor: "pointer",
+                fontFamily: "'DM Sans', sans-serif",
+              }}
+            >
+              {t("copyShare")}
+            </button>
           </div>
-          <button onClick={() => navigator.clipboard?.writeText(t('shareText', overall))} style={{ background: "rgba(255,255,255,0.95)", color: "#2C241D", border: "none", borderRadius: 10, padding: "10px 22px", fontSize: 12, fontWeight: 600, cursor: "pointer", letterSpacing: "0.05em", fontFamily: "'DM Sans', sans-serif", boxShadow: "0 2px 10px rgba(0,0,0,0.12)" }}>
-            {t('copyShare')}
-          </button>
+          {shareMsg && (
+            <p style={{ margin: "12px 0 0", fontSize: 12, color: "rgba(212,165,116,0.85)", fontFamily: "'DM Sans', sans-serif", lineHeight: 1.5 }}>
+              {shareMsg}
+            </p>
+          )}
         </div>
 
         <div style={{ marginTop: 20, padding: "0 4px" }}>
