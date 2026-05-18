@@ -66,70 +66,90 @@ export default async function handler(req, res) {
     const product_type = session.metadata?.product_type;
     const paymentStatus = session.payment_status;
 
-    console.log('[webhook] checkout.session.completed');
-    console.log('[webhook]   userId:', userId);
-    console.log('[webhook]   analysisId:', analysisId);
+    console.log('[webhook] checkout.session.completed ——————————————');
+    console.log('[webhook]   session.id:', session.id);
+    console.log('[webhook]   userId (client_reference_id):', userId || 'NULL ⚠️');
+    console.log('[webhook]   analysisId (metadata):', analysisId || 'NULL ⚠️');
     console.log('[webhook]   product_type:', product_type);
     console.log('[webhook]   payment_status:', paymentStatus);
 
-    // Only process fully paid sessions
     if (paymentStatus !== 'paid') {
       console.warn('[webhook] payment_status is not "paid":', paymentStatus, '— skipping');
       return res.status(200).json({ received: true });
     }
 
-    if (!userId) {
-      console.error('[webhook] no client_reference_id on session — cannot credit user');
-      return res.status(200).json({ received: true });
-    }
-
     const supabase = createAdminClient();
 
-    // ── 1. Update user paid_unlocks ──
-    const { data: user, error: fetchError } = await supabase
-      .from('users')
-      .select('paid_unlocks')
-      .eq('id', userId)
-      .single();
-
-    if (fetchError) {
-      console.error('[webhook] failed to fetch user:', fetchError.message, '| code:', fetchError.code);
-      return res.status(200).json({ received: true });
-    }
-
-    const unlocksToAdd = product_type === 'five_analyses' ? 5 : 1;
-    const newUnlocks = (user.paid_unlocks || 0) + unlocksToAdd;
-
-    console.log('[webhook] user paid_unlocks:', user.paid_unlocks, '→', newUnlocks);
-
-    const { error: updateError } = await supabase
-      .from('users')
-      .update({ paid_unlocks: newUnlocks, updated_at: new Date().toISOString() })
-      .eq('id', userId);
-
-    if (updateError) {
-      console.error('[webhook] ❌ failed to update paid_unlocks:', updateError.message);
-    } else {
-      console.log('[webhook] ✅ paid_unlocks updated to', newUnlocks, 'for user:', userId);
-    }
-
-    // ── 2. Mark analysis as paid ──
+    // ── 1. Mark analysis as paid (CRITICAL — runs regardless of user state) ──
     if (analysisId) {
-      const { data: updatedRow, error: analysisError } = await supabase
+      console.log('[webhook] Step 1: fetching analysis row id:', analysisId);
+
+      const { data: existingAnalysis, error: fetchAnalysisErr } = await supabase
+        .from('analyses')
+        .select('id, is_paid, user_id')
+        .eq('id', analysisId)
+        .single();
+
+      if (fetchAnalysisErr) {
+        console.error('[webhook] ❌ could not fetch analysis:', fetchAnalysisErr.message, '| code:', fetchAnalysisErr.code);
+      } else {
+        console.log('[webhook]   found analysis:', existingAnalysis);
+      }
+
+      console.log('[webhook] Step 1: running UPDATE analyses SET is_paid=true WHERE id=', analysisId);
+      const { data: updatedRow, error: analysisUpdateErr } = await supabase
         .from('analyses')
         .update({ is_paid: true })
         .eq('id', analysisId)
         .select('id, is_paid')
         .single();
 
-      if (analysisError) {
-        console.error('[webhook] ❌ failed to mark analysis as paid:', analysisError.message, '| code:', analysisError.code);
+      if (analysisUpdateErr) {
+        console.error('[webhook] ❌ analysis update failed:', analysisUpdateErr.message,
+          '| code:', analysisUpdateErr.code,
+          '| details:', analysisUpdateErr.details,
+          '| hint:', analysisUpdateErr.hint);
       } else {
-        console.log('[webhook] ✅ analysis marked as paid:', updatedRow);
+        console.log('[webhook] ✅ analysis is_paid set to TRUE:', updatedRow);
       }
     } else {
-      console.warn('[webhook] no analysisId in metadata — analyses table not updated');
+      console.error('[webhook] ❌ analysisId missing from Stripe metadata — cannot mark analysis as paid');
     }
+
+    // ── 2. Credit user paid_unlocks (best-effort — failure does NOT block step 1) ──
+    if (userId) {
+      console.log('[webhook] Step 2: crediting paid_unlocks for user:', userId);
+
+      const { data: user, error: fetchUserErr } = await supabase
+        .from('users')
+        .select('paid_unlocks')
+        .eq('id', userId)
+        .single();
+
+      if (fetchUserErr) {
+        console.error('[webhook] ❌ could not fetch user:', fetchUserErr.message, '| code:', fetchUserErr.code);
+        console.warn('[webhook]   user credits NOT updated, but analysis was already marked paid above');
+      } else {
+        const unlocksToAdd = product_type === 'five_analyses' ? 5 : 1;
+        const newUnlocks = (user.paid_unlocks || 0) + unlocksToAdd;
+        console.log('[webhook]   paid_unlocks:', user.paid_unlocks, '→', newUnlocks);
+
+        const { error: updateUserErr } = await supabase
+          .from('users')
+          .update({ paid_unlocks: newUnlocks, updated_at: new Date().toISOString() })
+          .eq('id', userId);
+
+        if (updateUserErr) {
+          console.error('[webhook] ❌ failed to update paid_unlocks:', updateUserErr.message);
+        } else {
+          console.log('[webhook] ✅ paid_unlocks updated to', newUnlocks);
+        }
+      }
+    } else {
+      console.warn('[webhook] no client_reference_id — user credits not updated');
+    }
+
+    console.log('[webhook] ————————————————————————————————————————');
 
   } else {
     console.log('[webhook] ignoring event type:', event.type);
