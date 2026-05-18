@@ -422,6 +422,9 @@ body::before {
 
   /* Score hero: compact margin */
   .rpt-score-hero { margin-bottom: 16px !important; }
+
+  /* Home upload buttons: smaller text + padding so they fit side by side */
+  .home-upload-btn { font-size: 11.5px !important; padding: 10px 16px !important; letter-spacing: 0.01em !important; }
 }
 
 /* ── Premium Apple Liquid Glass Buttons ── */

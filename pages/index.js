@@ -492,17 +492,17 @@ export default function Home() {
                 <p style={{ margin: '16px 0 0', fontSize: 11, color: '#CBAA8D', letterSpacing: '0.08em', textTransform: 'uppercase', fontFamily: "'DM Sans', sans-serif" }}>
                   {t('or')}
                 </p>
-                <div style={{ display: 'flex', gap: 10, justifyContent: 'center', marginTop: 14, flexWrap: 'wrap' }}>
+                <div style={{ display: 'flex', gap: 8, justifyContent: 'center', marginTop: 14, flexWrap: 'wrap' }}>
                   <button
                     onClick={(e) => { e.stopPropagation(); fileInputRef.current?.click(); }}
-                    className="btn-liquid-glass-dark"
+                    className="btn-liquid-glass-dark home-upload-btn"
                     style={{ border: 'none' }}
                   >
                     {t('uploadPhoto')}
                   </button>
                   <button
                     onClick={(e) => { e.stopPropagation(); startCamera(); }}
-                    className="btn-liquid-glass"
+                    className="btn-liquid-glass home-upload-btn"
                     style={{ border: 'none' }}
                   >
                     {t('takeASelfie')}
