@@ -41,7 +41,7 @@ Respond ONLY with RAW JSON (no markdown, no code blocks). Return EXACTLY this st
   "overall": <integer 0-100>,
   "summary": "<1 authoritative sentence describing the primary clinical finding visible in the photo, e.g. 'Periorbital hyperpigmentation and mild sebaceous hyperactivity are the dominant findings in this analysis.'>",
   "faceShape": "<clinical descriptor, e.g. 'Oval', 'Square', 'Heart'>",
-  "eyeColor": "<colour>",
+  "skinType": "<Dermatological skin type inferred from photo: 'Normal', 'Dry', 'Oily', 'Combination', or 'Sensitive'>",
   "skinTone": "<Fitzpatrick scale + descriptor, e.g. 'Type III — Medium Beige'>",
   "free_version": {
     "mainProblems": [
@@ -162,11 +162,13 @@ export default async function handler(req, res) {
         role: 'user',
         content: [
           { type: 'image', source: { type: 'base64', media_type: mimeType, data: imageBase64 } },
-          { type: 'text', text: `Additional Context (secondary only, use to inform clinical rationale but never override visual evidence):
+          {
+            type: 'text', text: `Additional Context (secondary only, use to inform clinical rationale but never override visual evidence):
 - Stated concern: ${skinConcern || 'None'}
 - Age: ${age || 'Unknown'}
 - Climate/Environment: ${climate || 'Unknown'}
-- Allergies/Sensitivities: ${allergies || 'None'}` },
+- Allergies/Sensitivities: ${allergies || 'None'}`
+          },
         ]
       }]
     });

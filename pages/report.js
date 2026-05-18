@@ -54,7 +54,7 @@ export default function Report() {
         overall: 82,
         summary: "Mild dehydration and periorbital hyperpigmentation are the dominant findings in this analysis.",
         faceShape: "Oval",
-        eyeColor: "Hazel Brown",
+        skinType: "Combination",
         skinTone: "Type III — Medium Beige",
         free_version: {
           mainProblems: [
@@ -113,7 +113,8 @@ export default function Report() {
         }
       };
       setData(mockReport);
-      setIsPaid(true);
+      const urlParams = new URLSearchParams(window.location.search);
+      setIsPaid(urlParams.get('paid') === 'true');
     } else {
       if (!stored) { setNotFound(true); return; }
       try {
@@ -131,8 +132,8 @@ export default function Report() {
     if (storedIsPaid === 'true') {
       setIsPaid(true);
     } else if (process.env.NODE_ENV === 'development') {
-      // In local development, always force paid state so the whole page is fully unlocked!
-      setIsPaid(true);
+      const urlParams = new URLSearchParams(window.location.search);
+      setIsPaid(urlParams.get('paid') === 'true');
     }
 
     // 2. Fetch identity + paid_unlocks
@@ -142,7 +143,7 @@ export default function Report() {
         setUserId(uid);
         if (unlocks > 0) setPaidUnlocks(unlocks);
       })
-      .catch(() => {});
+      .catch(() => { });
   }, []);
 
   // 3. Handle payment=success query param
@@ -169,7 +170,7 @@ export default function Report() {
           setCheckingPayment(false);
           return;
         }
-      } catch {}
+      } catch { }
       attempts++;
       if (attempts < 10) {
         setTimeout(poll, 2000);
@@ -244,7 +245,7 @@ export default function Report() {
             width: 32, height: 32,
             border: '2px solid #0d0d0d', borderTopColor: 'transparent',
             borderRadius: '50%', animation: 'spin 0.7s linear infinite',
-          }}/>
+          }} />
           <p style={{ fontSize: 14, color: '#0d0d0d' }}>{t('checkingPayment')}</p>
         </div>
       )}

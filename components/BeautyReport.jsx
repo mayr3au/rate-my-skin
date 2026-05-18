@@ -2,27 +2,105 @@ import { useState, useEffect } from "react";
 import { useLang } from "../lib/LangContext";
 import { shareScore } from "../lib/shareImage";
 
-const GOLD = "#A87449";
+const GOLD = "#C5A028";
 const CARD = {
-  background: "linear-gradient(135deg, rgba(255, 255, 255, 0.72) 0%, rgba(253, 246, 237, 0.48) 50%, rgba(246, 235, 222, 0.72) 100%)",
-  backdropFilter: "blur(25px) saturate(150%)",
-  WebkitBackdropFilter: "blur(25px) saturate(150%)",
-  border: "1px solid rgba(255, 255, 255, 0.75)",
+  background: "rgba(255, 255, 255, 0.55)",
+  backdropFilter: "blur(20px) saturate(150%)",
+  WebkitBackdropFilter: "blur(20px) saturate(150%)",
+  border: "1px solid rgba(255, 255, 255, 0.65)",
   borderRadius: 20,
-  boxShadow: "0 8px 32px rgba(168, 116, 73, 0.03), inset 0 1px 0 0 rgba(255, 255, 255, 0.75)",
+  boxShadow: "0 8px 32px rgba(168, 116, 73, 0.03), inset 0 1px 0 rgba(255, 255, 255, 0.9)",
   transition: "all 0.5s cubic-bezier(0.16, 1, 0.3, 1)"
 };
-const LABEL_STYLE = { margin: "0 0 4px", fontSize: 9.5, letterSpacing: "0.22em", textTransform: "uppercase", color: "#B9AC9E", fontWeight: 600, fontFamily: "'DM Sans', sans-serif" };
-const TITLE_STYLE = { margin: "0 0 16px", fontSize: 22, fontWeight: 300, fontFamily: "'Cormorant Garamond', serif", color: "#2C241D" };
+const LABEL_STYLE = { margin: "0 0 4px", fontSize: 9.5, letterSpacing: "0.22em", textTransform: "uppercase", color: "#B0885E", fontWeight: 600, fontFamily: "'DM Sans', sans-serif" };
+const TITLE_STYLE = { margin: "0 0 16px", fontSize: 22, fontWeight: 300, fontFamily: "'Cormorant Garamond', serif", color: "#3A2E26" };
 
 const ICONS = ["✦", "◈", "◉", "▲", "◆", "●"];
 
+// Helper to solve cubic-bezier(x1, y1, x2, y2) at progress t
+function solveCubicBezier(x1, y1, x2, y2, t) {
+  const cx = 3.0 * x1;
+  const bx = 3.0 * (x2 - x1) - cx;
+  const ax = 1.0 - cx - bx;
+
+  const cy = 3.0 * y1;
+  const by = 3.0 * (y2 - y1) - cy;
+  const ay = 1.0 - cy - by;
+
+  function sampleCurveX(tVal) {
+    return ((ax * tVal + bx) * tVal + cx) * tVal;
+  }
+  function sampleCurveY(tVal) {
+    return ((ay * tVal + by) * tVal + cy) * tVal;
+  }
+  function sampleCurveDerivativeX(tVal) {
+    return (3.0 * ax * tVal + 2.0 * bx) * tVal + cx;
+  }
+
+  let x = t;
+  let tFound = t;
+  for (let i = 0; i < 8; i++) {
+    const xEst = sampleCurveX(tFound) - x;
+    if (Math.abs(xEst) < 1e-4) break;
+    const dX = sampleCurveDerivativeX(tFound);
+    if (Math.abs(dX) < 1e-3) break;
+    tFound -= xEst / dX;
+  }
+  return sampleCurveY(tFound);
+}
+
 /* ══ Score hero card — dark tech panel ══════════════════════════════════ */
-function ScoreHeroCard({ score, summary, faceShape, eyeColor, skinTone, badge, miniMetrics, t, lang }) {
+function ScoreHeroCard({ score, summary, faceShape, skinType, skinTone, badge, miniMetrics, t, lang }) {
   const [animated, setAnimated] = useState(0);
+  const [displayScore, setDisplayScore] = useState(1);
+
+  // Helper to translate trait values automatically in French
+  const getTranslatedValue = (val) => {
+    if (!val) return "";
+    if (lang === 'fr') {
+      const lower = val.toLowerCase().trim();
+      if (lower.includes('combination to oily') || lower.includes('combination') || lower === 'mixte à grasse') return 'Mixte à Grasse';
+      if (lower.includes('oval') || lower === 'ovale') return 'Ovale';
+      if (lower.includes('medium beige') || lower.includes('type iii')) return 'Type III — Beige Moyen';
+      if (lower.includes('dry') || lower === 'sèche') return 'Peau Sèche';
+      if (lower.includes('oily') || lower === 'grasse') return 'Peau Grasse';
+      if (lower.includes('sensitive') || lower === 'sensible') return 'Peau Sensible';
+      if (lower.includes('normal')) return 'Peau Normale';
+    }
+    return val;
+  };
+
   useEffect(() => {
-    const timer = setTimeout(() => setAnimated(score), 220);
-    return () => clearTimeout(timer);
+    let startTimestamp = null;
+    const duration = 2000; // 2 seconds, perfectly in sync with the visual weight
+    let animationFrameId;
+
+    const step = (timestamp) => {
+      if (!startTimestamp) startTimestamp = timestamp;
+      const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+
+      // Calculate eased progress matching the exact cubic-bezier curve
+      const easeProgress = solveCubicBezier(0.4, 0, 0.2, 1, progress);
+
+      const currentRingVal = score * easeProgress;
+      const currentScoreVal = Math.round(1 + (score - 1) * easeProgress);
+
+      setAnimated(currentRingVal);
+      setDisplayScore(currentScoreVal);
+
+      if (progress < 1) {
+        animationFrameId = requestAnimationFrame(step);
+      }
+    };
+
+    const delayTimer = setTimeout(() => {
+      animationFrameId = requestAnimationFrame(step);
+    }, 220);
+
+    return () => {
+      clearTimeout(delayTimer);
+      cancelAnimationFrame(animationFrameId);
+    };
   }, [score]);
 
   const SIZE = 156;
@@ -30,43 +108,64 @@ function ScoreHeroCard({ score, summary, faceShape, eyeColor, skinTone, badge, m
   const circ = 2 * Math.PI * r;
   const dash = (animated / 100) * circ;
   const statusLabel = score >= 78 ? t("scoreExcellent") : score >= 65 ? t("scoreGood") : t("scoreNeedsWork");
-  const arcColor = score >= 78 ? "#D4A574" : score >= 65 ? "#A87449" : "#8C7A6B";
+  const arcColor = score >= 78 ? "#C5A028" : score >= 65 ? "#A87449" : "#8C7A6B";
 
   return (
     <div style={{
-      background: "linear-gradient(150deg, #1E1810 0%, #2C241D 55%, #201A13 100%)",
-      borderRadius: 24, marginBottom: 16, position: "relative", overflow: "hidden",
-      boxShadow: "0 24px 64px rgba(0,0,0,0.3), 0 0 0 1px rgba(212,165,116,0.1)",
+      background: "linear-gradient(135deg, rgba(255,255,255,0.84) 0%, rgba(253,246,237,0.68) 50%, rgba(246,235,222,0.84) 100%)",
+      backdropFilter: "blur(32px) saturate(170%)",
+      WebkitBackdropFilter: "blur(32px) saturate(170%)",
+      borderRadius: 28, marginBottom: 24, position: "relative", overflow: "hidden",
+      border: "1px solid rgba(255,255,255,0.9)",
+      boxShadow: [
+        "0 2px 0 rgba(255,255,255,0.95)",
+        "0 6px 12px rgba(168,116,73,0.10)",
+        "0 18px 40px rgba(140,90,50,0.18)",
+        "0 40px 80px rgba(100,60,30,0.14)",
+        "0 70px 120px rgba(80,45,15,0.08)",
+        "inset 0 1px 0 rgba(255,255,255,0.98)",
+        "inset 0 -1px 0 rgba(168,116,73,0.06)",
+      ].join(", "),
+      transform: "translateY(-4px)",
       padding: "clamp(20px,5vw,32px)",
     }}>
-      {/* Radial glow behind ring */}
-      <div style={{ position: "absolute", inset: 0, pointerEvents: "none",
-        background: "radial-gradient(ellipse 55% 60% at 50% 38%, rgba(168,116,73,0.18) 0%, transparent 68%)" }}/>
 
       {/* Corner bracket — top-left */}
-      <div style={{ position: "absolute", top: 14, left: 14, width: 18, height: 18,
-        borderTop: "1.5px solid rgba(212,165,116,0.35)", borderLeft: "1.5px solid rgba(212,165,116,0.35)", pointerEvents: "none" }}/>
+      <div style={{
+        position: "absolute", top: 14, left: 14, width: 18, height: 18,
+        borderTop: "1.5px solid rgba(168,116,73,0.2)", borderLeft: "1.5px solid rgba(168,116,73,0.2)", pointerEvents: "none"
+      }} />
       {/* Corner bracket — top-right */}
-      <div style={{ position: "absolute", top: 14, right: 14, width: 18, height: 18,
-        borderTop: "1.5px solid rgba(212,165,116,0.35)", borderRight: "1.5px solid rgba(212,165,116,0.35)", pointerEvents: "none" }}/>
+      <div style={{
+        position: "absolute", top: 14, right: 14, width: 18, height: 18,
+        borderTop: "1.5px solid rgba(168,116,73,0.2)", borderRight: "1.5px solid rgba(168,116,73,0.2)", pointerEvents: "none"
+      }} />
       {/* Corner bracket — bottom-left */}
-      <div style={{ position: "absolute", bottom: 14, left: 14, width: 18, height: 18,
-        borderBottom: "1.5px solid rgba(212,165,116,0.35)", borderLeft: "1.5px solid rgba(212,165,116,0.35)", pointerEvents: "none" }}/>
+      <div style={{
+        position: "absolute", bottom: 14, left: 14, width: 18, height: 18,
+        borderBottom: "1.5px solid rgba(168,116,73,0.2)", borderLeft: "1.5px solid rgba(168,116,73,0.2)", pointerEvents: "none"
+      }} />
       {/* Corner bracket — bottom-right */}
-      <div style={{ position: "absolute", bottom: 14, right: 14, width: 18, height: 18,
-        borderBottom: "1.5px solid rgba(212,165,116,0.35)", borderRight: "1.5px solid rgba(212,165,116,0.35)", pointerEvents: "none" }}/>
+      <div style={{
+        position: "absolute", bottom: 14, right: 14, width: 18, height: 18,
+        borderBottom: "1.5px solid rgba(168,116,73,0.2)", borderRight: "1.5px solid rgba(168,116,73,0.2)", pointerEvents: "none"
+      }} />
 
       {/* Top label row */}
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 18, position: "relative" }}>
-        <p style={{ margin: 0, fontSize: 8.5, fontWeight: 700, letterSpacing: "0.26em", textTransform: "uppercase",
-          color: "rgba(212,165,116,0.55)", fontFamily: "'DM Sans', sans-serif" }}>
+        <p style={{
+          margin: 0, fontSize: 8.5, fontWeight: 700, letterSpacing: "0.26em", textTransform: "uppercase",
+          color: "#B0885E", fontFamily: "'DM Sans', sans-serif"
+        }}>
           {t("overallScore")}
         </p>
         {badge && (
-          <span style={{ fontSize: 7.5, fontWeight: 700, letterSpacing: "0.18em", textTransform: "uppercase",
-            color: "rgba(185,172,158,0.6)", background: "rgba(255,255,255,0.04)",
-            border: "1px solid rgba(212,165,116,0.14)", borderRadius: 20, padding: "3px 10px",
-            fontFamily: "'DM Sans', sans-serif" }}>
+          <span style={{
+            fontSize: 7.5, fontWeight: 700, letterSpacing: "0.18em", textTransform: "uppercase",
+            color: "#8C7A6B", background: "rgba(255,255,255,0.55)",
+            border: "1px solid rgba(255,255,255,0.75)", borderRadius: 20, padding: "3px 10px",
+            fontFamily: "'DM Sans', sans-serif"
+          }}>
             {badge}
           </span>
         )}
@@ -78,47 +177,51 @@ function ScoreHeroCard({ score, summary, faceShape, eyeColor, skinTone, badge, m
           {/* Decorative outer dashes */}
           <svg width={SIZE} height={SIZE} viewBox={`0 0 ${SIZE} ${SIZE}`}
             style={{ position: "absolute", inset: 0 }}>
-            <circle cx={SIZE/2} cy={SIZE/2} r={r + 7}
-              fill="none" stroke="rgba(212,165,116,0.07)" strokeWidth="1" strokeDasharray="2.5 8"/>
+            <circle cx={SIZE / 2} cy={SIZE / 2} r={r + 7}
+              fill="none" stroke="rgba(168, 116, 73, 0.14)" strokeWidth="1" strokeDasharray="2.5 8" />
           </svg>
           {/* Progress ring */}
           <svg width={SIZE} height={SIZE} viewBox={`0 0 ${SIZE} ${SIZE}`}
             style={{ position: "absolute", inset: 0, transform: "rotate(-90deg)" }}>
             <defs>
               <linearGradient id="heroArcGrad" x1="0%" y1="0%" x2="100%" y2="0%">
-                <stop offset="0%" stopColor="#6B4828"/>
-                <stop offset="50%" stopColor="#D4A574"/>
-                <stop offset="100%" stopColor="#A87449"/>
+                <stop offset="0%" stopColor="#6B4828" />
+                <stop offset="50%" stopColor="#D4A574" />
+                <stop offset="100%" stopColor="#A87449" />
               </linearGradient>
             </defs>
             {/* Track */}
-            <circle cx={SIZE/2} cy={SIZE/2} r={r}
-              fill="none" stroke="rgba(255,255,255,0.04)" strokeWidth="7"/>
+            <circle cx={SIZE / 2} cy={SIZE / 2} r={r}
+              fill="none" stroke="rgba(168,116,73,0.1)" strokeWidth="9" />
             {/* Arc */}
-            <circle cx={SIZE/2} cy={SIZE/2} r={r}
-              fill="none" stroke="url(#heroArcGrad)" strokeWidth="7"
-              strokeDasharray={`${dash} ${circ}`} strokeLinecap="round"
-              style={{
-                transition: "stroke-dasharray 2s cubic-bezier(0.4,0,0.2,1)",
-                filter: `drop-shadow(0 0 7px ${arcColor}88)`,
-              }}/>
+            <circle cx={SIZE / 2} cy={SIZE / 2} r={r}
+              fill="none" stroke="url(#heroArcGrad)" strokeWidth="9"
+              strokeDasharray={`${dash} ${circ}`} strokeLinecap="round" />
           </svg>
           {/* Number + status label centered */}
-          <div style={{ position: "absolute", inset: 0, display: "flex", flexDirection: "column",
-            alignItems: "center", justifyContent: "center", gap: 2 }}>
+          <div style={{
+            position: "absolute", inset: 0, display: "flex", flexDirection: "column",
+            alignItems: "center", justifyContent: "center", gap: 2
+          }}>
             <div style={{ display: "flex", alignItems: "baseline", gap: 3 }}>
-              <span style={{ fontSize: 58, fontWeight: 200, lineHeight: 1,
-                fontFamily: "'Cormorant Garamond', serif", color: "#F2E8DC",
-                textShadow: "0 0 24px rgba(212,165,116,0.25)" }}>
-                {score}
+              <span style={{
+                fontSize: 58, fontWeight: 200, lineHeight: 1,
+                fontFamily: "'Cormorant Garamond', serif", color: "#3A2E26",
+                textShadow: "none"
+              }}>
+                {displayScore}
               </span>
-              <span style={{ fontSize: 15, color: "rgba(212,165,116,0.4)",
-                fontFamily: "'Cormorant Garamond', serif", paddingBottom: 7 }}>
+              <span style={{
+                fontSize: 15, color: "#A87449",
+                fontFamily: "'Cormorant Garamond', serif", paddingBottom: 7
+              }}>
                 /100
               </span>
             </div>
-            <span style={{ fontSize: 8, fontWeight: 700, letterSpacing: "0.2em", textTransform: "uppercase",
-              color: arcColor, fontFamily: "'DM Sans', sans-serif", marginTop: 1 }}>
+            <span style={{
+              fontSize: 8, fontWeight: 700, letterSpacing: "0.2em", textTransform: "uppercase",
+              color: arcColor, fontFamily: "'DM Sans', sans-serif", marginTop: 1
+            }}>
               {statusLabel}
             </span>
           </div>
@@ -126,27 +229,35 @@ function ScoreHeroCard({ score, summary, faceShape, eyeColor, skinTone, badge, m
       </div>
 
       {/* Summary */}
-      <p style={{ margin: "0 0 16px", fontSize: 13.5, lineHeight: 1.72, textAlign: "center", position: "relative",
-        color: "rgba(242,232,220,0.65)", fontStyle: "italic", fontFamily: "'Cormorant Garamond', serif",
-        wordBreak: "break-word" }}>
+      <p style={{
+        margin: "0 0 16px", fontSize: 13.5, lineHeight: 1.72, textAlign: "center", position: "relative",
+        color: "#6F6156", fontStyle: "italic", fontFamily: "'Cormorant Garamond', serif",
+        wordBreak: "break-word"
+      }}>
         {summary}
       </p>
 
       {/* Separator */}
-      <div style={{ height: "1px", background: "linear-gradient(90deg, transparent, rgba(212,165,116,0.18), transparent)", margin: "0 0 16px" }}/>
+      <div style={{ height: "1px", background: "linear-gradient(90deg, transparent, rgba(168,116,73,0.15), transparent)", margin: "0 0 16px" }} />
 
       {/* Trait tags */}
       <div style={{ display: "flex", gap: 8, flexWrap: "wrap", justifyContent: "center", position: "relative" }}>
-        {[{ k: t("faceShape"), v: faceShape }, { k: t("eyeColor"), v: eyeColor }, { k: t("skinTone"), v: skinTone }].map(tag => tag.v ? (
-          <div key={tag.k} style={{ background: "rgba(255,255,255,0.04)", borderRadius: 10,
-            padding: "7px 14px", border: "1px solid rgba(212,165,116,0.1)" }}>
-            <div style={{ fontSize: 8, letterSpacing: "0.16em", textTransform: "uppercase",
-              color: "rgba(185,172,158,0.45)", fontWeight: 600, fontFamily: "'DM Sans', sans-serif" }}>
+        {[{ k: t("faceShape"), v: faceShape }, { k: t("skinType"), v: skinType }, { k: t("skinTone"), v: skinTone }].map(tag => tag.v ? (
+          <div key={tag.k} style={{
+            background: "rgba(255,255,255,0.62)", backdropFilter: "blur(12px)", WebkitBackdropFilter: "blur(12px)", borderRadius: 10,
+            padding: "7px 14px", border: "1px solid rgba(255,255,255,0.82)"
+          }}>
+            <div style={{
+              fontSize: 8, letterSpacing: "0.16em", textTransform: "uppercase",
+              color: "#B0885E", fontWeight: 600, fontFamily: "'DM Sans', sans-serif"
+            }}>
               {tag.k}
             </div>
-            <div style={{ fontSize: 12, color: "rgba(242,232,220,0.82)", fontWeight: 600,
-              marginTop: 3, fontFamily: "'DM Sans', sans-serif" }}>
-              {tag.v}
+            <div style={{
+              fontSize: 12, color: "#3A2E26", fontWeight: 600,
+              marginTop: 3, fontFamily: "'DM Sans', sans-serif"
+            }}>
+              {getTranslatedValue(tag.v)}
             </div>
           </div>
         ) : null)}
@@ -155,20 +266,24 @@ function ScoreHeroCard({ score, summary, faceShape, eyeColor, skinTone, badge, m
       {/* Mini-metrics strip (paid view only) */}
       {miniMetrics && miniMetrics.length > 0 && (
         <>
-          <div style={{ height: "1px", background: "linear-gradient(90deg, transparent, rgba(212,165,116,0.18), transparent)", margin: "16px 0" }}/>
+          <div style={{ height: "1px", background: "linear-gradient(90deg, transparent, rgba(168,116,73,0.15), transparent)", margin: "16px 0" }} />
           <div style={{ display: "flex", position: "relative" }}>
             {miniMetrics.map((m, i) => (
               <div key={m.label} className="rpt-mini-metric" style={{
                 flex: 1, textAlign: "center", padding: "0 10px",
-                borderRight: i < miniMetrics.length - 1 ? "1px solid rgba(212,165,116,0.1)" : "none",
+                borderRight: i < miniMetrics.length - 1 ? "1px solid rgba(168,116,73,0.12)" : "none",
               }}>
-                <div style={{ fontSize: 22, fontWeight: 200, color: "#F2E8DC",
-                  fontFamily: "'Cormorant Garamond', serif", lineHeight: 1 }}>
+                <div style={{
+                  fontSize: 22, fontWeight: 200, color: "#3A2E26",
+                  fontFamily: "'Cormorant Garamond', serif", lineHeight: 1
+                }}>
                   {m.score}
                 </div>
-                <div style={{ fontSize: 8.5, letterSpacing: "0.1em", textTransform: "uppercase",
-                  color: "rgba(185,172,158,0.5)", fontWeight: 600, marginTop: 4,
-                  fontFamily: "'DM Sans', sans-serif" }}>
+                <div style={{
+                  fontSize: 8.5, letterSpacing: "0.1em", textTransform: "uppercase",
+                  color: "#A0938A", fontWeight: 600, marginTop: 4,
+                  fontFamily: "'DM Sans', sans-serif"
+                }}>
                   {m.label}
                 </div>
               </div>
@@ -193,11 +308,11 @@ function ScoreRing({ score, size = 64 }) {
   const color = score >= 78 ? GOLD : score >= 65 ? "#8C7A6B" : "#B9AC9E";
   return (
     <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} style={{ transform: "rotate(-90deg)", flexShrink: 0, display: "block" }}>
-      <circle cx={size/2} cy={size/2} r={r} fill="none" stroke="rgba(212,165,116,0.12)" strokeWidth="3"/>
-      <circle cx={size/2} cy={size/2} r={r} fill="none" stroke={color} strokeWidth="3"
+      <circle cx={size / 2} cy={size / 2} r={r} fill="none" stroke="rgba(168,116,73,0.12)" strokeWidth="3" />
+      <circle cx={size / 2} cy={size / 2} r={r} fill="none" stroke={color} strokeWidth="3"
         strokeDasharray={`${dash} ${circ}`}
         style={{ transition: "stroke-dasharray 1.4s cubic-bezier(0.4,0,0.2,1)" }}
-        strokeLinecap="round"/>
+        strokeLinecap="round" />
     </svg>
   );
 }
@@ -209,7 +324,7 @@ function MetricCard({ m, index }) {
     const timer = setTimeout(() => setVis(true), index * 80 + 100);
     return () => clearTimeout(timer);
   }, [index]);
-  const gradeColor = m.score >= 78 ? { bg: "#2C241D", color: "#fff" } : m.score >= 65 ? { bg: "rgba(168,116,73,0.1)", color: "#8C7A6B" } : { bg: "#F5F4F2", color: "#B9AC9E" };
+  const gradeColor = m.score >= 78 ? { bg: "rgba(197,160,40,0.12)", color: "#8B6914" } : m.score >= 65 ? { bg: "rgba(168,116,73,0.1)", color: "#8C7A6B" } : { bg: "rgba(168,116,73,0.06)", color: "#B9AC9E" };
   return (
     <div style={{
       ...CARD, padding: "18px 20px",
@@ -218,18 +333,18 @@ function MetricCard({ m, index }) {
       transition: "opacity 0.55s ease, transform 0.55s ease",
     }}>
       <div className="rpt-metric-ring" style={{ position: "relative", flexShrink: 0, width: 58, height: 58 }}>
-        <ScoreRing score={m.score} size={58}/>
+        <ScoreRing score={m.score} size={58} />
         <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center", zIndex: 1 }}>
-          <span style={{ fontSize: 13, fontWeight: 700, color: "#2C241D", fontFamily: "'Cormorant Garamond', serif" }}>{m.score}</span>
+          <span style={{ fontSize: 13, fontWeight: 700, color: "#3A2E26", fontFamily: "'Cormorant Garamond', serif" }}>{m.score}</span>
         </div>
       </div>
       <div style={{ flex: 1, minWidth: 0, overflow: "hidden" }}>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 6, gap: 8 }}>
-          <span style={{ fontSize: 11, fontWeight: 600, letterSpacing: "0.1em", textTransform: "uppercase", color: "#2C241D" }}>{m.label}</span>
+          <span style={{ fontSize: 11, fontWeight: 600, letterSpacing: "0.1em", textTransform: "uppercase", color: "#3A2E26" }}>{m.label}</span>
           <span style={{ fontSize: 10, fontWeight: 700, borderRadius: 6, padding: "3px 9px", background: gradeColor.bg, color: gradeColor.color, letterSpacing: "0.06em", flexShrink: 0 }}>{m.grade}</span>
         </div>
-        <div style={{ height: 2, background: "rgba(212,165,116,0.12)", borderRadius: 10, marginBottom: 8, overflow: "hidden" }}>
-          <div style={{ height: "100%", width: `${m.score}%`, background: `linear-gradient(90deg, #2C241D, ${GOLD})`, borderRadius: 10, transition: "width 1.6s cubic-bezier(0.4,0,0.2,1)" }}/>
+        <div style={{ height: 2, background: "rgba(168,116,73,0.1)", borderRadius: 10, marginBottom: 8, overflow: "hidden" }}>
+          <div style={{ height: "100%", width: `${m.score}%`, background: "linear-gradient(90deg, #A87449, #D4A574)", borderRadius: 10, transition: "width 1.6s cubic-bezier(0.4,0,0.2,1)" }} />
         </div>
         <p className="rpt-metric-detail" style={{ margin: 0, fontSize: 12, lineHeight: 1.65, color: "#8C7A6B", wordBreak: "break-word", overflowWrap: "break-word" }}>{m.detail}</p>
       </div>
@@ -249,7 +364,7 @@ function ProductCard({ product, lang, t }) {
   return (
     <div onMouseEnter={() => setHov(true)} onMouseLeave={() => setHov(false)} style={{
       ...CARD, padding: "18px 20px",
-      border: hov ? "1px solid rgba(168,116,73,0.6)" : "1px solid rgba(255, 255, 255, 0.55)",
+      border: hov ? "1px solid rgba(168,116,73,0.45)" : "1px solid rgba(255, 255, 255, 0.65)",
       boxShadow: hov ? "0 12px 40px rgba(168,116,73,0.08), inset 0 1px 1px rgba(255, 255, 255, 0.95)" : CARD.boxShadow,
       opacity: vis ? 1 : 0, transform: vis ? "translateY(0)" : "translateY(12px)",
       transition: "opacity 0.45s ease, transform 0.45s ease, border-color 0.2s, box-shadow 0.2s, background-color 0.2s",
@@ -269,8 +384,8 @@ function ProductCard({ product, lang, t }) {
               height: "clamp(72px, 20vw, 88px)",
               objectFit: "contain",
               borderRadius: 12,
-              background: "rgba(245,240,235,0.5)",
-              border: "1px solid rgba(212,165,116,0.15)",
+              background: "rgba(255,255,255,0.85)",
+              border: "1px solid rgba(255,255,255,0.9)",
               padding: 6,
               display: "block",
               transition: "opacity 0.2s",
@@ -282,13 +397,13 @@ function ProductCard({ product, lang, t }) {
 
       {/* Content */}
       <div style={{ flex: 1, minWidth: 0, overflow: "hidden" }}>
-        <span style={{ display: "inline-block", marginBottom: 8, fontSize: 9, fontWeight: 700, letterSpacing: "0.14em", textTransform: "uppercase", color: "#7C2D2D", background: "#FDF2F2", border: "1px solid #F5DADA", borderRadius: 6, padding: "3px 9px" }}>
+        <span style={{ display: "inline-block", marginBottom: 8, fontSize: 9, fontWeight: 700, letterSpacing: "0.14em", textTransform: "uppercase", color: "#A0634A", background: "rgba(168,116,73,0.1)", border: "1px solid rgba(168,116,73,0.22)", borderRadius: 6, padding: "3px 9px" }}>
           {product.skinProblem}
         </span>
-        <div style={{ fontSize: 15.5, fontWeight: 400, color: "#2C241D", marginBottom: 5, fontFamily: "'Cormorant Garamond', serif", lineHeight: 1.3, wordBreak: "break-word" }}>{product.productName}</div>
+        <div style={{ fontSize: 15.5, fontWeight: 400, color: "#3A2E26", marginBottom: 5, fontFamily: "'Cormorant Garamond', serif", lineHeight: 1.3, wordBreak: "break-word" }}>{product.productName}</div>
         <p style={{ margin: "0 0 14px", fontSize: 12, color: "#8C7A6B", lineHeight: 1.65, wordBreak: "break-word" }}>{product.description}</p>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 8 }}>
-          <span style={{ fontSize: 17, fontWeight: 300, color: "#2C241D", fontFamily: "'Cormorant Garamond', serif" }}>{product.price}</span>
+          <span style={{ fontSize: 17, fontWeight: 300, color: "#A87449", fontFamily: "'Cormorant Garamond', serif" }}>{product.price}</span>
           <div className="rpt-product-btns" style={{ display: "flex", gap: 7 }}>
             <a href={amazonUrl} target="_blank" rel="noopener noreferrer" className="btn-liquid-glass-dark" style={{ padding: "8px 14px", fontSize: 11.5, borderRadius: 12, border: "none" }}>{t('buyAmazon')}</a>
             <a href={sephoraUrl} target="_blank" rel="noopener noreferrer" className="btn-liquid-glass" style={{ padding: "8px 14px", fontSize: 11.5, borderRadius: 12, border: "none" }}>{t('buySephora')}</a>
@@ -302,9 +417,9 @@ function ProductCard({ product, lang, t }) {
 /* ── Severity badge ── */
 function SeverityBadge({ severity, t }) {
   const configs = {
-    mild:        { color: "#6B7280", bg: "#F3F4F6", border: "#D1D5DB", label: t('severityMild') },
-    moderate:    { color: "#92400E", bg: "#FFFBEB", border: "#FCD34D", label: t('severityModerate') },
-    significant: { color: "#991B1B", bg: "#FEF2F2", border: "#FCA5A5", label: t('severitySignificant') },
+    mild:        { color: "#7BC49A", bg: "rgba(123,196,154,0.12)", border: "rgba(123,196,154,0.28)", label: t('severityMild') },
+    moderate:    { color: "#E8B86D", bg: "rgba(232,184,109,0.12)", border: "rgba(232,184,109,0.28)", label: t('severityModerate') },
+    significant: { color: "#E8907A", bg: "rgba(232,144,122,0.12)", border: "rgba(232,144,122,0.28)", label: t('severitySignificant') },
   };
   const cfg = configs[severity] || configs.mild;
   return (
@@ -314,27 +429,27 @@ function SeverityBadge({ severity, t }) {
   );
 }
 
-const SEVERITY_ACCENT = { mild: "#D1D5DB", moderate: "#FCD34D", significant: "#FCA5A5" };
+const SEVERITY_ACCENT = { mild: "#7BC49A", moderate: "#E8B86D", significant: "#E8907A" };
 
 /* ── Shared report header ── */
 function ReportHeader({ t }) {
   return (
     <div style={{
-      background: "rgba(255, 255, 255, 0.45)",
-      backdropFilter: "blur(18px) saturate(120%)",
-      WebkitBackdropFilter: "blur(18px) saturate(120%)",
-      borderBottom: "1px solid rgba(255, 255, 255, 0.5)",
+      background: "rgba(255,255,255,0.55)",
+      backdropFilter: "blur(22px) saturate(150%)",
+      WebkitBackdropFilter: "blur(22px) saturate(150%)",
+      borderBottom: "1px solid rgba(255,255,255,0.65)",
       padding: "32px 28px 24px",
       position: "relative",
       overflow: "hidden"
     }}>
-      <div style={{ position: "absolute", inset: 0, pointerEvents: "none", background: "radial-gradient(ellipse 80% 100% at 50% -20%, rgba(0,0,0,0.025) 0%, transparent 100%)" }} />
+      <div style={{ position: "absolute", inset: 0, pointerEvents: "none", background: "radial-gradient(ellipse 80% 100% at 50% -20%, rgba(168,116,73,0.02) 0%, transparent 100%)" }} />
       <div className="mobile-padding" style={{ maxWidth: 680, margin: "0 auto", position: "relative" }}>
         <p className="mobile-hide" style={{ ...LABEL_STYLE, margin: "0 0 4px" }}>{t('aestheticAnalysis')}</p>
-        <h1 style={{ margin: "0 0 4px", fontSize: 28, fontWeight: 300, fontFamily: "'Cormorant Garamond', serif", background: "linear-gradient(135deg, #2C241D 0%, #A87449 100%)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text", color: "transparent" }}>
+        <h1 style={{ margin: "0 0 4px", fontSize: 28, fontWeight: 300, fontFamily: "'Cormorant Garamond', serif", color: "#3A2E26" }}>
           {t('yourFacialReport')}
         </h1>
-        <p style={{ margin: 0, fontSize: 11.5, color: "#B9AC9E", letterSpacing: "0.02em", fontFamily: "'DM Sans', sans-serif" }}>{t('notMedicalAdvice')}</p>
+        <p style={{ margin: 0, fontSize: 11.5, color: "#8C7A6B", letterSpacing: "0.02em", fontFamily: "'DM Sans', sans-serif" }}>{t('notMedicalAdvice')}</p>
       </div>
     </div>
   );
@@ -353,7 +468,7 @@ function SectionHeading({ label, title }) {
 /* ── Trait tag ── */
 function TraitTag({ label, value }) {
   return (
-    <div style={{ background: "rgba(245,240,235,0.6)", borderRadius: 12, padding: "8px 16px", border: "1px solid rgba(212,165,116,0.14)" }}>
+    <div style={{ background: "rgba(255,255,255,0.55)", borderRadius: 12, padding: "8px 16px", border: "1px solid rgba(255,255,255,0.75)" }}>
       <div style={{ fontSize: 8.5, letterSpacing: "0.16em", textTransform: "uppercase", color: "#B9AC9E", fontWeight: 600, fontFamily: "'DM Sans', sans-serif" }}>{label}</div>
       <div style={{ fontSize: 12.5, color: "#2C241D", fontWeight: 600, marginTop: 3, fontFamily: "'DM Sans', sans-serif" }}>{value}</div>
     </div>
@@ -368,6 +483,7 @@ export default function BeautyReport({ data, isPaid, onUnlock }) {
   const [previewTab, setPreviewTab] = useState(0);
   const [sharing, setSharing] = useState(false);
   const [shareMsg, setShareMsg] = useState("");
+  const [showAllFree, setShowAllFree] = useState(false);
 
   const handleShare = async () => {
     setSharing(true);
@@ -395,7 +511,7 @@ export default function BeautyReport({ data, isPaid, onUnlock }) {
     );
   }
 
-  const { overall, summary, faceShape, eyeColor, skinTone } = data;
+  const { overall, summary, faceShape, skinType, skinTone } = data;
 
   const handleUnlock = async (planId) => {
     setUnlocking(true);
@@ -427,7 +543,7 @@ export default function BeautyReport({ data, isPaid, onUnlock }) {
           <ScoreHeroCard
             score={overall}
             summary={basicSummary}
-            faceShape={faceShape} eyeColor={eyeColor} skinTone={skinTone}
+            faceShape={faceShape} skinType={skinType} skinTone={skinTone}
             badge={t("freeReportLabel")}
             t={t} lang={lang}
           />
@@ -437,35 +553,66 @@ export default function BeautyReport({ data, isPaid, onUnlock }) {
             <div style={{ marginTop: 28 }}>
               <SectionHeading label={t('mainProblemsHeading')} title={t('areasToAddress')} />
               <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-                {mainProblems.map((problem, i) => (
-                  <div key={i} style={{ ...CARD, padding: "0", display: "flex", overflow: "hidden" }}>
-                    <div style={{ width: 4, background: SEVERITY_ACCENT[problem.severity] || "#D1D5DB", flexShrink: 0 }}/>
-                    <div style={{ padding: "18px 20px", flex: 1 }}>
-                      <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 8 }}>
-                        <SeverityBadge severity={problem.severity} t={t} />
+                {mainProblems.map((problem, i) => {
+                  if (i > 0 && !showAllFree) return null;
+                  return (
+                    <div key={i} style={{ ...CARD, padding: "0", display: "flex", overflow: "hidden" }}>
+                      <div style={{ width: 4, background: SEVERITY_ACCENT[problem.severity] || "#D1D5DB", flexShrink: 0 }} />
+                      <div style={{ padding: "18px 20px", flex: 1 }}>
+                        <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 8 }}>
+                          <SeverityBadge severity={problem.severity} t={t} />
+                        </div>
+                        <div style={{ fontSize: 16, fontWeight: 400, color: "#3A2E26", marginBottom: 6, fontFamily: "'Cormorant Garamond', serif", lineHeight: 1.3 }}>{problem.title}</div>
+                        <p style={{ margin: 0, fontSize: 12.5, lineHeight: 1.7, color: "#8C7A6B" }}>{problem.description}</p>
                       </div>
-                      <div style={{ fontSize: 16, fontWeight: 400, color: "#2C241D", marginBottom: 6, fontFamily: "'Cormorant Garamond', serif", lineHeight: 1.3 }}>{problem.title}</div>
-                      <p style={{ margin: 0, fontSize: 12.5, lineHeight: 1.7, color: "#8C7A6B" }}>{problem.description}</p>
                     </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
+
+              {/* Voir plus / Voir moins toggle button */}
+              {mainProblems.length > 1 && (
+                <div style={{ display: "flex", justifyContent: "center", marginTop: 16 }}>
+                  <button
+                    onClick={() => setShowAllFree(!showAllFree)}
+                    className="btn-liquid-glass-pearl"
+                    style={{
+                      padding: "10px 24px",
+                      fontSize: 12,
+                      fontWeight: 600,
+                      borderRadius: 20,
+                      border: "none",
+                      cursor: "pointer",
+                      display: "flex",
+                      alignItems: "center",
+                      gap: 6,
+                      color: "#A87449",
+                      boxShadow: "0 4px 12px rgba(168, 116, 73, 0.05)"
+                    }}
+                  >
+                    {showAllFree
+                      ? (lang === 'fr' ? 'Voir moins' : 'See less')
+                      : (lang === 'fr' ? 'Voir plus' : 'See more')}
+                    <span style={{ fontSize: 9 }}>{showAllFree ? '▲' : '▼'}</span>
+                  </button>
+                </div>
+              )}
             </div>
           )}
 
           {/* ── Products (free) ── */}
-          {allProducts.length > 0 && (
+          {showAllFree && allProducts.length > 0 && (
             <div style={{ marginTop: 32 }}>
               <div style={{ display: "flex", alignItems: "flex-end", justifyContent: "space-between", marginBottom: 14, gap: 8 }}>
                 <SectionHeading label={t('shopSubtitle')} title={t('shopTitle')} />
-                <span style={{ fontSize: 9, fontWeight: 700, letterSpacing: "0.16em", textTransform: "uppercase", color: "#C5A028", background: "rgba(197,160,40,0.08)", border: "1px solid rgba(197,160,40,0.25)", borderRadius: 20, padding: "4px 12px", whiteSpace: "nowrap", flexShrink: 0, fontFamily: "'DM Sans', sans-serif", marginBottom: 16 }}>
+                <span style={{ fontSize: 9, fontWeight: 700, letterSpacing: "0.16em", textTransform: "uppercase", color: "#8B6914", background: "rgba(197,160,40,0.1)", border: "1px solid rgba(197,160,40,0.28)", borderRadius: 20, padding: "4px 12px", whiteSpace: "nowrap", flexShrink: 0, fontFamily: "'DM Sans', sans-serif", marginBottom: 16 }}>
                   {t('freeIncluded')}
                 </span>
               </div>
               <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
                 {allProducts.map((p, i) => <ProductCard key={i} product={p} lang={lang} t={t} />)}
               </div>
-              <p style={{ fontSize: 10, color: "#C4B8AE", textAlign: "center", padding: "12px 4px 0", lineHeight: 1.7, fontFamily: "'DM Sans', sans-serif" }}>
+              <p style={{ fontSize: 10, color: "#B9AC9E", textAlign: "center", padding: "12px 4px 0", lineHeight: 1.7, fontFamily: "'DM Sans', sans-serif" }}>
                 {t('affiliateNotice')}
               </p>
             </div>
@@ -475,25 +622,25 @@ export default function BeautyReport({ data, isPaid, onUnlock }) {
         {/* ── Paywall card ── */}
         <div style={{ maxWidth: 680, margin: "32px auto 0", padding: "0 20px" }}>
           <div style={{
-            background: "rgba(255, 255, 255, 0.55)",
-            backdropFilter: "blur(24px) saturate(150%)",
-            WebkitBackdropFilter: "blur(24px) saturate(150%)",
-            border: "1.5px solid rgba(197, 160, 40, 0.45)",
+            background: "linear-gradient(135deg, rgba(255,255,255,0.78) 0%, rgba(253,246,237,0.62) 50%, rgba(246,235,222,0.78) 100%)",
+            backdropFilter: "blur(28px) saturate(150%)",
+            WebkitBackdropFilter: "blur(28px) saturate(150%)",
+            border: "1px solid rgba(255,255,255,0.82)",
             borderRadius: 24, padding: "clamp(28px,5vw,40px)",
-            boxShadow: "0 20px 56px rgba(168, 116, 73, 0.08), inset 0 1px 2px rgba(255, 255, 255, 0.95)",
+            boxShadow: "0 8px 40px rgba(168,116,73,0.06), inset 0 1px 0 rgba(255,255,255,0.95)",
             textAlign: "center",
           }}>
-            <div style={{ width: 36, height: 3, background: "linear-gradient(90deg, #C5A028, #E8C872)", borderRadius: 2, margin: "0 auto 18px" }} />
-            <p style={{ fontSize: 9, fontWeight: 700, letterSpacing: "0.24em", textTransform: "uppercase", color: "#C5A028", margin: "0 0 10px", fontFamily: "'DM Sans', sans-serif" }}>
+            <div style={{ width: 36, height: 3, background: "linear-gradient(90deg, #C5A028, #D4A574)", borderRadius: 2, margin: "0 auto 18px" }} />
+            <p style={{ fontSize: 9, fontWeight: 700, letterSpacing: "0.24em", textTransform: "uppercase", color: "#B0885E", margin: "0 0 10px", fontFamily: "'DM Sans', sans-serif" }}>
               {t('paywallCardLabel')}
             </p>
-            <h2 style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: "clamp(22px,5vw,28px)", fontWeight: 400, color: "#2C241D", margin: "0 0 10px", lineHeight: 1.2 }}>
+            <h2 style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: "clamp(22px,5vw,28px)", fontWeight: 400, color: "#3A2E26", margin: "0 0 10px", lineHeight: 1.2 }}>
               {t('paywallCardTitle')}
             </h2>
             <p style={{ fontSize: 13, color: "#8C7A6B", lineHeight: 1.65, margin: "0 0 22px", fontFamily: "'DM Sans', sans-serif" }}>
               {t('paywallCardDesc')}
             </p>
-            <div style={{ display: "flex", flexDirection: "column", gap: 9, marginBottom: 24, textAlign: "left", background: "rgba(245,240,235,0.4)", borderRadius: 14, padding: "16px 18px" }}>
+            <div style={{ display: "flex", flexDirection: "column", gap: 9, marginBottom: 24, textAlign: "left", background: "rgba(255,255,255,0.55)", backdropFilter: "blur(12px)", WebkitBackdropFilter: "blur(12px)", border: "1px solid rgba(255,255,255,0.75)", borderRadius: 14, padding: "16px 18px" }}>
               {[t('paywallPerk1'), t('paywallPerk2'), t('paywallImprove')].map((perk, i) => (
                 <div key={i} style={{ display: "flex", gap: 10, alignItems: "flex-start" }}>
                   <span style={{ color: GOLD, fontSize: 10, flexShrink: 0, marginTop: 3 }}>✦</span>
@@ -509,7 +656,7 @@ export default function BeautyReport({ data, isPaid, onUnlock }) {
                 {t('unlockPack')}
               </button>
             </div>
-            <p style={{ marginTop: 14, fontSize: 11, color: "#C4B8AE", fontFamily: "'DM Sans', sans-serif" }}>
+            <p style={{ marginTop: 14, fontSize: 11, color: "#B9AC9E", fontFamily: "'DM Sans', sans-serif" }}>
               {t('oneTimePayment')}
             </p>
           </div>
@@ -529,7 +676,7 @@ export default function BeautyReport({ data, isPaid, onUnlock }) {
             }}
           >
             {sharing
-              ? <><span style={{ display: "inline-block", width: 12, height: 12, border: "2px solid rgba(185,172,158,0.35)", borderTopColor: "#B9AC9E", borderRadius: "50%", animation: "spin 0.7s linear infinite" }}/>{t('shareGenerating')}</>
+              ? <><span style={{ display: "inline-block", width: 12, height: 12, border: "2px solid rgba(185,172,158,0.35)", borderTopColor: "#B9AC9E", borderRadius: "50%", animation: "spin 0.7s linear infinite" }} />{t('shareGenerating')}</>
               : <>{t('shareScore')}<span style={{ fontSize: 11, opacity: 0.6, fontWeight: 400 }}>· Instagram / TikTok</span></>
             }
           </button>
@@ -543,10 +690,9 @@ export default function BeautyReport({ data, isPaid, onUnlock }) {
           </p>
           <div className="rpt-tabs" style={{
             display: "flex", gap: 4,
-            background: "rgba(255, 255, 255, 0.4)",
-            backdropFilter: "blur(16px) saturate(120%)",
-            WebkitBackdropFilter: "blur(16px) saturate(120%)",
-            border: "1px solid rgba(255, 255, 255, 0.5)",
+            background: "rgba(255,255,255,0.55)",
+          backdropFilter: "blur(18px) saturate(150%)", WebkitBackdropFilter: "blur(18px) saturate(150%)",
+          border: "1px solid rgba(255,255,255,0.65)",
             borderRadius: 14, padding: 4,
             boxShadow: "0 8px 32px rgba(168,116,73,0.03), inset 0 1px 1px rgba(255, 255, 255, 0.8)",
             scrollbarWidth: "none"
@@ -555,7 +701,7 @@ export default function BeautyReport({ data, isPaid, onUnlock }) {
               <button key={label} onClick={() => setPreviewTab(i)} className="rpt-tab-btn" style={{
                 flex: 1, padding: "11px 4px", borderRadius: 10, textAlign: "center",
                 background: previewTab === i ? "linear-gradient(135deg, rgba(44, 36, 29, 0.85), rgba(28, 22, 17, 0.92))" : "transparent",
-                color: previewTab === i ? "#fff" : "#B9AC9E",
+                color: previewTab === i ? "#fff" : "#6F6156",
                 fontSize: 10, fontWeight: 600, letterSpacing: "0.08em",
                 fontFamily: "'DM Sans', sans-serif", textTransform: "uppercase",
                 border: previewTab === i ? "1px solid rgba(255, 255, 255, 0.15)" : "none", cursor: "pointer", transition: "all 0.25s ease",
@@ -568,7 +714,7 @@ export default function BeautyReport({ data, isPaid, onUnlock }) {
 
         {/* ── Blurred tab content ── */}
         <div style={{ maxWidth: 680, margin: "10px auto 0", padding: "0 20px 60px", filter: "blur(5px)", opacity: 0.3, pointerEvents: "none", userSelect: "none" }}>
-          {previewTab === 0 && <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>{previewMetrics.map((m, i) => <MetricCard key={i} m={m} index={i}/>)}</div>}
+          {previewTab === 0 && <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>{previewMetrics.map((m, i) => <MetricCard key={i} m={m} index={i} />)}</div>}
           {previewTab === 1 && (
             <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
               {previewStrengths.map((s, i) => (
@@ -599,7 +745,7 @@ export default function BeautyReport({ data, isPaid, onUnlock }) {
               ))}
             </div>
           )}
-          {previewTab === 4 && <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>{allProducts.map((p, i) => <ProductCard key={i} product={p} lang={lang} t={t}/>)}</div>}
+          {previewTab === 4 && <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>{allProducts.map((p, i) => <ProductCard key={i} product={p} lang={lang} t={t} />)}</div>}
         </div>
 
         <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
@@ -616,11 +762,11 @@ export default function BeautyReport({ data, isPaid, onUnlock }) {
   const products = paid.productRecommendations || [];
 
   const TABS_PAID = [
-    { id: "analysis",  label: t('tabMetrics') },
+    { id: "analysis", label: t('tabMetrics') },
     { id: "strengths", label: t('tabStrengths') },
-    { id: "improve",   label: t('tabImprove') },
-    { id: "recs",      label: t('tabRoutine') },
-    { id: "shop",      label: t('tabShop') },
+    { id: "improve", label: t('tabImprove') },
+    { id: "recs", label: t('tabRoutine') },
+    { id: "shop", label: t('tabShop') },
   ];
 
   return (
@@ -633,7 +779,7 @@ export default function BeautyReport({ data, isPaid, onUnlock }) {
         <ScoreHeroCard
           score={overall}
           summary={summary}
-          faceShape={faceShape} eyeColor={eyeColor} skinTone={skinTone}
+          faceShape={faceShape} skinType={skinType} skinTone={skinTone}
           miniMetrics={metrics.slice(0, 3)}
           t={t} lang={lang}
         />
@@ -641,10 +787,9 @@ export default function BeautyReport({ data, isPaid, onUnlock }) {
         {/* ── Tabs ── */}
         <div className="rpt-tabs" style={{
           display: "flex", gap: 4,
-          background: "rgba(255, 255, 255, 0.4)",
-          backdropFilter: "blur(16px) saturate(120%)",
-          WebkitBackdropFilter: "blur(16px) saturate(120%)",
-          border: "1px solid rgba(255, 255, 255, 0.5)",
+          background: "rgba(255,255,255,0.55)",
+          backdropFilter: "blur(18px) saturate(150%)", WebkitBackdropFilter: "blur(18px) saturate(150%)",
+          border: "1px solid rgba(255,255,255,0.65)",
           borderRadius: 14, padding: 4,
           boxShadow: "0 8px 32px rgba(168,116,73,0.03), inset 0 1px 1px rgba(255, 255, 255, 0.8)",
           scrollbarWidth: "none", WebkitOverflowScrolling: "touch"
@@ -653,7 +798,7 @@ export default function BeautyReport({ data, isPaid, onUnlock }) {
             <button key={tab.id} onClick={() => setActiveTab(tab.id)} className="rpt-tab-btn" style={{
               flex: 1, padding: "12px 4px", border: activeTab === tab.id ? "1px solid rgba(255, 255, 255, 0.15)" : "none", borderRadius: 10,
               background: activeTab === tab.id ? "linear-gradient(135deg, rgba(44, 36, 29, 0.85), rgba(28, 22, 17, 0.92))" : "transparent",
-              color: activeTab === tab.id ? "#fff" : "#B9AC9E",
+              color: activeTab === tab.id ? "#fff" : "#6F6156",
               fontSize: 10, fontWeight: 600, cursor: "pointer", letterSpacing: "0.08em",
               fontFamily: "'DM Sans', sans-serif", textTransform: "uppercase", whiteSpace: "nowrap",
               transition: "all 0.25s cubic-bezier(0.4,0,0.2,1)",
@@ -668,12 +813,12 @@ export default function BeautyReport({ data, isPaid, onUnlock }) {
           {/* Metrics */}
           {activeTab === "analysis" && (
             <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-              {metrics.map((m, i) => <MetricCard key={i} m={m} index={i}/>)}
+              {metrics.map((m, i) => <MetricCard key={i} m={m} index={i} />)}
               <div style={{ ...CARD, padding: "14px 18px", display: "flex", gap: 18, flexWrap: "wrap" }}>
-                {[{ range: "78–100", label: t('legendStrong'), color: "#2C241D" }, { range: "65–77", label: t('legendAverage'), color: "#8C7A6B" }, { range: "0–64", label: t('legendBelowAvg'), color: "#B9AC9E" }].map(l => (
+                {[{ range: "78–100", label: t('legendStrong'), color: "#D4A574" }, { range: "65–77", label: t('legendAverage'), color: "#8C7A6B" }, { range: "0–64", label: t('legendBelowAvg'), color: "#B9AC9E" }].map(l => (
                   <div key={l.range} style={{ display: "flex", alignItems: "center", gap: 7 }}>
-                    <div style={{ width: 7, height: 7, borderRadius: "50%", background: l.color, flexShrink: 0 }}/>
-                    <span style={{ fontSize: 11, color: "#B9AC9E", fontFamily: "'DM Sans', sans-serif" }}>{l.range} — {l.label}</span>
+                    <div style={{ width: 7, height: 7, borderRadius: "50%", background: l.color, flexShrink: 0 }} />
+                    <span style={{ fontSize: 11, color: "#8C7A6B", fontFamily: "'DM Sans', sans-serif" }}>{l.range} — {l.label}</span>
                   </div>
                 ))}
               </div>
@@ -685,9 +830,9 @@ export default function BeautyReport({ data, isPaid, onUnlock }) {
             <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
               {strengths.map((s, i) => (
                 <div key={i} style={{ ...CARD, padding: "20px 22px", display: "flex", gap: 14, alignItems: "flex-start", overflow: "hidden" }}>
-                  <div style={{ width: 36, height: 36, borderRadius: 11, background: "rgba(168,116,73,0.1)", border: "1px solid rgba(168,116,73,0.2)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, fontSize: 15, color: GOLD }}>{ICONS[i] || "✦"}</div>
+                  <div style={{ width: 36, height: 36, borderRadius: 11, background: "rgba(197,160,40,0.1)", border: "1px solid rgba(197,160,40,0.2)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, fontSize: 15, color: GOLD }}>{ICONS[i] || "✦"}</div>
                   <div style={{ flex: 1, minWidth: 0 }}>
-                    <div style={{ fontSize: 12.5, fontWeight: 600, color: "#2C241D", marginBottom: 6, letterSpacing: "0.04em", wordBreak: "break-word" }}>{s.title}</div>
+                    <div style={{ fontSize: 12.5, fontWeight: 600, color: "#3A2E26", marginBottom: 6, letterSpacing: "0.04em", wordBreak: "break-word" }}>{s.title}</div>
                     <p style={{ margin: 0, fontSize: 13, lineHeight: 1.7, color: "#8C7A6B", wordBreak: "break-word", overflowWrap: "break-word" }}>{s.desc}</p>
                   </div>
                 </div>
@@ -702,7 +847,7 @@ export default function BeautyReport({ data, isPaid, onUnlock }) {
                 <div key={i} style={{ ...CARD, padding: "20px 22px", display: "flex", gap: 14, alignItems: "flex-start", overflow: "hidden" }}>
                   <div style={{ width: 30, height: 30, borderRadius: "50%", background: "rgba(212,165,116,0.1)", border: "1px solid rgba(212,165,116,0.25)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, fontSize: 13, fontWeight: 600, color: GOLD, fontFamily: "'Cormorant Garamond', serif" }}>{i + 1}</div>
                   <div style={{ flex: 1, minWidth: 0 }}>
-                    <div style={{ fontSize: 12.5, fontWeight: 600, color: "#2C241D", marginBottom: 6, letterSpacing: "0.04em", wordBreak: "break-word" }}>{s.title}</div>
+                    <div style={{ fontSize: 12.5, fontWeight: 600, color: "#3A2E26", marginBottom: 6, letterSpacing: "0.04em", wordBreak: "break-word" }}>{s.title}</div>
                     <p style={{ margin: 0, fontSize: 13, lineHeight: 1.7, color: "#8C7A6B", wordBreak: "break-word", overflowWrap: "break-word" }}>{s.desc}</p>
                   </div>
                 </div>
@@ -715,12 +860,12 @@ export default function BeautyReport({ data, isPaid, onUnlock }) {
             const ROUTINE_SECTIONS = [
               { key: "morning", label: t('routineMorning'), dot: "#F6C667" },
               { key: "evening", label: t('routineEvening'), dot: "#8C7A6B" },
-              { key: "weekly",  label: t('routineWeekly'), dot: GOLD },
+              { key: "weekly", label: t('routineWeekly'), dot: GOLD },
             ].filter(s => (paidRoutine[s.key] || []).length > 0);
 
             if (ROUTINE_SECTIONS.length === 0) {
               return (
-                <div style={{ ...CARD, padding: "32px", textAlign: "center", color: "#C4B8AE", fontSize: 13, fontFamily: "'DM Sans', sans-serif" }}>
+                <div style={{ ...CARD, padding: "32px", textAlign: "center", color: "#B9AC9E", fontSize: 13, fontFamily: "'DM Sans', sans-serif" }}>
                   {t('routineUnavailable')}
                 </div>
               );
@@ -730,15 +875,15 @@ export default function BeautyReport({ data, isPaid, onUnlock }) {
               <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
                 {ROUTINE_SECTIONS.map(({ key, label, dot }) => (
                   <div key={key} style={{ ...CARD, padding: "20px 22px" }}>
-                    <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 14, paddingBottom: 12, borderBottom: "1px solid rgba(212,165,116,0.1)" }}>
-                      <div style={{ width: 8, height: 8, borderRadius: "50%", background: dot, flexShrink: 0 }}/>
-                      <span style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.12em", textTransform: "uppercase", color: "#2C241D", fontFamily: "'DM Sans', sans-serif" }}>{label}</span>
+                    <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 14, paddingBottom: 12, borderBottom: "1px solid rgba(168,116,73,0.12)" }}>
+                      <div style={{ width: 8, height: 8, borderRadius: "50%", background: dot, flexShrink: 0 }} />
+                      <span style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.12em", textTransform: "uppercase", color: "#3A2E26", fontFamily: "'DM Sans', sans-serif" }}>{label}</span>
                     </div>
                     <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
                       {(paidRoutine[key] || []).map((step, j) => (
                         <div key={j} style={{ display: "flex", gap: 12, alignItems: "flex-start" }}>
-                          <div style={{ minWidth: 22, height: 22, borderRadius: "50%", background: "rgba(212,165,116,0.1)", border: "1px solid rgba(212,165,116,0.22)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, fontSize: 10, fontWeight: 700, color: GOLD, fontFamily: "'Cormorant Garamond', serif", marginTop: 1 }}>{j + 1}</div>
-                          <span style={{ fontSize: 13, color: "#6F6156", lineHeight: 1.65, fontFamily: "'DM Sans', sans-serif" }}>{step}</span>
+                          <div style={{ minWidth: 22, height: 22, borderRadius: "50%", background: "rgba(197,160,40,0.1)", border: "1px solid rgba(197,160,40,0.22)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, fontSize: 10, fontWeight: 700, color: GOLD, fontFamily: "'Cormorant Garamond', serif", marginTop: 1 }}>{j + 1}</div>
+                          <span style={{ fontSize: 13, color: "#8C7A6B", lineHeight: 1.65, fontFamily: "'DM Sans', sans-serif" }}>{step}</span>
                         </div>
                       ))}
                     </div>
@@ -753,9 +898,9 @@ export default function BeautyReport({ data, isPaid, onUnlock }) {
             <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
               <SectionHeading label={t('shopSubtitle')} title={t('shopTitle')} />
               {products.length === 0 ? (
-                <div style={{ ...CARD, padding: "32px", textAlign: "center", color: "#C4B8AE", fontSize: 13 }}>{t('noProducts')}</div>
-              ) : products.map((p, i) => <ProductCard key={i} product={p} lang={lang} t={t}/>)}
-              <p style={{ fontSize: 10, color: "#C4B8AE", textAlign: "center", padding: "8px 4px 0", lineHeight: 1.7, fontFamily: "'DM Sans', sans-serif" }}>
+                <div style={{ ...CARD, padding: "32px", textAlign: "center", color: "#B9AC9E", fontSize: 13 }}>{t('noProducts')}</div>
+              ) : products.map((p, i) => <ProductCard key={i} product={p} lang={lang} t={t} />)}
+              <p style={{ fontSize: 10, color: "#B9AC9E", textAlign: "center", padding: "8px 4px 0", lineHeight: 1.7, fontFamily: "'DM Sans', sans-serif" }}>
                 {t('affiliateNotice')}
               </p>
             </div>
@@ -764,19 +909,21 @@ export default function BeautyReport({ data, isPaid, onUnlock }) {
 
         {/* ── Share CTA (paid view) ── */}
         <div style={{
-          background: "linear-gradient(145deg, #1E1810 0%, #2C241D 60%, #201A13 100%)",
+          background: "linear-gradient(135deg, rgba(255,255,255,0.72) 0%, rgba(253,246,237,0.55) 50%, rgba(246,235,222,0.72) 100%)",
+          backdropFilter: "blur(22px) saturate(150%)",
+          WebkitBackdropFilter: "blur(22px) saturate(150%)",
           borderRadius: 20, padding: "28px 24px", marginTop: 20,
-          border: "1px solid rgba(212,165,116,0.1)",
-          boxShadow: "0 12px 40px rgba(0,0,0,0.25)",
+          border: "1px solid rgba(255,255,255,0.78)",
+          boxShadow: "0 8px 32px rgba(168,116,73,0.04), inset 0 1px 0 rgba(255,255,255,0.9)",
           textAlign: "center",
         }}>
-          <p style={{ margin: "0 0 6px", fontSize: 9, letterSpacing: "0.22em", textTransform: "uppercase", color: "rgba(212,165,116,0.5)", fontFamily: "'DM Sans', sans-serif", fontWeight: 600 }}>
+          <p style={{ margin: "0 0 6px", fontSize: 9, letterSpacing: "0.22em", textTransform: "uppercase", color: "#B0885E", fontFamily: "'DM Sans', sans-serif", fontWeight: 600 }}>
             {t('shareHeading')}
           </p>
-          <h3 style={{ margin: "0 0 6px", fontFamily: "'Cormorant Garamond', serif", fontSize: 26, fontWeight: 300, color: "#F2E8DC", lineHeight: 1.2 }}>
+          <h3 style={{ margin: "0 0 6px", fontFamily: "'Cormorant Garamond', serif", fontSize: 26, fontWeight: 300, color: "#3A2E26", lineHeight: 1.2 }}>
             {t('shareYourScore', overall)}
           </h3>
-          <p style={{ margin: "0 0 20px", fontSize: 12, color: "rgba(185,172,158,0.6)", fontFamily: "'DM Sans', sans-serif", lineHeight: 1.6 }}>
+          <p style={{ margin: "0 0 20px", fontSize: 12, color: "#8C7A6B", fontFamily: "'DM Sans', sans-serif", lineHeight: 1.6 }}>
             {t('shareSubtitle')}
           </p>
           <div style={{ display: "flex", gap: 10, justifyContent: "center", flexWrap: "wrap" }}>
@@ -794,7 +941,7 @@ export default function BeautyReport({ data, isPaid, onUnlock }) {
               }}
             >
               {sharing
-                ? <><span style={{ display: "inline-block", width: 12, height: 12, border: "2px solid rgba(255,255,255,0.25)", borderTopColor: "rgba(255,255,255,0.7)", borderRadius: "50%", animation: "spin 0.7s linear infinite" }}/>{t('shareGeneratingShort')}</>
+                ? <><span style={{ display: "inline-block", width: 12, height: 12, border: "2px solid rgba(255,255,255,0.25)", borderTopColor: "rgba(255,255,255,0.7)", borderRadius: "50%", animation: "spin 0.7s linear infinite" }} />{t('shareGeneratingShort')}</>
                 : t("shareScore")
               }
             </button>
@@ -812,14 +959,14 @@ export default function BeautyReport({ data, isPaid, onUnlock }) {
             </button>
           </div>
           {shareMsg && (
-            <p style={{ margin: "12px 0 0", fontSize: 12, color: "rgba(212,165,116,0.85)", fontFamily: "'DM Sans', sans-serif", lineHeight: 1.5 }}>
+            <p style={{ margin: "12px 0 0", fontSize: 12, color: "#A87449", fontFamily: "'DM Sans', sans-serif", lineHeight: 1.5 }}>
               {shareMsg}
             </p>
           )}
         </div>
 
         <div style={{ marginTop: 20, padding: "0 4px" }}>
-          <p style={{ fontSize: 10, color: "#C4B8AE", lineHeight: 1.8, textAlign: "center", letterSpacing: "0.02em", fontFamily: "'DM Sans', sans-serif" }}>{t('disclaimer')}</p>
+          <p style={{ fontSize: 10, color: "#B9AC9E", lineHeight: 1.8, textAlign: "center", letterSpacing: "0.02em", fontFamily: "'DM Sans', sans-serif" }}>{t('disclaimer')}</p>
         </div>
       </div>
 
