@@ -486,3 +486,81 @@ body::before {
     inset 0 0 0 1px rgba(255, 255, 255, 0.05),
     0 4px 12px rgba(44, 36, 29, 0.1);
 }
+
+/* Premium Liquid Glass Gold variant */
+.btn-liquid-glass-gold {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'DM Sans', sans-serif;
+  font-weight: 600;
+  font-size: 14px;
+  letter-spacing: 0.02em;
+  padding: 14px 28px;
+  border-radius: 30px;
+  cursor: pointer;
+  outline: none;
+  border: 1px solid rgba(255, 255, 255, 0.45);
+  background: linear-gradient(135deg, rgba(222, 195, 155, 0.95) 0%, rgba(197, 160, 40, 0.95) 100%);
+  color: #3A2E26;
+  backdrop-filter: blur(25px) saturate(150%);
+  -webkit-backdrop-filter: blur(25px) saturate(150%);
+  box-shadow: 
+    0 1px 0 0 rgba(255, 255, 255, 0.6) inset,      /* Top highlight edge */
+    0 -1px 0 0 rgba(0, 0, 0, 0.1) inset,           /* Bottom shadow edge */
+    inset 0 0 0 1px rgba(255, 255, 255, 0.25),     /* Inner border refraction */
+    inset 0 12px 18px rgba(255, 255, 255, 0.2),     /* Curved lens highlight */
+    0 8px 24px rgba(197, 160, 40, 0.2);            /* Golden ambient projection */
+  transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+  overflow: hidden;
+  text-decoration: none;
+}
+
+.btn-liquid-glass-gold::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -150%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.0) 25%,
+    rgba(255, 255, 255, 0.65) 50%,
+    rgba(255, 255, 255, 0.0) 75%,
+    transparent 100%
+  );
+  transform: skewX(-30deg);
+  transition: none;
+  pointer-events: none;
+}
+
+.btn-liquid-glass-gold:hover::before {
+  left: 150%;
+  transition: left 1s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.btn-liquid-glass-gold:hover {
+  transform: translateY(-2px) scale(1.02);
+  background: linear-gradient(135deg, rgba(235, 210, 170, 0.98) 0%, rgba(212, 175, 55, 0.98) 100%);
+  border-color: rgba(255, 255, 255, 0.75);
+  box-shadow: 
+    0 1px 0 0 rgba(255, 255, 255, 0.7) inset,
+    0 -1px 0 0 rgba(0, 0, 0, 0.05) inset,
+    inset 0 0 0 1px rgba(255, 255, 255, 0.4),
+    inset 0 12px 20px rgba(255, 255, 255, 0.3),
+    0 16px 36px rgba(197, 160, 40, 0.32),
+    0 0 28px rgba(197, 160, 40, 0.65); /* Hyper-visible bright gold surbrillance glow */
+  color: #2C241D;
+}
+
+.btn-liquid-glass-gold:active {
+  transform: translateY(0px) scale(0.97);
+  background: linear-gradient(135deg, rgba(200, 175, 135, 0.95) 0%, rgba(180, 145, 30, 0.95) 100%);
+  box-shadow: 
+    0 1px 0 0 rgba(255, 255, 255, 0.4) inset,
+    inset 0 0 0 1px rgba(255, 255, 255, 0.15),
+    0 4px 12px rgba(197, 160, 40, 0.15);
+}

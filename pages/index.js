@@ -739,7 +739,7 @@ export default function Home() {
           <button
             onClick={handleAnalyse}
             disabled={!image || loading}
-            className={image && !loading ? "btn-liquid-glass-dark" : ""}
+            className={image && !loading ? "btn-liquid-glass-gold" : ""}
             style={{
               width: '100%', marginTop: 20,
               padding: '16px 24px', fontSize: 15, fontWeight: 600,
