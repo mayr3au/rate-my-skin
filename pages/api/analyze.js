@@ -152,7 +152,7 @@ export default async function handler(req, res) {
     const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
     const message = await anthropic.messages.create({
       model: 'claude-haiku-4-5-20251001',
-      max_tokens: 3500,
+      max_tokens: 8000,
       system: [{ type: 'text', text: buildSystemPrompt(lang, formattedProducts) }],
       messages: [{
         role: 'user',
@@ -166,10 +166,23 @@ export default async function handler(req, res) {
     });
 
     const raw = message.content[0].text;
+    console.log('[analyze] stop_reason:', message.stop_reason, '| output tokens:', message.usage?.output_tokens);
+    if (message.stop_reason === 'max_tokens') {
+      console.error('[analyze] ❌ response truncated — increase max_tokens');
+      throw new Error('Analysis response was truncated. Please try again.');
+    }
+
     const start = raw.indexOf('{');
     const end = raw.lastIndexOf('}');
     if (start === -1 || end === -1) throw new Error('Invalid JSON response from Claude');
-    const analysisData = JSON.parse(raw.substring(start, end + 1));
+    let analysisData;
+    try {
+      analysisData = JSON.parse(raw.substring(start, end + 1));
+    } catch (parseErr) {
+      console.error('[analyze] ❌ JSON parse failed:', parseErr.message);
+      console.error('[analyze] raw length:', raw.length, '| snippet at error:', raw.substring(Math.max(0, raw.length - 200)));
+      throw new Error('Analysis response was malformed. Please try again.');
+    }
 
     // Handle face-validation rejection from Claude
     if (analysisData.error === 'no_face') {
