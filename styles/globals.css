@@ -38,6 +38,11 @@ body::before {
 }
 
 @media (max-width: 600px) {
+  /* Fix mobile viewport background gradient scroll bug */
+  body {
+    background-attachment: scroll !important;
+  }
+
   /* Keep the organic paper grain texture for high-end tactile feel */
   body::before { opacity: 0.025; }
 
