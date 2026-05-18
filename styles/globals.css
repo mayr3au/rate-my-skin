@@ -38,18 +38,32 @@ body::before {
 }
 
 @media (max-width: 600px) {
-  body::after, body::before { display: none; }
+  /* Keep the organic paper grain texture for high-end tactile feel */
+  body::before { opacity: 0.025; }
 
-  /* Kill all backdrop-filter on mobile — huge GPU cost, not visible anyway */
-  * {
-    backdrop-filter: none !important;
-    -webkit-backdrop-filter: none !important;
+  /* Beautiful high-end glassmorphic mobile navigation */
+  .nav-blur {
+    background: rgba(255, 255, 255, 0.45) !important;
+    backdrop-filter: blur(20px) saturate(140%) !important;
+    -webkit-backdrop-filter: blur(20px) saturate(140%) !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.4) !important;
   }
 
-  /* Compensate with solid backgrounds where blur was hiding transparency */
-  .nav-blur  { background: rgba(242, 232, 218, 0.97) !important; }
-  .card-blur { background: #fff !important; }
-  .overlay-blur { background: rgba(242, 232, 218, 0.97) !important; }
+  /* Beautiful translucent report cards & interactive containers on mobile */
+  .card-blur {
+    background: rgba(255, 255, 255, 0.45) !important;
+    backdrop-filter: blur(20px) saturate(140%) !important;
+    -webkit-backdrop-filter: blur(20px) saturate(140%) !important;
+    border: 1px solid rgba(255, 255, 255, 0.55) !important;
+    box-shadow: 0 8px 32px rgba(168, 116, 73, 0.03), inset 0 1px 1px rgba(255, 255, 255, 0.8) !important;
+  }
+
+  /* Beautiful glass overlays & modals on mobile */
+  .overlay-blur {
+    background: rgba(253, 250, 247, 0.75) !important;
+    backdrop-filter: blur(20px) saturate(140%) !important;
+    -webkit-backdrop-filter: blur(20px) saturate(140%) !important;
+  }
 }
 
 ::selection {
@@ -460,17 +474,4 @@ body::before {
     0 1px 0 0 rgba(255, 255, 255, 0.2) inset,
     inset 0 0 0 1px rgba(255, 255, 255, 0.05),
     0 4px 12px rgba(44, 36, 29, 0.1);
-}
-
-/* Mobile high-opacity override fallback */
-@media (max-width: 600px) {
-  .btn-liquid-glass {
-    background: rgba(255, 255, 255, 0.9) !important;
-    border-color: rgba(0, 0, 0, 0.08) !important;
-    color: #3A2E26 !important;
-  }
-  .btn-liquid-glass-dark {
-    background: #2C241D !important;
-    color: #FFFFFF !important;
-  }
 }
