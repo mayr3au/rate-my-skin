@@ -291,8 +291,12 @@ body::before {
   .rpt-product-btns { flex-direction: column !important; width: 100% !important; gap: 8px !important; }
   .rpt-product-btns a { text-align: center !important; display: block !important; }
 
-  /* Metric card: smaller ring */
-  .rpt-metric-ring svg { width: 48px !important; height: 48px !important; }
+  /* Metric card: smaller ring — resize wrapper + svg together so overlay stays centred */
+  .rpt-metric-ring { width: 46px !important; height: 46px !important; }
+  .rpt-metric-ring svg { width: 46px !important; height: 46px !important; }
+
+  /* Metric detail text: prevent long clinical terms from overflowing */
+  .rpt-metric-detail { font-size: 11px !important; line-height: 1.55 !important; }
 
   /* Section heading badge: hide on mobile to save space */
   .rpt-section-badge { display: none !important; }

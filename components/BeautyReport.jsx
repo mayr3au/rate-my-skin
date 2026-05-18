@@ -20,7 +20,7 @@ function ScoreRing({ score, size = 64 }) {
   const dash = (animated / 100) * circ;
   const color = score >= 78 ? GOLD : score >= 65 ? "#8C7A6B" : "#B9AC9E";
   return (
-    <svg width={size} height={size} style={{ transform: "rotate(-90deg)", flexShrink: 0 }}>
+    <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} style={{ transform: "rotate(-90deg)", flexShrink: 0, display: "block" }}>
       <circle cx={size/2} cy={size/2} r={r} fill="none" stroke="rgba(212,165,116,0.12)" strokeWidth="3"/>
       <circle cx={size/2} cy={size/2} r={r} fill="none" stroke={color} strokeWidth="3"
         strokeDasharray={`${dash} ${circ}`}
@@ -45,13 +45,13 @@ function MetricCard({ m, index }) {
       opacity: vis ? 1 : 0, transform: vis ? "translateY(0)" : "translateY(14px)",
       transition: "opacity 0.55s ease, transform 0.55s ease",
     }}>
-      <div className="rpt-metric-ring" style={{ position: "relative", flexShrink: 0 }}>
+      <div className="rpt-metric-ring" style={{ position: "relative", flexShrink: 0, width: 58, height: 58 }}>
         <ScoreRing score={m.score} size={58}/>
-        <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center" }}>
+        <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center", zIndex: 1 }}>
           <span style={{ fontSize: 13, fontWeight: 700, color: "#2C241D", fontFamily: "'Cormorant Garamond', serif" }}>{m.score}</span>
         </div>
       </div>
-      <div style={{ flex: 1, minWidth: 0 }}>
+      <div style={{ flex: 1, minWidth: 0, overflow: "hidden" }}>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 6, gap: 8 }}>
           <span style={{ fontSize: 11, fontWeight: 600, letterSpacing: "0.1em", textTransform: "uppercase", color: "#2C241D" }}>{m.label}</span>
           <span style={{ fontSize: 10, fontWeight: 700, borderRadius: 6, padding: "3px 9px", background: gradeColor.bg, color: gradeColor.color, letterSpacing: "0.06em", flexShrink: 0 }}>{m.grade}</span>
@@ -59,7 +59,7 @@ function MetricCard({ m, index }) {
         <div style={{ height: 2, background: "rgba(212,165,116,0.12)", borderRadius: 10, marginBottom: 8, overflow: "hidden" }}>
           <div style={{ height: "100%", width: `${m.score}%`, background: `linear-gradient(90deg, #2C241D, ${GOLD})`, borderRadius: 10, transition: "width 1.6s cubic-bezier(0.4,0,0.2,1)" }}/>
         </div>
-        <p style={{ margin: 0, fontSize: 12, lineHeight: 1.65, color: "#8C7A6B" }}>{m.detail}</p>
+        <p className="rpt-metric-detail" style={{ margin: 0, fontSize: 12, lineHeight: 1.65, color: "#8C7A6B", wordBreak: "break-word", overflowWrap: "break-word" }}>{m.detail}</p>
       </div>
     </div>
   );
@@ -350,6 +350,7 @@ export default function BeautyReport({ data, isPaid, onUnlock }) {
                 fontFamily: "'DM Sans', sans-serif", textTransform: "uppercase",
                 border: "none", cursor: "pointer", transition: "all 0.2s ease",
                 boxShadow: previewTab === i ? "0 4px 14px rgba(44,36,29,0.15)" : "none",
+                whiteSpace: "nowrap",
               }}>{label}</button>
             ))}
           </div>
