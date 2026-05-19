@@ -1,3 +1,5 @@
+import { articles } from '../lib/blogData';
+
 export default function Sitemap() {
   return null;
 }
@@ -9,6 +11,12 @@ export async function getServerSideProps({ res }) {
     { url: 'https://ratemyskin.co/', priority: '1.0', changefreq: 'daily' },
     { url: 'https://ratemyskin.co/mes-rapports', priority: '0.8', changefreq: 'weekly' },
     { url: 'https://ratemyskin.co/report', priority: '0.5', changefreq: 'monthly' },
+    { url: 'https://ratemyskin.co/blog', priority: '0.8', changefreq: 'weekly' },
+    ...articles.map(a => ({
+      url: `https://ratemyskin.co/blog/${a.slug}`,
+      priority: '0.7',
+      changefreq: 'weekly',
+    })),
   ];
 
   const xml = `<?xml version="1.0" encoding="UTF-8"?>
