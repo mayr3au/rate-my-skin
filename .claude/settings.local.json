@@ -12,7 +12,10 @@
       "Bash(npm install *)",
       "Bash(git *)",
       "Bash(node -e \"require\\('sharp'\\)\")",
-      "Bash(node *)"
+      "Bash(node *)",
+      "Bash(del \"C:\\\\Users\\\\mayre\\\\OneDrive\\\\Documents\\\\rate my face\\\\scripts\\\\light-theme.js\")",
+      "Bash(grep -E \"\\\\.\\(sql|json\\)$\")",
+      "Bash(echo \"exit: $?\")"
     ]
   }
 }

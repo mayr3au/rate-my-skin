@@ -386,62 +386,234 @@ function MetricCard({ m, index }) {
   );
 }
 
+/* ── Product image lookup ── */
+const getProductImage = (productName) => {
+  const name = productName?.toLowerCase() || '';
+  if (name.includes('cerave sa cleanser') || name.includes('sa smoothing cleanser')) {
+    return 'https://images.unsplash.com/photo-1608248597481-496100c80836?q=80&w=240&auto=format&fit=crop';
+  }
+  if (name.includes("paula's choice 2%") || (name.includes('paula') && name.includes('bha'))) {
+    return 'https://images.unsplash.com/photo-1556228720-195a672e8a03?q=80&w=240&auto=format&fit=crop';
+  }
+  if (name.includes('alpha arbutin')) {
+    return 'https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?q=80&w=240&auto=format&fit=crop';
+  }
+  if (name.includes('skinceuticals') || name.includes('c e ferulic')) {
+    return 'https://images.unsplash.com/photo-1617897903246-719242758050?q=80&w=240&auto=format&fit=crop';
+  }
+  if (name.includes('cerave moistur') || name.includes('crème hydratante')) {
+    return 'https://images.unsplash.com/photo-1556228578-0d85b1a4d571?q=80&w=240&auto=format&fit=crop';
+  }
+  if (name.includes('laneige') || name.includes('sleeping mask')) {
+    return 'https://images.unsplash.com/photo-1571781926291-c477ebfd024b?q=80&w=240&auto=format&fit=crop';
+  }
+  if (name.includes('ordinary niacinamide')) {
+    return 'https://images.unsplash.com/photo-1620916566398-39f1143ab7be?q=80&w=240&auto=format&fit=crop';
+  }
+  if (name.includes('saturn') || name.includes('sunday riley') || name.includes('sulfur')) {
+    return 'https://images.unsplash.com/photo-1598440947619-2c35fc9aa908?q=80&w=240&auto=format&fit=crop';
+  }
+  if (name.includes('caffeine eye') || name.includes('inkey list')) {
+    return 'https://images.unsplash.com/photo-1601049541289-9b1b7bbbfe19?q=80&w=240&auto=format&fit=crop';
+  }
+  if (name.includes('avocado') || name.includes('kiehl')) {
+    return 'https://images.unsplash.com/photo-1601049541289-9b1b7bbbfe19?q=80&w=240&auto=format&fit=crop';
+  }
+  if (name.includes('glow recipe') || name.includes('watermelon') || name.includes('dew drops')) {
+    return 'https://images.unsplash.com/photo-1601049676099-e7ed07d825b0?q=80&w=240&auto=format&fit=crop';
+  }
+  if (name.includes('drunk elephant') || name.includes('firma')) {
+    return 'https://images.unsplash.com/photo-1526947425960-945c6e72858f?q=80&w=240&auto=format&fit=crop';
+  }
+  if (name.includes("paula's choice 8%") || (name.includes('paula') && name.includes('aha'))) {
+    return 'https://images.unsplash.com/photo-1556228720-195a672e8a03?q=80&w=240&auto=format&fit=crop';
+  }
+
+  if (name.includes('cleanser') || name.includes('nettoyant')) {
+    return 'https://images.unsplash.com/photo-1556228720-195a672e8a03?q=80&w=240&auto=format&fit=crop';
+  }
+  if (name.includes('serum') || name.includes('sérum')) {
+    return 'https://images.unsplash.com/photo-1620916566398-39f1143ab7be?q=80&w=240&auto=format&fit=crop';
+  }
+  if (name.includes('cream') || name.includes('moisturizer') || name.includes('crème')) {
+    return 'https://images.unsplash.com/photo-1556228578-0d85b1a4d571?q=80&w=240&auto=format&fit=crop';
+  }
+  return 'https://images.unsplash.com/photo-1608248597481-496100c80836?q=80&w=240&auto=format&fit=crop';
+};
+
 /* ── Product card ── */
 function ProductCard({ product, lang, t }) {
   const [hov, setHov] = useState(false);
   const [vis, setVis] = useState(false);
+  const [imgFailed, setImgFailed] = useState(false);
+  
   useEffect(() => { const t = setTimeout(() => setVis(true), 60); return () => clearTimeout(t); }, []);
+
   const amazonUrl = product.amazonLink || `https://www.amazon.fr/s?k=${encodeURIComponent(product.productName)}&tag=ratemyskin-21`;
   const sephoraUrl = product.sephoraLink || `https://www.sephora.fr/search/?q=${encodeURIComponent(product.productName)}`;
   const primaryLink = amazonUrl;
 
+  const imgUrl = product.imageUrl || getProductImage(product.productName);
+
   return (
-    <div onMouseEnter={() => setHov(true)} onMouseLeave={() => setHov(false)} style={{
-      ...CARD, padding: "18px 20px",
-      border: hov ? "1px solid rgba(168,116,73,0.45)" : "1px solid rgba(255, 255, 255, 0.65)",
-      boxShadow: hov ? "0 12px 40px rgba(168,116,73,0.08), inset 0 1px 1px rgba(255, 255, 255, 0.95)" : CARD.boxShadow,
-      opacity: vis ? 1 : 0, transform: vis ? "translateY(0)" : "translateY(12px)",
-      transition: "opacity 0.45s ease, transform 0.45s ease, border-color 0.2s, box-shadow 0.2s, background-color 0.2s",
-      display: "flex", gap: 16, alignItems: "flex-start", overflow: "hidden",
-    }}>
-
-      {/* Product image */}
-      {product.imageUrl && (
-        <a href={primaryLink} target="_blank" rel="noopener noreferrer" style={{ flexShrink: 0, display: "block" }}>
-          <img
-            src={product.imageUrl}
-            alt={product.productName}
-            width={88}
-            height={88}
-            style={{
-              width: "clamp(72px, 20vw, 88px)",
-              height: "clamp(72px, 20vw, 88px)",
-              objectFit: "contain",
-              borderRadius: 12,
-              background: "rgba(255,255,255,0.85)",
-              border: "1px solid rgba(255,255,255,0.9)",
-              padding: 6,
-              display: "block",
-              transition: "opacity 0.2s",
-              opacity: hov ? 0.85 : 1,
-            }}
-          />
+    <div
+      onMouseEnter={() => setHov(true)}
+      onMouseLeave={() => setHov(false)}
+      style={{
+        ...CARD,
+        padding: "20px",
+        border: hov ? "1px solid rgba(168,116,73,0.45)" : "1px solid rgba(255, 255, 255, 0.85)",
+        boxShadow: hov ? "0 16px 40px rgba(168,116,73,0.12), inset 0 1px 0 rgba(255,255,255,0.95)" : "0 8px 32px rgba(168,116,73,0.03), inset 0 1px 0 rgba(255,255,255,0.95)",
+        opacity: vis ? 1 : 0,
+        transform: hov ? "translateY(-4px)" : "translateY(0)",
+        transition: "opacity 0.45s ease, transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.3s, box-shadow 0.3s, background-color 0.3s",
+        display: "flex",
+        gap: "20px",
+        alignItems: "stretch",
+        overflow: "hidden",
+        background: "linear-gradient(135deg, rgba(255, 255, 255, 0.78) 0%, rgba(253, 246, 237, 0.52) 50%, rgba(246, 235, 222, 0.78) 100%)",
+        backdropFilter: "blur(20px) saturate(140%)",
+        WebkitBackdropFilter: "blur(20px) saturate(140%)",
+      }}
+    >
+      {/* Product image wrapper */}
+      <div style={{
+        flexShrink: 0,
+        width: "clamp(90px, 22vw, 110px)",
+        borderRadius: "14px",
+        overflow: "hidden",
+        background: "#FFFFFF",
+        border: "1px solid rgba(168,116,73,0.1)",
+        position: "relative",
+        boxShadow: "0 6px 18px rgba(168, 116, 73, 0.04)",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+      }}>
+        <a href={primaryLink} target="_blank" rel="noopener noreferrer" style={{ display: "block", width: "100%", height: "100%" }}>
+          {imgFailed ? (
+            <div style={{
+              width: "100%",
+              height: "100%",
+              background: "linear-gradient(135deg, #FBF6F0 0%, #EEDCD0 100%)",
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              justifyContent: "center",
+              padding: "10px",
+              textAlign: "center"
+            }}>
+              <span style={{ fontSize: "20px", color: "#A87449" }}>✦</span>
+              <span style={{ fontSize: "9px", fontWeight: 700, color: "#8C7A6B", marginTop: 4, letterSpacing: "0.05em", textTransform: "uppercase" }}>CARE</span>
+            </div>
+          ) : (
+            <img
+              src={imgUrl}
+              alt={product.productName}
+              onError={() => setImgFailed(true)}
+              style={{
+                width: "100%",
+                height: "100%",
+                objectFit: "cover",
+                display: "block",
+                transition: "transform 0.5s cubic-bezier(0.16, 1, 0.3, 1)",
+                transform: hov ? "scale(1.06)" : "scale(1)",
+              }}
+            />
+          )}
         </a>
-      )}
+      </div>
 
-      {/* Content */}
-      <div style={{ flex: 1, minWidth: 0, overflow: "hidden" }}>
-        <span style={{ display: "inline-block", marginBottom: 8, fontSize: 9, fontWeight: 700, letterSpacing: "0.14em", textTransform: "uppercase", color: "#A0634A", background: "rgba(168,116,73,0.1)", border: "1px solid rgba(168,116,73,0.22)", borderRadius: 6, padding: "3px 9px" }}>
-          {product.skinProblem}
-        </span>
-        <div style={{ fontSize: 15.5, fontWeight: 400, color: "#3A2E26", marginBottom: 5, fontFamily: "'Cormorant Garamond', serif", lineHeight: 1.3, wordBreak: "break-word" }}>{product.productName}</div>
-        <p style={{ margin: "0 0 14px", fontSize: 12, color: "#8C7A6B", lineHeight: 1.65, wordBreak: "break-word" }}>{product.description}</p>
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 8 }}>
-          <span style={{ fontSize: 17, fontWeight: 300, color: "#A87449", fontFamily: "'Cormorant Garamond', serif" }}>{product.price}</span>
-          <div className="rpt-product-btns" style={{ display: "flex", gap: 7 }}>
-            <a href={amazonUrl} target="_blank" rel="noopener noreferrer" className="btn-liquid-glass-dark" style={{ padding: "8px 14px", fontSize: 11.5, borderRadius: 12, border: "none" }}>{t('buyAmazon')}</a>
-            <a href={sephoraUrl} target="_blank" rel="noopener noreferrer" className="btn-liquid-glass" style={{ padding: "8px 14px", fontSize: 11.5, borderRadius: 12, border: "none" }}>{t('buySephora')}</a>
+      {/* Content wrapper */}
+      <div style={{ flex: 1, minWidth: 0, display: "flex", flexDirection: "column", justifyContent: "space-between" }}>
+        <div>
+          {/* Header row with Category and Price */}
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8, flexWrap: "wrap", gap: 8 }}>
+            <span style={{
+              display: "inline-block",
+              fontSize: 9,
+              fontWeight: 700,
+              letterSpacing: "0.15em",
+              textTransform: "uppercase",
+              color: "#A87449",
+              background: "rgba(168,116,73,0.06)",
+              border: "1px solid rgba(168,116,73,0.18)",
+              borderRadius: 6,
+              padding: "3px 8px"
+            }}>
+              {product.skinProblem}
+            </span>
+            <span style={{
+              fontSize: "15px",
+              fontWeight: 600,
+              color: "#A87449",
+              fontFamily: "'DM Sans', sans-serif"
+            }}>
+              {product.price}
+            </span>
           </div>
+
+          {/* Product Title */}
+          <div style={{
+            fontSize: 17.5,
+            fontWeight: 600,
+            color: "#2C241D",
+            marginBottom: 6,
+            fontFamily: "'Cormorant Garamond', serif",
+            lineHeight: 1.25,
+            wordBreak: "break-word"
+          }}>
+            {product.productName}
+          </div>
+
+          {/* Product Description */}
+          <p style={{
+            margin: "0 0 16px",
+            fontSize: 12.5,
+            color: "#6F6156",
+            lineHeight: 1.6,
+            wordBreak: "break-word"
+          }}>
+            {product.description}
+          </p>
+        </div>
+
+        {/* Buttons Row */}
+        <div className="rpt-product-btns" style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
+          <a
+            href={amazonUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="btn-liquid-glass-dark"
+            style={{
+              padding: "9px 18px",
+              fontSize: 11.5,
+              borderRadius: 10,
+              border: "none",
+              flex: 1,
+              textAlign: "center",
+              whiteSpace: "nowrap"
+            }}
+          >
+            {t('buyAmazon')}
+          </a>
+          <a
+            href={sephoraUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="btn-liquid-glass"
+            style={{
+              padding: "9px 18px",
+              fontSize: 11.5,
+              borderRadius: 10,
+              border: "none",
+              flex: 1,
+              textAlign: "center",
+              whiteSpace: "nowrap"
+            }}
+          >
+            {t('buySephora')}
+          </a>
         </div>
       </div>
     </div>
