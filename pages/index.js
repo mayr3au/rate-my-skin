@@ -788,6 +788,26 @@ export default function Home() {
               </span>
             ))}
           </div>
+
+          <div style={{ display: 'flex', justifyContent: 'center', marginTop: 24 }}>
+            <span
+              onClick={() => router.push('/privacy')}
+              style={{
+                fontSize: 11,
+                color: '#A87449',
+                cursor: 'pointer',
+                fontFamily: "'DM Sans', sans-serif",
+                letterSpacing: '0.04em',
+                opacity: 0.75,
+                transition: 'opacity 0.2s',
+                textDecoration: 'underline',
+              }}
+              onMouseEnter={(e) => e.target.style.opacity = 1}
+              onMouseLeave={(e) => e.target.style.opacity = 0.75}
+            >
+              {t('privacyPolicy')}
+            </span>
+          </div>
         </div>
       </main>
 

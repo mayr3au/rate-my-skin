@@ -14,10 +14,10 @@ export default async function handler(req, res) {
 
   const isPack = planId === 'pack';
   const amount = isPack ? 499 : 199;
-  const name = isPack
-    ? '5 Full Skin Reports — Rate My Skin'
-    : '1 Full Skin Report — Rate My Skin';
   const product_type = isPack ? 'five_analyses' : 'single_analysis';
+  const productId = isPack 
+    ? (process.env.STRIPE_PRODUCT_5_PACK || 'prod_UW0urukCJLR5yF')
+    : (process.env.STRIPE_PRODUCT_1_PACK || 'prod_UW0u9y5xXSSwK4');
 
   // Save email to the analysis row so it's retrievable via /mes-rapports
   if (email && validateEmail(email) && analysisId) {
@@ -43,10 +43,7 @@ export default async function handler(req, res) {
         {
           price_data: {
             currency: 'eur',
-            product_data: {
-              name,
-              description: 'Full AI-powered skin analysis: 8 metrics, personalised routine & product recommendations.',
-            },
+            product: productId,
             unit_amount: amount,
           },
           quantity: 1,
