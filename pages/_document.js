@@ -5,7 +5,7 @@ export default function Document() {
     <Html lang="fr">
       <Head>
         <meta name="google-site-verification" content="_VjUAFKvSl3HkG5ZyfGWfwNC1dufCfcUvQdHpkWcRSY" />
-        <link rel="icon" href="/favicon.png?v=2" type="image/png" />
+        <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link
