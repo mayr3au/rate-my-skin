@@ -824,6 +824,7 @@ export default function Home() {
           transition: 'opacity 0.65s ease',
         }}>
           <div className="card-blur" style={{
+            position: 'relative',
             borderRadius: 32,
             padding: 'clamp(32px, 6vw, 48px)',
             maxWidth: 420, width: '100%',
@@ -832,6 +833,33 @@ export default function Home() {
             transition: 'transform 0.65s cubic-bezier(0.4,0,0.2,1)',
             textAlign: 'center',
           }}>
+            {/* Close button */}
+            <button
+              onClick={() => {
+                setOverlayVisible(false);
+                setPendingAction(null);
+              }}
+              style={{
+                position: 'absolute',
+                top: 20,
+                right: 20,
+                background: 'none',
+                border: 'none',
+                color: '#8C7A6B',
+                fontSize: 18,
+                cursor: 'pointer',
+                fontFamily: "'DM Sans', sans-serif",
+                opacity: 0.7,
+                transition: 'opacity 0.2s',
+                padding: '4px 8px',
+                zIndex: 10,
+              }}
+              onMouseEnter={(e) => e.target.style.opacity = 1}
+              onMouseLeave={(e) => e.target.style.opacity = 0.7}
+            >
+              ✕
+            </button>
+
             <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 22 }}>
               <LuxuryFlower width={72} height={72} />
             </div>
