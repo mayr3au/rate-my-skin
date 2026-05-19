@@ -52,6 +52,7 @@ export default function Home() {
   const [emailLoading, setEmailLoading] = useState(false);
   const [newsletterConsent, setNewsletterConsent] = useState(true);
   const [overlayVisible, setOverlayVisible] = useState(false);
+  const [pendingAction, setPendingAction] = useState(null); // 'file' | 'camera'
 
   const [image, setImage] = useState(null);
   const [imageUrl, setImageUrl] = useState(null);
@@ -153,15 +154,33 @@ export default function Home() {
     localStorage.setItem('rms_user_email', email.trim());
     setEmailCaptured(true);
     
-    // Smooth transition: close overlay then start analysis automatically
+    // Smooth transition: close overlay, then resume the action the user originally triggered
     setTimeout(() => {
       setOverlayVisible(false);
       setEmailLoading(false);
-      // We call handleAnalyse after a short delay so the overlay close animation finishes
       setTimeout(() => {
-        handleAnalyse(true); // pass flag to bypass email check
+        if (pendingAction === 'file') {
+          fileInputRef.current?.click();
+        } else if (pendingAction === 'camera') {
+          startCamera();
+        } else {
+          handleAnalyse(true);
+        }
+        setPendingAction(null);
       }, 300);
     }, 650);
+  };
+
+  /* ── Email gate guard: show overlay or proceed directly ── */
+  const requireEmail = (action, e) => {
+    if (e) e.stopPropagation();
+    if (emailCaptured) {
+      if (action === 'file') fileInputRef.current?.click();
+      else if (action === 'camera') startCamera();
+    } else {
+      setPendingAction(action);
+      setOverlayVisible(true);
+    }
   };
 
   /* ── File handling ── */
@@ -490,7 +509,7 @@ export default function Home() {
 
           {/* Upload zone */}
           <div
-            onClick={() => !imageUrl && fileInputRef.current?.click()}
+            onClick={(e) => !imageUrl && requireEmail('file', e)}
             className="card-nacré"
             style={{
               border: dragOver ? `1.5px solid ${GOLD}` : undefined,
@@ -536,14 +555,14 @@ export default function Home() {
                 </p>
                 <div style={{ display: 'flex', gap: 8, justifyContent: 'center', marginTop: 14, flexWrap: 'wrap' }}>
                   <button
-                    onClick={(e) => { e.stopPropagation(); fileInputRef.current?.click(); }}
+                    onClick={(e) => requireEmail('file', e)}
                     className="btn-liquid-glass-dark home-upload-btn"
                     style={{ border: 'none' }}
                   >
                     {t('uploadPhoto')}
                   </button>
                   <button
-                    onClick={(e) => { e.stopPropagation(); startCamera(); }}
+                    onClick={(e) => requireEmail('camera', e)}
                     className="btn-liquid-glass home-upload-btn"
                     style={{ border: 'none' }}
                   >
