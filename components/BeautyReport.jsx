@@ -1,6 +1,7 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useLang } from "../lib/LangContext";
 import { shareScore } from "../lib/shareImage";
+import { sanitizeReport } from "../lib/textSanitizer";
 
 const GOLD = "#C5A028";
 const CARD = {
@@ -87,21 +88,69 @@ function solveCubicBezier(x1, y1, x2, y2, t) {
 function ScoreHeroCard({ score, summary, faceShape, skinType, skinTone, badge, miniMetrics, t, lang }) {
   const [animated, setAnimated] = useState(0);
   const [displayScore, setDisplayScore] = useState(1);
+  const [showTooltip, setShowTooltip] = useState(false);
+
+  const getPhototypeText = (val) => {
+    if (!val) return "";
+    const lower = val.toLowerCase();
+    const isFr = lang === 'fr';
+    if (lower.includes('type iii') || lower.includes('beige moyen') || lower.includes('medium')) {
+      return isFr ? "Phototype III selon l'échelle dermatologique" : "Phototype III according to the dermatological scale";
+    }
+    if (lower.includes('type ii') || lower.includes('clair') || lower.includes('fair') || lower.includes('light')) {
+      return isFr ? "Phototype II selon l'échelle dermatologique" : "Phototype II according to the dermatological scale";
+    }
+    if (lower.includes('type i') || lower.includes('très clair') || lower.includes('very fair')) {
+      return isFr ? "Phototype I selon l'échelle dermatologique" : "Phototype I according to the dermatological scale";
+    }
+    if (lower.includes('type vi') || lower.includes('foncé') || lower.includes('deep')) {
+      return isFr ? "Phototype VI selon l'échelle dermatologique" : "Phototype VI according to the dermatological scale";
+    }
+    if (lower.includes('type v') || lower.includes('brun') || lower.includes('dark')) {
+      return isFr ? "Phototype V selon l'échelle dermatologique" : "Phototype V according to the dermatological scale";
+    }
+    if (lower.includes('type iv') || lower.includes('mat') || lower.includes('olive')) {
+      return isFr ? "Phototype IV selon l'échelle dermatologique" : "Phototype IV according to the dermatological scale";
+    }
+    return isFr ? "Phototype selon l'échelle de Fitzpatrick" : "Phototype according to the Fitzpatrick scale";
+  };
+
+  useEffect(() => {
+    if (!showTooltip) return;
+    const handleOutsideClick = () => {
+      setShowTooltip(false);
+    };
+    document.addEventListener("click", handleOutsideClick);
+    return () => {
+      document.removeEventListener("click", handleOutsideClick);
+    };
+  }, [showTooltip]);
+
+  // Helper to remove phototype tags like Type I, Type II, Type III, etc. from the visible label
+  const getCleanedSkinTone = (val) => {
+    if (!val) return "";
+    let clean = val.replace(/\s*(?:—|-|\/|\|)?\s*Type\s+[IVXLCDM]+\s*(?:—|-|\/|\|)?\s*/gi, ' ');
+    clean = clean.replace(/\s*Type\s+[IVXLCDM]+\s*/gi, ' ');
+    clean = clean.trim().replace(/\s+/g, ' ');
+    clean = clean.replace(/^[—\-\/\|\s]+|[—\-\/\|\s]+$/g, '');
+    return clean;
+  };
 
   // Helper to translate trait values automatically in French
   const getTranslatedValue = (val) => {
     if (!val) return "";
+    let result = val;
     if (lang === 'fr') {
       const lower = val.toLowerCase().trim();
-      if (lower.includes('combination to oily') || lower.includes('combination') || lower === 'mixte à grasse') return 'Mixte à Grasse';
-      if (lower.includes('oval') || lower === 'ovale') return 'Ovale';
-      if (lower.includes('medium beige') || lower.includes('type iii')) return 'Type III — Beige Moyen';
-      if (lower.includes('dry') || lower === 'sèche') return 'Peau Sèche';
-      if (lower.includes('oily') || lower === 'grasse') return 'Peau Grasse';
-      if (lower.includes('sensitive') || lower === 'sensible') return 'Peau Sensible';
-      if (lower.includes('normal')) return 'Peau Normale';
+      if (lower.includes('combination to oily') || lower.includes('combination') || lower === 'mixte à grasse') result = 'Mixte à Grasse';
+      else if (lower.includes('oval') || lower === 'ovale') result = 'Ovale';
+      else if (lower.includes('medium beige') || lower.includes('type iii')) result = 'Beige Moyen';
+      else if (lower.includes('dry') || lower === 'sèche') result = 'Peau Sèche';
+      else if (lower.includes('oily') || lower === 'grasse') result = 'Peau Grasse';
+      else if (lower.includes('sensitive') || lower === 'sensible') result = 'Peau Sensible';
+      else if (lower.includes('normal')) result = 'Peau Normale';
     }
-    return val;
+    return getCleanedSkinTone(result);
   };
 
   useEffect(() => {
@@ -276,16 +325,54 @@ function ScoreHeroCard({ score, summary, faceShape, skinType, skinTone, badge, m
 
       {/* Trait tags */}
       <div style={{ display: "flex", gap: 8, flexWrap: "wrap", justifyContent: "center", position: "relative" }}>
-        {[{ k: t("faceShape"), v: faceShape }, { k: t("skinType"), v: skinType }, { k: t("skinTone"), v: skinTone }].map(tag => tag.v ? (
-          <div key={tag.k} style={{
-            background: "rgba(255,255,255,0.62)", backdropFilter: "blur(12px)", WebkitBackdropFilter: "blur(12px)", borderRadius: 10,
-            padding: "7px 14px", border: "1px solid rgba(255,255,255,0.82)"
-          }}>
+        {[
+          { type: 'faceShape', k: t("faceShape"), v: faceShape },
+          { type: 'skinType', k: t("skinType"), v: skinType },
+          { type: 'skinTone', k: t("skinTone"), v: skinTone }
+        ].map(tag => tag.v ? (
+          <div
+            key={tag.k}
+            onClick={(e) => {
+              if (tag.type === 'skinTone') {
+                e.stopPropagation();
+                setShowTooltip(!showTooltip);
+              }
+            }}
+            style={{
+              background: "rgba(255,255,255,0.62)",
+              backdropFilter: "blur(12px)",
+              WebkitBackdropFilter: "blur(12px)",
+              borderRadius: 10,
+              padding: "7px 14px",
+              border: "1px solid rgba(255,255,255,0.82)",
+              cursor: tag.type === 'skinTone' ? 'pointer' : 'default',
+              position: 'relative',
+              userSelect: 'none',
+            }}
+          >
             <div style={{
               fontSize: 8, letterSpacing: "0.16em", textTransform: "uppercase",
-              color: "#B0885E", fontWeight: 600, fontFamily: "'DM Sans', sans-serif"
+              color: "#B0885E", fontWeight: 600, fontFamily: "'DM Sans', sans-serif",
+              display: 'flex',
+              alignItems: 'center',
+              gap: 4
             }}>
               {tag.k}
+              {tag.type === 'skinTone' && (
+                <span style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  width: 12,
+                  height: 12,
+                  borderRadius: '50%',
+                  background: 'rgba(168,116,73,0.12)',
+                  color: '#A87449',
+                  fontSize: 8,
+                  fontWeight: 700,
+                  fontStyle: 'normal',
+                }}>i</span>
+              )}
             </div>
             <div style={{
               fontSize: 12, color: "#3A2E26", fontWeight: 600,
@@ -293,6 +380,46 @@ function ScoreHeroCard({ score, summary, faceShape, skinType, skinTone, badge, m
             }}>
               {getTranslatedValue(tag.v)}
             </div>
+
+            {/* Premium Info Bubble / Tooltip */}
+            {tag.type === 'skinTone' && showTooltip && (
+              <div
+                style={{
+                  position: 'absolute',
+                  bottom: '100%',
+                  left: '50%',
+                  transform: 'translateX(-50%) translateY(-8px)',
+                  width: 220,
+                  background: 'rgba(58, 46, 38, 0.96)',
+                  color: '#FAF6F0',
+                  padding: '10px 14px',
+                  borderRadius: 12,
+                  fontSize: 11,
+                  fontWeight: 500,
+                  lineHeight: 1.4,
+                  boxShadow: '0 8px 24px rgba(44, 36, 29, 0.25)',
+                  zIndex: 100,
+                  fontFamily: "'DM Sans', sans-serif",
+                  textAlign: 'center',
+                  animation: 'tooltipFadeIn 0.2s cubic-bezier(0.16, 1, 0.3, 1) forwards',
+                }}
+                onClick={(e) => e.stopPropagation()}
+              >
+                {getPhototypeText(tag.v)}
+                {/* Arrow */}
+                <div style={{
+                  position: 'absolute',
+                  top: '100%',
+                  left: '50%',
+                  transform: 'translateX(-50%)',
+                  width: 0,
+                  height: 0,
+                  borderLeft: '6px solid transparent',
+                  borderRight: '6px solid transparent',
+                  borderTop: '6px solid rgba(58, 46, 38, 0.96)',
+                }} />
+              </div>
+            )}
           </div>
         ) : null)}
       </div>
@@ -699,8 +826,9 @@ function TraitTag({ label, value }) {
 }
 
 /* ══════════════════════════════════════════════════════════════════════ */
-export default function BeautyReport({ data, isPaid, onUnlock }) {
+export default function BeautyReport({ data: rawData, isPaid, onUnlock }) {
   const { lang, t } = useLang();
+  const data = useMemo(() => sanitizeReport(rawData, lang), [rawData, lang]);
   const [activeTab, setActiveTab] = useState("analysis");
   const [unlocking, setUnlocking] = useState(false);
   const [previewTab, setPreviewTab] = useState(0);
@@ -1248,7 +1376,7 @@ export default function BeautyReport({ data, isPaid, onUnlock }) {
         </div>
       </div>
 
-      <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
+      <style>{`@keyframes spin { to { transform: rotate(360deg); } } @keyframes tooltipFadeIn { from { opacity: 0; transform: translateX(-50%) translateY(0); } to { opacity: 1; transform: translateX(-50%) translateY(-8px); } }`}</style>
     </div>
   );
 }

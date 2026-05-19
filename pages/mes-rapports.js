@@ -136,6 +136,18 @@ export default function MesRapports() {
         <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
           <LangToggle />
           <button
+            onClick={() => router.push('/blog')}
+            style={{
+              background: 'none', border: 'none',
+              padding: '2px 4px', fontSize: 12, color: '#8C7A6B', cursor: 'pointer',
+              fontFamily: "'DM Sans', sans-serif", fontWeight: 500,
+              letterSpacing: '0.02em',
+              marginRight: 6
+            }}
+          >
+            {t('blogNav')}
+          </button>
+          <button
             onClick={() => router.push('/')}
             style={{
               background: 'rgba(255, 255, 255, 0.45)',

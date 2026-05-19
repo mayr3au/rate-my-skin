@@ -331,6 +331,18 @@ export default function Report() {
           )}
           <LangToggle />
           <button
+            onClick={() => router.push('/blog')}
+            className="mobile-hide"
+            style={{
+              background: 'none', border: 'none',
+              padding: '9px 4px', fontSize: 12, color: '#888', cursor: 'pointer',
+              fontFamily: "'DM Sans', sans-serif", fontWeight: 500,
+              letterSpacing: '0.02em',
+            }}
+          >
+            {t('blogNav')}
+          </button>
+          <button
             onClick={() => router.push('/mes-rapports')}
             className="mobile-hide"
             style={{

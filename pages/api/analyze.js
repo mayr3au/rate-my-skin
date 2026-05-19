@@ -5,6 +5,7 @@ import {
   checkRateLimit, verifyCaptcha,
   validateImage, sanitiseText,
 } from '../../lib/security';
+import { sanitizeReport } from '../../lib/textSanitizer';
 
 export const config = {
   api: { bodyParser: { sizeLimit: '10mb' } },
@@ -273,6 +274,7 @@ export default async function handler(req, res) {
     let analysisData;
     try {
       analysisData = JSON.parse(raw.substring(start, end + 1));
+      analysisData = sanitizeReport(analysisData, lang);
     } catch (parseErr) {
       console.error('[analyze] ❌ JSON parse failed:', parseErr.message);
       console.error('[analyze] raw length:', raw.length, '| snippet at error:', raw.substring(Math.max(0, raw.length - 200)));

@@ -384,6 +384,17 @@ export default function Home() {
           )}
           <LangToggle />
           <button
+            onClick={() => router.push('/blog')}
+            style={{
+              background: 'none', border: 'none',
+              padding: '2px 4px', fontSize: 12, color: '#8C7A6B', cursor: 'pointer',
+              fontFamily: "'DM Sans', sans-serif", fontWeight: 500,
+              letterSpacing: '0.02em',
+            }}
+          >
+            {t('blogNav')}
+          </button>
+          <button
             onClick={() => router.push('/mes-rapports')}
             style={{
               background: 'none', border: 'none',
