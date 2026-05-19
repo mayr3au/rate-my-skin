@@ -34,7 +34,7 @@ function LangToggle() {
 
 export default function Report() {
   const router = useRouter();
-  const { t } = useLang();
+  const { lang, t } = useLang();
 
   const [data, setData] = useState(null);
   const [analysisId, setAnalysisId] = useState(null);
@@ -50,22 +50,40 @@ export default function Report() {
 
     // In local development, if no report exists, inject a beautiful mock paid report!
     if (!stored && process.env.NODE_ENV === 'development') {
+      const isFr = lang === 'fr';
       const mockReport = {
         overall: 82,
-        summary: "Mild dehydration and periorbital hyperpigmentation are the dominant findings in this analysis.",
-        faceShape: "Oval",
-        skinType: "Combination",
-        skinTone: "Type III — Medium Beige",
+        summary: isFr
+          ? "Une légère déshydratation et des cernes sont les principales observations de cette analyse."
+          : "Mild dehydration and periorbital hyperpigmentation are the dominant findings in this analysis.",
+        faceShape: isFr ? "Ovale" : "Oval",
+        skinType: isFr ? "Mixte" : "Combination",
+        skinTone: isFr ? "Teint Beige Moyen — Type III" : "Type III — Medium Beige",
         free_version: {
-          mainProblems: [
-            { title: "Dehydration", description: "Clinical signs of moisture depletion in the epidermal layer.", severity: "mild" },
-            { title: "Periorbital Hyperpigmentation", description: "Dark circles observed under the eyes.", severity: "moderate" },
-            { title: "Sebum Production", description: "Slight shininess in the T-zone area.", severity: "mild" }
+          mainProblems: isFr ? [
+            { title: "Déshydratation", description: "Des signes de manque d’hydratation sont visibles dans les couches superficielles de la peau. Cela arrive souvent avec la fatigue ou un manque d’eau.", severity: "mild" },
+            { title: "Cernes", description: "Des cernes sont observés sous les yeux, probablement liés à une légère fatigue ou une prédisposition naturelle.", severity: "moderate" },
+            { title: "Excès de sébum", description: "Un léger brillant est visible sur la zone T, signe d’une production de sébum un peu élevée.", severity: "mild" }
+          ] : [
+            { title: "Dehydration", description: "Clinical signs of moisture depletion in the epidermal layer. This often occurs with fatigue or insufficient water intake.", severity: "mild" },
+            { title: "Periorbital Hyperpigmentation", description: "Dark circles observed under the eyes, likely linked to mild fatigue or a natural predisposition.", severity: "moderate" },
+            { title: "Sebum Production", description: "Slight shininess in the T-zone area, indicating slightly elevated sebum production.", severity: "mild" }
           ],
-          basicSummary: "Your skin shows high overall resilience, with mild indicators of moisture loss."
+          basicSummary: isFr
+            ? "Votre peau présente une belle résistance générale, avec de légers signes de déshydratation à corriger. Dans l’ensemble, votre peau est en bonne santé — le rapport complet vous donnera des scores détaillés, une routine sur mesure et des produits adaptés."
+            : "Your skin shows high overall resilience, with mild indicators of moisture loss. Overall, your skin is in good health — the full report will give you detailed scores, a personalised routine and tailored product recommendations.",
         },
         paid_version: {
-          metrics: [
+          metrics: isFr ? [
+            { label: "Hydratation", score: 85, grade: "B", detail: "Bonne fonction barrière, quelques légères tiraillements sur le front." },
+            { label: "Pores", score: 79, grade: "B", detail: "Activité sébaceum dans les limites normales, pores légèrement visibles." },
+            { label: "Éclat", score: 88, grade: "A", detail: "Excellent renouvellement cellulaire, surface de la peau lumineuse." },
+            { label: "Acné", score: 92, grade: "A", detail: "Aucun coumédon actif ni lésion inflammatoire détecté." },
+            { label: "Taches", score: 74, grade: "C", detail: "Légères taches solaires sur les joues et hyperpigmentation." },
+            { label: "Cernes", score: 68, grade: "D", detail: "Léger creux sous l’œil avec cernes visibles, probablement liés à la fatigue." },
+            { label: "Symétrie", score: 85, grade: "B", detail: "Alignement facial très harmonieux, légère variance structurelle mineure." },
+            { label: "Harmonie", score: 90, grade: "A", detail: "Excellente relation spatiale entre les proportions du visage." }
+          ] : [
             { label: "Hydration", score: 85, grade: "B", detail: "Optimal barrier function, minor dry lines on the forehead." },
             { label: "Pores", score: 79, grade: "B", detail: "Sebaceous activity is within normal limits; minor visible pores." },
             { label: "Radiance", score: 88, grade: "A", detail: "Excellent cellular turnover; luminous skin surface reflection." },
@@ -75,15 +93,36 @@ export default function Report() {
             { label: "Symmetry", score: 85, grade: "B", detail: "Highly harmonious facial alignment; minor structural variance." },
             { label: "Harmony", score: 90, grade: "A", detail: "Perfect spatial relationship between golden ratios." }
           ],
-          strengths: [
+          strengths: isFr ? [
+            { title: "Éclat cellulaire", desc: "Texture de peau lumineuse montrant un renouvellement cellulaire très efficace." },
+            { title: "Résistance aux imperfections", desc: "Peau nette avec zéro lésion inflammatoire active." }
+          ] : [
             { title: "Cellular Radiance", desc: "Luminous skin texture showing highly effective cellular turnover." },
             { title: "Blemish Resilience", desc: "Clean skin canvas with zero active inflammatory lesions." }
           ],
-          improvements: [
+          improvements: isFr ? [
+            { title: "Hydrater le contour des yeux", desc: "Appliquer une hydratation topique ciblée pour atténuer les cernes." },
+            { title: "Protéger contre les taches", desc: "Utiliser une protection antioxydante pour prévenir les taches induites par le soleil." }
+          ] : [
             { title: "Orbital Hydration", desc: "Targeted active topical hydration to correct structural shadow pooling." },
             { title: "Pigment Moderation", desc: "Antioxidant protection to prevent ultraviolet-induced spots." }
           ],
-          routine: {
+          routine: isFr ? {
+            morning: [
+              "Nettoyer avec un soin doux à pH neutre.",
+              "Appliquer un sérum Vitamine C pour l’action antioxydante.",
+              "Utiliser une protection solaire SPF 50+ large spectre."
+            ],
+            evening: [
+              "Double nettoyage pour éliminer la pollution.",
+              "Appliquer du Rétinol 0,3 % pour stimuler le renouvellement cellulaire.",
+              "Utiliser une crème riche en céramides pour renforcer la barrière cutanée."
+            ],
+            weekly: [
+              "Exfoliant AHA/BHA deux fois par semaine pour affiner le grain de peau.",
+              "Masque hydratant apaisant une fois par semaine."
+            ]
+          } : {
             morning: [
               "Cleanse with a mild, pH-balanced cleanser.",
               "Apply Vitamin C Serum for antioxidant defence.",
@@ -101,9 +140,11 @@ export default function Report() {
           },
           productRecommendations: [
             {
-              skinProblem: "Under-Eye Hyperpigmentation",
+              skinProblem: isFr ? "Cernes" : "Under-Eye Hyperpigmentation",
               productName: "CeraVe Eye Repair Cream",
-              description: "Formulated with ceramides and hyaluronic acid to target structural dehydration lines and protect the orbital area.",
+              description: isFr
+                ? "Formulé avec des céramides et de l’acide hyaluronique pour cibler les signes de déshydratation et protéger le contour des yeux."
+                : "Formulated with ceramides and hyaluronic acid to target structural dehydration lines and protect the orbital area.",
               amazonLink: "https://www.amazon.fr/s?k=CeraVe+Eye+Repair+Cream&tag=ratemyskin-21",
               sephoraLink: "https://www.sephora.fr/search/?q=CeraVe+Eye+Repair+Cream",
               price: "€14.50",
@@ -144,7 +185,7 @@ export default function Report() {
         if (unlocks > 0) setPaidUnlocks(unlocks);
       })
       .catch(() => { });
-  }, []);
+  }, [lang]);
 
   // 3. Handle payment=success query param
   useEffect(() => {

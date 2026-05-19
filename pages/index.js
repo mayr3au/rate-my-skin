@@ -210,6 +210,8 @@ export default function Home() {
     { key: 'LargePores', label: t('quickConcernPores') },
     { key: 'Redness', label: t('quickConcernRedness') },
     { key: 'DarkCircles', label: t('quickConcernDarkCircles') },
+    { key: 'Blackheads', label: t('quickConcernBlackheads') },
+    { key: 'Sebum', label: t('quickConcernSebum') },
   ];
 
   const handleChip = (key, label) => {
@@ -952,20 +954,20 @@ export default function Home() {
                 display: 'inline-flex',
                 alignItems: 'center',
                 gap: 8,
-                background: 'rgba(255, 255, 255, 0.25)',
-                border: '1px solid rgba(255, 255, 255, 0.3)',
+                background: 'rgba(255, 255, 255, 0.38)',
+                border: '1px solid rgba(180, 155, 135, 0.35)',
                 borderRadius: 30,
                 padding: '6px 14px',
                 fontSize: 11,
                 fontWeight: 500,
-                color: '#E8DED3',
+                color: '#7A6A5E',
                 backdropFilter: 'blur(8px)',
                 WebkitBackdropFilter: 'blur(8px)',
-                boxShadow: 'inset 0 1px 0 rgba(255, 255, 255, 0.15)',
+                boxShadow: 'inset 0 1px 0 rgba(255, 255, 255, 0.6)',
                 fontFamily: "'DM Sans', sans-serif",
                 letterSpacing: '0.01em',
               }}>
-                <span style={{ fontSize: 6, color: '#E3C19C' }}>✦</span>
+                <span style={{ fontSize: 6, color: '#9C8070' }}>✦</span>
                 {t('heroLine3')}
               </span>
             </div>
