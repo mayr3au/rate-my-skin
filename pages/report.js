@@ -185,7 +185,9 @@ export default function Report() {
   // 4. handleUnlock: calls checkout, redirects to Stripe
   const handleUnlock = async (planId) => {
     if (!userId || !analysisId) return;
-    const email = typeof window !== 'undefined' ? (localStorage.getItem('rms_email') || '') : '';
+    const email = typeof window !== 'undefined'
+      ? (localStorage.getItem('rms_user_email') || localStorage.getItem('rms_email') || '')
+      : '';
     try {
       const res = await fetch('/api/checkout', {
         method: 'POST',

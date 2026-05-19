@@ -71,14 +71,27 @@ export default function Home() {
   const loadingMessages = t('loadingSteps');
 
   useEffect(() => {
+    // Migrate old localStorage key so returning users are recognised
+    const oldEmail = localStorage.getItem('rms_email');
+    if (oldEmail && !localStorage.getItem('rms_user_email')) {
+      localStorage.setItem('rms_user_email', oldEmail);
+    }
+
     const captured = localStorage.getItem('rms_email_captured') === '1';
     setEmailCaptured(captured);
-    // Overlay stays false until triggered by button
+
     fetch('/api/identity')
       .then(r => r.json())
-      .then(({ userId: uid, paidUnlocks: unlocks }) => {
+      .then(({ userId: uid, paidUnlocks: unlocks, email: cookieEmail }) => {
         setUserId(uid);
         if (unlocks > 0) setPaidUnlocks(unlocks);
+        // Cookie email means this device is already identified — skip the gate
+        if (cookieEmail) {
+          setEmail(cookieEmail);
+          setEmailCaptured(true);
+          localStorage.setItem('rms_user_email', cookieEmail);
+          localStorage.setItem('rms_email_captured', '1');
+        }
       })
       .catch(() => {});
   }, []);
@@ -122,14 +135,22 @@ export default function Home() {
     if (!email.trim()) return;
     setEmailLoading(true);
     try {
-      await fetch('/api/newsletter', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: email.trim(), newsletter: newsletterConsent }),
-      });
+      await Promise.all([
+        fetch('/api/newsletter', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email: email.trim(), newsletter: newsletterConsent }),
+        }),
+        // Sets httpOnly email cookie so this device is auto-identified on return
+        fetch('/api/identity', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email: email.trim() }),
+        }),
+      ]);
     } catch {}
     localStorage.setItem('rms_email_captured', '1');
-    localStorage.setItem('rms_email', email.trim());
+    localStorage.setItem('rms_user_email', email.trim());
     setEmailCaptured(true);
     
     // Smooth transition: close overlay then start analysis automatically
@@ -255,7 +276,7 @@ export default function Home() {
       const imageBase64 = btoa(binary);
       const mimeType = image.type;
 
-      const storedEmail = localStorage.getItem('rms_email') || null;
+      const storedEmail = localStorage.getItem('rms_user_email') || localStorage.getItem('rms_email') || null;
       const res = await fetch('/api/analyze', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },

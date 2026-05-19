@@ -65,6 +65,7 @@ export default async function handler(req, res) {
     const analysisId = session.metadata?.analysisId;
     const product_type = session.metadata?.product_type;
     const paymentStatus = session.payment_status;
+    const stripeEmail = (session.customer_details?.email || session.customer_email || '').toLowerCase() || null;
 
     console.log('[webhook] checkout.session.completed ——————————————');
     console.log('[webhook]   session.id:', session.id);
@@ -111,6 +112,17 @@ export default async function handler(req, res) {
           '| hint:', analysisUpdateErr.hint);
       } else {
         console.log('[webhook] ✅ analysis is_paid set to TRUE:', updatedRow);
+
+      // Backup: stamp email on analysis row from Stripe customer details
+      if (stripeEmail) {
+        const { error: emailUpdateErr } = await supabase
+          .from('analyses')
+          .update({ email: stripeEmail })
+          .eq('id', analysisId)
+          .is('email', null);
+        if (emailUpdateErr) console.error('[webhook] email stamp failed:', emailUpdateErr.message);
+        else console.log('[webhook] ✅ email stamped on analysis from Stripe:', stripeEmail);
+      }
       }
     } else {
       console.error('[webhook] ❌ analysisId missing from Stripe metadata — cannot mark analysis as paid');

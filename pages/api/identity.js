@@ -1,23 +1,70 @@
 import { createAdminClient } from '../../lib/supabase';
+import { validateEmail } from '../../lib/security';
 
-const COOKIE_NAME = 'rms_uid';
+const UID_COOKIE = 'rms_uid';
+const EMAIL_COOKIE = 'rms_email_id';
 const MAX_AGE = 365 * 24 * 60 * 60; // 1 year
 
+function makeCookie(name, value) {
+  const secure = process.env.NODE_ENV === 'production' ? '; Secure' : '';
+  return `${name}=${encodeURIComponent(value)}; HttpOnly; Path=/; SameSite=Lax; Max-Age=${MAX_AGE}${secure}`;
+}
+
 export default async function handler(req, res) {
-  if (req.method !== 'GET') return res.status(405).end();
+  // POST /api/identity { email } — persist email to cookie + users table
+  if (req.method === 'POST') {
+    const { email } = req.body || {};
+    if (!validateEmail(email)) {
+      return res.status(400).json({ error: 'Invalid email' });
+    }
+    const normalizedEmail = email.trim().toLowerCase();
 
-  let userId = req.cookies[COOKIE_NAME];
+    let userId = req.cookies[UID_COOKIE];
+    const cookies = [];
 
-  if (!userId) {
-    userId = crypto.randomUUID();
-    const secure = process.env.NODE_ENV === 'production' ? '; Secure' : '';
-    res.setHeader(
-      'Set-Cookie',
-      `${COOKIE_NAME}=${userId}; HttpOnly; Path=/; SameSite=Lax; Max-Age=${MAX_AGE}${secure}`
-    );
+    if (!userId) {
+      userId = crypto.randomUUID();
+      cookies.push(makeCookie(UID_COOKIE, userId));
+    }
+    cookies.push(makeCookie(EMAIL_COOKIE, normalizedEmail));
+    res.setHeader('Set-Cookie', cookies);
+
+    // Link email to users row (best-effort)
+    try {
+      const supabase = createAdminClient();
+      const { data: existingUser } = await supabase
+        .from('users')
+        .select('id')
+        .eq('id', userId)
+        .single();
+
+      if (existingUser) {
+        await supabase.from('users').update({ email: normalizedEmail }).eq('id', userId);
+      } else {
+        await supabase.from('users').insert({
+          id: userId, analyses_used: 0, paid_credits: 0, paid_unlocks: 0, email: normalizedEmail,
+        });
+      }
+    } catch {}
+
+    return res.status(200).json({ ok: true, userId, email: normalizedEmail });
   }
 
-  // Fetch paid_unlocks so the client can display the counter without a second request
+  if (req.method !== 'GET') return res.status(405).end();
+
+  // GET — issue/read userId cookie, read email cookie, return both + paidUnlocks
+  let userId = req.cookies[UID_COOKIE];
+  const emailFromCookie = req.cookies[EMAIL_COOKIE]
+    ? decodeURIComponent(req.cookies[EMAIL_COOKIE])
+    : null;
+
+  const cookies = [];
+  if (!userId) {
+    userId = crypto.randomUUID();
+    cookies.push(makeCookie(UID_COOKIE, userId));
+  }
+  if (cookies.length) res.setHeader('Set-Cookie', cookies);
+
   let paidUnlocks = 0;
   try {
     const supabase = createAdminClient();
@@ -29,5 +76,5 @@ export default async function handler(req, res) {
     paidUnlocks = data?.paid_unlocks || 0;
   } catch {}
 
-  return res.status(200).json({ userId, paidUnlocks });
+  return res.status(200).json({ userId, paidUnlocks, email: emailFromCookie });
 }

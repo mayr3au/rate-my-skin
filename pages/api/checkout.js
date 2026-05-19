@@ -33,10 +33,12 @@ export default async function handler(req, res) {
   }
 
   const origin = `https://${req.headers.host}`;
+  const customerEmail = email && validateEmail(email) ? email.trim().toLowerCase() : undefined;
 
   try {
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ['card'],
+      ...(customerEmail ? { customer_email: customerEmail } : {}),
       line_items: [
         {
           price_data: {

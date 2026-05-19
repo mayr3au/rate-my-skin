@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import Head from 'next/head';
 import Logo from '../components/Logo';
@@ -56,6 +56,17 @@ export default function MesRapports() {
   const [reports, setReports] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+
+  useEffect(() => {
+    // Auto-fill from localStorage (same device)
+    const stored = localStorage.getItem('rms_user_email') || localStorage.getItem('rms_email');
+    if (stored) { setEmail(stored); return; }
+    // Fallback: try httpOnly cookie via identity endpoint (e.g. cleared localStorage)
+    fetch('/api/identity')
+      .then(r => r.json())
+      .then(({ email: cookieEmail }) => { if (cookieEmail) setEmail(cookieEmail); })
+      .catch(() => {});
+  }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
