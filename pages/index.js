@@ -335,10 +335,29 @@ export default function Home() {
   return (
     <>
       <Head>
-        <title>Rate My Skin — AI Skin Analysis</title>
-        <meta name="description" content="Upload a photo for your instant AI skin score. Free analysis, full details from €1.99." />
+        <title>Rate My Skin - Analyse IA de Peau Gratuite | Score &amp; Conseils Skincare</title>
+        <meta name="description" content="Découvrez votre score de peau en 30 secondes avec notre IA. Recommandations skincare personnalisées. Gratuit, sans inscription." />
+        <meta name="keywords" content="analyse peau, ia skincare, score peau, skincare gratuit, diagnostic peau" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+        <link rel="canonical" href="https://ratemyskin.co/" />
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content="https://ratemyskin.co/" />
+        <meta property="og:title" content="Rate My Skin - Analyse IA de Peau Gratuite | Score & Conseils Skincare" />
+        <meta property="og:description" content="Découvrez votre score de peau en 30 secondes avec notre IA. Recommandations skincare personnalisées. Gratuit, sans inscription." />
+        <meta property="og:image" content="https://ratemyskin.co/og-image.png" />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content="Rate My Skin - Analyse IA de Peau Gratuite | Score & Conseils Skincare" />
+        <meta name="twitter:description" content="Découvrez votre score de peau en 30 secondes avec notre IA. Recommandations skincare personnalisées. Gratuit, sans inscription." />
+        <meta name="twitter:image" content="https://ratemyskin.co/og-image.png" />
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify({
+          '@context': 'https://schema.org',
+          '@type': 'WebApplication',
+          name: 'Rate My Skin',
+          url: 'https://ratemyskin.co',
+          applicationCategory: 'HealthApplication',
+          description: 'Analyse IA de peau gratuite. Obtenez votre score de peau et des recommandations skincare personnalisées en 30 secondes.',
+          offers: { '@type': 'Offer', price: '0', priceCurrency: 'EUR' },
+        }) }} />
       </Head>
 
       {/* ── Sticky nav ── */}

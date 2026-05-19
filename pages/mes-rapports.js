@@ -109,8 +109,18 @@ export default function MesRapports() {
     <>
       <Head>
         <title>{t('myReportsPageTitle')}</title>
+        <meta name="description" content={lang === 'fr' ? "Retrouvez tous vos rapports d'analyse de peau payés en entrant votre email." : "Access all your paid skin analysis reports by entering your email."} />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+        <link rel="canonical" href="https://ratemyskin.co/mes-rapports" />
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content="https://ratemyskin.co/mes-rapports" />
+        <meta property="og:title" content={t('myReportsPageTitle')} />
+        <meta property="og:description" content={lang === 'fr' ? "Retrouvez tous vos rapports d'analyse de peau payés en entrant votre email." : "Access all your paid skin analysis reports by entering your email."} />
+        <meta property="og:image" content="https://ratemyskin.co/og-image.png" />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content={t('myReportsPageTitle')} />
+        <meta name="twitter:description" content={lang === 'fr' ? "Retrouvez tous vos rapports d'analyse de peau payés en entrant votre email." : "Access all your paid skin analysis reports by entering your email."} />
+        <meta name="twitter:image" content="https://ratemyskin.co/og-image.png" />
       </Head>
 
       {/* Nav */}

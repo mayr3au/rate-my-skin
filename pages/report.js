@@ -270,8 +270,18 @@ export default function Report() {
       <Head>
         <title>{t('reportTitle')}</title>
         <meta name="description" content={t('reportMetaDesc')} />
+        <meta name="robots" content="noindex, nofollow" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+        <link rel="canonical" href="https://ratemyskin.co/report" />
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content="https://ratemyskin.co/report" />
+        <meta property="og:title" content={t('reportTitle')} />
+        <meta property="og:description" content={t('reportMetaDesc')} />
+        <meta property="og:image" content="https://ratemyskin.co/og-image.png" />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content={t('reportTitle')} />
+        <meta name="twitter:description" content={t('reportMetaDesc')} />
+        <meta name="twitter:image" content="https://ratemyskin.co/og-image.png" />
       </Head>
 
       {/* Payment checking overlay */}
