@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+﻿import { useEffect, useRef, useState } from 'react';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
 import Logo, { CreamDrop, LuxuryFlower } from '../components/Logo';
@@ -335,19 +335,21 @@ export default function Home() {
   return (
     <>
       <Head>
-        <title>Rate My Skin - Analyse IA de Peau Gratuite | Score &amp; Conseils Skincare</title>
-        <meta name="description" content="Découvrez votre score de peau en 30 secondes avec notre IA. Recommandations skincare personnalisées. Gratuit, sans inscription." />
-        <meta name="keywords" content="analyse peau, ia skincare, score peau, skincare gratuit, diagnostic peau" />
+        <title>Note Ma Peau - Analyse IA Gratuite de ta Peau | Rate My Skin</title>
+        <meta name="description" content="Note ma peau gratuitement avec notre IA. Diagnostic de peau personnalisé en 30 secondes. Score, conseils et produits adaptés." />
+        <meta name="keywords" content="note ma peau, analyse ma peau, diagnostic peau, score peau, ia skincare, test peau gratuit, rate my skin" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="canonical" href="https://ratemyskin.co/" />
+        <link rel='alternate' hreflang='fr' href='https://ratemyskin.co/' />
+        <link rel='alternate' hreflang='x-default' href='https://ratemyskin.co/' />
         <meta property="og:type" content="website" />
         <meta property="og:url" content="https://ratemyskin.co/" />
-        <meta property="og:title" content="Rate My Skin - Analyse IA de Peau Gratuite | Score & Conseils Skincare" />
-        <meta property="og:description" content="Découvrez votre score de peau en 30 secondes avec notre IA. Recommandations skincare personnalisées. Gratuit, sans inscription." />
+        <meta property="og:title" content="Note Ma Peau - Analyse IA Gratuite" />
+        <meta property="og:description" content="Note ma peau gratuitement avec notre IA. Diagnostic de peau personnalisé en 30 secondes. Score, conseils et produits adaptés." />
         <meta property="og:image" content="https://ratemyskin.co/og-image.png" />
         <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content="Rate My Skin - Analyse IA de Peau Gratuite | Score & Conseils Skincare" />
-        <meta name="twitter:description" content="Découvrez votre score de peau en 30 secondes avec notre IA. Recommandations skincare personnalisées. Gratuit, sans inscription." />
+        <meta name="twitter:title" content="Note Ma Peau - Analyse IA Gratuite" />
+        <meta name="twitter:description" content="Note ma peau gratuitement avec notre IA. Diagnostic de peau personnalisé en 30 secondes. Score, conseils et produits adaptés." />
         <meta name="twitter:image" content="https://ratemyskin.co/og-image.png" />
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify({
           '@context': 'https://schema.org',
@@ -440,11 +442,17 @@ export default function Home() {
           <h1 style={{
             fontFamily: "'Cormorant Garamond', serif",
             fontSize: 'clamp(32px, 6vw, 52px)', fontWeight: 400,
-            color: '#3A2E26', lineHeight: 1.18, margin: 0,
+            color: '#3A2E26', lineHeight: 1.18, margin: '0 0 6px',
           }}>
-            {t('heroLine1')}<br />
-            <em>{t('heroLine2')}</em>
+            {t('heroLine1')}
           </h1>
+          <h2 style={{
+            fontFamily: "'Cormorant Garamond', serif",
+            fontSize: 'clamp(20px, 3.5vw, 30px)', fontWeight: 300,
+            color: '#6B5040', lineHeight: 1.25, margin: 0,
+          }}>
+            <em>{t('heroLine2')}</em>
+          </h2>
           <div style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', margin: '18px auto 0' }}>
             <span style={{
               display: 'inline-flex',
@@ -840,6 +848,23 @@ export default function Home() {
               {t('privacyPolicy')}
             </span>
           </div>
+        </div>
+
+        {/* SEO section - French keyword visibility */}
+        <div style={{ maxWidth: 560, margin: '0 auto', padding: '0 24px 48px', textAlign: 'center' }}>
+          <h2 style={{
+            fontFamily: "'Cormorant Garamond', serif",
+            fontSize: 'clamp(18px, 3.5vw, 24px)', fontWeight: 400,
+            color: '#3A2E26', margin: '0 0 12px',
+          }}>
+            {t('pourquoiH2')}
+          </h2>
+          <p style={{
+            fontSize: 13, color: '#8C7A6B', lineHeight: 1.75,
+            fontFamily: "'DM Sans', sans-serif", margin: 0,
+          }}>
+            {t('pourquoiDesc')}
+          </p>
         </div>
       </main>
 
