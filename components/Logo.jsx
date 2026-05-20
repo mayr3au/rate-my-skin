@@ -206,7 +206,7 @@ export default function Logo() {
           RateMy
         </span>
 
-        <LuxuryFlower width={16} height={16} />
+        <LuxuryFlower width={22} height={22} />
 
         <span className="logo-text-skin" style={{
           ...creamyStyle,
