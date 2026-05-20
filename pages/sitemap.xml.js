@@ -9,6 +9,7 @@ export async function getServerSideProps({ res }) {
 
   const pages = [
     { url: 'https://ratemyskin.co/', priority: '1.0', changefreq: 'daily' },
+    { url: 'https://ratemyskin.co/note-ma-peau', priority: '0.9', changefreq: 'monthly' },
     { url: 'https://ratemyskin.co/mes-rapports', priority: '0.8', changefreq: 'weekly' },
     { url: 'https://ratemyskin.co/report', priority: '0.5', changefreq: 'monthly' },
     { url: 'https://ratemyskin.co/blog', priority: '0.8', changefreq: 'weekly' },
