@@ -206,17 +206,7 @@ export default function Logo() {
           RateMy
         </span>
 
-        <span className="logo-diamond" style={{
-          fontSize: 'clamp(4px, 1vw, 6px)',
-          lineHeight: 1,
-          animation: 'pulse 6s ease-in-out infinite',
-          background: 'linear-gradient(135deg, #A87449, #FDFBF9, #A87449)',
-          WebkitBackgroundClip: 'text',
-          WebkitTextFillColor: 'transparent',
-          backgroundClip: 'text',
-        }}>
-          ◆
-        </span>
+        <LuxuryFlower width={16} height={16} />
 
         <span className="logo-text-skin" style={{
           ...creamyStyle,
