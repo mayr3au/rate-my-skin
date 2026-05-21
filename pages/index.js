@@ -3,6 +3,7 @@ import Head from 'next/head';
 import { useRouter } from 'next/router';
 import Logo, { CreamDrop, LuxuryFlower } from '../components/Logo';
 import { useLang } from '../lib/LangContext';
+import MedicalDisclaimer from '../components/MedicalDisclaimer';
 
 const SKIN_CONCERN_MAX = 200;
 const GOLD = '#C5A028';
@@ -829,25 +830,33 @@ export default function Home() {
             ))}
           </div>
 
-          <div style={{ display: 'flex', justifyContent: 'center', marginTop: 24 }}>
-            <span
-              onClick={() => router.push('/privacy')}
-              style={{
-                fontSize: 11,
-                color: '#A87449',
-                cursor: 'pointer',
-                fontFamily: "'DM Sans', sans-serif",
-                letterSpacing: '0.04em',
-                opacity: 0.75,
-                transition: 'opacity 0.2s',
-                textDecoration: 'underline',
-              }}
-              onMouseEnter={(e) => e.target.style.opacity = 1}
-              onMouseLeave={(e) => e.target.style.opacity = 0.75}
-            >
-              {t('privacyPolicy')}
-            </span>
+          <div style={{ display: 'flex', justifyContent: 'center', gap: 20, marginTop: 24, flexWrap: 'wrap' }}>
+            {[
+              { label: t('privacyPolicy'), path: '/privacy' },
+              { label: lang === 'fr' ? 'Avertissement médical' : 'Medical Disclaimer', path: '/mentions-legales' },
+            ].map(({ label, path }) => (
+              <span
+                key={path}
+                onClick={() => router.push(path)}
+                style={{
+                  fontSize: 11,
+                  color: '#A87449',
+                  cursor: 'pointer',
+                  fontFamily: "'DM Sans', sans-serif",
+                  letterSpacing: '0.04em',
+                  opacity: 0.75,
+                  transition: 'opacity 0.2s',
+                  textDecoration: 'underline',
+                }}
+                onMouseEnter={(e) => e.target.style.opacity = 1}
+                onMouseLeave={(e) => e.target.style.opacity = 0.75}
+              >
+                {label}
+              </span>
+            ))}
           </div>
+
+          <MedicalDisclaimer style={{ marginTop: 16 }} />
         </div>
 
         {/* SEO section - French keyword visibility */}

@@ -2,6 +2,7 @@ import { useState, useEffect, useMemo } from "react";
 import { useLang } from "../lib/LangContext";
 import { shareScore } from "../lib/shareImage";
 import { sanitizeReport } from "../lib/textSanitizer";
+import MedicalDisclaimer from "./MedicalDisclaimer";
 
 const GOLD = "#C5A028";
 const CARD = {
@@ -899,6 +900,8 @@ export default function BeautyReport({ data: rawData, isPaid, onUnlock }) {
             t={t} lang={lang}
           />
 
+          <MedicalDisclaimer style={{ marginTop: 16 }} />
+
           {/* ── Main problems ── */}
           {mainProblems.length > 0 && (
             <div style={{ marginTop: 28 }}>
@@ -1049,6 +1052,14 @@ export default function BeautyReport({ data: rawData, isPaid, onUnlock }) {
               {t('paywallValueFrame')}
             </p>
 
+            {/* Payment disclaimer */}
+            <p style={{ fontSize: 10.5, color: "#B9AC9E", textAlign: "center", margin: "0 0 14px", fontFamily: "'DM Sans', sans-serif", lineHeight: 1.55 }}>
+              {lang === 'fr'
+                ? <>En procédant au paiement, vous reconnaissez avoir lu notre{' '}<a href="/mentions-legales" style={{ color: "#A87449", textDecoration: "underline" }}>avertissement médical</a>.</>
+                : <>By proceeding to payment, you confirm you have read our{' '}<a href="/mentions-legales" style={{ color: "#A87449", textDecoration: "underline" }}>medical disclaimer</a>.</>
+              }
+            </p>
+
             {/* CTA buttons */}
             <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
               <button onClick={() => handleUnlock("single")} disabled={unlocking} className="btn-liquid-glass-dark" style={{ width: "100%", padding: "16px", borderRadius: 14, fontSize: 14, fontWeight: 700, letterSpacing: "0.02em", display: "flex", alignItems: "center", justifyContent: "center", gap: 8, border: "none" }}>
@@ -1154,6 +1165,15 @@ export default function BeautyReport({ data: rawData, isPaid, onUnlock }) {
           {previewTab === 4 && <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>{allProducts.map((p, i) => <ProductCard key={i} product={p} lang={lang} t={t} />)}</div>}
         </div>
 
+        <div style={{ maxWidth: 680, margin: "20px auto 0", padding: "0 20px 8px", textAlign: "center" }}>
+          <p style={{ fontSize: 10, color: "#B9AC9E", lineHeight: 1.8, letterSpacing: "0.02em", fontFamily: "'DM Sans', sans-serif", margin: "0 0 6px" }}>
+            {lang === 'fr' ? 'Scores basés sur les données photographiques · Pas un avis dermatologique' : 'Scores reflect visible photographic data · Not a medical assessment'}
+          </p>
+          <a href="/mentions-legales" style={{ fontSize: 10, color: "#A87449", textDecoration: "underline", fontFamily: "'DM Sans', sans-serif", opacity: 0.75 }}>
+            {lang === 'fr' ? 'Avertissement médical' : 'Medical Disclaimer'}
+          </a>
+        </div>
+
         <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
       </div>
     );
@@ -1189,6 +1209,8 @@ export default function BeautyReport({ data: rawData, isPaid, onUnlock }) {
           miniMetrics={metrics.slice(0, 3)}
           t={t} lang={lang}
         />
+
+        <MedicalDisclaimer style={{ marginTop: 16 }} />
 
         {/* ── Tabs ── */}
         <div className="rpt-tabs" style={{
@@ -1371,8 +1393,11 @@ export default function BeautyReport({ data: rawData, isPaid, onUnlock }) {
           )}
         </div>
 
-        <div style={{ marginTop: 20, padding: "0 4px" }}>
-          <p style={{ fontSize: 10, color: "#B9AC9E", lineHeight: 1.8, textAlign: "center", letterSpacing: "0.02em", fontFamily: "'DM Sans', sans-serif" }}>{t('disclaimer')}</p>
+        <div style={{ marginTop: 20, padding: "0 4px", textAlign: "center" }}>
+          <p style={{ fontSize: 10, color: "#B9AC9E", lineHeight: 1.8, letterSpacing: "0.02em", fontFamily: "'DM Sans', sans-serif", margin: "0 0 6px" }}>{t('disclaimer')}</p>
+          <a href="/mentions-legales" style={{ fontSize: 10, color: "#A87449", textDecoration: "underline", fontFamily: "'DM Sans', sans-serif", opacity: 0.75 }}>
+            {lang === 'fr' ? 'Avertissement médical' : 'Medical Disclaimer'}
+          </a>
         </div>
       </div>
 
