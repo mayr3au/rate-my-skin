@@ -5,6 +5,11 @@ export default function Document() {
     <Html lang="fr">
       <Head>
         <meta name="google-site-verification" content="_VjUAFKvSl3HkG5ZyfGWfwNC1dufCfcUvQdHpkWcRSY" />
+        <link rel="icon" type="image/png" sizes="192x192" href="/favicon.png" />
+        <link rel="icon" type="image/png" sizes="48x48" href="/favicon-48.png" />
+        <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+        <link rel="shortcut icon" href="/favicon.ico" />
+        <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
         <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
