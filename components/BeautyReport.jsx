@@ -480,7 +480,7 @@ function ScoreRing({ score, size = 64 }) {
 }
 
 /* ── Metric card ── */
-function MetricCard({ m, index }) {
+function MetricCard({ m, index, t }) {
   const [vis, setVis] = useState(false);
   useEffect(() => {
     const timer = setTimeout(() => setVis(true), index * 80 + 100);
@@ -501,9 +501,12 @@ function MetricCard({ m, index }) {
         </div>
       </div>
       <div style={{ flex: 1, minWidth: 0, overflow: "hidden" }}>
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 6, gap: 8 }}>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 6, gap: 8, flexWrap: "wrap" }}>
           <span style={{ fontSize: 11, fontWeight: 600, letterSpacing: "0.1em", textTransform: "uppercase", color: "#3A2E26" }}>{m.label}</span>
-          <span style={{ fontSize: 10, fontWeight: 700, borderRadius: 6, padding: "3px 9px", background: gradeColor.bg, color: gradeColor.color, letterSpacing: "0.06em", flexShrink: 0 }}>{m.grade}</span>
+          <div style={{ display: "flex", gap: 6, alignItems: "center", flexShrink: 0 }}>
+            <span style={{ fontSize: 10, fontWeight: 700, borderRadius: 6, padding: "3px 9px", background: gradeColor.bg, color: gradeColor.color, letterSpacing: "0.06em" }}>{m.grade}</span>
+            {m.severity && t && <SeverityBadge severity={m.severity} t={t} />}
+          </div>
         </div>
         <div style={{ height: 2, background: "rgba(168,116,73,0.1)", borderRadius: 10, marginBottom: 8, overflow: "hidden" }}>
           <div style={{ height: "100%", width: `${m.score}%`, background: "linear-gradient(90deg, #A87449, #D4A574)", borderRadius: 10, transition: "width 1.6s cubic-bezier(0.4,0,0.2,1)" }} />
@@ -1131,7 +1134,7 @@ export default function BeautyReport({ data: rawData, isPaid, onUnlock }) {
 
         {/* ── Blurred tab content ── */}
         <div style={{ maxWidth: 680, margin: "10px auto 0", padding: "0 20px 60px", filter: "blur(5px)", opacity: 0.3, pointerEvents: "none", userSelect: "none" }}>
-          {previewTab === 0 && <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>{previewMetrics.map((m, i) => <MetricCard key={i} m={m} index={i} />)}</div>}
+          {previewTab === 0 && <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>{previewMetrics.map((m, i) => <MetricCard key={i} m={m} index={i} t={t} />)}</div>}
           {previewTab === 1 && (
             <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
               {previewStrengths.map((s, i) => (
@@ -1241,7 +1244,7 @@ export default function BeautyReport({ data: rawData, isPaid, onUnlock }) {
           {/* Metrics */}
           {activeTab === "analysis" && (
             <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-              {metrics.map((m, i) => <MetricCard key={i} m={m} index={i} />)}
+              {metrics.map((m, i) => <MetricCard key={i} m={m} index={i} t={t} />)}
               <div style={{ ...CARD, padding: "14px 18px", display: "flex", gap: 18, flexWrap: "wrap" }}>
                 {[{ range: "78–100", label: t('legendStrong'), color: "#D4A574" }, { range: "65–77", label: t('legendAverage'), color: "#8C7A6B" }, { range: "0–64", label: t('legendBelowAvg'), color: "#B9AC9E" }].map(l => (
                   <div key={l.range} style={{ display: "flex", alignItems: "center", gap: 7 }}>

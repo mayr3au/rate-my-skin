@@ -58,14 +58,14 @@ Réponds UNIQUEMENT avec du JSON BRUT (pas de blocs de code markdown, pas de tex
   },
   "paid_version": {
     "metrics": [
-      { "label": "Hydratation", "score": <0-100>, "grade": "<A|B|C|D>", "detail": "<1-2 phrases très simples en français : ce que tu observes pour l'hydratation et comment l'améliorer>" },
-      { "label": "Pores", "score": <0-100>, "grade": "<A|B|C|D>", "detail": "<1-2 phrases très simples en français>" },
-      { "label": "Éclat", "score": <0-100>, "grade": "<A|B|C|D>", "detail": "<1-2 phrases très simples en français>" },
-      { "label": "Acné", "score": <0-100>, "grade": "<A|B|C|D>", "detail": "<1-2 phrases très simples en français>" },
-      { "label": "Taches", "score": <0-100>, "grade": "<A|B|C|D>", "detail": "<1-2 phrases très simples en français>" },
-      { "label": "Cernes", "score": <0-100>, "grade": "<A|B|C|D>", "detail": "<1-2 phrases très simples en français>" },
-      { "label": "Symétrie", "score": <0-100>, "grade": "<A|B|C|D>", "detail": "<1-2 phrases très simples en français>" },
-      { "label": "Harmonie", "score": <0-100>, "grade": "<A|B|C|D>", "detail": "<1-2 phrases très simples en français>" }
+      { "label": "Hydratation", "score": <0-100>, "grade": "<A|B|C|D>", "severity": "<mild|moderate|significant. Utilise 'mild' si le score est >= 78, 'moderate' si 65-77, 'significant' si < 65>", "detail": "<1-2 phrases très simples en français : ce que tu observes pour l'hydratation et comment l'améliorer>" },
+      { "label": "Pores", "score": <0-100>, "grade": "<A|B|C|D>", "severity": "<mild|moderate|significant>", "detail": "<1-2 phrases très simples en français>" },
+      { "label": "Éclat", "score": <0-100>, "grade": "<A|B|C|D>", "severity": "<mild|moderate|significant>", "detail": "<1-2 phrases très simples en français>" },
+      { "label": "Acné", "score": <0-100>, "grade": "<A|B|C|D>", "severity": "<mild|moderate|significant>", "detail": "<1-2 phrases très simples en français>" },
+      { "label": "Taches", "score": <0-100>, "grade": "<A|B|C|D>", "severity": "<mild|moderate|significant>", "detail": "<1-2 phrases très simples en français>" },
+      { "label": "Cernes", "score": <0-100>, "grade": "<A|B|C|D>", "severity": "<mild|moderate|significant>", "detail": "<1-2 phrases très simples en français>" },
+      { "label": "Symétrie", "score": <0-100>, "grade": "<A|B|C|D>", "severity": "<mild|moderate|significant>", "detail": "<1-2 phrases très simples en français>" },
+      { "label": "Harmonie", "score": <0-100>, "grade": "<A|B|C|D>", "severity": "<mild|moderate|significant>", "detail": "<1-2 phrases très simples en français>" }
     ],
     "strengths": [
       { "title": "<point fort de la peau en français simple, ex : 'Excellente élasticité', 'Teint très lumineux'>", "desc": "<pourquoi c'est génial pour la santé de la peau, en français simple et encourageant>" },
@@ -142,14 +142,14 @@ Respond ONLY with RAW JSON (no markdown, no code blocks). Return EXACTLY this st
   },
   "paid_version": {
     "metrics": [
-      { "label": "Hydration", "score": <0-100>, "grade": "<A|B|C|D>", "detail": "<1-2 simple sentences in English explaining what you observe and how to support it>" },
-      { "label": "Pores", "score": <0-100>, "grade": "<A|B|C|D>", "detail": "..." },
-      { "label": "Radiance", "score": <0-100>, "grade": "<A|B|C|D>", "detail": "..." },
-      { "label": "Acne", "score": <0-100>, "grade": "<A|B|C|D>", "detail": "..." },
-      { "label": "Dark Spots", "score": <0-100>, "grade": "<A|B|C|D>", "detail": "..." },
-      { "label": "Under-Eye", "score": <0-100>, "grade": "<A|B|C|D>", "detail": "..." },
-      { "label": "Symmetry", "score": <0-100>, "grade": "<A|B|C|D>", "detail": "..." },
-      { "label": "Harmony", "score": <0-100>, "grade": "<A|B|C|D>", "detail": "..." }
+      { "label": "Hydration", "score": <0-100>, "grade": "<A|B|C|D>", "severity": "<mild|moderate|significant>", "detail": "<1-2 simple sentences in English explaining what you observe and how to support it>" },
+      { "label": "Pores", "score": <0-100>, "grade": "<A|B|C|D>", "severity": "<mild|moderate|significant>", "detail": "..." },
+      { "label": "Radiance", "score": <0-100>, "grade": "<A|B|C|D>", "severity": "<mild|moderate|significant>", "detail": "..." },
+      { "label": "Acne", "score": <0-100>, "grade": "<A|B|C|D>", "severity": "<mild|moderate|significant>", "detail": "..." },
+      { "label": "Dark Spots", "score": <0-100>, "grade": "<A|B|C|D>", "severity": "<mild|moderate|significant>", "detail": "..." },
+      { "label": "Under-Eye", "score": <0-100>, "grade": "<A|B|C|D>", "severity": "<mild|moderate|significant>", "detail": "..." },
+      { "label": "Symmetry", "score": <0-100>, "grade": "<A|B|C|D>", "severity": "<mild|moderate|significant>", "detail": "..." },
+      { "label": "Harmony", "score": <0-100>, "grade": "<A|B|C|D>", "severity": "<mild|moderate|significant>", "detail": "..." }
     ],
     "strengths": [
       { "title": "<visible strength in simple English, e.g. 'Great elasticity', 'Bright complexion'>", "desc": "<why this is positive for skin health, in a simple encouraging tone>" },
@@ -180,6 +180,7 @@ Respond ONLY with RAW JSON (no markdown, no code blocks). Return EXACTLY this st
 CRITICAL RULES:
 - mainProblems MUST have EXACTLY 3 items; severity values: mild | moderate | significant.
 - metrics MUST have EXACTLY 8 items in the exact label order listed above (Hydration, Pores, Radiance, Acne, Dark Spots, Under-Eye, Symmetry, Harmony).
+- For each metric, assign severity based on score: mild (score >= 78), moderate (score 65–77), significant (score < 65).
 - productRecommendations MUST match products to the skin problems visible and use exact data from AVAILABLE PRODUCTS.
 - Do NOT wrap output in markdown code blocks.`;
   }
