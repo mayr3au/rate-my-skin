@@ -901,30 +901,77 @@ export default function Home() {
           <button
             onClick={handleAnalyse}
             disabled={!image || loading}
-            className={image && !loading ? "btn-liquid-glass-pearl" : ""}
             style={{
-              width: '100%', marginTop: 20,
-              padding: '16px 24px', fontSize: 15, fontWeight: 600,
-              display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10,
-              ...(!image || loading ? {
-                background: 'rgba(255, 255, 255, 0.25)',
-                border: '1px solid rgba(255, 255, 255, 0.35)',
+              width: '100%',
+              marginTop: 20,
+              padding: '16px 28px',
+              fontSize: 16,
+              fontWeight: 700,
+              letterSpacing: '0.05em',
+              textTransform: 'uppercase',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: 12,
+              fontFamily: "'DM Sans', sans-serif",
+              borderRadius: 32,
+              border: 'none',
+              cursor: image && !loading ? 'pointer' : 'not-allowed',
+              transition: 'all 0.4s cubic-bezier(0.16, 1, 0.3, 1)',
+              position: 'relative',
+              overflow: 'hidden',
+              ...(image && !loading ? {
+                background: 'linear-gradient(135deg, #C5A028 0%, #D4B844 50%, #B89020 100%)',
+                boxShadow: [
+                  '0 2px 0 0 rgba(255,255,255,0.6) inset',
+                  '0 -2px 0 0 rgba(0,0,0,0.2) inset',
+                  'inset 0 0 0 1px rgba(255,255,255,0.25)',
+                  '0 12px 32px rgba(197,160,40,0.35)',
+                  '0 4px 12px rgba(197,160,40,0.25)',
+                ].join(','),
+                color: '#FFFFFF',
+                transform: 'translateY(-2px)',
+              } : {
+                background: 'linear-gradient(135deg, rgba(255,255,255,0.15) 0%, rgba(255,255,255,0.08) 100%)',
+                boxShadow: 'inset 0 0 0 1px rgba(255,255,255,0.15), 0 4px 12px rgba(0,0,0,0.1)',
                 color: '#B9AC9E',
-                cursor: 'not-allowed',
-                boxShadow: 'none',
-                backdropFilter: 'blur(10px)',
-                WebkitBackdropFilter: 'blur(10px)',
-                borderRadius: 30,
-                fontFamily: "'DM Sans', sans-serif",
-              } : { border: 'none' })
+                backdropFilter: 'blur(12px)',
+                WebkitBackdropFilter: 'blur(12px)',
+              }),
+            }}
+            onMouseEnter={(e) => {
+              if (image && !loading) {
+                e.target.style.transform = 'translateY(-4px) scale(1.02)';
+                e.target.style.boxShadow = [
+                  '0 2px 0 0 rgba(255,255,255,0.6) inset',
+                  '0 -2px 0 0 rgba(0,0,0,0.2) inset',
+                  'inset 0 0 0 1px rgba(255,255,255,0.4)',
+                  '0 16px 40px rgba(197,160,40,0.45)',
+                  '0 8px 20px rgba(197,160,40,0.35)',
+                ].join(',');
+              }
+            }}
+            onMouseLeave={(e) => {
+              if (image && !loading) {
+                e.target.style.transform = 'translateY(-2px)';
+                e.target.style.boxShadow = [
+                  '0 2px 0 0 rgba(255,255,255,0.6) inset',
+                  '0 -2px 0 0 rgba(0,0,0,0.2) inset',
+                  'inset 0 0 0 1px rgba(255,255,255,0.25)',
+                  '0 12px 32px rgba(197,160,40,0.35)',
+                  '0 4px 12px rgba(197,160,40,0.25)',
+                ].join(',');
+              }
             }}
           >
             {loading ? (
-              <span style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+              <span style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
                 <LuxuryFlower width={22} height={22} />
                 {t('analysingFeatures')}
               </span>
-            ) : t('analyseNow')}
+            ) : (
+              t('analyseNow')
+            )}
           </button>
 
           {loading && (
