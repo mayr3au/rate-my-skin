@@ -1090,51 +1090,6 @@ export default function BeautyReport({ data: rawData, isPaid, onUnlock }) {
             boxShadow: "0 24px 64px rgba(61,41,20,0.08), 0 2px 0 rgba(255,255,255,0.95), inset 0 1px 0 rgba(255,255,255,0.98)",
             position: "relative",
           }}>
-            {/* Elegant premium seals */}
-            <div style={{ display: "flex", justifyContent: "center", gap: 10, flexWrap: "wrap", marginBottom: 20 }}>
-              <span style={{
-                display: "inline-flex",
-                alignItems: "center",
-                gap: 6,
-                background: "linear-gradient(135deg, rgba(201, 169, 97, 0.15), rgba(197, 160, 40, 0.08))",
-                border: "1px solid rgba(201, 169, 97, 0.35)",
-                borderRadius: 30,
-                padding: "6px 14px",
-                fontSize: 10,
-                fontWeight: 700,
-                letterSpacing: "0.14em",
-                textTransform: "uppercase",
-                color: "#8C6A3A",
-                fontFamily: "'DM Sans', sans-serif",
-                boxShadow: "0 2px 8px rgba(201, 169, 97, 0.05)"
-              }}>
-                <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor" stroke="none" style={{ color: "#C9A961" }}>
-                  <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
-                </svg>
-                {lang === 'fr' ? 'ANALYSE HAUTE DÉFINITION' : 'HIGH DEFINITION DIAGNOSTIC'}
-              </span>
-              <span style={{
-                display: "inline-flex",
-                alignItems: "center",
-                gap: 6,
-                background: "linear-gradient(135deg, rgba(201, 169, 97, 0.15), rgba(197, 160, 40, 0.08))",
-                border: "1px solid rgba(201, 169, 97, 0.35)",
-                borderRadius: 30,
-                padding: "6px 14px",
-                fontSize: 10,
-                fontWeight: 700,
-                letterSpacing: "0.14em",
-                textTransform: "uppercase",
-                color: "#8C6A3A",
-                fontFamily: "'DM Sans', sans-serif",
-                boxShadow: "0 2px 8px rgba(201, 169, 97, 0.05)"
-              }}>
-                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#C9A961" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
-                  <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
-                </svg>
-                {lang === 'fr' ? 'SÉCURISÉ & CERTIFIÉ' : 'SECURE & CERTIFIED'}
-              </span>
-            </div>
 
             {/* 2. COMPTEUR SOCIAL PROOF */}
             <div style={{
