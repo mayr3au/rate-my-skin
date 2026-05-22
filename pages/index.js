@@ -52,7 +52,24 @@ const FACTS = [
   {
     title: "Le SPF est non-négociable",
     desc: "80% du vieillissement cutané est lié aux UV. Même par temps nuageux, même en intérieur près d'une fenêtre."
-  }
+  },
+  {
+    title: "La règle des 60 secondes",
+    desc: "Laisser un nettoyant agir 60 secondes sur la peau améliore significativement la dissolution du sébum et des impûretés."
+  },
+  {
+    title: "L'hydratation de l'intérieur",
+    desc: "Boire 1,5 L d'eau par jour améliore l'éclat et la souplesse de la peau dès les premières semaines."
+  },
+];
+
+const ANALYSIS_STEPS = [
+  { icon: "M12 2a7 7 0 1 0 0 14A7 7 0 0 0 12 2zm0 3v4l3 3", label: "Détection du type de peau…" },
+  { icon: "M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7z M12 9a3 3 0 1 0 0 6 3 3 0 0 0 0-6z", label: "Analyse des pores et texture…" },
+  { icon: "M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z", label: "Cartographie des zones sensibles…" },
+  { icon: "M3 12h18M3 6h18M3 18h18", label: "Évaluation du teint et phototype…" },
+  { icon: "M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z", label: "Scoring global de votre peau…" },
+  { icon: "M9 12l2 2 4-4M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0z", label: "Génération du rapport final…" },
 ];
 
 export default function Home() {
@@ -91,6 +108,8 @@ export default function Home() {
   const [progress, setProgress] = useState(0);
   const [factIndex, setFactIndex] = useState(0);
   const [fade, setFade] = useState(true);
+  const [analysisStep, setAnalysisStep] = useState(0);
+  const [stepFade, setStepFade] = useState(true);
 
   useEffect(() => {
     // Migrate old localStorage key so returning users are recognised
@@ -130,27 +149,41 @@ export default function Home() {
 
   useEffect(() => {
     let progressInterval;
-    let rotationInterval;
+    let factInterval;
+    let stepInterval;
     let fadeTimeout;
+    let stepFadeTimeout;
 
     if (loading) {
       const startTime = Date.now();
-      progressInterval = setInterval(() => {
-        const elapsed = Date.now() - startTime;
-        const currentProgress = Math.min((elapsed / 8000) * 99, 99);
-        setProgress(currentProgress);
-        if (elapsed >= 8000) {
-          clearInterval(progressInterval);
-        }
-      }, 50);
+      const totalDuration = 20000; // 20s max — ease-out so it slows near 99%
 
-      rotationInterval = setInterval(() => {
+      progressInterval = setInterval(() => {
+        const elapsed = Math.min(Date.now() - startTime, totalDuration);
+        // Ease-out curve: fast start, slows dramatically near 99%
+        const t = elapsed / totalDuration;
+        const eased = 1 - Math.pow(1 - t, 2.8);
+        const currentProgress = Math.min(eased * 99, 99);
+        setProgress(currentProgress);
+      }, 80);
+
+      // Facts rotate every 5 seconds
+      factInterval = setInterval(() => {
         setFade(false);
         fadeTimeout = setTimeout(() => {
-          setFactIndex(prev => (prev + 1) % 4);
+          setFactIndex(prev => (prev + 1) % FACTS.length);
           setFade(true);
-        }, 300);
-      }, 2000);
+        }, 400);
+      }, 5000);
+
+      // Analysis steps rotate every ~3.2s, synced with progress stages
+      stepInterval = setInterval(() => {
+        setStepFade(false);
+        stepFadeTimeout = setTimeout(() => {
+          setAnalysisStep(prev => Math.min(prev + 1, ANALYSIS_STEPS.length - 1));
+          setStepFade(true);
+        }, 350);
+      }, 3200);
 
       const scrollY = window.scrollY;
       document.body.style.position = 'fixed';
@@ -162,13 +195,17 @@ export default function Home() {
       setProgress(0);
       setFactIndex(0);
       setFade(true);
+      setAnalysisStep(0);
+      setStepFade(true);
       unlockBody();
     }
 
     return () => {
       clearInterval(progressInterval);
-      clearInterval(rotationInterval);
+      clearInterval(factInterval);
+      clearInterval(stepInterval);
       clearTimeout(fadeTimeout);
+      clearTimeout(stepFadeTimeout);
       unlockBody();
     };
   }, [loading]);
@@ -1102,159 +1139,193 @@ export default function Home() {
       {loading && (
         <div className="analysis-loading-overlay" style={{
           zIndex: 1000,
-          background: 'linear-gradient(to bottom, #FFFFFF 0%, #FBF6F0 40%, #EEDCD0 75%, #E3C9B5 100%)',
+          background: 'linear-gradient(160deg, #FDFAF7 0%, #FBF6F0 35%, #F5EDE3 70%, #EDD9C5 100%)',
           display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
-          padding: '32px',
+          padding: '32px 24px',
           paddingTop: 'max(32px, env(safe-area-inset-top))',
           paddingBottom: 'max(32px, env(safe-area-inset-bottom))',
           textAlign: 'center',
-          animation: 'fadeIn 0.5s ease-out forwards',
+          animation: 'fadeIn 0.6s ease-out forwards',
+          gap: 0,
         }}>
-          {/* Reuse the silk texture for the loading page too */}
+          {/* Silk texture */}
           <div style={{
-            position: 'absolute', inset: 0, opacity: 0.4, pointerEvents: 'none',
+            position: 'absolute', inset: 0, opacity: 0.35, pointerEvents: 'none',
             background: 'url("data:image/svg+xml,%3Csvg viewBox=\'0 0 1000 1000\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cfilter id=\'silk\'%3E%3CfeTurbulence type=\'fractalNoise\' baseFrequency=\'0.005\' numOctaves=\'2\' stitchTiles=\'stitch\'/%3E%3CfeColorMatrix type=\'saturate\' values=\'0\'/%3E%3CfeComponentTransfer%3E%3CfeFuncA type=\'linear\' slope=\'0.03\'/%3E%3C/feComponentTransfer%3E%3C/filter%3E%3Crect width=\'100%25\' height=\'100%25\' filter=\'url(%23silk)\'/%3E%3C/svg%3E")',
           }} />
 
-          {/* Centered mobile-first content layout */}
           <div style={{
-            position: 'relative',
-            zIndex: 1,
-            width: '100%',
-            maxWidth: '480px',
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            gap: '32px',
+            position: 'relative', zIndex: 1,
+            width: '100%', maxWidth: '440px',
+            display: 'flex', flexDirection: 'column',
+            alignItems: 'center', gap: '28px',
           }}>
-            {/* Header section */}
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-              <h2 style={{
-                fontFamily: "'Playfair Display', serif",
-                fontSize: '24px',
-                fontWeight: 700,
-                color: '#3D2914',
-                margin: 0,
-                letterSpacing: '0.02em',
-              }}>
-                Analyse en cours…
-              </h2>
-              <p style={{
-                fontFamily: "'Inter', sans-serif",
-                fontSize: '14px',
-                color: '#6B6B6B',
-                margin: 0,
-              }}>
-                Traitement multi-zones de votre peau
-              </p>
-            </div>
 
-            {/* Circular Progress Indicator */}
+            {/* ── TOP: Flower + Live step ── */}
             <div style={{
-              position: 'relative',
-              width: 140,
-              height: 140,
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              filter: 'drop-shadow(0 4px 12px rgba(201, 169, 97, 0.12))',
+              display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '14px',
+              background: 'rgba(255,255,255,0.55)',
+              backdropFilter: 'blur(16px)',
+              WebkitBackdropFilter: 'blur(16px)',
+              border: '1px solid rgba(201,169,97,0.2)',
+              borderRadius: '24px',
+              padding: '20px 28px',
+              width: '100%',
+              boxShadow: '0 4px 20px rgba(168,116,73,0.05)',
             }}>
-              <svg width="140" height="140" viewBox="0 0 140 140" style={{ transform: 'rotate(-90deg)' }}>
-                {/* Background circle */}
-                <circle
-                  cx="70"
-                  cy="70"
-                  r="55"
-                  fill="transparent"
-                  stroke="#F5EDE3"
-                  strokeWidth="6"
-                />
-                {/* Progress circle */}
-                <circle
-                  cx="70"
-                  cy="70"
-                  r="55"
-                  fill="transparent"
-                  stroke="#C9A961"
-                  strokeWidth="6"
-                  strokeDasharray={345.575}
-                  strokeDashoffset={345.575 * (1 - progress / 100)}
-                  strokeLinecap="round"
-                  style={{ transition: 'stroke-dashoffset 0.1s linear' }}
-                />
-              </svg>
+              {/* Flower spinning */}
               <div style={{
-                position: 'absolute',
-                fontFamily: "'Playfair Display', serif",
-                fontSize: '32px',
-                fontWeight: '700',
-                color: '#3D2914',
+                filter: 'drop-shadow(0 0 12px rgba(201,169,97,0.35))',
+                animation: 'floatBob 3s ease-in-out infinite',
               }}>
-                {Math.round(progress)}%
+                <LuxuryFlower width={52} height={52} />
+              </div>
+
+              {/* Title */}
+              <div>
+                <h2 style={{
+                  fontFamily: "'Playfair Display', serif",
+                  fontSize: '22px', fontWeight: 700,
+                  color: '#3D2914', margin: '0 0 4px',
+                  letterSpacing: '0.01em',
+                }}>Analyse en cours…</h2>
+                <p style={{
+                  fontFamily: "'Inter', sans-serif",
+                  fontSize: '13px', color: '#8C7A6B', margin: 0,
+                }}>Intelligence artificielle dermatologique</p>
+              </div>
+
+              {/* Live step pill */}
+              <div style={{
+                display: 'flex', alignItems: 'center', gap: '8px',
+                background: 'linear-gradient(135deg, rgba(201,169,97,0.12), rgba(197,160,40,0.06))',
+                border: '1px solid rgba(201,169,97,0.28)',
+                borderRadius: '9999px',
+                padding: '7px 16px',
+                opacity: stepFade ? 1 : 0,
+                transition: 'opacity 350ms ease-in-out',
+              }}>
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#C9A961" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0, animation: 'stepIconPulse 1.5s ease-in-out infinite' }}>
+                  <path d={ANALYSIS_STEPS[analysisStep]?.icon} />
+                </svg>
+                <span style={{
+                  fontFamily: "'Inter', sans-serif",
+                  fontSize: '12px', fontWeight: 600,
+                  color: '#6B4E2A', letterSpacing: '0.01em',
+                }}>{ANALYSIS_STEPS[analysisStep]?.label}</span>
               </div>
             </div>
 
-            {/* Facts Card */}
+            {/* ── CENTER: Progress ring ── */}
+            <div style={{
+              position: 'relative', width: 160, height: 160,
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+            }}>
+              {/* Outer glow ring */}
+              <div style={{
+                position: 'absolute', inset: -8,
+                borderRadius: '50%',
+                background: `conic-gradient(rgba(201,169,97,${(progress/100)*0.25}) ${progress * 3.6}deg, transparent 0deg)`,
+                filter: 'blur(8px)',
+                transition: 'background 0.5s ease',
+              }} />
+              <svg width="160" height="160" viewBox="0 0 160 160" style={{ transform: 'rotate(-90deg)', position: 'relative', zIndex: 1 }}>
+                {/* Dashed track */}
+                <circle cx="80" cy="80" r="66" fill="none" stroke="rgba(201,169,97,0.12)" strokeWidth="8" strokeDasharray="4 6" />
+                {/* Solid track */}
+                <circle cx="80" cy="80" r="66" fill="none" stroke="rgba(201,169,97,0.08)" strokeWidth="8" />
+                {/* Progress arc */}
+                <circle
+                  cx="80" cy="80" r="66"
+                  fill="none"
+                  stroke="url(#progressGrad)"
+                  strokeWidth="8"
+                  strokeDasharray={414.69}
+                  strokeDashoffset={414.69 * (1 - progress / 100)}
+                  strokeLinecap="round"
+                  style={{ transition: 'stroke-dashoffset 0.3s cubic-bezier(0.4,0,0.2,1)' }}
+                />
+                <defs>
+                  <linearGradient id="progressGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                    <stop offset="0%" stopColor="#A87449" />
+                    <stop offset="50%" stopColor="#C9A961" />
+                    <stop offset="100%" stopColor="#E5C583" />
+                  </linearGradient>
+                </defs>
+              </svg>
+              {/* Center content */}
+              <div style={{
+                position: 'absolute', display: 'flex', flexDirection: 'column',
+                alignItems: 'center', gap: '2px',
+              }}>
+                <span style={{
+                  fontFamily: "'Playfair Display', serif",
+                  fontSize: '42px', fontWeight: 700,
+                  color: '#3D2914', lineHeight: 1,
+                }}>{Math.round(progress)}%</span>
+                <span style={{
+                  fontFamily: "'Inter', sans-serif",
+                  fontSize: '10px', fontWeight: 600,
+                  color: '#B0885E', letterSpacing: '0.15em',
+                  textTransform: 'uppercase',
+                }}>analyse</span>
+              </div>
+            </div>
+
+            {/* ── BOTTOM: Facts card ── */}
             <div style={{
               width: '100%',
-              background: '#FFFFFF',
-              border: '1px solid #F5EDE3',
-              borderRadius: '16px',
-              padding: '24px',
-              boxShadow: '0 8px 24px rgba(61, 41, 20, 0.04)',
-              display: 'flex',
-              flexDirection: 'column',
-              gap: '12px',
+              background: 'rgba(255,255,255,0.75)',
+              backdropFilter: 'blur(20px)',
+              WebkitBackdropFilter: 'blur(20px)',
+              border: '1px solid rgba(201,169,97,0.18)',
+              borderRadius: '20px',
+              padding: '20px 22px',
+              boxShadow: '0 8px 28px rgba(61,41,20,0.04)',
               textAlign: 'left',
               boxSizing: 'border-box',
             }}>
               {/* Card Header */}
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#C9A961" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px' }}>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#C9A961" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                   <path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A5 5 0 0 0 8 8c0 1.3.5 2.6 1.5 3.5.8.8 1.3 1.5 1.5 2.5" />
-                  <path d="M9 18h6" />
-                  <path d="M10 22h4" />
+                  <path d="M9 18h6" /><path d="M10 22h4" />
                 </svg>
                 <span style={{
                   fontFamily: "'Inter', sans-serif",
-                  fontSize: '12px',
-                  fontWeight: 600,
-                  letterSpacing: '0.08em',
-                  textTransform: 'uppercase',
+                  fontSize: '11px', fontWeight: 700,
+                  letterSpacing: '0.1em', textTransform: 'uppercase',
                   color: '#C9A961',
-                }}>
-                  Le saviez-vous ?
-                </span>
+                }}>Le saviez-vous ?</span>
+                {/* Dots indicator */}
+                <div style={{ marginLeft: 'auto', display: 'flex', gap: '4px' }}>
+                  {FACTS.map((_, i) => (
+                    <div key={i} style={{
+                      width: i === factIndex ? 16 : 5, height: 5,
+                      borderRadius: '9999px',
+                      background: i === factIndex ? '#C9A961' : 'rgba(201,169,97,0.25)',
+                      transition: 'all 0.4s ease',
+                    }} />
+                  ))}
+                </div>
               </div>
 
-              {/* Fading Content */}
+              {/* Fading fact content */}
               <div style={{
                 opacity: fade ? 1 : 0,
-                transition: 'opacity 300ms ease-in-out',
-                minHeight: '80px',
-                display: 'flex',
-                flexDirection: 'column',
-                justifyContent: 'center',
+                transition: 'opacity 400ms ease-in-out',
+                minHeight: '72px',
               }}>
                 <h3 style={{
                   fontFamily: "'Playfair Display', serif",
-                  fontSize: '18px',
-                  fontWeight: 700,
-                  color: '#3D2914',
-                  margin: '0 0 6px 0',
-                  lineHeight: '1.3',
-                }}>
-                  {FACTS[factIndex]?.title}
-                </h3>
+                  fontSize: '16px', fontWeight: 700,
+                  color: '#3D2914', margin: '0 0 6px', lineHeight: 1.3,
+                }}>{FACTS[factIndex]?.title}</h3>
                 <p style={{
                   fontFamily: "'Inter', sans-serif",
-                  fontSize: '14px',
-                  color: '#6B6B6B',
-                  lineHeight: '1.6',
-                  margin: 0,
-                }}>
-                  {FACTS[factIndex]?.desc}
-                </p>
+                  fontSize: '13px', color: '#6B6B6B',
+                  lineHeight: '1.6', margin: 0,
+                }}>{FACTS[factIndex]?.desc}</p>
               </div>
             </div>
           </div>
@@ -1314,19 +1385,27 @@ export default function Home() {
       <style>{`
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
         @keyframes fadeInUp { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
-        @keyframes loadingProgress {
-          0% { transform: translateX(-100%); }
-          100% { transform: translateX(200%); }
-        }
         @keyframes spin { to { transform: rotate(360deg); } }
         @keyframes logoShimmer {
-          0% { background-position: 50% 100%; }
-          50% { background-position: 50% 0%; }
-          100% { background-position: 50% 100%; }
+          0% { background-position: 50% 0%; }
+          50% { background-position: 50% 100%; }
+          100% { background-position: 50% 0%; }
         }
         @keyframes pulse {
           0%, 100% { opacity: 0.6; transform: scale(1); }
           50% { opacity: 1; transform: scale(1.3); }
+        }
+        @keyframes floatBob {
+          0%, 100% { transform: translateY(0px); }
+          50% { transform: translateY(-5px); }
+        }
+        @keyframes stepIconPulse {
+          0%, 100% { opacity: 0.8; transform: scale(1); }
+          50% { opacity: 1; transform: scale(1.2); }
+        }
+        @keyframes loadingProgress {
+          0% { transform: translateX(-100%); }
+          100% { transform: translateX(200%); }
         }
         * { box-sizing: border-box; }
       `}</style>
