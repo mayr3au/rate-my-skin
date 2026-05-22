@@ -719,7 +719,7 @@ export default function Home() {
                     className="btn-liquid-glass home-upload-btn"
                     style={{ border: 'none' }}
                   >
-                    {t('takeASelfie')}
+                    {t('scan')}
                   </button>
                 </div>
               </>
