@@ -19,39 +19,59 @@ const TITLE_STYLE = { margin: "0 0 16px", fontSize: 22, fontWeight: 300, fontFam
 
 const ICONS = ["✦", "◈", "◉", "▲", "◆", "●"];
 
-const PAYWALL_ICONS = [
-  /* 1 — Metrics: minimal scan lines (like a skin reader) */
-  <svg key="scan" width="17" height="17" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round">
-    <line x1="2" y1="4.5" x2="14" y2="4.5"/>
-    <line x1="2" y1="7.5" x2="11" y2="7.5"/>
-    <line x1="2" y1="10.5" x2="13" y2="10.5"/>
-    <line x1="2" y1="13.5" x2="9" y2="13.5"/>
-    <line x1="3" y1="1.5" x2="3" y2="14.5" strokeWidth="0.8" strokeOpacity="0.35"/>
-  </svg>,
-  /* 2 — Strengths: single botanical leaf */
-  <svg key="leaf" width="17" height="17" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round">
-    <path d="M8 14 C8 14 2 10 3 4 C6 3 12 4 13 8 C14 12 8 14 8 14 Z"/>
-    <line x1="8" y1="14" x2="7" y2="7" strokeWidth="0.9"/>
-  </svg>,
-  /* 3 — Improvement: minimal upward trend */
-  <svg key="trend" width="17" height="17" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round">
-    <polyline points="2,12 6,8 9,10 14,4"/>
-    <polyline points="11,4 14,4 14,7"/>
-  </svg>,
-  /* 4 — Routine: crescent moon + dot (AM/PM) */
-  <svg key="moon" width="17" height="17" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round">
-    <path d="M11 3 A6 6 0 1 0 11 13 A4 4 0 1 1 11 3 Z"/>
-    <circle cx="12.5" cy="3.5" r="0.7" fill="currentColor" stroke="none"/>
-  </svg>,
-  /* 5 — Products: serum dropper bottle */
-  <svg key="bottle" width="17" height="17" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round">
-    <rect x="5.5" y="6" width="5" height="8" rx="1.5"/>
-    <path d="M7 6 L7 4 L9 4 L9 6"/>
-    <line x1="8" y1="2" x2="8" y2="4"/>
-    <line x1="6.5" y1="9.5" x2="9.5" y2="9.5" strokeWidth="0.9" strokeOpacity="0.5"/>
-    <line x1="6.5" y1="11.5" x2="9.5" y2="11.5" strokeWidth="0.9" strokeOpacity="0.5"/>
-  </svg>,
-];
+const CUSTOM_PAYWALL_ICONS = {
+  scan: (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#C9A961" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M4 6c3-1.5 5 1.5 8 0s5-1.5 8 0" />
+      <path d="M4 11c3-1.5 5 1.5 8 0s5-1.5 8 0" opacity="0.6" />
+      <path d="M4 16c3-1.5 5 1.5 8 0s5-1.5 8 0" opacity="0.35" />
+      <circle cx="12" cy="11" r="5" strokeDasharray="3 3" />
+      <path d="M12 8v6M10 10l2-2 2 2" />
+    </svg>
+  ),
+  routine: (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#C9A961" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M5 11a4 4 0 0 1 4-4h6a4 4 0 0 1 4 4v7a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2z" />
+      <path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+      <line x1="5" y1="12" x2="19" y2="12" />
+      <path d="m12 15 .5-1.5 1.5-.5-1.5-.5L12 11l-.5 1.5-1.5.5 1.5.5z" fill="#C9A961" stroke="none" />
+      <path d="m17 10 .3-.7.7-.3-.7-.3-.3-.7-.3.7-.7.3.7.3z" fill="#C9A961" stroke="none" />
+    </svg>
+  ),
+  dropper: (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#C9A961" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M12 2v3" strokeWidth="2" />
+      <path d="M9 5h6" />
+      <rect x="10" y="6" width="4" height="2" rx="0.5" />
+      <path d="M7 11v8a3 3 0 0 0 3 3h4a3 3 0 0 0 3-3v-8a3 3 0 0 0-3-3h-4a3 3 0 0 0-3 3z" />
+      <line x1="12" y1="8" x2="12" y2="16" opacity="0.6" />
+      <path d="M12 19a1.5 1.5 0 0 0 0 3 1.5 1.5 0 0 0 0-3z" fill="#C9A961" stroke="none" />
+    </svg>
+  ),
+  lifestyle: (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#C9A961" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 8.4 19 14a7 7 0 0 1-8 6Z" />
+      <path d="M9 11a3 3 0 0 1 3-3" />
+      <path d="M11 20V12" />
+      <path d="M17 6.5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0Z" fill="#C9A961" stroke="none" />
+    </svg>
+  ),
+  progression: (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#C9A961" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M3 20c2-3 4-8 7-8s5 4 8 0" />
+      <path d="m15 11 3-3 3 3" />
+      <circle cx="18" cy="12" r="2" fill="#C9A961" stroke="none" />
+      <circle cx="12" cy="12" r="10" strokeDasharray="4 4" opacity="0.5" />
+    </svg>
+  ),
+  chat: (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#C9A961" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z" />
+      <path d="m11 11 .3-.7.7-.3-.7-.3-.3-.7-.3.7-.7.3.7.3z" fill="#C9A961" stroke="none" />
+      <path d="m15 9 .2-.5.5-.2-.5-.2-.2-.5-.2.5-.5.2.5.2z" fill="#C9A961" stroke="none" />
+    </svg>
+  ),
+};
 
 // Helper to solve cubic-bezier(x1, y1, x2, y2) at progress t
 function solveCubicBezier(x1, y1, x2, y2, t) {
@@ -1062,13 +1082,60 @@ export default function BeautyReport({ data: rawData, isPaid, onUnlock }) {
       {!isPaid && (
         <div style={{ maxWidth: 680, margin: "32px auto 0", padding: "0 20px" }}>
           <div style={{
-            background: "linear-gradient(150deg, rgba(255,255,255,0.82) 0%, rgba(253,246,237,0.68) 55%, rgba(246,235,222,0.82) 100%)",
+            background: "linear-gradient(150deg, rgba(255,255,255,0.92) 0%, rgba(253,246,237,0.85) 55%, rgba(246,235,222,0.92) 100%)",
             backdropFilter: "blur(32px) saturate(160%)",
             WebkitBackdropFilter: "blur(32px) saturate(160%)",
-            border: "1px solid rgba(255,255,255,0.88)",
-            borderRadius: 26, padding: "clamp(28px,5vw,40px)",
-            boxShadow: "0 12px 48px rgba(168,116,73,0.09), 0 2px 0 rgba(255,255,255,0.95), inset 0 1px 0 rgba(255,255,255,0.98)",
+            border: "1px solid rgba(201, 169, 97, 0.35)",
+            borderRadius: 28, padding: "clamp(28px,5vw,40px)",
+            boxShadow: "0 24px 64px rgba(61,41,20,0.08), 0 2px 0 rgba(255,255,255,0.95), inset 0 1px 0 rgba(255,255,255,0.98)",
+            position: "relative",
           }}>
+            {/* Elegant premium seals */}
+            <div style={{ display: "flex", justifyContent: "center", gap: 10, flexWrap: "wrap", marginBottom: 20 }}>
+              <span style={{
+                display: "inline-flex",
+                alignItems: "center",
+                gap: 6,
+                background: "linear-gradient(135deg, rgba(201, 169, 97, 0.15), rgba(197, 160, 40, 0.08))",
+                border: "1px solid rgba(201, 169, 97, 0.35)",
+                borderRadius: 30,
+                padding: "6px 14px",
+                fontSize: 10,
+                fontWeight: 700,
+                letterSpacing: "0.14em",
+                textTransform: "uppercase",
+                color: "#8C6A3A",
+                fontFamily: "'DM Sans', sans-serif",
+                boxShadow: "0 2px 8px rgba(201, 169, 97, 0.05)"
+              }}>
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor" stroke="none" style={{ color: "#C9A961" }}>
+                  <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+                </svg>
+                {lang === 'fr' ? 'ANALYSE HAUTE DÉFINITION' : 'HIGH DEFINITION DIAGNOSTIC'}
+              </span>
+              <span style={{
+                display: "inline-flex",
+                alignItems: "center",
+                gap: 6,
+                background: "linear-gradient(135deg, rgba(201, 169, 97, 0.15), rgba(197, 160, 40, 0.08))",
+                border: "1px solid rgba(201, 169, 97, 0.35)",
+                borderRadius: 30,
+                padding: "6px 14px",
+                fontSize: 10,
+                fontWeight: 700,
+                letterSpacing: "0.14em",
+                textTransform: "uppercase",
+                color: "#8C6A3A",
+                fontFamily: "'DM Sans', sans-serif",
+                boxShadow: "0 2px 8px rgba(201, 169, 97, 0.05)"
+              }}>
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#C9A961" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
+                  <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+                </svg>
+                {lang === 'fr' ? 'SÉCURISÉ & CERTIFIÉ' : 'SECURE & CERTIFIED'}
+              </span>
+            </div>
+
             {/* 2. COMPTEUR SOCIAL PROOF */}
             <div style={{
               display: "flex",
@@ -1076,7 +1143,7 @@ export default function BeautyReport({ data: rawData, isPaid, onUnlock }) {
               justifyContent: "center",
               gap: "8px",
               marginBottom: "16px",
-              fontSize: "12px",
+              fontSize: "12.5px",
               color: "#6B6B6B",
               fontStyle: "italic",
               fontFamily: "'Inter', sans-serif",
@@ -1085,43 +1152,63 @@ export default function BeautyReport({ data: rawData, isPaid, onUnlock }) {
                 <span className="pulsing-dot-ping" />
                 <span className="pulsing-dot-core" />
               </span>
-              <span>{socialProofN} femmes ont noté leur peau cette semaine</span>
+              <span>
+                {lang === 'fr' 
+                  ? `${socialProofN} femmes ont noté leur peau cette semaine` 
+                  : `${socialProofN} women rated their skin this week`}
+              </span>
             </div>
 
             {/* 3. COPY HOOK */}
             <h1 className="paywall-title">
-              Découvrez votre routine personnalisée avant que vos imperfections ne s'aggravent
+              {lang === 'fr'
+                ? "Découvrez votre routine personnalisée avant que vos imperfections ne s'aggravent"
+                : "Reveal your personalised routine before concerns advance"}
             </h1>
             <p className="paywall-subtitle">
-              Votre rapport complet est prêt — analyse des causes, routine sur-mesure, produits adaptés à votre peau et à votre budget
+              {lang === 'fr'
+                ? "Votre rapport complet est prêt — analyse des causes, routine sur-mesure, produits adaptés à votre peau et à votre budget"
+                : "Your complete report is ready — root causes, custom routine, budget-friendly product matches"}
             </p>
 
             {/* 4. UNLOCK GRID */}
             <div className="unlock-grid">
               <div className="grid-cell">
-                <span className="cell-emoji">🔬</span>
-                <span className="cell-text">Analyse approfondie des causes</span>
+                <div className="cell-icon-container">
+                  {CUSTOM_PAYWALL_ICONS.scan}
+                </div>
+                <span className="cell-text">{lang === 'fr' ? 'Analyse approfondie des causes' : 'In-depth root cause analysis'}</span>
               </div>
               <div className="grid-cell" style={{ position: "relative" }}>
-                <span className="cell-emoji">✨</span>
-                <span className="cell-text">Routine personnalisée</span>
-                <span className="badge-gold">PERSONNALISABLE</span>
+                <div className="cell-icon-container">
+                  {CUSTOM_PAYWALL_ICONS.routine}
+                </div>
+                <span className="cell-text">{lang === 'fr' ? 'Routine personnalisée' : 'Personalised routine'}</span>
+                <span className="badge-gold">{lang === 'fr' ? 'SUR MESURE' : 'CUSTOMISABLE'}</span>
               </div>
               <div className="grid-cell">
-                <span className="cell-emoji">🧴</span>
-                <span className="cell-text">Produits recommandés (par budget)</span>
+                <div className="cell-icon-container">
+                  {CUSTOM_PAYWALL_ICONS.dropper}
+                </div>
+                <span className="cell-text">{lang === 'fr' ? 'Produits recommandés (par budget)' : 'Recommended products (by budget)'}</span>
               </div>
               <div className="grid-cell">
-                <span className="cell-emoji">🥗</span>
-                <span className="cell-text">Conseils nutrition & lifestyle</span>
+                <div className="cell-icon-container">
+                  {CUSTOM_PAYWALL_ICONS.lifestyle}
+                </div>
+                <span className="cell-text">{lang === 'fr' ? 'Conseils nutrition & lifestyle' : 'Nutrition & lifestyle advice'}</span>
               </div>
               <div className="grid-cell">
-                <span className="cell-emoji">📈</span>
-                <span className="cell-text">Suivi de progression</span>
+                <div className="cell-icon-container">
+                  {CUSTOM_PAYWALL_ICONS.progression}
+                </div>
+                <span className="cell-text">{lang === 'fr' ? 'Suivi de progression' : 'Progress tracking'}</span>
               </div>
               <div className="grid-cell">
-                <span className="cell-emoji">💬</span>
-                <span className="cell-text">Assistant IA conversationnel</span>
+                <div className="cell-icon-container">
+                  {CUSTOM_PAYWALL_ICONS.chat}
+                </div>
+                <span className="cell-text">{lang === 'fr' ? 'Assistant IA conversationnel' : 'Conversational AI assistant'}</span>
               </div>
             </div>
 
@@ -1136,12 +1223,14 @@ export default function BeautyReport({ data: rawData, isPaid, onUnlock }) {
             {/* 1. COUNTDOWN TIMER */}
             {timeLeft !== null && (
               <div className="countdown-pill">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#C9A961" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
+                <svg className="countdown-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#C9A961" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
                   <circle cx="12" cy="12" r="10" />
                   <polyline points="12 6 12 12 16 14" />
                 </svg>
                 <span className="countdown-text">
-                  Offre disponible encore {formatTime(timeLeft)}
+                  {lang === 'fr' 
+                    ? `Offre disponible encore ${formatTime(timeLeft)}` 
+                    : `Offer available for another ${formatTime(timeLeft)}`}
                 </span>
               </div>
             )}
@@ -1162,11 +1251,13 @@ export default function BeautyReport({ data: rawData, isPaid, onUnlock }) {
                   {t('redirecting')}
                 </>
               ) : (
-                "Débloquer mon rapport complet — 7,99 €"
+                lang === 'fr' ? "Débloquer mon rapport complet — 7,99 €" : "Unlock My Full Report — €7.99"
               )}
             </button>
             <p className="cta-under-text">
-              Paiement unique · Sécurisé Stripe · Accès immédiat
+              {lang === 'fr'
+                ? "Paiement unique · Sécurisé Stripe · Accès immédiat"
+                : "One-time payment · Stripe Secure · Instant Access"}
             </p>
           </div>
         </div>
@@ -1543,26 +1634,26 @@ export default function BeautyReport({ data: rawData, isPaid, onUnlock }) {
         
         .paywall-title {
           font-family: 'Playfair Display', serif;
-          font-size: 32px;
-          font-weight: 700;
+          font-size: 26px;
+          font-weight: 600;
           color: #3D2914;
-          line-height: 1.25;
+          line-height: 1.35;
           text-align: center;
-          margin: 0 0 16px;
+          margin: 0 0 14px;
         }
         @media (min-width: 768px) {
           .paywall-title {
-            font-size: 48px;
+            font-size: 34px;
           }
         }
         
         .paywall-subtitle {
           font-family: 'Inter', sans-serif;
-          font-size: 14px;
-          color: #6B6B6B;
-          line-height: 1.6;
+          font-size: 13.5px;
+          color: #6F6156;
+          line-height: 1.65;
           text-align: center;
-          margin: 0 auto 32px;
+          margin: 0 auto 28px;
           max-width: 520px;
         }
         
@@ -1579,28 +1670,48 @@ export default function BeautyReport({ data: rawData, isPaid, onUnlock }) {
         }
         .grid-cell {
           position: relative;
-          background-color: #F5EDE3;
-          border: 1px solid rgba(201, 169, 97, 0.3);
-          border-radius: 12px;
-          padding: 16px;
+          background: linear-gradient(135deg, rgba(255, 255, 255, 0.75) 0%, rgba(253, 246, 237, 0.45) 50%, rgba(201, 169, 97, 0.04) 100%);
+          backdrop-filter: blur(14px);
+          -webkit-backdrop-filter: blur(14px);
+          border: 1px solid rgba(201, 169, 97, 0.22);
+          border-radius: 20px;
+          padding: 18px;
           display: flex;
           align-items: center;
-          gap: 12px;
-          transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.2s ease;
+          gap: 16px;
+          box-shadow: 0 4px 12px rgba(168, 116, 73, 0.02), inset 0 1px 0 rgba(255, 255, 255, 0.6);
+          transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.35s, box-shadow 0.35s, background-color 0.35s;
         }
         .grid-cell:hover {
-          transform: scale(1.02);
-          box-shadow: 0 4px 12px rgba(201, 169, 97, 0.08);
+          transform: translateY(-3px);
+          background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(253, 246, 237, 0.75) 50%, rgba(201, 169, 97, 0.08) 100%);
+          border-color: rgba(201, 169, 97, 0.6);
+          box-shadow: 0 12px 28px rgba(168, 116, 73, 0.08), 0 0 10px rgba(201, 169, 97, 0.12);
         }
-        .cell-emoji {
-          font-size: 20px;
+        .cell-icon-container {
+          width: 40px;
+          height: 40px;
+          border-radius: 50%;
+          background: rgba(201, 169, 97, 0.08);
+          border: 1px solid rgba(201, 169, 97, 0.22);
+          display: flex;
+          align-items: center;
+          justify-content: center;
           flex-shrink: 0;
+          box-shadow: inset 0 1px 2px rgba(201, 169, 97, 0.05);
+          transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .grid-cell:hover .cell-icon-container {
+          background: rgba(201, 169, 97, 0.18);
+          border-color: rgba(201, 169, 97, 0.5);
+          transform: scale(1.05) rotate(5deg);
         }
         .cell-text {
           font-family: 'Inter', sans-serif;
           font-size: 13.5px;
           font-weight: 500;
           color: #3D2914;
+          letter-spacing: -0.01em;
         }
         
         .badge-gold {
@@ -1611,11 +1722,11 @@ export default function BeautyReport({ data: rawData, isPaid, onUnlock }) {
           color: #FFFFFF;
           font-size: 8px;
           font-weight: 700;
-          letter-spacing: 0.06em;
-          padding: 2px 6px;
-          border-radius: 4px;
+          letter-spacing: 0.08em;
+          padding: 3px 7px;
+          border-radius: 6px;
           font-family: 'Inter', sans-serif;
-          box-shadow: 0 2px 4px rgba(201, 169, 97, 0.25);
+          box-shadow: 0 2px 5px rgba(201, 169, 97, 0.3);
         }
         
         .countdown-pill {
@@ -1623,18 +1734,36 @@ export default function BeautyReport({ data: rawData, isPaid, onUnlock }) {
           align-items: center;
           justify-content: center;
           gap: 8px;
-          background-color: #F5EDE3;
-          border: 1px solid #C9A961;
+          background: linear-gradient(135deg, rgba(245, 237, 227, 0.95) 0%, rgba(255, 255, 255, 0.95) 100%);
+          border: 1px solid rgba(201, 169, 97, 0.45);
           border-radius: 9999px;
-          padding: 8px 16px;
-          margin: 0 auto 16px;
+          padding: 9px 20px;
+          margin: 0 auto 24px;
           width: fit-content;
+          box-shadow: 0 4px 12px rgba(201, 169, 97, 0.08);
+          animation: pulseShadow 3s infinite ease-in-out;
+        }
+        @keyframes pulseShadow {
+          0%, 100% {
+            box-shadow: 0 4px 12px rgba(201, 169, 97, 0.08), 0 0 0 rgba(201, 169, 97, 0);
+          }
+          50% {
+            box-shadow: 0 6px 20px rgba(201, 169, 97, 0.22), 0 0 8px rgba(201, 169, 97, 0.2);
+          }
+        }
+        .countdown-icon {
+          animation: pulseClock 2s infinite ease-in-out;
+        }
+        @keyframes pulseClock {
+          0%, 100% { transform: scale(1); opacity: 0.9; }
+          50% { transform: scale(1.15); opacity: 1; }
         }
         .countdown-text {
           font-family: 'Inter', sans-serif;
           font-size: 12px;
           font-weight: 600;
           color: #3D2914;
+          letter-spacing: 0.01em;
         }
         
         .cta-button {
@@ -1643,24 +1772,37 @@ export default function BeautyReport({ data: rawData, isPaid, onUnlock }) {
           justify-content: center;
           gap: 10px;
           width: 100%;
-          background-color: #3D2914;
+          background: linear-gradient(135deg, #3D2914 0%, #4E351B 50%, #281B0D 100%);
+          background-size: 200% 200%;
+          animation: buttonShimmer 8s ease infinite;
           color: #FFFFFF;
           font-family: 'Inter', sans-serif;
-          font-size: 15px;
+          font-size: 15.5px;
           font-weight: 700;
-          padding: 20px;
-          border-radius: 16px;
-          border: none;
+          padding: 19px 24px;
+          border-radius: 18px;
+          border: 1px solid rgba(201, 169, 97, 0.55);
           cursor: pointer;
-          transition: background-color 0.2s ease, transform 0.1s ease;
-          box-shadow: 0 4px 14px rgba(61, 41, 20, 0.25);
+          transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+          box-shadow: 0 8px 24px rgba(61, 41, 20, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.15);
           margin-bottom: 12px;
+          letter-spacing: 0.04em;
+          text-transform: uppercase;
+        }
+        @keyframes buttonShimmer {
+          0% { background-position: 0% 50%; }
+          50% { background-position: 100% 50%; }
+          100% { background-position: 0% 50%; }
         }
         .cta-button:hover {
-          background-color: #4E351B;
+          background: linear-gradient(135deg, #4E351B 0%, #5E4021 50%, #3D2914 100%);
+          border-color: rgba(201, 169, 97, 0.85);
+          box-shadow: 0 12px 30px rgba(61, 41, 20, 0.35), 0 0 15px rgba(201, 169, 97, 0.25);
+          transform: translateY(-2px) scale(1.005);
         }
         .cta-button:active {
-          transform: scale(0.98);
+          transform: translateY(1px);
+          box-shadow: 0 4px 10px rgba(61, 41, 20, 0.2);
         }
         .cta-button:disabled {
           opacity: 0.7;

@@ -45,6 +45,12 @@ export default function Report() {
   const [checkingPayment, setCheckingPayment] = useState(false);
 
   useEffect(() => {
+    if (typeof window !== 'undefined') {
+      window.scrollTo(0, 0);
+    }
+  }, []);
+
+  useEffect(() => {
     // 1. Read from sessionStorage
     const stored = sessionStorage.getItem('rms_report');
 
