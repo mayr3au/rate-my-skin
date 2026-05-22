@@ -1117,13 +1117,13 @@ export default function BeautyReport({ data: rawData, isPaid, onUnlock }) {
             {/* 3. COPY HOOK */}
             <h1 className="paywall-title">
               {lang === 'fr'
-                ? "Découvrez votre routine personnalisée avant que vos imperfections ne s'aggravent"
-                : "Reveal your personalised routine before concerns advance"}
+                ? "Votre peau mérite une analyse qui va jusqu'au bout"
+                : "Your skin deserves an analysis that goes all the way"}
             </h1>
             <p className="paywall-subtitle">
               {lang === 'fr'
-                ? "Votre rapport complet est prêt — analyse des causes, routine sur-mesure, produits adaptés à votre peau et à votre budget"
-                : "Your complete report is ready — root causes, custom routine, budget-friendly product matches"}
+                ? "Rapport complet prêt à débloquer — causes identifiées, routine sur-mesure matin & soir, produits adaptés à votre budget et plan de progression semaine par semaine"
+                : "Your full report is ready to unlock — root causes identified, personalised AM & PM routine, budget-matched products and a week-by-week progression plan"}
             </p>
 
             {/* 4. UNLOCK GRID */}
@@ -1132,38 +1132,56 @@ export default function BeautyReport({ data: rawData, isPaid, onUnlock }) {
                 <div className="cell-icon-container">
                   {CUSTOM_PAYWALL_ICONS.scan}
                 </div>
-                <span className="cell-text">{lang === 'fr' ? 'Analyse approfondie des causes' : 'In-depth root cause analysis'}</span>
+                <div className="cell-text-block">
+                  <span className="cell-text">{lang === 'fr' ? 'Causes identifiées zone par zone' : 'Root causes identified zone by zone'}</span>
+                  <span className="cell-subtext">{lang === 'fr' ? 'Front, joues, nez, contour des yeux — chaque imperfection expliquée' : 'Forehead, cheeks, nose, eye area — every concern explained'}</span>
+                </div>
               </div>
               <div className="grid-cell" style={{ position: "relative" }}>
                 <div className="cell-icon-container">
                   {CUSTOM_PAYWALL_ICONS.routine}
                 </div>
-                <span className="cell-text">{lang === 'fr' ? 'Routine personnalisée' : 'Personalised routine'}</span>
-                <span className="badge-gold">{lang === 'fr' ? 'SUR MESURE' : 'CUSTOMISABLE'}</span>
+                <div className="cell-text-block">
+                  <span className="cell-text">{lang === 'fr' ? 'Routine matin & soir sur-mesure' : 'Custom morning & evening routine'}</span>
+                  <span className="cell-subtext">{lang === 'fr' ? 'Étapes dans le bon ordre, actifs ciblés pour votre peau' : 'Steps in the right order, actives matched to your skin'}</span>
+                </div>
+                <span className="badge-gold">{lang === 'fr' ? 'SUR MESURE' : 'CUSTOM'}</span>
               </div>
               <div className="grid-cell">
                 <div className="cell-icon-container">
                   {CUSTOM_PAYWALL_ICONS.dropper}
                 </div>
-                <span className="cell-text">{lang === 'fr' ? 'Produits recommandés (par budget)' : 'Recommended products (by budget)'}</span>
+                <div className="cell-text-block">
+                  <span className="cell-text">{lang === 'fr' ? 'Produits sélectionnés par budget' : 'Products selected by budget'}</span>
+                  <span className="cell-subtext">{lang === 'fr' ? 'Marques accessibles et premium, avec liens directs' : 'Accessible and premium brands, with direct links'}</span>
+                </div>
               </div>
               <div className="grid-cell">
                 <div className="cell-icon-container">
                   {CUSTOM_PAYWALL_ICONS.lifestyle}
                 </div>
-                <span className="cell-text">{lang === 'fr' ? 'Conseils nutrition & lifestyle' : 'Nutrition & lifestyle advice'}</span>
+                <div className="cell-text-block">
+                  <span className="cell-text">{lang === 'fr' ? 'Alimentation, sommeil & stress' : 'Diet, sleep & stress habits'}</span>
+                  <span className="cell-subtext">{lang === 'fr' ? 'Les habitudes de vie qui impactent directement votre peau' : 'Lifestyle habits that directly affect your skin'}</span>
+                </div>
               </div>
               <div className="grid-cell">
                 <div className="cell-icon-container">
                   {CUSTOM_PAYWALL_ICONS.progression}
                 </div>
-                <span className="cell-text">{lang === 'fr' ? 'Suivi de progression' : 'Progress tracking'}</span>
+                <div className="cell-text-block">
+                  <span className="cell-text">{lang === 'fr' ? 'Plan de progression sur 4 semaines' : '4-week progression plan'}</span>
+                  <span className="cell-subtext">{lang === 'fr' ? 'Objectifs concrets semaine après semaine pour voir les résultats' : 'Concrete weekly goals to see visible results'}</span>
+                </div>
               </div>
               <div className="grid-cell">
                 <div className="cell-icon-container">
                   {CUSTOM_PAYWALL_ICONS.chat}
                 </div>
-                <span className="cell-text">{lang === 'fr' ? 'Assistant IA conversationnel' : 'Conversational AI assistant'}</span>
+                <div className="cell-text-block">
+                  <span className="cell-text">{lang === 'fr' ? 'Rapport PDF à garder et partager' : 'PDF report to keep and share'}</span>
+                  <span className="cell-subtext">{lang === 'fr' ? 'Téléchargeable, à montrer à un dermatologue ou un professionnel' : 'Downloadable, shareable with a dermatologist or professional'}</span>
+                </div>
               </div>
             </div>
 
@@ -1209,11 +1227,30 @@ export default function BeautyReport({ data: rawData, isPaid, onUnlock }) {
                 lang === 'fr' ? "Débloquer mon rapport complet — 7,99 €" : "Unlock My Full Report — €7.99"
               )}
             </button>
-            <p className="cta-under-text">
-              {lang === 'fr'
-                ? "Paiement unique · Sécurisé Stripe · Accès immédiat"
-                : "One-time payment · Stripe Secure · Instant Access"}
-            </p>
+            <div className="trust-signals">
+              <span className="trust-item">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#C9A961" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+                </svg>
+                {lang === 'fr' ? 'Paiement 100% sécurisé' : '100% Secure payment'}
+              </span>
+              <span className="trust-sep">·</span>
+              <span className="trust-item">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#C9A961" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                  <rect x="2" y="5" width="20" height="14" rx="2" />
+                  <line x1="2" y1="10" x2="22" y2="10" />
+                </svg>
+                {lang === 'fr' ? 'Paiement unique, sans abonnement' : 'One-time payment, no subscription'}
+              </span>
+              <span className="trust-sep">·</span>
+              <span className="trust-item">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#C9A961" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                  <circle cx="12" cy="12" r="10" />
+                  <polyline points="12 6 12 12 16 14" />
+                </svg>
+                {lang === 'fr' ? 'Accès instantané' : 'Instant access'}
+              </span>
+            </div>
           </div>
         </div>
       )}
@@ -1632,7 +1669,7 @@ export default function BeautyReport({ data: rawData, isPaid, onUnlock }) {
           border-radius: 20px;
           padding: 18px;
           display: flex;
-          align-items: center;
+          align-items: flex-start;
           gap: 16px;
           box-shadow: 0 4px 12px rgba(168, 116, 73, 0.02), inset 0 1px 0 rgba(255, 255, 255, 0.6);
           transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.35s, box-shadow 0.35s, background-color 0.35s;
@@ -1653,6 +1690,7 @@ export default function BeautyReport({ data: rawData, isPaid, onUnlock }) {
           align-items: center;
           justify-content: center;
           flex-shrink: 0;
+          margin-top: 1px;
           box-shadow: inset 0 1px 2px rgba(201, 169, 97, 0.05);
           transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
         }
@@ -1661,12 +1699,27 @@ export default function BeautyReport({ data: rawData, isPaid, onUnlock }) {
           border-color: rgba(201, 169, 97, 0.5);
           transform: scale(1.05) rotate(5deg);
         }
+        .cell-text-block {
+          display: flex;
+          flex-direction: column;
+          gap: 3px;
+          flex: 1;
+          min-width: 0;
+        }
         .cell-text {
           font-family: 'Inter', sans-serif;
-          font-size: 13.5px;
-          font-weight: 500;
+          font-size: 13px;
+          font-weight: 600;
           color: #3D2914;
           letter-spacing: -0.01em;
+          line-height: 1.3;
+        }
+        .cell-subtext {
+          font-family: 'Inter', sans-serif;
+          font-size: 11px;
+          font-weight: 400;
+          color: #8C7A6B;
+          line-height: 1.4;
         }
         
         .badge-gold {
@@ -1764,12 +1817,26 @@ export default function BeautyReport({ data: rawData, isPaid, onUnlock }) {
           cursor: not-allowed;
         }
         
-        .cta-under-text {
-          font-family: 'Inter', sans-serif;
-          font-size: 12px;
-          color: #6B6B6B;
-          text-align: center;
+        .trust-signals {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 10px;
+          flex-wrap: wrap;
           margin: 0 0 20px;
+        }
+        .trust-item {
+          display: flex;
+          align-items: center;
+          gap: 5px;
+          font-family: 'Inter', sans-serif;
+          font-size: 11px;
+          font-weight: 500;
+          color: #8C7A6B;
+        }
+        .trust-sep {
+          color: rgba(168, 116, 73, 0.35);
+          font-size: 12px;
         }
       `}</style>
     </div>
