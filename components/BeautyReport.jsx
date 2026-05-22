@@ -1170,7 +1170,7 @@ export default function BeautyReport({ data: rawData, isPaid, onUnlock }) {
                   {CUSTOM_PAYWALL_ICONS.progression}
                 </div>
                 <div className="cell-text-block">
-                  <span className="cell-text">{lang === 'fr' ? 'Plan de progression sur 4 semaines' : '4-week progression plan'}</span>
+                  <span className="cell-text">{lang === 'fr' ? 'Plan de progression sur 8 semaines' : '8-week progression plan'}</span>
                   <span className="cell-subtext">{lang === 'fr' ? 'Objectifs concrets semaine après semaine pour voir les résultats' : 'Concrete weekly goals to see visible results'}</span>
                 </div>
               </div>

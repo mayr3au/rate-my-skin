@@ -91,15 +91,19 @@ Réponds UNIQUEMENT avec du JSON BRUT (pas de blocs de code markdown, pas de tex
       }
     ],
     "lifestyle": {
-      "diet": { "title": "<recommandation alimentation en français simple, ex : 'Plus d'oméga-3'>", "desc": "<pourquoi c'est bénéfique pour cette peau>" },
-      "sleep": { "title": "<recommandation sommeil en français simple>", "desc": "<...>" },
-      "stress": { "title": "<recommandation stress en français simple>", "desc": "<...>" }
+      "diet": { "title": "<recommandation alimentation en français simple et spécifique aux problèmes observés, ex : 'Plus d'oméga-3 pour hydrater de l'intérieur' ou 'Réduire produits laitiers si acné'>", "desc": "<2-3 phrases détaillées en français: (1) pourquoi c'est bénéfique pour cette peau spécifique, (2) quels aliments prioritaires à ajouter ou réduire, (3) comment cela aide la routine topique>" },
+      "sleep": { "title": "<recommandation sommeil ciblée ex : 'Minimum 8h de sommeil régulier' ou 'Bannir écrans 1h avant le coucher'>", "desc": "<2-3 phrases détaillées: (1) comment le manque de sommeil affecte les problèmes observés (cernes, impuretés, éclat), (2) position de sommeil/taie d'oreiller recommandée, (3) avantages pour la barrière cutanée>" },
+      "stress": { "title": "<recommandation stress ciblée ex : 'Yoga 3x par semaine' ou 'Méditation quotidienne 10min'>", "desc": "<2-3 phrases détaillées: (1) comment le stress aggrave les problèmes visibles (rougeurs, acné, cernes), (2) pratiques concrètes et simples à intégrer, (3) synergies avec la routine skincare pour amplifier les résultats>" }
     },
     "progression": [
-      { "week": 1, "title": "<titre semaine 1 en français simple, ex : 'Focus Hydratation'>", "desc": "<action principale de la semaine 1>" },
-      { "week": 2, "title": "...", "desc": "..." },
-      { "week": 3, "title": "...", "desc": "..." },
-      { "week": 4, "title": "...", "desc": "..." }
+      { "week": 1, "title": "<titre semaine 1 en français simple, ex : 'Semaine 1 — Nettoyage fondamental'>", "desc": "<action principale: établir la routine de base (matin/soir) sans éléments complexes. Inclure : quel produit utiliser, à quelle fréquence, résultat attendu>" },
+      { "week": 2, "title": "<titre semaine 2, ex : 'Semaine 2 — Hydratation boostée'>", "desc": "<action: ajouter/renforcer hydratation. Spécifier le soin recommandé de la routine et comment l'intégrer>" },
+      { "week": 3, "title": "<titre semaine 3, ex : 'Semaine 3 — Ciblage des problèmes'>", "desc": "<action: introduire soin spécifique pour le problème principal observé (sérums, traitements ciblés)>" },
+      { "week": 4, "title": "<titre semaine 4, ex : 'Semaine 4 — Consolidation et évaluation'>", "desc": "<action: maintenir routine, évaluer premiers résultats (texture, brillance, cernes?), ajuster si besoin>" },
+      { "week": 5, "title": "<titre semaine 5, ex : 'Semaine 5 — Booster secondaire'>", "desc": "<action: ajouter 2e soin ciblé pour problème secondaire (ex: si acné + cernes, ajouter traitement cernes)>" },
+      { "week": 6, "title": "<titre semaine 6, ex : 'Semaine 6 — Protection et soutien'>", "desc": "<action: renforcer protection SPF daily, ajouter antioxydants si pertinent, intégrer soin lifestyle recommandé>" },
+      { "week": 7, "title": "<titre semaine 7, ex : 'Semaine 7 — Affinement et détail'>", "desc": "<action: affiner routine (ajouter exfoliation douce si applicable, traitement 3e problème si identifié), optimiser ordre application>" },
+      { "week": 8, "title": "<titre semaine 8, ex : 'Semaine 8 — Résultats et maintenance'>", "desc": "<action: évaluer transformations majeures attendues, stabiliser meilleure routine, donner conseils maintenance long-terme (fréquence, saisonnalité)>" }
     ]
   }
 }
@@ -186,15 +190,19 @@ Respond ONLY with RAW JSON (no markdown, no code blocks). Return EXACTLY this st
       }
     ],
     "lifestyle": {
-      "diet": { "title": "<simple diet tip, e.g. 'More Omega-3s'>", "desc": "<why this benefits their skin>" },
-      "sleep": { "title": "<simple sleep tip>", "desc": "<...>" },
-      "stress": { "title": "<simple stress tip>", "desc": "<...>" }
+      "diet": { "title": "<targeted diet tip based on skin issues observed, e.g. 'More Omega-3s to hydrate from within' or 'Reduce dairy if acne-prone'>", "desc": "<2-3 detailed sentences in simple English: (1) why this specifically benefits their observed skin concerns, (2) which foods to prioritize adding or reducing, (3) how this amplifies their skincare routine>" },
+      "sleep": { "title": "<targeted sleep recommendation, e.g. 'Consistent 8-hour sleep schedule' or 'No screens 1 hour before bed'>", "desc": "<2-3 detailed sentences: (1) how poor sleep specifically worsens their visible issues (dark circles, breakouts, dullness), (2) recommended sleeping position and pillowcase material, (3) benefits for skin barrier repair>" },
+      "stress": { "title": "<targeted stress management, e.g. 'Yoga 3x weekly' or 'Daily 10-minute meditation'>", "desc": "<2-3 detailed sentences: (1) how stress specifically triggers their visible problems (redness, acne flare-ups, dark circles), (2) concrete simple practices to integrate daily, (3) how stress management synergizes with their skincare for faster results>" }
     },
     "progression": [
-      { "week": 1, "title": "<week 1 focus in simple English, e.g. 'Hydration Boost'>", "desc": "<main action for week 1>" },
-      { "week": 2, "title": "...", "desc": "..." },
-      { "week": 3, "title": "...", "desc": "..." },
-      { "week": 4, "title": "...", "desc": "..." }
+      { "week": 1, "title": "<week 1 title in simple English, e.g. 'Week 1 — Foundation Cleanse'>", "desc": "<main action: establish the core AM/PM routine with basic steps. Include: which product, frequency, expected result>" },
+      { "week": 2, "title": "<week 2 title, e.g. 'Week 2 — Hydration Power'>", "desc": "<main action: boost hydration layer. Specify which recommended product to add and how to layer>" },
+      { "week": 3, "title": "<week 3 title, e.g. 'Week 3 — Target Main Issue'>", "desc": "<main action: introduce targeted treatment for primary skin concern (serums, spot treatments, specialized products)>" },
+      { "week": 4, "title": "<week 4 title, e.g. 'Week 4 — Evaluate & Adjust'>", "desc": "<main action: maintain routine, evaluate early results (texture improvements, brightness, under-eye changes?), fine-tune if needed>" },
+      { "week": 5, "title": "<week 5 title, e.g. 'Week 5 — Secondary Boost'>", "desc": "<main action: add second targeted treatment for secondary issue (e.g., if dark circles + acne, add undereye treatment)>" },
+      { "week": 6, "title": "<week 6 title, e.g. 'Week 6 — Protection & Support'>", "desc": "<main action: reinforce daily SPF protection, add antioxidants if relevant, integrate recommended lifestyle change>" },
+      { "week": 7, "title": "<week 7 title, e.g. 'Week 7 — Refinement Phase'>", "desc": "<main action: refine routine (add gentle exfoliation if applicable, address 3rd concern if identified), optimize layering sequence>" },
+      { "week": 8, "title": "<week 8 title, e.g. 'Week 8 — Results & Maintenance'>", "desc": "<main action: assess major transformations expected by now, lock in your best routine, provide long-term maintenance advice (frequency, seasonal adjustments)>" }
     ]
   }
 }
