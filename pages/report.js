@@ -156,6 +156,26 @@ export default function Report() {
               price: "€14.50",
               imageUrl: "https://images.unsplash.com/photo-1608248597481-496100c80836?q=80&w=200&auto=format&fit=crop"
             }
+          ],
+          lifestyle: isFr ? {
+            diet: { title: "Plus d'Oméga-3", desc: "Favorise l'hydratation et réduit l'inflammation. Mangez plus de saumon, noix et graines de chia." },
+            sleep: { title: "Sommeil réparateur", desc: "7 à 8 heures par nuit sont cruciales pour la régénération cellulaire et pour réduire les cernes." },
+            stress: { title: "Gestion du cortisol", desc: "Le stress chronique augmente le sébum et l'inflammation. Intégrez 5 min de respiration profonde." }
+          } : {
+            diet: { title: "More Omega-3s", desc: "Promotes hydration and reduces inflammation. Eat more salmon, walnuts, and chia seeds." },
+            sleep: { title: "Restful Sleep", desc: "7-8 hours a night are crucial for cell regeneration and reducing dark circles." },
+            stress: { title: "Cortisol Management", desc: "Chronic stress increases sebum and inflammation. Try 5 minutes of deep breathing daily." }
+          },
+          progression: isFr ? [
+            { week: 1, title: "Fondations & Tolérance", desc: "Introduction de la nouvelle routine. La barrière cutanée s'adapte en douceur." },
+            { week: 2, title: "Action ciblée", desc: "Les actifs commencent à pénétrer et à agir sur l'hydratation et les rougeurs." },
+            { week: 3, title: "Régénération", desc: "Le grain de peau s'affine, les pores paraissent visuellement moins dilatés." },
+            { week: 4, title: "Résultats visibles", desc: "Une peau visiblement plus lumineuse, repulpée, équilibrée et éclatante." }
+          ] : [
+            { week: 1, title: "Foundations & Tolerance", desc: "Introduction of the new routine. The skin barrier adapts gently." },
+            { week: 2, title: "Targeted Action", desc: "Actives begin to penetrate and target hydration and redness." },
+            { week: 3, title: "Turnover Boost", desc: "Skin texture is refined, pores appear visibly less enlarged." },
+            { week: 4, title: "Visible Results", desc: "Visibly brighter, plumper, balanced and more radiant skin." }
           ]
         }
       };

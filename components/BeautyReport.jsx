@@ -990,7 +990,7 @@ export default function BeautyReport({ data: rawData, isPaid, onUnlock }) {
   const displayImprovements = isPaid ? (paid.improvements || []) : previewImprovements;
   const displayProducts = isPaid ? (paid.productRecommendations || []) : allProducts;
 
-  const TABS = [t('tabMetrics'), t('tabStrengths'), t('tabImprove'), t('tabRoutine'), t('tabShop')];
+  const TABS = [t('tabMetrics'), t('tabStrengths'), t('tabImprove'), t('tabRoutine'), t('tabShop'), t('tabLifestyle'), t('tabPlan')];
 
   return (
     <div style={{ background: "transparent", minHeight: "100vh", fontFamily: "'DM Sans', sans-serif", paddingBottom: 80 }}>
@@ -1179,8 +1179,8 @@ export default function BeautyReport({ data: rawData, isPaid, onUnlock }) {
                   {CUSTOM_PAYWALL_ICONS.chat}
                 </div>
                 <div className="cell-text-block">
-                  <span className="cell-text">{lang === 'fr' ? 'Rapport PDF à garder et partager' : 'PDF report to keep and share'}</span>
-                  <span className="cell-subtext">{lang === 'fr' ? 'Téléchargeable, à montrer à un dermatologue ou un professionnel' : 'Downloadable, shareable with a dermatologist or professional'}</span>
+                  <span className="cell-text">{lang === 'fr' ? 'Assistant IA conversationnel' : 'AI Skincare Assistant'}</span>
+                  <span className="cell-subtext">{lang === 'fr' ? 'Posez toutes vos questions à notre IA experte disponible 24h/7' : 'Ask any questions to our expert AI available 24/7'}</span>
                 </div>
               </div>
             </div>
@@ -1446,6 +1446,60 @@ export default function BeautyReport({ data: rawData, isPaid, onUnlock }) {
         {previewTab === 4 && (
           <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
             {displayProducts.map((p, i) => <ProductCard key={i} product={p} lang={lang} t={t} />)}
+          </div>
+        )}
+        {previewTab === 5 && (
+          <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+            {['diet', 'sleep', 'stress'].map((key) => {
+              const item = (paid.lifestyle || {})[key];
+              if (!item) return null;
+              const icons = { diet: "🥑", sleep: "💤", stress: "🧘‍♀️" };
+              const titles = { diet: lang === 'fr' ? 'Alimentation' : 'Diet', sleep: lang === 'fr' ? 'Sommeil' : 'Sleep', stress: 'Stress' };
+              return (
+                <div key={key} style={{ ...CARD, padding: "20px", display: "flex", gap: 16, alignItems: "flex-start" }}>
+                  <div style={{ width: 40, height: 40, borderRadius: 12, background: "rgba(168,116,73,0.08)", border: "1px solid rgba(168,116,73,0.15)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18, flexShrink: 0 }}>
+                    {icons[key]}
+                  </div>
+                  <div>
+                    <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: "0.15em", textTransform: "uppercase", color: "#A87449", marginBottom: 4, fontFamily: "'DM Sans', sans-serif" }}>{titles[key]}</div>
+                    <div style={{ fontSize: 16, fontWeight: 600, color: "#2C241D", marginBottom: 6, fontFamily: "'Cormorant Garamond', serif" }}>{item.title}</div>
+                    <p style={{ margin: 0, fontSize: 13, lineHeight: 1.6, color: "#6F6156" }}>{item.desc}</p>
+                  </div>
+                </div>
+              );
+            })}
+            {!paid.lifestyle && (
+              <div style={{ ...CARD, padding: "20px", textAlign: "center", color: "#8C7A6B" }}>
+                {lang === 'fr' ? 'Recommandations de mode de vie non disponibles pour ce rapport.' : 'Lifestyle recommendations not available for this report.'}
+              </div>
+            )}
+          </div>
+        )}
+        {previewTab === 6 && (
+          <div style={{ display: "flex", flexDirection: "column", gap: 12, position: "relative" }}>
+            {paid.progression ? (
+              <>
+                <div style={{ position: "absolute", left: 36, top: 20, bottom: 20, width: 2, background: "linear-gradient(180deg, rgba(201,169,97,0.5), rgba(201,169,97,0.05))", zIndex: 0 }} />
+                {paid.progression.map((step, i) => (
+                  <div key={i} style={{ ...CARD, padding: "18px 20px", display: "flex", gap: 16, alignItems: "center", position: "relative", zIndex: 1 }}>
+                    <div style={{ width: 34, height: 34, borderRadius: "50%", background: "#FFF", border: "2px solid #C9A961", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, fontWeight: 700, color: "#A87449", flexShrink: 0, boxShadow: "0 4px 12px rgba(201,169,97,0.2)" }}>
+                      {step.week}
+                    </div>
+                    <div>
+                      <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", color: "#8C7A6B", marginBottom: 2 }}>
+                        {lang === 'fr' ? `Semaine ${step.week}` : `Week ${step.week}`}
+                      </div>
+                      <div style={{ fontSize: 16, fontWeight: 600, color: "#2C241D", marginBottom: 4, fontFamily: "'Cormorant Garamond', serif" }}>{step.title}</div>
+                      <p style={{ margin: 0, fontSize: 12.5, lineHeight: 1.5, color: "#6F6156" }}>{step.desc}</p>
+                    </div>
+                  </div>
+                ))}
+              </>
+            ) : (
+              <div style={{ ...CARD, padding: "20px", textAlign: "center", color: "#8C7A6B" }}>
+                {lang === 'fr' ? 'Plan de progression non disponible pour ce rapport.' : 'Progression plan not available for this report.'}
+              </div>
+            )}
           </div>
         )}
       </div>

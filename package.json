@@ -9,6 +9,7 @@
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.52.0",
+    "@mediapipe/tasks-vision": "^0.10.8",
     "@supabase/supabase-js": "^2.43.4",
     "@vercel/analytics": "^2.0.1",
     "@vercel/speed-insights": "^2.0.0",

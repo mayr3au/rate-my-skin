@@ -4,6 +4,7 @@ import { useRouter } from 'next/router';
 import Logo, { CreamDrop, LuxuryFlower } from '../components/Logo';
 import { useLang } from '../lib/LangContext';
 import MedicalDisclaimer from '../components/MedicalDisclaimer';
+import MultiAngleCamera from '../components/MultiAngleCamera';
 
 const SKIN_CONCERN_MAX = 200;
 const GOLD = '#C5A028';
@@ -82,6 +83,7 @@ export default function Home() {
   const streamRef = useRef(null);
 
   const [showCamera, setShowCamera] = useState(false);
+  const [showMultiAngle, setShowMultiAngle] = useState(false);
   const [screenFlash, setScreenFlash] = useState(false);
 
   const [emailCaptured, setEmailCaptured] = useState(false);
@@ -242,7 +244,7 @@ export default function Home() {
         if (pendingAction === 'file') {
           fileInputRef.current?.click();
         } else if (pendingAction === 'camera') {
-          startCamera();
+          setShowMultiAngle(true);
         } else {
           handleAnalyse(true);
         }
@@ -256,10 +258,24 @@ export default function Home() {
     if (e) e.stopPropagation();
     if (emailCaptured) {
       if (action === 'file') fileInputRef.current?.click();
-      else if (action === 'camera') startCamera();
+      else if (action === 'camera') setShowMultiAngle(true);
     } else {
       setPendingAction(action);
       setOverlayVisible(true);
+    }
+  };
+
+  /* ── Handle multi-angle captures ── */
+  const handleMultiAngleCaptures = (captures) => {
+    setShowMultiAngle(false);
+    // Use the frontal (FRONT) image as the primary image for analysis
+    // The other angles can be used for extended analysis in the future
+    if (captures.FRONT) {
+      processFile(captures.FRONT);
+    } else if (captures.LEFT) {
+      processFile(captures.LEFT);
+    } else if (captures.RIGHT) {
+      processFile(captures.RIGHT);
     }
   };
 
@@ -1381,6 +1397,15 @@ export default function Home() {
 
       {/* Hidden canvas for capture */}
       <canvas ref={canvasRef} style={{ display: 'none' }} />
+
+      {/* ── Multi-Angle Camera ── */}
+      {showMultiAngle && (
+        <MultiAngleCamera
+          onCapturesComplete={handleMultiAngleCaptures}
+          onClose={() => setShowMultiAngle(false)}
+          t={t}
+        />
+      )}
 
       <style>{`
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }

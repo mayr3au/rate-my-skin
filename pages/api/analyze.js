@@ -89,6 +89,17 @@ Réponds UNIQUEMENT avec du JSON BRUT (pas de blocs de code markdown, pas de tex
         "sephoraLink": "<lien exact sephora extrait des PRODUITS DISPONIBLES>",
         "price": "<prix exact extrait des PRODUITS DISPONIBLES>"
       }
+    ],
+    "lifestyle": {
+      "diet": { "title": "<recommandation alimentation en français simple, ex : 'Plus d'oméga-3'>", "desc": "<pourquoi c'est bénéfique pour cette peau>" },
+      "sleep": { "title": "<recommandation sommeil en français simple>", "desc": "<...>" },
+      "stress": { "title": "<recommandation stress en français simple>", "desc": "<...>" }
+    },
+    "progression": [
+      { "week": 1, "title": "<titre semaine 1 en français simple, ex : 'Focus Hydratation'>", "desc": "<action principale de la semaine 1>" },
+      { "week": 2, "title": "...", "desc": "..." },
+      { "week": 3, "title": "...", "desc": "..." },
+      { "week": 4, "title": "...", "desc": "..." }
     ]
   }
 }
@@ -173,6 +184,17 @@ Respond ONLY with RAW JSON (no markdown, no code blocks). Return EXACTLY this st
         "sephoraLink": "<exact link from AVAILABLE PRODUCTS>",
         "price": "<price from AVAILABLE PRODUCTS>"
       }
+    ],
+    "lifestyle": {
+      "diet": { "title": "<simple diet tip, e.g. 'More Omega-3s'>", "desc": "<why this benefits their skin>" },
+      "sleep": { "title": "<simple sleep tip>", "desc": "<...>" },
+      "stress": { "title": "<simple stress tip>", "desc": "<...>" }
+    },
+    "progression": [
+      { "week": 1, "title": "<week 1 focus in simple English, e.g. 'Hydration Boost'>", "desc": "<main action for week 1>" },
+      { "week": 2, "title": "...", "desc": "..." },
+      { "week": 3, "title": "...", "desc": "..." },
+      { "week": 4, "title": "...", "desc": "..." }
     ]
   }
 }
