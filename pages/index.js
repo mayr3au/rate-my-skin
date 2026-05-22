@@ -921,15 +921,18 @@ export default function Home() {
               position: 'relative',
               overflow: 'hidden',
               ...(image && !loading ? {
-                background: 'linear-gradient(135deg, #C5A028 0%, #D4B844 50%, #B89020 100%)',
+                background: 'rgba(255, 255, 255, 0.85)',
+                backdropFilter: 'blur(20px) saturate(150%)',
+                WebkitBackdropFilter: 'blur(20px) saturate(150%)',
+                border: '1px solid rgba(255, 255, 255, 0.95)',
                 boxShadow: [
-                  '0 2px 0 0 rgba(255,255,255,0.6) inset',
-                  '0 -2px 0 0 rgba(0,0,0,0.2) inset',
-                  'inset 0 0 0 1px rgba(255,255,255,0.25)',
-                  '0 12px 32px rgba(197,160,40,0.35)',
-                  '0 4px 12px rgba(197,160,40,0.25)',
+                  '0 2px 0 0 rgba(255,255,255,0.95) inset',
+                  '0 -2px 0 0 rgba(168,116,73,0.15) inset',
+                  'inset 0 1px 0 rgba(255,255,255,0.98)',
+                  '0 12px 32px rgba(168, 116, 73, 0.08)',
+                  '0 4px 12px rgba(168, 116, 73, 0.04)',
                 ].join(','),
-                color: '#FFFFFF',
+                color: '#3A2E26',
                 transform: 'translateY(-2px)',
               } : {
                 background: 'linear-gradient(135deg, rgba(255,255,255,0.15) 0%, rgba(255,255,255,0.08) 100%)',
@@ -943,11 +946,11 @@ export default function Home() {
               if (image && !loading) {
                 e.target.style.transform = 'translateY(-4px) scale(1.02)';
                 e.target.style.boxShadow = [
-                  '0 2px 0 0 rgba(255,255,255,0.6) inset',
-                  '0 -2px 0 0 rgba(0,0,0,0.2) inset',
-                  'inset 0 0 0 1px rgba(255,255,255,0.4)',
-                  '0 16px 40px rgba(197,160,40,0.45)',
-                  '0 8px 20px rgba(197,160,40,0.35)',
+                  '0 2px 0 0 rgba(255,255,255,0.98) inset',
+                  '0 -2px 0 0 rgba(168,116,73,0.2) inset',
+                  'inset 0 1px 0 rgba(255,255,255,0.99)',
+                  '0 16px 40px rgba(168, 116, 73, 0.12)',
+                  '0 8px 20px rgba(168, 116, 73, 0.08)',
                 ].join(',');
               }
             }}
@@ -955,11 +958,11 @@ export default function Home() {
               if (image && !loading) {
                 e.target.style.transform = 'translateY(-2px)';
                 e.target.style.boxShadow = [
-                  '0 2px 0 0 rgba(255,255,255,0.6) inset',
-                  '0 -2px 0 0 rgba(0,0,0,0.2) inset',
-                  'inset 0 0 0 1px rgba(255,255,255,0.25)',
-                  '0 12px 32px rgba(197,160,40,0.35)',
-                  '0 4px 12px rgba(197,160,40,0.25)',
+                  '0 2px 0 0 rgba(255,255,255,0.95) inset',
+                  '0 -2px 0 0 rgba(168,116,73,0.15) inset',
+                  'inset 0 1px 0 rgba(255,255,255,0.98)',
+                  '0 12px 32px rgba(168, 116, 73, 0.08)',
+                  '0 4px 12px rgba(168, 116, 73, 0.04)',
                 ].join(',');
               }
             }}
