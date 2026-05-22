@@ -833,12 +833,46 @@ function TraitTag({ label, value }) {
 export default function BeautyReport({ data: rawData, isPaid, onUnlock }) {
   const { lang, t } = useLang();
   const data = useMemo(() => sanitizeReport(rawData, lang), [rawData, lang]);
-  const [activeTab, setActiveTab] = useState("analysis");
   const [unlocking, setUnlocking] = useState(false);
   const [previewTab, setPreviewTab] = useState(0);
   const [sharing, setSharing] = useState(false);
   const [shareMsg, setShareMsg] = useState("");
   const [showAllFree, setShowAllFree] = useState(false);
+  const [pdfLoading, setPdfLoading] = useState(false);
+  const [timeLeft, setTimeLeft] = useState(null);
+
+  useEffect(() => {
+    if (isPaid) return;
+    
+    // Get finished timestamp
+    let finishedAt = sessionStorage.getItem('rms_generation_finished_at');
+    if (!finishedAt) {
+      // Fallback: set it to now if not set yet (e.g. direct load of report)
+      finishedAt = Date.now().toString();
+      sessionStorage.setItem('rms_generation_finished_at', finishedAt);
+    }
+    
+    const finishedTime = parseInt(finishedAt, 10);
+    const duration = 15 * 60 * 1000; // 15 minutes in ms
+    
+    const updateTimer = () => {
+      const elapsed = Date.now() - finishedTime;
+      const remaining = Math.max(0, duration - elapsed);
+      setTimeLeft(Math.floor(remaining / 1000));
+    };
+    
+    updateTimer();
+    const interval = setInterval(updateTimer, 1000);
+    
+    return () => clearInterval(interval);
+  }, [isPaid]);
+
+  const formatTime = (seconds) => {
+    if (seconds === null) return '15:00';
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+  };
 
   const handleShare = async () => {
     setSharing(true);
@@ -858,6 +892,18 @@ export default function BeautyReport({ data: rawData, isPaid, onUnlock }) {
     }
   };
 
+  const handleDownloadPDF = async () => {
+    setPdfLoading(true);
+    try {
+      const { generateSkinReportPDF } = await import('../lib/pdfGenerator');
+      await generateSkinReportPDF(data, lang);
+    } catch (error) {
+      console.error('Error generating PDF:', error);
+    } finally {
+      setPdfLoading(false);
+    }
+  };
+
   if (!data) {
     return (
       <div style={{ display: "flex", alignItems: "center", justifyContent: "center", minHeight: "60vh" }}>
@@ -873,108 +919,112 @@ export default function BeautyReport({ data: rawData, isPaid, onUnlock }) {
     try { await onUnlock(planId); } finally { setUnlocking(false); }
   };
 
-  /* ══════════════════════════ FREE VIEW ══════════════════════════ */
-  if (!isPaid) {
-    const freeData = data.free_version || {};
-    const mainProblems = freeData.mainProblems || [];
-    const basicSummary = freeData.basicSummary || summary || "";
-    const paid = data.paid_version || {};
-    const previewMetrics = (paid.metrics || []).slice(0, 4);
-    const previewStrengths = (paid.strengths || []).slice(0, 2);
-    const previewImprovements = (paid.improvements || []).slice(0, 2);
-    const routine = paid.routine || {};
-    const previewRoutine = [...(routine.morning || []), ...(routine.evening || [])].slice(0, 4);
-    const allProducts = (paid.productRecommendations || []).slice(0, 3);
+  const freeData = data.free_version || {};
+  const mainProblems = freeData.mainProblems || [];
+  const basicSummary = freeData.basicSummary || summary || "";
+  const paid = data.paid_version || {};
+  const previewMetrics = (paid.metrics || []).slice(0, 4);
+  const previewStrengths = (paid.strengths || []).slice(0, 2);
+  const previewImprovements = (paid.improvements || []).slice(0, 2);
+  const routine = paid.routine || {};
+  const previewRoutine = [...(routine.morning || []), ...(routine.evening || [])].slice(0, 4);
+  const allProducts = (paid.productRecommendations || []).slice(0, 3);
 
-    const TABS = [t('tabMetrics'), t('tabStrengths'), t('tabImprove'), t('tabRoutine'), t('tabShop')];
+  const displayMetrics = isPaid ? (paid.metrics || []) : previewMetrics;
+  const displayStrengths = isPaid ? (paid.strengths || []) : previewStrengths;
+  const displayImprovements = isPaid ? (paid.improvements || []) : previewImprovements;
+  const displayProducts = isPaid ? (paid.productRecommendations || []) : allProducts;
 
-    return (
-      <div style={{ background: "transparent", minHeight: "100vh", fontFamily: "'DM Sans', sans-serif", paddingBottom: 80 }}>
-        <ReportHeader t={t} />
+  const TABS = [t('tabMetrics'), t('tabStrengths'), t('tabImprove'), t('tabRoutine'), t('tabShop')];
 
-        <div style={{ maxWidth: 680, margin: "0 auto", padding: "24px 20px 0" }}>
+  return (
+    <div style={{ background: "transparent", minHeight: "100vh", fontFamily: "'DM Sans', sans-serif", paddingBottom: 80 }}>
+      <ReportHeader t={t} />
 
-          {/* ── Score hero ── */}
-          <ScoreHeroCard
-            score={overall}
-            summary={basicSummary}
-            faceShape={faceShape} skinType={skinType} skinTone={skinTone}
-            badge={t("freeReportLabel")}
-            t={t} lang={lang}
-          />
+      <div style={{ maxWidth: 680, margin: "0 auto", padding: "24px 20px 0" }}>
 
-          <MedicalDisclaimer style={{ marginTop: 16 }} />
+        {/* ── Score hero ── */}
+        <ScoreHeroCard
+          score={overall}
+          summary={basicSummary}
+          faceShape={faceShape} skinType={skinType} skinTone={skinTone}
+          badge={isPaid ? null : t("freeReportLabel")}
+          t={t} lang={lang}
+        />
 
-          {/* ── Main problems ── */}
-          {mainProblems.length > 0 && (
-            <div style={{ marginTop: 28 }}>
-              <SectionHeading label={t('mainProblemsHeading')} title={t('areasToAddress')} />
-              <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-                {mainProblems.map((problem, i) => {
-                  if (i > 0 && !showAllFree) return null;
-                  return (
-                    <div key={i} style={{ ...CARD, padding: "0", display: "flex", overflow: "hidden" }}>
-                      <div style={{ width: 4, background: SEVERITY_ACCENT[problem.severity] || "#D1D5DB", flexShrink: 0 }} />
-                      <div style={{ padding: "18px 20px", flex: 1 }}>
-                        <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 8 }}>
-                          <SeverityBadge severity={problem.severity} t={t} />
-                        </div>
-                        <div style={{ fontSize: 16, fontWeight: 400, color: "#3A2E26", marginBottom: 6, fontFamily: "'Cormorant Garamond', serif", lineHeight: 1.3 }}>{problem.title}</div>
-                        <p style={{ margin: 0, fontSize: 12.5, lineHeight: 1.7, color: "#8C7A6B" }}>{problem.description}</p>
+        <MedicalDisclaimer style={{ marginTop: 16 }} />
+
+        {/* ── Main problems ── */}
+        {mainProblems.length > 0 && (
+          <div style={{ marginTop: 28 }}>
+            <SectionHeading label={t('mainProblemsHeading')} title={t('areasToAddress')} />
+            <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+              {mainProblems.map((problem, i) => {
+                if (i > 0 && !showAllFree) return null;
+                return (
+                  <div key={i} style={{ ...CARD, padding: "0", display: "flex", overflow: "hidden" }}>
+                    <div style={{ width: 4, background: SEVERITY_ACCENT[problem.severity] || "#D1D5DB", flexShrink: 0 }} />
+                    <div style={{ padding: "18px 20px", flex: 1 }}>
+                      <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 8 }}>
+                        <SeverityBadge severity={problem.severity} t={t} />
                       </div>
+                      <div style={{ fontSize: 16, fontWeight: 400, color: "#3A2E26", marginBottom: 6, fontFamily: "'Cormorant Garamond', serif", lineHeight: 1.3 }}>{problem.title}</div>
+                      <p style={{ margin: 0, fontSize: 12.5, lineHeight: 1.7, color: "#8C7A6B" }}>{problem.description}</p>
                     </div>
-                  );
-                })}
-              </div>
-
-              {/* Voir plus / Voir moins toggle button */}
-              {mainProblems.length > 1 && (
-                <div style={{ display: "flex", justifyContent: "center", marginTop: 16 }}>
-                  <button
-                    onClick={() => setShowAllFree(!showAllFree)}
-                    className="btn-liquid-glass-pearl"
-                    style={{
-                      padding: "10px 24px",
-                      fontSize: 12,
-                      fontWeight: 600,
-                      borderRadius: 20,
-                      border: "none",
-                      cursor: "pointer",
-                      display: "flex",
-                      alignItems: "center",
-                      gap: 6,
-                      color: "#A87449",
-                      boxShadow: "0 4px 12px rgba(168, 116, 73, 0.05)"
-                    }}
-                  >
-                    {showAllFree ? t('seeLess') : t('seeMore')}
-                    <span style={{ fontSize: 9 }}>{showAllFree ? '▲' : '▼'}</span>
-                  </button>
-                </div>
-              )}
+                  </div>
+                );
+              })}
             </div>
-          )}
 
-          {/* ── Products (free) ── */}
-          {showAllFree && allProducts.length > 0 && (
-            <div style={{ marginTop: 32 }}>
-              <div style={{ display: "flex", alignItems: "flex-end", justifyContent: "space-between", marginBottom: 14, gap: 8 }}>
-                <SectionHeading label={t('shopSubtitle')} title={t('shopTitle')} />
-                <span style={{ fontSize: 9, fontWeight: 700, letterSpacing: "0.16em", textTransform: "uppercase", color: "#8B6914", background: "rgba(197,160,40,0.1)", border: "1px solid rgba(197,160,40,0.28)", borderRadius: 20, padding: "4px 12px", whiteSpace: "nowrap", flexShrink: 0, fontFamily: "'DM Sans', sans-serif", marginBottom: 16 }}>
-                  {t('freeIncluded')}
-                </span>
+            {/* Voir plus / Voir moins toggle button */}
+            {mainProblems.length > 1 && (
+              <div style={{ display: "flex", justifyContent: "center", marginTop: 16 }}>
+                <button
+                  onClick={() => setShowAllFree(!showAllFree)}
+                  className="btn-liquid-glass-pearl"
+                  style={{
+                    padding: "10px 24px",
+                    fontSize: 12,
+                    fontWeight: 600,
+                    borderRadius: 20,
+                    border: "none",
+                    cursor: "pointer",
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 6,
+                    color: "#A87449",
+                    boxShadow: "0 4px 12px rgba(168, 116, 73, 0.05)"
+                  }}
+                >
+                  {showAllFree ? t('seeLess') : t('seeMore')}
+                  <span style={{ fontSize: 9 }}>{showAllFree ? '▲' : '▼'}</span>
+                </button>
               </div>
-              <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-                {allProducts.map((p, i) => <ProductCard key={i} product={p} lang={lang} t={t} />)}
-              </div>
-              <p style={{ fontSize: 10, color: "#B9AC9E", textAlign: "center", padding: "12px 4px 0", lineHeight: 1.7, fontFamily: "'DM Sans', sans-serif" }}>
-                {t('affiliateNotice')}
-              </p>
+            )}
+          </div>
+        )}
+
+        {/* ── Products (free) ── */}
+        {showAllFree && allProducts.length > 0 && (
+          <div style={{ marginTop: 32 }}>
+            <div style={{ display: "flex", alignItems: "flex-end", justifyContent: "space-between", marginBottom: 14, gap: 8 }}>
+              <SectionHeading label={t('shopSubtitle')} title={t('shopTitle')} />
+              <span style={{ fontSize: 9, fontWeight: 700, letterSpacing: "0.16em", textTransform: "uppercase", color: "#8B6914", background: "rgba(197,160,40,0.1)", border: "1px solid rgba(197,160,40,0.28)", borderRadius: 20, padding: "4px 12px", whiteSpace: "nowrap", flexShrink: 0, fontFamily: "'DM Sans', sans-serif", marginBottom: 16 }}>
+                {t('freeIncluded')}
+              </span>
             </div>
-          )}
-        </div>
+            <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+              {allProducts.map((p, i) => <ProductCard key={i} product={p} lang={lang} t={t} />)}
+            </div>
+            <p style={{ fontSize: 10, color: "#B9AC9E", textAlign: "center", padding: "12px 4px 0", lineHeight: 1.7, fontFamily: "'DM Sans', sans-serif" }}>
+              {t('affiliateNotice')}
+            </p>
+          </div>
+        )}
+      </div>
 
-        {/* ── Paywall card ── */}
+      {/* ── Paywall card (unpaid only) ── */}
+      {!isPaid && (
         <div style={{ maxWidth: 680, margin: "32px auto 0", padding: "0 20px" }}>
           <div style={{
             background: "linear-gradient(150deg, rgba(255,255,255,0.82) 0%, rgba(253,246,237,0.68) 55%, rgba(246,235,222,0.82) 100%)",
@@ -982,7 +1032,7 @@ export default function BeautyReport({ data: rawData, isPaid, onUnlock }) {
             WebkitBackdropFilter: "blur(32px) saturate(160%)",
             border: "1px solid rgba(255,255,255,0.88)",
             borderRadius: 26, padding: "clamp(28px,5vw,40px)",
-            boxShadow: "0 12px 48px rgba(168,116,73,0.09), 0 2px 0 rgba(255,255,255,0.9), inset 0 1px 0 rgba(255,255,255,0.98)",
+            boxShadow: "0 12px 48px rgba(168,116,73,0.09), 0 2px 0 rgba(255,255,255,0.95), inset 0 1px 0 rgba(255,255,255,0.98)",
           }}>
             {/* Label pill */}
             <div style={{ display: "flex", justifyContent: "center", marginBottom: 20 }}>
@@ -1015,6 +1065,31 @@ export default function BeautyReport({ data: rawData, isPaid, onUnlock }) {
             }}>
               {t('paywallCardDesc')}
             </p>
+
+            {/* Countdown timer */}
+            {timeLeft !== null && (
+              <div style={{
+                display: "flex", alignItems: "center", justifyContent: "center", gap: 8,
+                background: timeLeft > 0 ? "rgba(168, 116, 73, 0.04)" : "rgba(0, 0, 0, 0.02)",
+                border: timeLeft > 0 ? "1px solid rgba(168, 116, 73, 0.15)" : "1px solid rgba(0, 0, 0, 0.08)",
+                borderRadius: 14, padding: "10px 16px",
+                margin: "-10px auto 24px", maxWidth: 280,
+                boxShadow: "inset 0 1px 0 rgba(255,255,255,0.6)",
+              }}>
+                <span style={{ fontSize: 13, animation: timeLeft > 0 ? "dropletFloat 2s ease-in-out infinite" : "none" }}>⏳</span>
+                <span style={{
+                  fontSize: 12, fontWeight: 600, color: timeLeft > 0 ? "#8C6A3A" : "#888",
+                  fontFamily: "'DM Sans', sans-serif", letterSpacing: "0.02em", textTransform: "uppercase"
+                }}>
+                  {timeLeft > 0 
+                    ? (lang === 'fr' ? 'Offre limitée :' : 'Limited offer:') 
+                    : (lang === 'fr' ? 'Offre expirée :' : 'Offer expired:')}{" "}
+                  <span style={{ fontFamily: "monospace", fontSize: 13, fontWeight: 700, color: timeLeft > 0 ? "#A87449" : "#888", marginLeft: 4 }}>
+                    {formatTime(timeLeft)}
+                  </span>
+                </span>
+              </div>
+            )}
 
             {/* Feature rows */}
             <div style={{ display: "flex", flexDirection: "column", gap: 0, marginBottom: 24, borderRadius: 16, overflow: "hidden", border: "1px solid rgba(255,255,255,0.75)" }}>
@@ -1081,81 +1156,186 @@ export default function BeautyReport({ data: rawData, isPaid, onUnlock }) {
             </p>
           </div>
         </div>
+      )}
 
-        {/* ── Share button (free view) ── */}
-        <div style={{ maxWidth: 680, margin: "24px auto 0", padding: "0 20px" }}>
-          <button
-            onClick={handleShare}
-            disabled={sharing}
-            className="btn-liquid-glass-dark"
-            style={{
-              width: "100%", padding: "14px", borderRadius: 14,
-              fontSize: 13, fontWeight: 600, letterSpacing: "0.04em",
-              display: "flex", alignItems: "center", justifyContent: "center", gap: 10,
-              border: "none",
-            }}
-          >
-            {sharing
-              ? <><span style={{ display: "inline-block", width: 12, height: 12, border: "2px solid rgba(185,172,158,0.35)", borderTopColor: "#B9AC9E", borderRadius: "50%", animation: "spin 0.7s linear infinite" }} />{t('shareGenerating')}</>
-              : <>{t('shareScore')}<span style={{ fontSize: 11, opacity: 0.6, fontWeight: 400 }}>· Instagram / TikTok</span></>
-            }
-          </button>
-          {shareMsg && <p style={{ margin: "10px 0 0", fontSize: 12, color: "#A87449", textAlign: "center", fontFamily: "'DM Sans', sans-serif" }}>{shareMsg}</p>}
-        </div>
+      {/* ── Share button ── */}
+      <div style={{ maxWidth: 680, margin: "24px auto 0", padding: "0 20px" }}>
+        <button
+          onClick={handleShare}
+          disabled={sharing}
+          className="btn-liquid-glass-dark"
+          style={{
+            width: "100%", padding: "14px", borderRadius: 14,
+            fontSize: 13, fontWeight: 600, letterSpacing: "0.04em",
+            display: "flex", alignItems: "center", justifyContent: "center", gap: 10,
+            border: "none",
+          }}
+        >
+          {sharing
+            ? <><span style={{ display: "inline-block", width: 12, height: 12, border: "2px solid rgba(185,172,158,0.35)", borderTopColor: "#B9AC9E", borderRadius: "50%", animation: "spin 0.7s linear infinite" }} />{t('shareGenerating')}</>
+            : <>{t('shareScore')}<span style={{ fontSize: 11, opacity: 0.6, fontWeight: 400 }}>· Instagram / TikTok</span></>
+          }
+        </button>
+        {shareMsg && <p style={{ margin: "10px 0 0", fontSize: 12, color: "#A87449", textAlign: "center", fontFamily: "'DM Sans', sans-serif" }}>{shareMsg}</p>}
+      </div>
 
-        {/* ── Clickable tab preview bar ── */}
-        <div style={{ maxWidth: 680, margin: "24px auto 0", padding: "0 20px" }}>
+      {/* ── Clickable tab preview bar (ALWAYS DISPLAYED) ── */}
+      <div style={{ maxWidth: 680, margin: "24px auto 0", padding: "0 20px" }}>
+        {!isPaid && (
           <p style={{ ...LABEL_STYLE, textAlign: "center", marginBottom: 10 }}>
             {t('previewLabel')}
           </p>
-          <div className="rpt-tabs" style={{
-            display: "flex", gap: 4,
-            background: "rgba(255,255,255,0.55)",
+        )}
+        <div className="rpt-tabs" style={{
+          display: "flex", gap: 4,
+          background: "rgba(255,255,255,0.55)",
           backdropFilter: "blur(18px) saturate(150%)", WebkitBackdropFilter: "blur(18px) saturate(150%)",
           border: "1px solid rgba(255,255,255,0.65)",
-            borderRadius: 14, padding: 4,
-            boxShadow: "0 8px 32px rgba(168,116,73,0.03), inset 0 1px 1px rgba(255, 255, 255, 0.8)",
-            scrollbarWidth: "none"
-          }}>
-            {TABS.map((label, i) => (
-              <button key={label} onClick={() => setPreviewTab(i)} className="rpt-tab-btn" style={{
-                flex: 1, padding: "11px 4px", borderRadius: 10, textAlign: "center",
-                background: previewTab === i ? "linear-gradient(135deg, rgba(44, 36, 29, 0.85), rgba(28, 22, 17, 0.92))" : "transparent",
-                color: previewTab === i ? "#fff" : "#6F6156",
-                fontSize: 9, fontWeight: 600, letterSpacing: "0.06em",
-                fontFamily: "'DM Sans', sans-serif", textTransform: "uppercase",
-                border: previewTab === i ? "1px solid rgba(255, 255, 255, 0.15)" : "none", cursor: "pointer", transition: "all 0.25s ease",
-                boxShadow: previewTab === i ? "0 4px 14px rgba(44,36,29,0.15)" : "none",
-                whiteSpace: "nowrap",
-              }}>{label}</button>
+          borderRadius: 14, padding: 4,
+          boxShadow: "0 8px 32px rgba(168,116,73,0.03), inset 0 1px 1px rgba(255, 255, 255, 0.8)",
+          scrollbarWidth: "none"
+        }}>
+          {TABS.map((label, i) => (
+            <button key={label} onClick={() => setPreviewTab(i)} className="rpt-tab-btn" style={{
+              flex: 1, padding: "11px 4px", borderRadius: 10, textAlign: "center",
+              background: previewTab === i ? "linear-gradient(135deg, rgba(44, 36, 29, 0.85), rgba(28, 22, 17, 0.92))" : "transparent",
+              color: previewTab === i ? "#fff" : "#6F6156",
+              fontSize: 9, fontWeight: 600, letterSpacing: "0.06em",
+              fontFamily: "'DM Sans', sans-serif", textTransform: "uppercase",
+              border: previewTab === i ? "1px solid rgba(255, 255, 255, 0.15)" : "none", cursor: "pointer", transition: "all 0.25s ease",
+              boxShadow: previewTab === i ? "0 4px 14px rgba(44,36,29,0.15)" : "none",
+              whiteSpace: "nowrap",
+            }}>{label}</button>
+          ))}
+        </div>
+      </div>
+
+      {/* ── Tab content (Blurred for unpaid, interactive and complete for paid) ── */}
+      <div style={{
+        maxWidth: 680,
+        margin: "10px auto 0",
+        padding: "0 20px 60px",
+        filter: isPaid ? "none" : "blur(5px)",
+        opacity: isPaid ? 1 : 0.3,
+        pointerEvents: isPaid ? "auto" : "none",
+        userSelect: isPaid ? "auto" : "none"
+      }}>
+        {previewTab === 0 && (
+          <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+            {displayMetrics.map((m, i) => <MetricCard key={i} m={m} index={i} t={t} />)}
+          </div>
+        )}
+        {previewTab === 1 && (
+          <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+            {displayStrengths.map((s, i) => (
+              <div key={i} style={{ ...CARD, padding: "20px 22px", display: "flex", gap: 14, alignItems: "flex-start" }}>
+                <div style={{ width: 34, height: 34, borderRadius: 10, background: "rgba(168,116,73,0.12)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, color: GOLD, fontSize: 14 }}>{ICONS[i] || "✦"}</div>
+                <div><div style={{ fontSize: 12, fontWeight: 600, color: "#2C241D", marginBottom: 6 }}>{s.title}</div><p style={{ margin: 0, fontSize: 13, lineHeight: 1.7, color: "#8C7A6B" }}>{s.desc}</p></div>
+              </div>
             ))}
           </div>
-        </div>
+        )}
+        {previewTab === 2 && (
+          <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+            {displayImprovements.map((item, i) => (
+              <div key={i} style={{ ...CARD, padding: "20px 22px", display: "flex", gap: 14, alignItems: "flex-start" }}>
+                <div style={{ width: 28, height: 28, borderRadius: "50%", background: "rgba(212,165,116,0.12)", border: "1px solid rgba(212,165,116,0.25)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, fontSize: 13, fontWeight: 600, color: GOLD, fontFamily: "'Cormorant Garamond', serif" }}>{i + 1}</div>
+                <div><div style={{ fontSize: 12, fontWeight: 600, color: "#2C241D", marginBottom: 6 }}>{item.title}</div><p style={{ margin: 0, fontSize: 13, lineHeight: 1.7, color: "#8C7A6B" }}>{item.desc}</p></div>
+              </div>
+            ))}
+          </div>
+        )}
+        {previewTab === 3 && (
+          isPaid ? (
+            (routine.morning || []).length === 0 && (routine.evening || []).length === 0 && (routine.weekly || []).length === 0 ? (
+              <div style={{ ...CARD, padding: "20px", textAlign: "center", color: "#8C7A6B" }}>
+                {t('routineUnavailable')}
+              </div>
+            ) : (
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: 16 }}>
+                {(routine.morning || []).length > 0 && (
+                  <div style={{
+                    ...CARD,
+                    padding: "20px",
+                    background: "linear-gradient(135deg, rgba(255,255,255,0.75) 0%, rgba(253,246,237,0.50) 100%)",
+                    border: "1px solid rgba(255, 255, 255, 0.8)",
+                    display: "flex",
+                    flexDirection: "column",
+                    gap: 12
+                  }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: 8, borderBottom: "1px solid rgba(168,116,73,0.12)", paddingBottom: 8 }}>
+                      <span style={{ color: "#F6C667", fontSize: 16 }}>☀️</span>
+                      <span style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", color: "#3A2E26", fontFamily: "'DM Sans', sans-serif" }}>
+                        {t('routineMorning')}
+                      </span>
+                    </div>
+                    <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+                      {(routine.morning || []).map((step, idx) => (
+                        <div key={idx} style={{ display: "flex", gap: 8, alignItems: "flex-start" }}>
+                          <span style={{ color: GOLD, fontSize: 11, fontWeight: 700, minWidth: 16 }}>{idx + 1}.</span>
+                          <p style={{ margin: 0, fontSize: 12.5, lineHeight: 1.6, color: "#6F6156" }}>{step}</p>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
 
-        {/* ── Blurred tab content ── */}
-        <div style={{ maxWidth: 680, margin: "10px auto 0", padding: "0 20px 60px", filter: "blur(5px)", opacity: 0.3, pointerEvents: "none", userSelect: "none" }}>
-          {previewTab === 0 && <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>{previewMetrics.map((m, i) => <MetricCard key={i} m={m} index={i} t={t} />)}</div>}
-          {previewTab === 1 && (
-            <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-              {previewStrengths.map((s, i) => (
-                <div key={i} style={{ ...CARD, padding: "20px 22px", display: "flex", gap: 14, alignItems: "flex-start" }}>
-                  <div style={{ width: 34, height: 34, borderRadius: 10, background: "rgba(168,116,73,0.12)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, color: GOLD, fontSize: 14 }}>{ICONS[i] || "✦"}</div>
-                  <div><div style={{ fontSize: 12, fontWeight: 600, color: "#2C241D", marginBottom: 6 }}>{s.title}</div><p style={{ margin: 0, fontSize: 13, lineHeight: 1.7, color: "#8C7A6B" }}>{s.desc}</p></div>
-                </div>
-              ))}
-            </div>
-          )}
-          {previewTab === 2 && (
-            <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-              {previewImprovements.map((item, i) => (
-                <div key={i} style={{ ...CARD, padding: "20px 22px", display: "flex", gap: 14, alignItems: "flex-start" }}>
-                  <div style={{ width: 28, height: 28, borderRadius: "50%", background: "rgba(212,165,116,0.12)", border: "1px solid rgba(212,165,116,0.25)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, fontSize: 13, fontWeight: 600, color: GOLD, fontFamily: "'Cormorant Garamond', serif" }}>{i + 1}</div>
-                  <div><div style={{ fontSize: 12, fontWeight: 600, color: "#2C241D", marginBottom: 6 }}>{item.title}</div><p style={{ margin: 0, fontSize: 13, lineHeight: 1.7, color: "#8C7A6B" }}>{item.desc}</p></div>
-                </div>
-              ))}
-            </div>
-          )}
-          {previewTab === 3 && (
+                {(routine.evening || []).length > 0 && (
+                  <div style={{
+                    ...CARD,
+                    padding: "20px",
+                    background: "linear-gradient(135deg, rgba(255,255,255,0.75) 0%, rgba(253,246,237,0.50) 100%)",
+                    border: "1px solid rgba(255, 255, 255, 0.8)",
+                    display: "flex",
+                    flexDirection: "column",
+                    gap: 12
+                  }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: 8, borderBottom: "1px solid rgba(168,116,73,0.12)", paddingBottom: 8 }}>
+                      <span style={{ color: "#8C7A6B", fontSize: 16 }}>🌙</span>
+                      <span style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", color: "#3A2E26", fontFamily: "'DM Sans', sans-serif" }}>
+                        {t('routineEvening')}
+                      </span>
+                    </div>
+                    <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+                      {(routine.evening || []).map((step, idx) => (
+                        <div key={idx} style={{ display: "flex", gap: 8, alignItems: "flex-start" }}>
+                          <span style={{ color: GOLD, fontSize: 11, fontWeight: 700, minWidth: 16 }}>{idx + 1}.</span>
+                          <p style={{ margin: 0, fontSize: 12.5, lineHeight: 1.6, color: "#6F6156" }}>{step}</p>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {(routine.weekly || []).length > 0 && (
+                  <div style={{
+                    ...CARD,
+                    padding: "20px",
+                    background: "linear-gradient(135deg, rgba(255,255,255,0.75) 0%, rgba(253,246,237,0.50) 100%)",
+                    border: "1px solid rgba(255, 255, 255, 0.8)",
+                    display: "flex",
+                    flexDirection: "column",
+                    gap: 12
+                  }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: 8, borderBottom: "1px solid rgba(168,116,73,0.12)", paddingBottom: 8 }}>
+                      <span style={{ color: GOLD, fontSize: 16 }}>✨</span>
+                      <span style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", color: "#3A2E26", fontFamily: "'DM Sans', sans-serif" }}>
+                        {t('routineWeekly')}
+                      </span>
+                    </div>
+                    <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+                      {(routine.weekly || []).map((step, idx) => (
+                        <div key={idx} style={{ display: "flex", gap: 8, alignItems: "flex-start" }}>
+                          <span style={{ color: GOLD, fontSize: 11, fontWeight: 700, minWidth: 16 }}>{idx + 1}.</span>
+                          <p style={{ margin: 0, fontSize: 12.5, lineHeight: 1.6, color: "#6F6156" }}>{step}</p>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            )
+          ) : (
             <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
               {previewRoutine.map((rec, i) => (
                 <div key={i} style={{ ...CARD, padding: "16px 20px", display: "flex", gap: 12, alignItems: "flex-start" }}>
@@ -1164,247 +1344,150 @@ export default function BeautyReport({ data: rawData, isPaid, onUnlock }) {
                 </div>
               ))}
             </div>
-          )}
-          {previewTab === 4 && <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>{allProducts.map((p, i) => <ProductCard key={i} product={p} lang={lang} t={t} />)}</div>}
-        </div>
-
-        <div style={{ maxWidth: 680, margin: "20px auto 0", padding: "0 20px 8px", textAlign: "center" }}>
-          <p style={{ fontSize: 10, color: "#B9AC9E", lineHeight: 1.8, letterSpacing: "0.02em", fontFamily: "'DM Sans', sans-serif", margin: "0 0 6px" }}>
-            {lang === 'fr' ? 'Scores basés sur les données photographiques · Pas un avis dermatologique' : 'Scores reflect visible photographic data · Not a medical assessment'}
-          </p>
-          <a href="/mentions-legales" style={{ fontSize: 10, color: "#A87449", textDecoration: "underline", fontFamily: "'DM Sans', sans-serif", opacity: 0.75 }}>
-            {lang === 'fr' ? 'Avertissement médical' : 'Medical Disclaimer'}
-          </a>
-        </div>
-
-        <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
+          )
+        )}
+        {previewTab === 4 && (
+          <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+            {displayProducts.map((p, i) => <ProductCard key={i} product={p} lang={lang} t={t} />)}
+          </div>
+        )}
       </div>
-    );
-  }
 
-  /* ══════════════════════════ PAID VIEW ══════════════════════════ */
-  const paid = data.paid_version || {};
-  const metrics = paid.metrics || [];
-  const strengths = paid.strengths || [];
-  const improvements = paid.improvements || [];
-  const paidRoutine = paid.routine || {};
-  const products = paid.productRecommendations || [];
+      {/* ── PDF download card (paid only) ── */}
+      {isPaid && (
+        <div style={{ maxWidth: 680, margin: "32px auto 0", padding: "0 20px" }}>
+          <div style={{
+            background: "linear-gradient(150deg, rgba(255,255,255,0.85) 0%, rgba(253,246,237,0.72) 55%, rgba(246,235,222,0.85) 100%)",
+            backdropFilter: "blur(32px) saturate(160%)",
+            WebkitBackdropFilter: "blur(32px) saturate(160%)",
+            border: "1px solid rgba(255,255,255,0.9)",
+            borderRadius: 26, padding: "clamp(28px,5vw,40px)",
+            boxShadow: "0 12px 48px rgba(168,116,73,0.09), 0 2px 0 rgba(255,255,255,0.95), inset 0 1px 0 rgba(255,255,255,0.98)",
+            textAlign: "center"
+          }}>
+            {/* Label pill */}
+            <div style={{ display: "flex", justifyContent: "center", marginBottom: 20 }}>
+              <span style={{
+                display: "inline-flex", alignItems: "center", gap: 6,
+                background: "linear-gradient(135deg, rgba(197,160,40,0.12), rgba(212,165,116,0.08))",
+                border: "1px solid rgba(197,160,40,0.30)",
+                borderRadius: 30, padding: "5px 14px",
+                fontSize: 10, fontWeight: 700, letterSpacing: "0.18em", textTransform: "uppercase",
+                color: "#8B6914", fontFamily: "'DM Sans', sans-serif",
+              }}>
+                <span style={{ fontSize: 7 }}>✦</span>
+                {t('pdfCardTitle')}
+              </span>
+            </div>
 
-  const TABS_PAID = [
-    { id: "analysis", label: t('tabMetrics') },
-    { id: "strengths", label: t('tabStrengths') },
-    { id: "improve", label: t('tabImprove') },
-    { id: "recs", label: t('tabRoutine') },
-    { id: "shop", label: t('tabShop') },
-  ];
+            {/* Headline */}
+            <h2 style={{
+              fontFamily: "'Cormorant Garamond', serif",
+              fontSize: "clamp(24px,5vw,32px)", fontWeight: 400,
+              color: "#3A2E26", margin: "0 0 12px", lineHeight: 1.18,
+            }}>
+              {t('pdfCardTitle')}
+            </h2>
 
-  return (
-    <div style={{ background: "transparent", minHeight: "100vh", fontFamily: "'DM Sans', sans-serif", paddingBottom: 60 }}>
-      <ReportHeader t={t} />
+            {/* Description */}
+            <p style={{
+              fontSize: 13.5, color: "#6F6156", lineHeight: 1.7,
+              margin: "0 0 28px", fontFamily: "'DM Sans', sans-serif",
+            }}>
+              {t('pdfCardDesc')}
+            </p>
 
-      <div style={{ maxWidth: 680, margin: "0 auto", padding: "24px 20px 0" }}>
-
-        {/* ── Score hero ── */}
-        <ScoreHeroCard
-          score={overall}
-          summary={summary}
-          faceShape={faceShape} skinType={skinType} skinTone={skinTone}
-          miniMetrics={metrics.slice(0, 3)}
-          t={t} lang={lang}
-        />
-
-        <MedicalDisclaimer style={{ marginTop: 16 }} />
-
-        {/* ── Tabs ── */}
-        <div className="rpt-tabs" style={{
-          display: "flex", gap: 4,
-          background: "rgba(255,255,255,0.55)",
-          backdropFilter: "blur(18px) saturate(150%)", WebkitBackdropFilter: "blur(18px) saturate(150%)",
-          border: "1px solid rgba(255,255,255,0.65)",
-          borderRadius: 14, padding: 4,
-          boxShadow: "0 8px 32px rgba(168,116,73,0.03), inset 0 1px 1px rgba(255, 255, 255, 0.8)",
-          scrollbarWidth: "none", WebkitOverflowScrolling: "touch"
-        }}>
-          {TABS_PAID.map(tab => (
-            <button key={tab.id} onClick={() => setActiveTab(tab.id)} className="rpt-tab-btn" style={{
-              flex: 1, padding: "12px 4px", border: activeTab === tab.id ? "1px solid rgba(255, 255, 255, 0.15)" : "none", borderRadius: 10,
-              background: activeTab === tab.id ? "linear-gradient(135deg, rgba(44, 36, 29, 0.85), rgba(28, 22, 17, 0.92))" : "transparent",
-              color: activeTab === tab.id ? "#fff" : "#6F6156",
-              fontSize: 9, fontWeight: 600, cursor: "pointer", letterSpacing: "0.06em",
-              fontFamily: "'DM Sans', sans-serif", textTransform: "uppercase", whiteSpace: "nowrap",
-              transition: "all 0.25s cubic-bezier(0.4,0,0.2,1)",
-              boxShadow: activeTab === tab.id ? "0 4px 16px rgba(0,0,0,0.14)" : "none",
-            }}>{tab.label}</button>
-          ))}
-        </div>
-
-        {/* ── Tab content ── */}
-        <div style={{ marginTop: 16 }}>
-
-          {/* Metrics */}
-          {activeTab === "analysis" && (
-            <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-              {metrics.map((m, i) => <MetricCard key={i} m={m} index={i} t={t} />)}
-              <div style={{ ...CARD, padding: "14px 18px", display: "flex", gap: 18, flexWrap: "wrap" }}>
-                {[{ range: "78–100", label: t('legendStrong'), color: "#D4A574" }, { range: "65–77", label: t('legendAverage'), color: "#8C7A6B" }, { range: "0–64", label: t('legendBelowAvg'), color: "#B9AC9E" }].map(l => (
-                  <div key={l.range} style={{ display: "flex", alignItems: "center", gap: 7 }}>
-                    <div style={{ width: 7, height: 7, borderRadius: "50%", background: l.color, flexShrink: 0 }} />
-                    <span style={{ fontSize: 11, color: "#8C7A6B", fontFamily: "'DM Sans', sans-serif" }}>{l.range} — {l.label}</span>
-                  </div>
-                ))}
+            {/* Blurred PDF Preview Mockup */}
+            <div style={{
+              position: "relative",
+              width: "160px",
+              height: "220px",
+              margin: "0 auto 24px",
+              borderRadius: "12px",
+              overflow: "hidden",
+              border: "1px solid rgba(168,116,73,0.2)",
+              boxShadow: "0 8px 24px rgba(168, 116, 73, 0.08)",
+              background: "#fff",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center"
+            }}>
+              <img
+                src="/pdf-preview-mockup.png"
+                alt="PDF Preview"
+                style={{
+                  width: "100%",
+                  height: "100%",
+                  objectFit: "cover",
+                  filter: "blur(3px)",
+                  transform: "scale(1.05)",
+                  display: "block"
+                }}
+              />
+              <div style={{
+                position: "absolute",
+                inset: 0,
+                background: "linear-gradient(to bottom, rgba(58, 46, 38, 0.05), rgba(58, 46, 38, 0.2))",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center"
+              }}>
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#FAF6F0" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{
+                  filter: "drop-shadow(0 2px 4px rgba(58, 46, 38, 0.2))"
+                }}>
+                  <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z" />
+                  <polyline points="14 2 14 8 20 8" />
+                </svg>
               </div>
             </div>
-          )}
 
-          {/* Strengths */}
-          {activeTab === "strengths" && (
-            <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-              {strengths.map((s, i) => (
-                <div key={i} style={{ ...CARD, padding: "20px 22px", display: "flex", gap: 14, alignItems: "flex-start", overflow: "hidden" }}>
-                  <div style={{ width: 36, height: 36, borderRadius: 11, background: "rgba(197,160,40,0.1)", border: "1px solid rgba(197,160,40,0.2)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, fontSize: 15, color: GOLD }}>{ICONS[i] || "✦"}</div>
-                  <div style={{ flex: 1, minWidth: 0 }}>
-                    <div style={{ fontSize: 12.5, fontWeight: 600, color: "#3A2E26", marginBottom: 6, letterSpacing: "0.04em", wordBreak: "break-word" }}>{s.title}</div>
-                    <p style={{ margin: 0, fontSize: 13, lineHeight: 1.7, color: "#8C7A6B", wordBreak: "break-word", overflowWrap: "break-word" }}>{s.desc}</p>
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
-
-          {/* Improvements */}
-          {activeTab === "improve" && (
-            <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-              {improvements.map((s, i) => (
-                <div key={i} style={{ ...CARD, padding: "20px 22px", display: "flex", gap: 14, alignItems: "flex-start", overflow: "hidden" }}>
-                  <div style={{ width: 30, height: 30, borderRadius: "50%", background: "rgba(212,165,116,0.1)", border: "1px solid rgba(212,165,116,0.25)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, fontSize: 13, fontWeight: 600, color: GOLD, fontFamily: "'Cormorant Garamond', serif" }}>{i + 1}</div>
-                  <div style={{ flex: 1, minWidth: 0 }}>
-                    <div style={{ fontSize: 12.5, fontWeight: 600, color: "#3A2E26", marginBottom: 6, letterSpacing: "0.04em", wordBreak: "break-word" }}>{s.title}</div>
-                    <p style={{ margin: 0, fontSize: 13, lineHeight: 1.7, color: "#8C7A6B", wordBreak: "break-word", overflowWrap: "break-word" }}>{s.desc}</p>
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
-
-          {/* Routine */}
-          {activeTab === "recs" && (() => {
-            const ROUTINE_SECTIONS = [
-              { key: "morning", label: t('routineMorning'), dot: "#F6C667" },
-              { key: "evening", label: t('routineEvening'), dot: "#8C7A6B" },
-              { key: "weekly", label: t('routineWeekly'), dot: GOLD },
-            ].filter(s => (paidRoutine[s.key] || []).length > 0);
-
-            if (ROUTINE_SECTIONS.length === 0) {
-              return (
-                <div style={{ ...CARD, padding: "32px", textAlign: "center", color: "#B9AC9E", fontSize: 13, fontFamily: "'DM Sans', sans-serif" }}>
-                  {t('routineUnavailable')}
-                </div>
-              );
-            }
-
-            return (
-              <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-                {ROUTINE_SECTIONS.map(({ key, label, dot }) => (
-                  <div key={key} style={{ ...CARD, padding: "20px 22px" }}>
-                    <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 14, paddingBottom: 12, borderBottom: "1px solid rgba(168,116,73,0.12)" }}>
-                      <div style={{ width: 8, height: 8, borderRadius: "50%", background: dot, flexShrink: 0 }} />
-                      <span style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.12em", textTransform: "uppercase", color: "#3A2E26", fontFamily: "'DM Sans', sans-serif" }}>{label}</span>
-                    </div>
-                    <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-                      {(paidRoutine[key] || []).map((step, j) => (
-                        <div key={j} style={{ display: "flex", gap: 12, alignItems: "flex-start" }}>
-                          <div style={{ minWidth: 22, height: 22, borderRadius: "50%", background: "rgba(197,160,40,0.1)", border: "1px solid rgba(197,160,40,0.22)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, fontSize: 10, fontWeight: 700, color: GOLD, fontFamily: "'Cormorant Garamond', serif", marginTop: 1 }}>{j + 1}</div>
-                          <span style={{ fontSize: 13, color: "#8C7A6B", lineHeight: 1.65, fontFamily: "'DM Sans', sans-serif" }}>{step}</span>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            );
-          })()}
-
-          {/* Shop */}
-          {activeTab === "shop" && (
-            <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-              <SectionHeading label={t('shopSubtitle')} title={t('shopTitle')} />
-              {products.length === 0 ? (
-                <div style={{ ...CARD, padding: "32px", textAlign: "center", color: "#B9AC9E", fontSize: 13 }}>{t('noProducts')}</div>
-              ) : products.map((p, i) => <ProductCard key={i} product={p} lang={lang} t={t} />)}
-              <p style={{ fontSize: 10, color: "#B9AC9E", textAlign: "center", padding: "8px 4px 0", lineHeight: 1.7, fontFamily: "'DM Sans', sans-serif" }}>
-                {t('affiliateNotice')}
-              </p>
-            </div>
-          )}
-        </div>
-
-        {/* ── Share CTA (paid view) ── */}
-        <div style={{
-          background: "linear-gradient(135deg, rgba(255,255,255,0.72) 0%, rgba(253,246,237,0.55) 50%, rgba(246,235,222,0.72) 100%)",
-          backdropFilter: "blur(22px) saturate(150%)",
-          WebkitBackdropFilter: "blur(22px) saturate(150%)",
-          borderRadius: 20, padding: "28px 24px", marginTop: 20,
-          border: "1px solid rgba(255,255,255,0.78)",
-          boxShadow: "0 8px 32px rgba(168,116,73,0.04), inset 0 1px 0 rgba(255,255,255,0.9)",
-          textAlign: "center",
-        }}>
-          <p style={{ margin: "0 0 6px", fontSize: 9, letterSpacing: "0.22em", textTransform: "uppercase", color: "#B0885E", fontFamily: "'DM Sans', sans-serif", fontWeight: 600 }}>
-            {t('shareHeading')}
-          </p>
-          <h3 style={{ margin: "0 0 6px", fontFamily: "'Cormorant Garamond', serif", fontSize: 26, fontWeight: 300, color: "#3A2E26", lineHeight: 1.2 }}>
-            {t('shareYourScore', overall)}
-          </h3>
-          <p style={{ margin: "0 0 20px", fontSize: 12, color: "#8C7A6B", fontFamily: "'DM Sans', sans-serif", lineHeight: 1.6 }}>
-            {t('shareSubtitle')}
-          </p>
-          <div style={{ display: "flex", gap: 10, justifyContent: "center", flexWrap: "wrap" }}>
+            {/* Button */}
             <button
-              onClick={handleShare}
-              disabled={sharing}
-              className="btn-liquid-glass"
+              onClick={handleDownloadPDF}
+              disabled={pdfLoading}
+              className="btn-liquid-glass-dark"
               style={{
-                padding: "12px 26px",
-                borderRadius: 10,
-                fontSize: 13, fontWeight: 600,
-                letterSpacing: "0.04em",
-                display: "flex", alignItems: "center", gap: 8,
-                border: "none",
+                width: "100%", padding: "16px", borderRadius: 14,
+                fontSize: 14, fontWeight: 700, letterSpacing: "0.02em",
+                display: "flex", alignItems: "center", justifyContent: "center", gap: 8,
+                border: "none", cursor: "pointer"
               }}
             >
-              {sharing
-                ? <><span style={{ display: "inline-block", width: 12, height: 12, border: "2px solid rgba(255,255,255,0.25)", borderTopColor: "rgba(255,255,255,0.7)", borderRadius: "50%", animation: "spin 0.7s linear infinite" }} />{t('shareGeneratingShort')}</>
-                : t("shareScore")
-              }
-            </button>
-            <button
-              onClick={() => navigator.clipboard?.writeText(t("shareText", overall))}
-              className="btn-liquid-glass"
-              style={{
-                padding: "12px 20px",
-                borderRadius: 10,
-                fontSize: 12, fontWeight: 500,
-                border: "none",
-              }}
-            >
-              {t("copyShare")}
+              {pdfLoading ? (
+                <>
+                  <span style={{
+                    display: "inline-block", width: 14, height: 14,
+                    border: "2px solid rgba(255,255,255,0.4)", borderTopColor: "#fff",
+                    borderRadius: "50%", animation: "spin 0.7s linear infinite"
+                  }} />
+                  {t('pdfLoading')}
+                </>
+              ) : (
+                <>
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ marginRight: 4 }}>
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                    <polyline points="7 10 12 15 17 10" />
+                    <line x1="12" y1="15" x2="12" y2="3" />
+                  </svg>
+                  {t('pdfButton')}
+                </>
+              )}
             </button>
           </div>
-          {shareMsg && (
-            <p style={{ margin: "12px 0 0", fontSize: 12, color: "#A87449", fontFamily: "'DM Sans', sans-serif", lineHeight: 1.5 }}>
-              {shareMsg}
-            </p>
-          )}
         </div>
+      )}
 
-        <div style={{ marginTop: 20, padding: "0 4px", textAlign: "center" }}>
-          <p style={{ fontSize: 10, color: "#B9AC9E", lineHeight: 1.8, letterSpacing: "0.02em", fontFamily: "'DM Sans', sans-serif", margin: "0 0 6px" }}>{t('disclaimer')}</p>
-          <a href="/mentions-legales" style={{ fontSize: 10, color: "#A87449", textDecoration: "underline", fontFamily: "'DM Sans', sans-serif", opacity: 0.75 }}>
-            {lang === 'fr' ? 'Avertissement médical' : 'Medical Disclaimer'}
-          </a>
-        </div>
+      {/* Footer disclaimer and links */}
+      <div style={{ maxWidth: 680, margin: "20px auto 0", padding: "0 20px 8px", textAlign: "center" }}>
+        <p style={{ fontSize: 10, color: "#B9AC9E", lineHeight: 1.8, letterSpacing: "0.02em", fontFamily: "'DM Sans', sans-serif", margin: "0 0 6px" }}>
+          {lang === 'fr' ? 'Scores basés sur les données photographiques · Pas un avis dermatologique' : 'Scores reflect visible photographic data · Not a medical assessment'}
+        </p>
+        <a href="/mentions-legales" style={{ fontSize: 10, color: "#A87449", textDecoration: "underline", fontFamily: "'DM Sans', sans-serif", opacity: 0.75 }}>
+          {lang === 'fr' ? 'Avertissement médical' : 'Medical Disclaimer'}
+        </a>
       </div>
 
-      <style>{`@keyframes spin { to { transform: rotate(360deg); } } @keyframes tooltipFadeIn { from { opacity: 0; transform: translateX(-50%) translateY(0); } to { opacity: 1; transform: translateX(-50%) translateY(-8px); } }`}</style>
+      <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
     </div>
   );
 }

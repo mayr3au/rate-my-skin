@@ -1,4 +1,4 @@
-﻿import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
 import Logo, { CreamDrop, LuxuryFlower } from '../components/Logo';
@@ -69,6 +69,7 @@ export default function Home() {
   const [userId, setUserId] = useState(null);
   const [paidUnlocks, setPaidUnlocks] = useState(0);
   const [loadingStep, setLoadingStep] = useState(0);
+  const [activeSlide, setActiveSlide] = useState(0);
 
   const loadingMessages = t('loadingSteps');
 
@@ -109,11 +110,15 @@ export default function Home() {
   };
 
   useEffect(() => {
-    let interval;
+    let stepInterval;
+    let slideInterval;
     if (loading) {
-      interval = setInterval(() => {
+      stepInterval = setInterval(() => {
         setLoadingStep(s => (s + 1) % loadingMessages.length);
       }, 3500);
+      slideInterval = setInterval(() => {
+        setActiveSlide(s => (s + 1) % 3);
+      }, 4500);
       const scrollY = window.scrollY;
       document.body.style.position = 'fixed';
       document.body.style.top = `-${scrollY}px`;
@@ -122,11 +127,13 @@ export default function Home() {
       document.body.style.overflow = 'hidden';
     } else {
       setLoadingStep(0);
+      setActiveSlide(0);
       unlockBody();
     }
     // Always restore body on unmount (e.g. Next.js navigates away mid-loading)
     return () => {
-      clearInterval(interval);
+      clearInterval(stepInterval);
+      clearInterval(slideInterval);
       unlockBody();
     };
   }, [loading, loadingMessages.length]);
@@ -322,6 +329,7 @@ export default function Home() {
       sessionStorage.setItem('rms_report', JSON.stringify(json.data));
       sessionStorage.setItem('rms_analysis_id', json.analysisId);
       sessionStorage.setItem('rms_is_paid', json.isPaid ? 'true' : 'false');
+      sessionStorage.setItem('rms_generation_finished_at', Date.now().toString());
       // Sync userId from server response in case it was server-generated
       if (json.userId && !userId) setUserId(json.userId);
       // Update paid_unlocks counter from server response
@@ -1110,6 +1118,83 @@ export default function Home() {
           }}>
             {t('funnyLoadingNote')}
           </p>
+
+          {/* Waiting page carousel of skin facts */}
+          <div style={{
+            marginTop: 32,
+            width: '100%',
+            maxWidth: 400,
+            background: 'rgba(255, 255, 255, 0.42)',
+            backdropFilter: 'blur(15px)',
+            WebkitBackdropFilter: 'blur(15px)',
+            border: '1px solid rgba(255, 255, 255, 0.5)',
+            borderRadius: 20,
+            padding: '20px 24px',
+            boxShadow: '0 8px 32px rgba(168, 116, 73, 0.04)',
+            overflow: 'hidden',
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            boxSizing: 'border-box',
+            animation: 'fadeInUp 0.8s ease-out 1.8s both',
+          }}>
+            <span style={{
+              fontFamily: "'DM Sans', sans-serif",
+              fontSize: 10,
+              letterSpacing: '0.18em',
+              textTransform: 'uppercase',
+              color: '#A87449',
+              fontWeight: 700,
+              display: 'block',
+              marginBottom: 10,
+            }}>
+              ✦ {t('didYouKnow')} ✦
+            </span>
+            <div style={{ overflow: 'hidden', width: '100%', minHeight: 60, display: 'flex', alignItems: 'center' }}>
+              <div style={{
+                display: 'flex',
+                transform: `translateX(-${activeSlide * 100}%)`,
+                transition: 'transform 0.6s cubic-bezier(0.16, 1, 0.3, 1)',
+                width: '100%',
+              }}>
+                {[0, 1, 2].map((idx) => (
+                  <div key={idx} style={{ flex: '0 0 100%', width: '100%', padding: '0 8px', boxSizing: 'border-box' }}>
+                    <p style={{
+                      fontFamily: "'Cormorant Garamond', serif",
+                      fontSize: 'clamp(14px, 4vw, 17px)',
+                      fontWeight: 400,
+                      color: '#2C241D',
+                      lineHeight: 1.45,
+                      margin: 0,
+                      fontStyle: 'italic',
+                    }}>
+                      "{t(`fact${idx + 1}`)}"
+                    </p>
+                  </div>
+                ))}
+              </div>
+            </div>
+            {/* Indicators */}
+            <div style={{ display: 'flex', justifyContent: 'center', gap: 6, marginTop: 14 }}>
+              {[0, 1, 2].map((idx) => (
+                <button
+                  key={idx}
+                  onClick={() => setActiveSlide(idx)}
+                  style={{
+                    width: activeSlide === idx ? 16 : 6,
+                    height: 6,
+                    borderRadius: 3,
+                    background: activeSlide === idx ? '#A87449' : 'rgba(168, 116, 73, 0.22)',
+                    border: 'none',
+                    padding: 0,
+                    cursor: 'pointer',
+                    transition: 'all 0.3s cubic-bezier(0.16, 1, 0.3, 1)',
+                  }}
+                  aria-label={`Slide ${idx + 1}`}
+                />
+              ))}
+            </div>
+          </div>
         </div>
       )}
 
