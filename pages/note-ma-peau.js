@@ -31,7 +31,7 @@ const faqs = [
   },
   {
     q: 'Est-ce vraiment gratuit ?',
-    a: "Oui, entièrement gratuit. Tu obtiens ton score de peau et tes 3 principaux problèmes cutanés sans débourser un centime, sans inscription obligatoire. Un rapport complet avec les 8 métriques détaillées, ton plan d'amélioration et ta routine sur-mesure est disponible en option à 1,99 €.",
+    a: "Oui, entièrement gratuit. Tu obtiens ton score de peau et tes 3 principaux problèmes cutanés sans débourser un centime, sans inscription obligatoire. Un rapport complet avec les 8 métriques détaillées, ton plan d'amélioration et ta routine sur-mesure est disponible en option à 7,99 €.",
   },
   {
     q: 'Quelles sont les notes possibles ?',

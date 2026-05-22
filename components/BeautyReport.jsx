@@ -841,24 +841,59 @@ export default function BeautyReport({ data: rawData, isPaid, onUnlock }) {
   const [pdfLoading, setPdfLoading] = useState(false);
   const [timeLeft, setTimeLeft] = useState(null);
 
+  // Social Proof Counter
+  const [socialProofN, setSocialProofN] = useState(() => {
+    if (typeof window !== "undefined") {
+      const stored = localStorage.getItem("rms_social_proof_n");
+      if (stored) {
+        const val = parseInt(stored, 10);
+        if (!isNaN(val)) return val;
+      }
+    }
+    return 847;
+  });
+
+  useEffect(() => {
+    let timeoutId;
+    const scheduleNextIncrement = () => {
+      // Random delay between 90s and 180s
+      const delay = Math.floor(Math.random() * (180000 - 90000 + 1)) + 90000;
+      timeoutId = setTimeout(() => {
+        setSocialProofN(prev => {
+          const nextVal = prev + 1;
+          localStorage.setItem("rms_social_proof_n", nextVal.toString());
+          return nextVal;
+        });
+        scheduleNextIncrement();
+      }, delay);
+    };
+
+    scheduleNextIncrement();
+    return () => clearTimeout(timeoutId);
+  }, []);
+
   useEffect(() => {
     if (isPaid) return;
     
-    // Get finished timestamp
-    let finishedAt = sessionStorage.getItem('rms_generation_finished_at');
-    if (!finishedAt) {
-      // Fallback: set it to now if not set yet (e.g. direct load of report)
-      finishedAt = Date.now().toString();
-      sessionStorage.setItem('rms_generation_finished_at', finishedAt);
+    let timerEnd = sessionStorage.getItem('rms_paywall_timer_end');
+    if (!timerEnd) {
+      timerEnd = (Date.now() + 15 * 60 * 1000).toString();
+      sessionStorage.setItem('rms_paywall_timer_end', timerEnd);
     }
     
-    const finishedTime = parseInt(finishedAt, 10);
-    const duration = 15 * 60 * 1000; // 15 minutes in ms
+    let endTimestamp = parseInt(timerEnd, 10);
     
     const updateTimer = () => {
-      const elapsed = Date.now() - finishedTime;
-      const remaining = Math.max(0, duration - elapsed);
-      setTimeLeft(Math.floor(remaining / 1000));
+      const now = Date.now();
+      let remaining = Math.ceil((endTimestamp - now) / 1000);
+      if (remaining <= 0) {
+        // Silently restart at 5:00
+        const newEnd = Date.now() + 5 * 60 * 1000;
+        sessionStorage.setItem('rms_paywall_timer_end', newEnd.toString());
+        endTimestamp = newEnd;
+        remaining = 300;
+      }
+      setTimeLeft(remaining);
     };
     
     updateTimer();
@@ -1034,125 +1069,104 @@ export default function BeautyReport({ data: rawData, isPaid, onUnlock }) {
             borderRadius: 26, padding: "clamp(28px,5vw,40px)",
             boxShadow: "0 12px 48px rgba(168,116,73,0.09), 0 2px 0 rgba(255,255,255,0.95), inset 0 1px 0 rgba(255,255,255,0.98)",
           }}>
-            {/* Label pill */}
-            <div style={{ display: "flex", justifyContent: "center", marginBottom: 20 }}>
-              <span style={{
-                display: "inline-flex", alignItems: "center", gap: 6,
-                background: "linear-gradient(135deg, rgba(197,160,40,0.12), rgba(212,165,116,0.08))",
-                border: "1px solid rgba(197,160,40,0.30)",
-                borderRadius: 30, padding: "5px 14px",
-                fontSize: 10, fontWeight: 700, letterSpacing: "0.18em", textTransform: "uppercase",
-                color: "#8B6914", fontFamily: "'DM Sans', sans-serif",
-              }}>
-                <span style={{ fontSize: 7 }}>✦</span>
-                {t('paywallCardLabel')}
+            {/* 2. COMPTEUR SOCIAL PROOF */}
+            <div style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              gap: "8px",
+              marginBottom: "16px",
+              fontSize: "12px",
+              color: "#6B6B6B",
+              fontStyle: "italic",
+              fontFamily: "'Inter', sans-serif",
+            }}>
+              <span className="pulsing-dot-wrapper">
+                <span className="pulsing-dot-ping" />
+                <span className="pulsing-dot-core" />
               </span>
+              <span>{socialProofN} femmes ont noté leur peau cette semaine</span>
             </div>
 
-            {/* Headline */}
-            <h2 style={{
-              fontFamily: "'Cormorant Garamond', serif",
-              fontSize: "clamp(24px,5vw,32px)", fontWeight: 400,
-              color: "#3A2E26", margin: "0 0 12px", lineHeight: 1.18, textAlign: "center",
-            }}>
-              {t('paywallCardTitle')}
-            </h2>
-
-            {/* Sub-copy */}
-            <p style={{
-              fontSize: 13.5, color: "#6F6156", lineHeight: 1.7,
-              margin: "0 0 28px", fontFamily: "'DM Sans', sans-serif", textAlign: "center",
-            }}>
-              {t('paywallCardDesc')}
+            {/* 3. COPY HOOK */}
+            <h1 className="paywall-title">
+              Découvrez votre routine personnalisée avant que vos imperfections ne s'aggravent
+            </h1>
+            <p className="paywall-subtitle">
+              Votre rapport complet est prêt — analyse des causes, routine sur-mesure, produits adaptés à votre peau et à votre budget
             </p>
 
-            {/* Countdown timer */}
+            {/* 4. UNLOCK GRID */}
+            <div className="unlock-grid">
+              <div className="grid-cell">
+                <span className="cell-emoji">🔬</span>
+                <span className="cell-text">Analyse approfondie des causes</span>
+              </div>
+              <div className="grid-cell" style={{ position: "relative" }}>
+                <span className="cell-emoji">✨</span>
+                <span className="cell-text">Routine personnalisée</span>
+                <span className="badge-gold">PERSONNALISABLE</span>
+              </div>
+              <div className="grid-cell">
+                <span className="cell-emoji">🧴</span>
+                <span className="cell-text">Produits recommandés (par budget)</span>
+              </div>
+              <div className="grid-cell">
+                <span className="cell-emoji">🥗</span>
+                <span className="cell-text">Conseils nutrition & lifestyle</span>
+              </div>
+              <div className="grid-cell">
+                <span className="cell-emoji">📈</span>
+                <span className="cell-text">Suivi de progression</span>
+              </div>
+              <div className="grid-cell">
+                <span className="cell-emoji">💬</span>
+                <span className="cell-text">Assistant IA conversationnel</span>
+              </div>
+            </div>
+
+            {/* Medical disclaimer */}
+            <p style={{ fontSize: 10.5, color: "#B9AC9E", textAlign: "center", margin: "0 auto 20px", fontFamily: "'Inter', sans-serif", lineHeight: 1.55, maxWidth: "480px" }}>
+              {lang === 'fr'
+                ? <>En procédant au paiement, vous reconnaissez avoir lu notre{' '}<a href="/mentions-legales" style={{ color: "#3D2914", fontWeight: "600", textDecoration: "underline" }}>avertissement médical</a>.</>
+                : <>By proceeding to payment, you confirm you have read our{' '}<a href="/mentions-legales" style={{ color: "#3D2914", fontWeight: "600", textDecoration: "underline" }}>medical disclaimer</a>.</>
+              }
+            </p>
+
+            {/* 1. COUNTDOWN TIMER */}
             {timeLeft !== null && (
-              <div style={{
-                display: "flex", alignItems: "center", justifyContent: "center", gap: 8,
-                background: timeLeft > 0 ? "rgba(168, 116, 73, 0.04)" : "rgba(0, 0, 0, 0.02)",
-                border: timeLeft > 0 ? "1px solid rgba(168, 116, 73, 0.15)" : "1px solid rgba(0, 0, 0, 0.08)",
-                borderRadius: 14, padding: "10px 16px",
-                margin: "-10px auto 24px", maxWidth: 280,
-                boxShadow: "inset 0 1px 0 rgba(255,255,255,0.6)",
-              }}>
-                <span style={{ fontSize: 13, animation: timeLeft > 0 ? "dropletFloat 2s ease-in-out infinite" : "none" }}>⏳</span>
-                <span style={{
-                  fontSize: 12, fontWeight: 600, color: timeLeft > 0 ? "#8C6A3A" : "#888",
-                  fontFamily: "'DM Sans', sans-serif", letterSpacing: "0.02em", textTransform: "uppercase"
-                }}>
-                  {timeLeft > 0 
-                    ? (lang === 'fr' ? 'Offre limitée :' : 'Limited offer:') 
-                    : (lang === 'fr' ? 'Offre expirée :' : 'Offer expired:')}{" "}
-                  <span style={{ fontFamily: "monospace", fontSize: 13, fontWeight: 700, color: timeLeft > 0 ? "#A87449" : "#888", marginLeft: 4 }}>
-                    {formatTime(timeLeft)}
-                  </span>
+              <div className="countdown-pill">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#C9A961" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
+                  <circle cx="12" cy="12" r="10" />
+                  <polyline points="12 6 12 12 16 14" />
+                </svg>
+                <span className="countdown-text">
+                  Offre disponible encore {formatTime(timeLeft)}
                 </span>
               </div>
             )}
 
-            {/* Feature rows */}
-            <div style={{ display: "flex", flexDirection: "column", gap: 0, marginBottom: 24, borderRadius: 16, overflow: "hidden", border: "1px solid rgba(255,255,255,0.75)" }}>
-              {t('paywallFeatures').map((f, i, arr) => (
-                <div key={i} style={{
-                  display: "flex", gap: 14, alignItems: "flex-start",
-                  padding: "14px 18px",
-                  background: i % 2 === 0 ? "rgba(255,255,255,0.60)" : "rgba(253,248,242,0.50)",
-                  borderBottom: i < arr.length - 1 ? "1px solid rgba(255,255,255,0.65)" : "none",
-                }}>
-                  <div className="rpt-paywall-feature-icon" style={{
-                    width: 34, height: 34, borderRadius: 10, flexShrink: 0,
-                    background: "linear-gradient(135deg, rgba(197,160,40,0.13), rgba(212,165,116,0.08))",
-                    border: "1px solid rgba(197,160,40,0.20)",
-                    display: "flex", alignItems: "center", justifyContent: "center",
-                    color: "#A87449", marginTop: 1,
-                  }}>
-                    {PAYWALL_ICONS[i] || f.icon}
-                  </div>
-                  <div style={{ flex: 1, minWidth: 0 }}>
-                    <div className="rpt-paywall-feature-title" style={{ fontSize: 12.5, fontWeight: 700, color: "#3A2E26", marginBottom: 3, fontFamily: "'DM Sans', sans-serif", letterSpacing: "0.01em" }}>
-                      {f.title}
-                    </div>
-                    <div className="rpt-paywall-feature-desc" style={{ fontSize: 11.5, color: "#8C7A6B", lineHeight: 1.55, fontFamily: "'DM Sans', sans-serif" }}>
-                      {f.desc}
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-
-            {/* Value framing */}
-            <p style={{
-              fontSize: 12, color: "#A87449", textAlign: "center",
-              fontFamily: "'Cormorant Garamond', serif", fontStyle: "italic",
-              fontSize: 15, margin: "0 0 22px", letterSpacing: "0.01em",
-            }}>
-              {t('paywallValueFrame')}
-            </p>
-
-            {/* Payment disclaimer */}
-            <p style={{ fontSize: 10.5, color: "#B9AC9E", textAlign: "center", margin: "0 0 14px", fontFamily: "'DM Sans', sans-serif", lineHeight: 1.55 }}>
-              {lang === 'fr'
-                ? <>En procédant au paiement, vous reconnaissez avoir lu notre{' '}<a href="/mentions-legales" style={{ color: "#A87449", textDecoration: "underline" }}>avertissement médical</a>.</>
-                : <>By proceeding to payment, you confirm you have read our{' '}<a href="/mentions-legales" style={{ color: "#A87449", textDecoration: "underline" }}>medical disclaimer</a>.</>
-              }
-            </p>
-
-            {/* CTA buttons */}
-            <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-              <button onClick={() => handleUnlock("single")} disabled={unlocking} className="btn-liquid-glass-dark" style={{ width: "100%", padding: "16px", borderRadius: 14, fontSize: 14, fontWeight: 700, letterSpacing: "0.02em", display: "flex", alignItems: "center", justifyContent: "center", gap: 8, border: "none" }}>
-                {unlocking
-                  ? <><span style={{ display: "inline-block", width: 14, height: 14, border: "2px solid rgba(255,255,255,0.4)", borderTopColor: "#fff", borderRadius: "50%", animation: "spin 0.7s linear infinite" }} />{t('redirecting')}</>
-                  : t('paywallSingleCta')}
-              </button>
-              <button onClick={() => handleUnlock("pack")} disabled={unlocking} className="btn-liquid-glass" style={{ width: "100%", padding: "15px", borderRadius: 14, fontSize: 13, fontWeight: 600, letterSpacing: "0.02em", border: "none" }}>
-                {t('paywallPackCta')}
-              </button>
-            </div>
-
-            {/* Trust footer */}
-            <p style={{ marginTop: 16, fontSize: 11, color: "#B9AC9E", fontFamily: "'DM Sans', sans-serif", textAlign: "center", letterSpacing: "0.01em" }}>
-              {t('paywallTrust')}
+            {/* 5. CTA BUTTON */}
+            <button onClick={() => handleUnlock("single")} disabled={unlocking} className="cta-button">
+              {unlocking ? (
+                <>
+                  <span style={{
+                    display: "inline-block",
+                    width: "16px",
+                    height: "16px",
+                    border: "2px solid rgba(255,255,255,0.4)",
+                    borderTopColor: "#ffffff",
+                    borderRadius: "50%",
+                    animation: "spin 0.7s linear infinite"
+                  }} />
+                  {t('redirecting')}
+                </>
+              ) : (
+                "Débloquer mon rapport complet — 7,99 €"
+              )}
+            </button>
+            <p className="cta-under-text">
+              Paiement unique · Sécurisé Stripe · Accès immédiat
             </p>
           </div>
         </div>
@@ -1487,7 +1501,180 @@ export default function BeautyReport({ data: rawData, isPaid, onUnlock }) {
         </a>
       </div>
 
-      <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
+      <style>{`
+        @keyframes spin { to { transform: rotate(360deg); } }
+        
+        .pulsing-dot-wrapper {
+          position: relative;
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          width: 8px;
+          height: 8px;
+          flex-shrink: 0;
+        }
+        .pulsing-dot-core {
+          position: relative;
+          display: inline-block;
+          border-radius: 50%;
+          width: 8px;
+          height: 8px;
+          background-color: #10B981;
+        }
+        .pulsing-dot-ping {
+          position: absolute;
+          display: inline-block;
+          border-radius: 50%;
+          width: 8px;
+          height: 8px;
+          background-color: #10B981;
+          animation: pulse-ping 1.5s cubic-bezier(0, 0, 0.2, 1) infinite;
+        }
+        @keyframes pulse-ping {
+          0% {
+            transform: scale(0.95);
+            opacity: 1;
+          }
+          75%, 100% {
+            transform: scale(2.5);
+            opacity: 0;
+          }
+        }
+        
+        .paywall-title {
+          font-family: 'Playfair Display', serif;
+          font-size: 32px;
+          font-weight: 700;
+          color: #3D2914;
+          line-height: 1.25;
+          text-align: center;
+          margin: 0 0 16px;
+        }
+        @media (min-width: 768px) {
+          .paywall-title {
+            font-size: 48px;
+          }
+        }
+        
+        .paywall-subtitle {
+          font-family: 'Inter', sans-serif;
+          font-size: 14px;
+          color: #6B6B6B;
+          line-height: 1.6;
+          text-align: center;
+          margin: 0 auto 32px;
+          max-width: 520px;
+        }
+        
+        .unlock-grid {
+          display: grid;
+          grid-template-columns: 1fr;
+          gap: 12px;
+          margin-bottom: 24px;
+        }
+        @media (min-width: 768px) {
+          .unlock-grid {
+            grid-template-columns: repeat(2, 1fr);
+          }
+        }
+        .grid-cell {
+          position: relative;
+          background-color: #F5EDE3;
+          border: 1px solid rgba(201, 169, 97, 0.3);
+          border-radius: 12px;
+          padding: 16px;
+          display: flex;
+          align-items: center;
+          gap: 12px;
+          transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.2s ease;
+        }
+        .grid-cell:hover {
+          transform: scale(1.02);
+          box-shadow: 0 4px 12px rgba(201, 169, 97, 0.08);
+        }
+        .cell-emoji {
+          font-size: 20px;
+          flex-shrink: 0;
+        }
+        .cell-text {
+          font-family: 'Inter', sans-serif;
+          font-size: 13.5px;
+          font-weight: 500;
+          color: #3D2914;
+        }
+        
+        .badge-gold {
+          position: absolute;
+          top: 8px;
+          right: 8px;
+          background: linear-gradient(135deg, #C9A961, #E5C583);
+          color: #FFFFFF;
+          font-size: 8px;
+          font-weight: 700;
+          letter-spacing: 0.06em;
+          padding: 2px 6px;
+          border-radius: 4px;
+          font-family: 'Inter', sans-serif;
+          box-shadow: 0 2px 4px rgba(201, 169, 97, 0.25);
+        }
+        
+        .countdown-pill {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 8px;
+          background-color: #F5EDE3;
+          border: 1px solid #C9A961;
+          border-radius: 9999px;
+          padding: 8px 16px;
+          margin: 0 auto 16px;
+          width: fit-content;
+        }
+        .countdown-text {
+          font-family: 'Inter', sans-serif;
+          font-size: 12px;
+          font-weight: 600;
+          color: #3D2914;
+        }
+        
+        .cta-button {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 10px;
+          width: 100%;
+          background-color: #3D2914;
+          color: #FFFFFF;
+          font-family: 'Inter', sans-serif;
+          font-size: 15px;
+          font-weight: 700;
+          padding: 20px;
+          border-radius: 16px;
+          border: none;
+          cursor: pointer;
+          transition: background-color 0.2s ease, transform 0.1s ease;
+          box-shadow: 0 4px 14px rgba(61, 41, 20, 0.25);
+          margin-bottom: 12px;
+        }
+        .cta-button:hover {
+          background-color: #4E351B;
+        }
+        .cta-button:active {
+          transform: scale(0.98);
+        }
+        .cta-button:disabled {
+          opacity: 0.7;
+          cursor: not-allowed;
+        }
+        
+        .cta-under-text {
+          font-family: 'Inter', sans-serif;
+          font-size: 12px;
+          color: #6B6B6B;
+          text-align: center;
+          margin: 0 0 20px;
+        }
+      `}</style>
     </div>
   );
 }

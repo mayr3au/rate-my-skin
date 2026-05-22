@@ -36,6 +36,25 @@ function LangToggle() {
 }
 
 /* ── Main page ── */
+const FACTS = [
+  {
+    title: "Le mythe du 'trop propre'",
+    desc: "Nettoyer sa peau plus de 2 fois par jour détruit la barrière cutanée et peut paradoxalement causer plus d'imperfections."
+  },
+  {
+    title: "L'impact du stress",
+    desc: "Le cortisol stimule la production de sébum. La gestion du stress fait partie intégrante d'une routine peau efficace."
+  },
+  {
+    title: "L'ordre compte",
+    desc: "Appliquer ses soins du plus fluide au plus épais maximise leur absorption. Sérum avant crème, jamais l'inverse."
+  },
+  {
+    title: "Le SPF est non-négociable",
+    desc: "80% du vieillissement cutané est lié aux UV. Même par temps nuageux, même en intérieur près d'une fenêtre."
+  }
+];
+
 export default function Home() {
   const router = useRouter();
   const { lang, t } = useLang();
@@ -68,10 +87,10 @@ export default function Home() {
   const [error, setError] = useState('');
   const [userId, setUserId] = useState(null);
   const [paidUnlocks, setPaidUnlocks] = useState(0);
-  const [loadingStep, setLoadingStep] = useState(0);
-  const [activeSlide, setActiveSlide] = useState(0);
 
-  const loadingMessages = t('loadingSteps');
+  const [progress, setProgress] = useState(0);
+  const [factIndex, setFactIndex] = useState(0);
+  const [fade, setFade] = useState(true);
 
   useEffect(() => {
     // Migrate old localStorage key so returning users are recognised
@@ -110,15 +129,29 @@ export default function Home() {
   };
 
   useEffect(() => {
-    let stepInterval;
-    let slideInterval;
+    let progressInterval;
+    let rotationInterval;
+    let fadeTimeout;
+
     if (loading) {
-      stepInterval = setInterval(() => {
-        setLoadingStep(s => (s + 1) % loadingMessages.length);
-      }, 3500);
-      slideInterval = setInterval(() => {
-        setActiveSlide(s => (s + 1) % 3);
-      }, 4500);
+      const startTime = Date.now();
+      progressInterval = setInterval(() => {
+        const elapsed = Date.now() - startTime;
+        const currentProgress = Math.min((elapsed / 8000) * 99, 99);
+        setProgress(currentProgress);
+        if (elapsed >= 8000) {
+          clearInterval(progressInterval);
+        }
+      }, 50);
+
+      rotationInterval = setInterval(() => {
+        setFade(false);
+        fadeTimeout = setTimeout(() => {
+          setFactIndex(prev => (prev + 1) % 4);
+          setFade(true);
+        }, 300);
+      }, 2000);
+
       const scrollY = window.scrollY;
       document.body.style.position = 'fixed';
       document.body.style.top = `-${scrollY}px`;
@@ -126,17 +159,19 @@ export default function Home() {
       document.body.style.right = '0';
       document.body.style.overflow = 'hidden';
     } else {
-      setLoadingStep(0);
-      setActiveSlide(0);
+      setProgress(0);
+      setFactIndex(0);
+      setFade(true);
       unlockBody();
     }
-    // Always restore body on unmount (e.g. Next.js navigates away mid-loading)
+
     return () => {
-      clearInterval(stepInterval);
-      clearInterval(slideInterval);
+      clearInterval(progressInterval);
+      clearInterval(rotationInterval);
+      clearTimeout(fadeTimeout);
       unlockBody();
     };
-  }, [loading, loadingMessages.length]);
+  }, [loading]);
 
   /* ── Email submit ── */
   const handleEmailSubmit = async (e) => {
@@ -281,7 +316,6 @@ export default function Home() {
     }, 200);
   };
 
-  /* ── Analyse ── */
   const handleAnalyse = async (bypassEmailCheck = false) => {
     if (!image) return;
 
@@ -293,6 +327,10 @@ export default function Home() {
 
     setLoading(true);
     setError('');
+    
+    // Start min 8s promise
+    const minDurationPromise = new Promise(resolve => setTimeout(resolve, 8000));
+    
     try {
       // Convert File to base64 (chunked to avoid stack overflow on large files)
       const arrayBuffer = await image.arrayBuffer();
@@ -306,25 +344,33 @@ export default function Home() {
       const mimeType = image.type;
 
       const storedEmail = localStorage.getItem('rms_user_email') || localStorage.getItem('rms_email') || null;
-      const res = await fetch('/api/analyze', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          imageBase64,
-          mimeType,
-          userId: userId || null,
-          lang,
-          skinConcern: skinConcern.trim() || null,
-          age: age.trim() || null,
-          climate: climate.trim() || null,
-          allergies: allergies.trim() || null,
-          email: storedEmail,
-        }),
-      });
-      const json = await res.json();
+      
+      const apiCallPromise = (async () => {
+        const res = await fetch('/api/analyze', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            imageBase64,
+            mimeType,
+            userId: userId || null,
+            lang,
+            skinConcern: skinConcern.trim() || null,
+            age: age.trim() || null,
+            climate: climate.trim() || null,
+            allergies: allergies.trim() || null,
+            email: storedEmail,
+          }),
+        });
+        const json = await res.json();
 
-      if (json.error === 'no_face') throw new Error(json.message || t('noFaceError'));
-      if (!res.ok || json.error) throw new Error(json.error || t('analysisFailed'));
+        if (json.error === 'no_face') throw new Error(json.message || t('noFaceError'));
+        if (!res.ok || json.error) throw new Error(json.error || t('analysisFailed'));
+        
+        return json;
+      })();
+
+      // Wait for both the minimum 8s delay and the API call
+      const [_, json] = await Promise.all([minDurationPromise, apiCallPromise]);
 
       sessionStorage.setItem('rms_report', JSON.stringify(json.data));
       sessionStorage.setItem('rms_analysis_id', json.analysisId);
@@ -334,7 +380,12 @@ export default function Home() {
       if (json.userId && !userId) setUserId(json.userId);
       // Update paid_unlocks counter from server response
       if (typeof json.paidUnlocksLeft === 'number') setPaidUnlocks(json.paidUnlocksLeft);
-      router.push('/report');
+      
+      setProgress(100);
+      // Give a tiny moment for 100% to display before router navigates
+      setTimeout(() => {
+        router.push('/report');
+      }, 150);
     } catch (err) {
       setError(err.message || t('analysisFailed'));
       setLoading(false);
@@ -1065,134 +1116,146 @@ export default function Home() {
             background: 'url("data:image/svg+xml,%3Csvg viewBox=\'0 0 1000 1000\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cfilter id=\'silk\'%3E%3CfeTurbulence type=\'fractalNoise\' baseFrequency=\'0.005\' numOctaves=\'2\' stitchTiles=\'stitch\'/%3E%3CfeColorMatrix type=\'saturate\' values=\'0\'/%3E%3CfeComponentTransfer%3E%3CfeFuncA type=\'linear\' slope=\'0.03\'/%3E%3C/feComponentTransfer%3E%3C/filter%3E%3Crect width=\'100%25\' height=\'100%25\' filter=\'url(%23silk)\'/%3E%3C/svg%3E")',
           }} />
 
-          <div style={{ position: 'relative', marginBottom: 40 }}>
-            <LuxuryFlower width={100} height={100} />
-            <div style={{
-              position: 'absolute', inset: -20,
-              border: '1px solid rgba(168, 116, 73, 0.1)',
-              borderRadius: '50%',
-              animation: 'spin 20s linear infinite',
-            }} />
-          </div>
-
-          <h2 style={{
-            fontFamily: "'Cormorant Garamond', serif",
-            fontSize: 'clamp(24px, 5vw, 32px)', fontWeight: 300,
-            color: '#2C241D', margin: '0 0 16px', letterSpacing: '0.02em',
-          }}>
-            {t('analysingFeatures')}
-          </h2>
-
-          <div style={{ height: 20 }}>
-            <p style={{
-              fontFamily: "'DM Sans', sans-serif",
-              fontSize: 12, letterSpacing: '0.15em', textTransform: 'uppercase',
-              color: '#A87449', fontWeight: 600, margin: 0,
-              animation: 'pulse 2s ease-in-out infinite',
-            }}>
-              {loadingMessages[loadingStep]}
-            </p>
-          </div>
-
+          {/* Centered mobile-first content layout */}
           <div style={{
-            marginTop: 48, width: '100%', maxWidth: 200, height: 1,
-            background: 'rgba(168, 116, 73, 0.1)', position: 'relative', overflow: 'hidden'
-          }}>
-            <div style={{
-              position: 'absolute', inset: 0,
-              background: 'linear-gradient(90deg, transparent, #A87449, transparent)',
-              width: '50%',
-              animation: 'loadingProgress 2s ease-in-out infinite',
-            }} />
-          </div>
-
-          <p style={{ marginTop: 24, fontSize: 11, color: '#B9AC9E', fontFamily: "'DM Sans', sans-serif" }}>
-            {t('analysisTime')}
-          </p>
-
-          <p style={{
-            marginTop: 16, fontSize: 12, color: '#C4A882',
-            fontFamily: "'DM Sans', sans-serif", fontStyle: 'italic',
-            maxWidth: 280, lineHeight: 1.5,
-            animation: 'fadeInUp 0.8s ease-out 1.5s both',
-          }}>
-            {t('funnyLoadingNote')}
-          </p>
-
-          {/* Waiting page carousel of skin facts */}
-          <div style={{
-            marginTop: 32,
+            position: 'relative',
+            zIndex: 1,
             width: '100%',
-            maxWidth: 400,
-            background: 'rgba(255, 255, 255, 0.42)',
-            backdropFilter: 'blur(15px)',
-            WebkitBackdropFilter: 'blur(15px)',
-            border: '1px solid rgba(255, 255, 255, 0.5)',
-            borderRadius: 20,
-            padding: '20px 24px',
-            boxShadow: '0 8px 32px rgba(168, 116, 73, 0.04)',
-            overflow: 'hidden',
+            maxWidth: '480px',
             display: 'flex',
             flexDirection: 'column',
             alignItems: 'center',
-            boxSizing: 'border-box',
-            animation: 'fadeInUp 0.8s ease-out 1.8s both',
+            gap: '32px',
           }}>
-            <span style={{
-              fontFamily: "'DM Sans', sans-serif",
-              fontSize: 10,
-              letterSpacing: '0.18em',
-              textTransform: 'uppercase',
-              color: '#A87449',
-              fontWeight: 700,
-              display: 'block',
-              marginBottom: 10,
-            }}>
-              ✦ {t('didYouKnow')} ✦
-            </span>
-            <div style={{ overflow: 'hidden', width: '100%', minHeight: 60, display: 'flex', alignItems: 'center' }}>
-              <div style={{
-                display: 'flex',
-                transform: `translateX(-${activeSlide * 100}%)`,
-                transition: 'transform 0.6s cubic-bezier(0.16, 1, 0.3, 1)',
-                width: '100%',
+            {/* Header section */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+              <h2 style={{
+                fontFamily: "'Playfair Display', serif",
+                fontSize: '24px',
+                fontWeight: 700,
+                color: '#3D2914',
+                margin: 0,
+                letterSpacing: '0.02em',
               }}>
-                {[0, 1, 2].map((idx) => (
-                  <div key={idx} style={{ flex: '0 0 100%', width: '100%', padding: '0 8px', boxSizing: 'border-box' }}>
-                    <p style={{
-                      fontFamily: "'Cormorant Garamond', serif",
-                      fontSize: 'clamp(14px, 4vw, 17px)',
-                      fontWeight: 400,
-                      color: '#2C241D',
-                      lineHeight: 1.45,
-                      margin: 0,
-                      fontStyle: 'italic',
-                    }}>
-                      "{t(`fact${idx + 1}`)}"
-                    </p>
-                  </div>
-                ))}
+                Analyse en cours…
+              </h2>
+              <p style={{
+                fontFamily: "'Inter', sans-serif",
+                fontSize: '14px',
+                color: '#6B6B6B',
+                margin: 0,
+              }}>
+                Traitement multi-zones de votre peau
+              </p>
+            </div>
+
+            {/* Circular Progress Indicator */}
+            <div style={{
+              position: 'relative',
+              width: 140,
+              height: 140,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              filter: 'drop-shadow(0 4px 12px rgba(201, 169, 97, 0.12))',
+            }}>
+              <svg width="140" height="140" viewBox="0 0 140 140" style={{ transform: 'rotate(-90deg)' }}>
+                {/* Background circle */}
+                <circle
+                  cx="70"
+                  cy="70"
+                  r="55"
+                  fill="transparent"
+                  stroke="#F5EDE3"
+                  strokeWidth="6"
+                />
+                {/* Progress circle */}
+                <circle
+                  cx="70"
+                  cy="70"
+                  r="55"
+                  fill="transparent"
+                  stroke="#C9A961"
+                  strokeWidth="6"
+                  strokeDasharray={345.575}
+                  strokeDashoffset={345.575 * (1 - progress / 100)}
+                  strokeLinecap="round"
+                  style={{ transition: 'stroke-dashoffset 0.1s linear' }}
+                />
+              </svg>
+              <div style={{
+                position: 'absolute',
+                fontFamily: "'Playfair Display', serif",
+                fontSize: '32px',
+                fontWeight: '700',
+                color: '#3D2914',
+              }}>
+                {Math.round(progress)}%
               </div>
             </div>
-            {/* Indicators */}
-            <div style={{ display: 'flex', justifyContent: 'center', gap: 6, marginTop: 14 }}>
-              {[0, 1, 2].map((idx) => (
-                <button
-                  key={idx}
-                  onClick={() => setActiveSlide(idx)}
-                  style={{
-                    width: activeSlide === idx ? 16 : 6,
-                    height: 6,
-                    borderRadius: 3,
-                    background: activeSlide === idx ? '#A87449' : 'rgba(168, 116, 73, 0.22)',
-                    border: 'none',
-                    padding: 0,
-                    cursor: 'pointer',
-                    transition: 'all 0.3s cubic-bezier(0.16, 1, 0.3, 1)',
-                  }}
-                  aria-label={`Slide ${idx + 1}`}
-                />
-              ))}
+
+            {/* Facts Card */}
+            <div style={{
+              width: '100%',
+              background: '#FFFFFF',
+              border: '1px solid #F5EDE3',
+              borderRadius: '16px',
+              padding: '24px',
+              boxShadow: '0 8px 24px rgba(61, 41, 20, 0.04)',
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '12px',
+              textAlign: 'left',
+              boxSizing: 'border-box',
+            }}>
+              {/* Card Header */}
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#C9A961" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A5 5 0 0 0 8 8c0 1.3.5 2.6 1.5 3.5.8.8 1.3 1.5 1.5 2.5" />
+                  <path d="M9 18h6" />
+                  <path d="M10 22h4" />
+                </svg>
+                <span style={{
+                  fontFamily: "'Inter', sans-serif",
+                  fontSize: '12px',
+                  fontWeight: 600,
+                  letterSpacing: '0.08em',
+                  textTransform: 'uppercase',
+                  color: '#C9A961',
+                }}>
+                  Le saviez-vous ?
+                </span>
+              </div>
+
+              {/* Fading Content */}
+              <div style={{
+                opacity: fade ? 1 : 0,
+                transition: 'opacity 300ms ease-in-out',
+                minHeight: '80px',
+                display: 'flex',
+                flexDirection: 'column',
+                justifyContent: 'center',
+              }}>
+                <h3 style={{
+                  fontFamily: "'Playfair Display', serif",
+                  fontSize: '18px',
+                  fontWeight: 700,
+                  color: '#3D2914',
+                  margin: '0 0 6px 0',
+                  lineHeight: '1.3',
+                }}>
+                  {FACTS[factIndex]?.title}
+                </h3>
+                <p style={{
+                  fontFamily: "'Inter', sans-serif",
+                  fontSize: '14px',
+                  color: '#6B6B6B',
+                  lineHeight: '1.6',
+                  margin: 0,
+                }}>
+                  {FACTS[factIndex]?.desc}
+                </p>
+              </div>
             </div>
           </div>
         </div>
