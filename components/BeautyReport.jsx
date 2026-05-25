@@ -1766,17 +1766,38 @@ export default function BeautyReport({ data: rawData, isPaid, onUnlock }) {
           scrollbarWidth: "none"
         }}>
           {TABS_CONFIG.map((tab, i) => (
-            <button key={i} onClick={() => setPreviewTab(i)} className="rpt-tab-btn" style={{
-              flex: "0 0 auto", padding: "10px 14px", borderRadius: 10, textAlign: "center",
-              background: previewTab === i ? "linear-gradient(135deg, rgba(44,36,29,0.88), rgba(28,22,17,0.94))" : "transparent",
-              color: previewTab === i ? "#fff" : "#6F6156",
-              fontSize: 9.5, fontWeight: 600, letterSpacing: "0.07em",
-              fontFamily: "'DM Sans', sans-serif", textTransform: "uppercase",
-              border: previewTab === i ? "1px solid rgba(255,255,255,0.15)" : "none",
-              cursor: "pointer", transition: "all 0.25s ease",
-              boxShadow: previewTab === i ? "0 4px 14px rgba(44,36,29,0.15)" : "none",
-              whiteSpace: "nowrap",
-            }}>{tab.short}</button>
+            <button key={i} onClick={() => setPreviewTab(i)} style={{
+              flex: "1 1 0px",
+              display: "flex", flexDirection: "column", alignItems: "center", gap: 4,
+              background: "none", border: "none", cursor: "pointer",
+              padding: "8px 6px",
+              color: previewTab === i ? "#C9A961" : "#9E8A7A",
+              transition: "all 0.2s ease",
+              minWidth: 0,
+            }}>
+              <div style={{ position: "relative", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                {tab.icon}
+                {previewTab === i && (
+                  <div style={{
+                    position: "absolute", top: -6, left: "50%", transform: "translateX(-50%)",
+                    width: 18, height: 2, borderRadius: 2,
+                    background: "linear-gradient(90deg, #C9A961, #A87449)",
+                  }} />
+                )}
+              </div>
+              <span style={{
+                fontSize: 8.5, fontWeight: previewTab === i ? 700 : 500,
+                fontFamily: "'DM Sans', sans-serif",
+                letterSpacing: "0.04em",
+                textTransform: "uppercase",
+                whiteSpace: "nowrap",
+                overflow: "hidden", textOverflow: "ellipsis",
+                maxWidth: 76,
+                lineHeight: 1.2,
+              }}>
+                {tab.short}
+              </span>
+            </button>
           ))}
         </div>
       </div>
