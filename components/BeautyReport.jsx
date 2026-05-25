@@ -1746,9 +1746,31 @@ export default function BeautyReport({ data: rawData, isPaid, onUnlock }) {
       {/* Desktop: scrollable pill row */}
       <div className="rpt-tabs-desktop" style={{ maxWidth: 680, margin: "24px auto 0", padding: "0 20px" }}>
         {!isPaid && (
-          <p style={{ ...LABEL_STYLE, textAlign: "center", marginBottom: 10 }}>
-            {t('previewLabel')}
-          </p>
+          <div style={{ textAlign: "center", marginBottom: 20 }}>
+            <span style={{ 
+              fontSize: 8.5, 
+              fontWeight: 700, 
+              letterSpacing: "0.22em", 
+              textTransform: "uppercase", 
+              color: "#C9A961", 
+              fontFamily: "'DM Sans', sans-serif" 
+            }}>
+              {lang === 'fr' ? 'Version gratuite' : 'Free Preview'}
+            </span>
+            <h2 style={{ 
+              margin: "4px 0 0", 
+              fontSize: 22, 
+              fontWeight: 400, 
+              fontFamily: "'Cormorant Garamond', serif", 
+              letterSpacing: "0.01em",
+              background: "linear-gradient(180deg, #2C241D 0%, #6B4828 40%, #A87449 100%)",
+              WebkitBackgroundClip: "text", 
+              WebkitTextFillColor: "transparent",
+              backgroundClip: "text",
+            }}>
+              {lang === 'fr' ? 'Aperçu du rapport complet' : 'Full Report Preview'}
+            </h2>
+          </div>
         )}
         <div style={{
           display: "flex", justifyContent: "center", gap: 20, overflowX: "auto",
