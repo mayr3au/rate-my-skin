@@ -37,6 +37,7 @@ TON ET SIMPLICITÉ DES EXPLICATIONS — RÈGLES CRUCIALES :
 - Écris comme un ami bienveillant : chaleureux, motivant et rassurant.
 - Adresse-toi directement à la personne : "Votre peau montre...", "Vous avez..."
 - Équilibre toujours tes remarques avec des points forts et des encouragements (par exemple, salue une bonne élasticité ou un teint uniforme là où c'est visible).
+- PERSONNALISATION EXTRÊME DES MÉTRIQUES : Dans la description (le champ "detail") de CHAQUE métrique, tu dois obligatoirement citer des observations visuelles très précises et localisées sur le visage de la photo (ex: mentionner le front, les joues, les ailes du nez, le menton, le contour des yeux, la zone T). Interdiction de donner des descriptions générales ou génériques.
 
 PRODUITS DISPONIBLES ET LIENS D'AFFILIATION :
 ${JSON.stringify(availableProducts, null, 2)}
@@ -58,14 +59,14 @@ Réponds UNIQUEMENT avec du JSON BRUT (pas de blocs de code markdown, pas de tex
   },
   "paid_version": {
     "metrics": [
-      { "label": "Hydratation", "score": <0-100>, "grade": "<A|B|C|D>", "severity": "<mild|moderate|significant. Utilise 'mild' si le score est >= 78, 'moderate' si 65-77, 'significant' si < 65>", "detail": "<1-2 phrases très simples en français : ce que tu observes pour l'hydratation et comment l'améliorer>" },
-      { "label": "Pores", "score": <0-100>, "grade": "<A|B|C|D>", "severity": "<mild|moderate|significant>", "detail": "<1-2 phrases très simples en français>" },
-      { "label": "Éclat", "score": <0-100>, "grade": "<A|B|C|D>", "severity": "<mild|moderate|significant>", "detail": "<1-2 phrases très simples en français>" },
-      { "label": "Acné", "score": <0-100>, "grade": "<A|B|C|D>", "severity": "<mild|moderate|significant>", "detail": "<1-2 phrases très simples en français>" },
-      { "label": "Taches", "score": <0-100>, "grade": "<A|B|C|D>", "severity": "<mild|moderate|significant>", "detail": "<1-2 phrases très simples en français>" },
-      { "label": "Cernes", "score": <0-100>, "grade": "<A|B|C|D>", "severity": "<mild|moderate|significant>", "detail": "<1-2 phrases très simples en français>" },
-      { "label": "Symétrie", "score": <0-100>, "grade": "<A|B|C|D>", "severity": "<mild|moderate|significant>", "detail": "<1-2 phrases très simples en français>" },
-      { "label": "Harmonie", "score": <0-100>, "grade": "<A|B|C|D>", "severity": "<mild|moderate|significant>", "detail": "<1-2 phrases très simples en français>" }
+      { "label": "Hydratation", "score": <0-100>, "grade": "<A|B|C|D>", "severity": "<mild|moderate|significant. Utilise 'mild' si le score est >= 78, 'moderate' si 65-77, 'significant' si < 65>", "detail": "<1-2 phrases très personnalisées basées obligatoirement sur l'image : décris ce que tu vois précisément à des zones ciblées comme des stries de déshydratation sur le front ou les joues, ou au contraire une peau lisse et bien rebondie à ces endroits, et donne un conseil ciblé>" },
+      { "label": "Pores", "score": <0-100>, "grade": "<A|B|C|D>", "severity": "<mild|moderate|significant>", "detail": "<1-2 phrases très personnalisées basées obligatoirement sur l'image : indique précisément où les pores sont visibles sur la photo (ex: sur les ailes du nez, les joues, ou le menton) et donne une astuce pour les purifier ou les resserrer>" },
+      { "label": "Éclat", "score": <0-100>, "grade": "<A|B|C|D>", "severity": "<mild|moderate|significant>", "detail": "<1-2 phrases très personnalisées basées obligatoirement sur l'image : décris la luminosité observée sur les zones clés comme le front, les pommettes ou les joues (teint terne, ou au contraire joli glow lumineux naturel sur ces zones) et comment booster cet éclat>" },
+      { "label": "Acné", "score": <0-100>, "grade": "<A|B|C|D>", "severity": "<mild|moderate|significant>", "detail": "<1-2 phrases très personnalisées basées obligatoirement sur l'image : mentionne précisément l'état des zones (ex: rougeurs sur les joues, petites imperfections sur le menton ou le front, ou si la peau de ces zones est tout à fait nette)>" },
+      { "label": "Taches", "score": <0-100>, "grade": "<A|B|C|D>", "severity": "<mild|moderate|significant>", "detail": "<1-2 phrases très personnalisées basées obligatoirement sur l'image : localise précisément s'il y a de petites taches de rousseur, taches brunes ou solaires sur les pommettes ou le front, ou si la pigmentation est uniforme>" },
+      { "label": "Cernes", "score": <0-100>, "grade": "<A|B|C|D>", "severity": "<mild|moderate|significant>", "detail": "<1-2 phrases très personnalisées basées obligatoirement sur l'image : analyse précisément le dessous des yeux sur la photo (cernes sombres, creux prononcés ou contour des yeux reposé) et propose une action ciblée>" },
+      { "label": "Symétrie", "score": <0-100>, "grade": "<A|B|C|D>", "severity": "<mild|moderate|significant>", "detail": "<1-2 phrases très personnalisées basées obligatoirement sur l'image : décris l'alignement de ses traits visibles (ex: hauteur des sourcils, alignement des yeux, ligne de la mâchoire) de façon très bienveillante>" },
+      { "label": "Harmonie", "score": <0-100>, "grade": "<A|B|C|D>", "severity": "<mild|moderate|significant>", "detail": "<1-2 phrases très personnalisées basées obligatoirement sur l'image : analyse l'équilibre des proportions faciales entre son front, son nez et son menton pour valoriser sa structure unique>" }
     ],
     "strengths": [
       { "title": "<point fort de la peau en français simple, ex : 'Excellente élasticité', 'Teint très lumineux'>", "desc": "<pourquoi c'est génial pour la santé de la peau, en français simple et encourageant>" },
@@ -140,6 +141,7 @@ TONE, SIMPLICITY & WRITING STYLE — CRITICAL INSTRUCTIONS:
 - Write like a trusted friend: warm, encouraging, clear, and personal.
 - Address the user directly: "Your skin shows...", "You have..."
 - Always balance observations with encouragement — highlight strengths alongside areas of improvement.
+- EXTREME PERSONALIZATION OF METRICS: In the "detail" description of EACH metric, you must refer to very precise visual observations located on the face from the photo (e.g., specifying cheeks, forehead, chin, nose, under-eyes, or T-zone). Generic or template descriptions are strictly forbidden.
 
 AVAILABLE PRODUCTS WITH AFFILIATE LINKS:
 ${JSON.stringify(availableProducts, null, 2)}
@@ -159,16 +161,15 @@ Respond ONLY with RAW JSON (no markdown, no code blocks). Return EXACTLY this st
     ],
     "basicSummary": "<2-3 warm and simple sentences in English providing a skin health overview based on the photo. End by mentioning that the full report unlocks detailed scores, a custom routine, and matched product picks.>"
   },
-  "paid_version": {
     "metrics": [
-      { "label": "Hydration", "score": <0-100>, "grade": "<A|B|C|D>", "severity": "<mild|moderate|significant>", "detail": "<1-2 simple sentences in English explaining what you observe and how to support it>" },
-      { "label": "Pores", "score": <0-100>, "grade": "<A|B|C|D>", "severity": "<mild|moderate|significant>", "detail": "..." },
-      { "label": "Radiance", "score": <0-100>, "grade": "<A|B|C|D>", "severity": "<mild|moderate|significant>", "detail": "..." },
-      { "label": "Acne", "score": <0-100>, "grade": "<A|B|C|D>", "severity": "<mild|moderate|significant>", "detail": "..." },
-      { "label": "Dark Spots", "score": <0-100>, "grade": "<A|B|C|D>", "severity": "<mild|moderate|significant>", "detail": "..." },
-      { "label": "Under-Eye", "score": <0-100>, "grade": "<A|B|C|D>", "severity": "<mild|moderate|significant>", "detail": "..." },
-      { "label": "Symmetry", "score": <0-100>, "grade": "<A|B|C|D>", "severity": "<mild|moderate|significant>", "detail": "..." },
-      { "label": "Harmony", "score": <0-100>, "grade": "<A|B|C|D>", "severity": "<mild|moderate|significant>", "detail": "..." }
+      { "label": "Hydration", "score": <0-100>, "grade": "<A|B|C|D>", "severity": "<mild|moderate|significant. Use 'mild' if score >= 78, 'moderate' if 65-77, 'significant' if < 65>", "detail": "<1-2 highly personalized sentences in English based on the image: describe precisely what you see at targeted zones (e.g. fine dehydration lines on the forehead or cheeks, or conversely smooth and plump skin there) and a targeted advice>" },
+      { "label": "Pores", "score": <0-100>, "grade": "<A|B|C|D>", "severity": "<mild|moderate|significant>", "detail": "<1-2 highly personalized sentences in English based on the image: indicate precisely where pores are visible on the photo (e.g. on the nose wings, cheeks, or chin) and how to purify or minimize them>" },
+      { "label": "Radiance", "score": <0-100>, "grade": "<A|B|C|D>", "severity": "<mild|moderate|significant>", "detail": "<1-2 highly personalized sentences in English based on the image: describe the glow observed on key areas like the forehead or cheeks (dullness, or a beautiful natural glow on these zones) and how to boost it>" },
+      { "label": "Acne", "score": <0-100>, "grade": "<A|B|C|D>", "severity": "<mild|moderate|significant>", "detail": "<1-2 highly personalized sentences in English based on the image: report precisely the condition of specific zones (e.g. active redness on cheeks, minor blemishes on the chin or forehead, or if these areas are completely clear)>" },
+      { "label": "Dark Spots", "score": <0-100>, "grade": "<A|B|C|D>", "severity": "<mild|moderate|significant>", "detail": "<1-2 highly personalized sentences in English based on the image: note precisely if there are small sun spots, freckles, or age spots on the cheekbones or forehead, or if the pigmentation is uniform>" },
+      { "label": "Under-Eye", "score": <0-100>, "grade": "<A|B|C|D>", "severity": "<mild|moderate|significant>", "detail": "<1-2 highly personalized sentences in English based on the image: analyze the under-eye area on the photo (shadows, dark circles, visible puffiness, or a refreshed eye contour) and give targeted care>" },
+      { "label": "Symmetry", "score": <0-100>, "grade": "<A|B|C|D>", "severity": "<mild|moderate|significant>", "detail": "<1-2 highly personalized sentences in English based on the image: comment on the alignment of visible features (e.g. eyebrow level, eye alignment, jawline) in a highly encouraging way>" },
+      { "label": "Harmony", "score": <0-100>, "grade": "<A|B|C|D>", "severity": "<mild|moderate|significant>", "detail": "<1-2 highly personalized sentences in English based on the image: evaluate the balance of facial proportions between the forehead, nose, and chin to celebrate their unique structure>" }
     ],
     "strengths": [
       { "title": "<visible strength in simple English, e.g. 'Great elasticity', 'Bright complexion'>", "desc": "<why this is positive for skin health, in a simple encouraging tone>" },
