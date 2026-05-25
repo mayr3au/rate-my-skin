@@ -2007,12 +2007,53 @@ export default function BeautyReport({ data: rawData, isPaid, onUnlock }) {
               const item = (paid.lifestyle || {})[key];
               if (!item) return null;
               const icons = {
-                diet: "🥑",
-                sleep: "💤",
-                stress: "🧘‍♀️",
-                hygiene: "🧼",
-                sun: "☀️",
-                hydration: "💧"
+                diet: (
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 8.4 19 14a7 7 0 0 1-8 6Z" />
+                    <path d="M9 11a3 3 0 0 1 3-3" />
+                    <path d="M11 20V12" />
+                  </svg>
+                ),
+                sleep: (
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
+                  </svg>
+                ),
+                stress: (
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+                    <circle cx="12" cy="12" r="10" />
+                    <path d="M8 12a4 4 0 0 1 8 0" />
+                    <path d="M12 2v2M12 20v2M4 12H2M22 12h-2" />
+                  </svg>
+                ),
+                hygiene: (
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z" />
+                  </svg>
+                ),
+                sun: (
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+                    <circle cx="12" cy="12" r="5" />
+                    <line x1="12" y1="1" x2="12" y2="3" />
+                    <line x1="12" y1="21" x2="12" y2="23" />
+                    <line x1="4.22" y1="4.22" x2="5.64" y2="5.64" />
+                    <line x1="18.36" y1="18.36" x2="19.78" y2="19.78" />
+                    <line x1="1" y1="12" x2="3" y2="12" />
+                    <line x1="21" y1="12" x2="23" y2="12" />
+                    <line x1="4.22" y1="19.78" x2="5.64" y2="18.36" />
+                    <line x1="18.36" y1="5.64" x2="19.78" y2="4.22" />
+                  </svg>
+                ),
+                exercise: (
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M22 12h-4l-3 9L9 3l-3 9H2" />
+                  </svg>
+                ),
+                temperature: (
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M12 22a7 7 0 0 0 7-7c0-4.3-7-13-7-13S5 10.7 5 15a7 7 0 0 0 7 7z" />
+                  </svg>
+                )
               };
               const titles = {
                 diet: lang === 'fr' ? 'Alimentation' : 'Diet',
@@ -2020,11 +2061,12 @@ export default function BeautyReport({ data: rawData, isPaid, onUnlock }) {
                 stress: 'Stress',
                 hygiene: lang === 'fr' ? 'Hygiène & Textile' : 'Hygiene & Habits',
                 sun: lang === 'fr' ? 'Exposition' : 'Sun Exposure',
-                hydration: 'Hydratation'
+                exercise: lang === 'fr' ? 'Activité & Sport' : 'Exercise',
+                temperature: lang === 'fr' ? 'Température Eau' : 'Water Temperature'
               };
               return (
                 <div key={key} style={{ ...CARD, padding: "20px", display: "flex", gap: 16, alignItems: "flex-start" }}>
-                  <div style={{ width: 40, height: 40, borderRadius: 12, background: "rgba(168,116,73,0.08)", border: "1px solid rgba(168,116,73,0.15)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18, flexShrink: 0 }}>
+                  <div style={{ width: 40, height: 40, borderRadius: 12, background: "rgba(168,116,73,0.08)", border: "1px solid rgba(168,116,73,0.15)", display: "flex", alignItems: "center", justifyContent: "center", color: "#A87449", flexShrink: 0 }}>
                     {icons[key] || "✦"}
                   </div>
                   <div>
