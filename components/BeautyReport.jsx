@@ -1757,20 +1757,20 @@ export default function BeautyReport({ data: rawData, isPaid, onUnlock }) {
           </p>
         )}
         <div style={{
-          display: "flex", justifyContent: "center", gap: 4, overflowX: "auto",
+          display: "flex", justifyContent: "center", gap: 20, overflowX: "auto",
           background: "rgba(255,255,255,0.55)",
           backdropFilter: "blur(18px) saturate(150%)", WebkitBackdropFilter: "blur(18px) saturate(150%)",
           border: "1px solid rgba(255,255,255,0.65)",
-          borderRadius: 14, padding: "6px 8px",
+          borderRadius: 14, padding: "6px 12px",
           boxShadow: "0 8px 32px rgba(168,116,73,0.03), inset 0 1px 1px rgba(255,255,255,0.8)",
           scrollbarWidth: "none"
         }}>
           {TABS_CONFIG.map((tab, i) => (
             <button key={i} onClick={() => setPreviewTab(i)} style={{
-              flex: "1 1 0px",
-              display: "flex", flexDirection: "column", alignItems: "center", gap: 4,
+              flex: "0 0 auto",
+              display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 4,
               background: "none", border: "none", cursor: "pointer",
-              padding: "8px 6px",
+              padding: "8px 10px",
               color: previewTab === i ? "#C9A961" : "#9E8A7A",
               transition: "all 0.2s ease",
               minWidth: 0,
@@ -1794,6 +1794,7 @@ export default function BeautyReport({ data: rawData, isPaid, onUnlock }) {
                 overflow: "hidden", textOverflow: "ellipsis",
                 maxWidth: 76,
                 lineHeight: 1.2,
+                textAlign: "center"
               }}>
                 {tab.short}
               </span>
