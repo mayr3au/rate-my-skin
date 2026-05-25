@@ -2003,18 +2003,32 @@ export default function BeautyReport({ data: rawData, isPaid, onUnlock }) {
         )}
         {previewTab === 5 && (
           <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-            {['diet', 'sleep', 'stress'].map((key) => {
+            {Object.keys(paid.lifestyle || {}).map((key) => {
               const item = (paid.lifestyle || {})[key];
               if (!item) return null;
-              const icons = { diet: "🥑", sleep: "💤", stress: "🧘‍♀️" };
-              const titles = { diet: lang === 'fr' ? 'Alimentation' : 'Diet', sleep: lang === 'fr' ? 'Sommeil' : 'Sleep', stress: 'Stress' };
+              const icons = {
+                diet: "🥑",
+                sleep: "💤",
+                stress: "🧘‍♀️",
+                hygiene: "🧼",
+                sun: "☀️",
+                hydration: "💧"
+              };
+              const titles = {
+                diet: lang === 'fr' ? 'Alimentation' : 'Diet',
+                sleep: lang === 'fr' ? 'Sommeil' : 'Sleep',
+                stress: 'Stress',
+                hygiene: lang === 'fr' ? 'Hygiène & Textile' : 'Hygiene & Habits',
+                sun: lang === 'fr' ? 'Exposition' : 'Sun Exposure',
+                hydration: 'Hydratation'
+              };
               return (
                 <div key={key} style={{ ...CARD, padding: "20px", display: "flex", gap: 16, alignItems: "flex-start" }}>
                   <div style={{ width: 40, height: 40, borderRadius: 12, background: "rgba(168,116,73,0.08)", border: "1px solid rgba(168,116,73,0.15)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18, flexShrink: 0 }}>
-                    {icons[key]}
+                    {icons[key] || "✦"}
                   </div>
                   <div>
-                    <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: "0.15em", textTransform: "uppercase", color: "#A87449", marginBottom: 4, fontFamily: "'DM Sans', sans-serif" }}>{titles[key]}</div>
+                    <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: "0.15em", textTransform: "uppercase", color: "#A87449", marginBottom: 4, fontFamily: "'DM Sans', sans-serif" }}>{titles[key] || key}</div>
                     <div style={{ fontSize: 16, fontWeight: 600, color: "#2C241D", marginBottom: 6, fontFamily: "'Cormorant Garamond', serif" }}>{item.title}</div>
                     <p style={{ margin: 0, fontSize: 13, lineHeight: 1.6, color: "#6F6156" }}>{item.desc}</p>
                   </div>

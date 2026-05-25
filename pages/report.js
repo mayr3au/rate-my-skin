@@ -215,13 +215,15 @@ export default function Report() {
             }
           ],
           lifestyle: isFr ? {
-            diet: { title: "Plus d'Oméga-3", desc: "Favorise l'hydratation et réduit l'inflammation. Mangez plus de saumon, noix et graines de chia." },
-            sleep: { title: "Sommeil réparateur", desc: "7 à 8 heures par nuit sont cruciales pour la régénération cellulaire et pour réduire les cernes." },
-            stress: { title: "Gestion du cortisol", desc: "Le stress chronique augmente le sébum et l'inflammation. Intégrez 5 min de respiration profonde." }
+            diet: { title: "Plus d'Oméga-3 & Hydratation", desc: "Favorise la barrière lipidique et réduit l'inflammation. Mangez plus de saumon, de noix, de graines de chia et veillez à boire au moins 1,5L d'eau par jour." },
+            sleep: { title: "Sommeil réparateur & Taie en Soie", desc: "Dormez 7 à 8 heures par nuit pour la régénération cellulaire. Privilégiez une taie d'oreiller en soie (pour limiter les frictions et préserver l'hydratation) et essayez de dormir sur le dos pour éviter les plis de pression." },
+            stress: { title: "Gestion du cortisol", desc: "Le stress chronique augmente le sébum et l'inflammation. Intégrez 5 min de respiration profonde ou de méditation chaque jour pour apaiser le système nerveux." },
+            hygiene: { title: "Hygiène des taies & du téléphone", desc: "Changez votre taie d'oreiller tous les 2 à 3 jours pour ne pas dormir sur des résidus bactériens accumulés. Désinfectez votre écran de téléphone tous les jours (véritable nid à bactéries) et lavez vos mains avant chaque routine skincare." }
           } : {
-            diet: { title: "More Omega-3s", desc: "Promotes hydration and reduces inflammation. Eat more salmon, walnuts, and chia seeds." },
-            sleep: { title: "Restful Sleep", desc: "7-8 hours a night are crucial for cell regeneration and reducing dark circles." },
-            stress: { title: "Cortisol Management", desc: "Chronic stress increases sebum and inflammation. Try 5 minutes of deep breathing daily." }
+            diet: { title: "More Omega-3s & Hydration", desc: "Supports the lipid barrier and reduces inflammation. Eat more salmon, walnuts, chia seeds, and aim for at least 1.5L of water daily." },
+            sleep: { title: "Restful Sleep & Silk Pillowcase", desc: "7-8 hours a night is crucial for cell turnover. Use a mulberry silk pillowcase to prevent skin friction and retain moisture, and try sleeping on your back." },
+            stress: { title: "Cortisol Management", desc: "Chronic stress triggers sebum production and inflammation. Practice 5 minutes of deep breathing or mindfulness daily to lower cortisol levels." },
+            hygiene: { title: "Pillowcase Hygiene & Phone Sanitization", desc: "Change your pillowcase every 2-3 days to avoid sleeping on bacteria, saliva, and sweat buildup. Sanitize your mobile screen daily and wash hands before applying any product." }
           },
           progression: isFr ? [
             { week: 1, title: "Fondations & Tolérance", desc: "Introduction de la nouvelle routine. La barrière cutanée s'adapte en douceur." },
