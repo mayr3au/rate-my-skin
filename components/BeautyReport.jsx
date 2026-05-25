@@ -1135,9 +1135,37 @@ function ReportHeader({ t }) {
 /* ── Section heading helper ── */
 function SectionHeading({ label, title }) {
   return (
-    <div style={{ marginBottom: 14 }}>
-      <p style={LABEL_STYLE}>{label}</p>
-      <h3 style={{ ...TITLE_STYLE, marginBottom: 0 }}>{title}</h3>
+    <div style={{ 
+      marginBottom: 20, 
+      borderBottom: "1px solid rgba(168, 116, 73, 0.08)", 
+      paddingBottom: 10,
+      display: "flex",
+      flexDirection: "column",
+      gap: 3
+    }}>
+      <span style={{ 
+        fontSize: 8.5, 
+        fontWeight: 700, 
+        letterSpacing: "0.22em", 
+        textTransform: "uppercase", 
+        color: "#C9A961", 
+        fontFamily: "'DM Sans', sans-serif" 
+      }}>
+        {label}
+      </span>
+      <h2 style={{ 
+        margin: 0, 
+        fontSize: 24, 
+        fontWeight: 400, 
+        fontFamily: "'Cormorant Garamond', serif", 
+        letterSpacing: "0.01em",
+        background: "linear-gradient(180deg, #2C241D 0%, #6B4828 40%, #A87449 100%)",
+        WebkitBackgroundClip: "text", 
+        WebkitTextFillColor: "transparent",
+        backgroundClip: "text",
+      }}>
+        {title}
+      </h2>
     </div>
   );
 }
@@ -1758,14 +1786,10 @@ export default function BeautyReport({ data: rawData, isPaid, onUnlock }) {
         userSelect: isPaid ? "auto" : "none"
       }}>
         {isPaid && (
-          <div style={{ marginBottom: 20 }}>
-            <p style={LABEL_STYLE}>
-              {lang === 'fr' ? 'Rapport détaillé' : 'Detailed Report'}
-            </p>
-            <h3 style={{ ...TITLE_STYLE, marginBottom: 0 }}>
-              {TABS_CONFIG[previewTab].label}
-            </h3>
-          </div>
+          <SectionHeading 
+            label={lang === 'fr' ? 'Rapport détaillé' : 'Detailed Report'} 
+            title={TABS_CONFIG[previewTab].label} 
+          />
         )}
         {previewTab === 0 && (
           <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
