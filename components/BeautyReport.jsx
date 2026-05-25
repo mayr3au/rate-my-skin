@@ -506,7 +506,20 @@ function MetricCard({ m, index, t }) {
     const timer = setTimeout(() => setVis(true), index * 80 + 100);
     return () => clearTimeout(timer);
   }, [index]);
-  const gradeColor = m.score >= 78 ? { bg: "rgba(197,160,40,0.12)", color: "#8B6914" } : m.score >= 65 ? { bg: "rgba(168,116,73,0.1)", color: "#8C7A6B" } : { bg: "rgba(168,116,73,0.06)", color: "#B9AC9E" };
+
+  const getGradeStyle = (grade) => {
+    const g = (grade || '').toUpperCase().trim();
+    if (g.startsWith('A')) {
+      return { color: "#7DBFA8", bg: "rgba(168,220,200,0.18)", border: "1px solid rgba(168,220,200,0.45)" };
+    }
+    if (g.startsWith('B')) {
+      return { color: "#82B8D8", bg: "rgba(168,200,232,0.18)", border: "1px solid rgba(168,200,232,0.45)" };
+    }
+    return { color: "#D4A0BC", bg: "rgba(232,184,212,0.18)", border: "1px solid rgba(232,184,212,0.45)" };
+  };
+
+  const gradeStyle = getGradeStyle(m.grade);
+
   return (
     <div style={{
       ...CARD, padding: "18px 20px",
@@ -524,7 +537,18 @@ function MetricCard({ m, index, t }) {
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 6, gap: 8, flexWrap: "wrap" }}>
           <span style={{ fontSize: 11, fontWeight: 600, letterSpacing: "0.1em", textTransform: "uppercase", color: "#3A2E26" }}>{m.label}</span>
           <div style={{ display: "flex", gap: 6, alignItems: "center", flexShrink: 0 }}>
-            <span style={{ fontSize: 10, fontWeight: 700, borderRadius: 6, padding: "3px 9px", background: gradeColor.bg, color: gradeColor.color, letterSpacing: "0.06em" }}>{m.grade}</span>
+            <span style={{
+              fontSize: 10,
+              fontWeight: 700,
+              borderRadius: 6,
+              padding: "3px 9px",
+              background: gradeStyle.bg,
+              color: gradeStyle.color,
+              border: gradeStyle.border,
+              letterSpacing: "0.06em"
+            }}>
+              {m.grade}
+            </span>
             {m.severity && t && <SeverityBadge severity={m.severity} t={t} />}
           </div>
         </div>
@@ -771,6 +795,285 @@ function ProductCard({ product, lang, t }) {
   );
 }
 
+const findMatchingProduct = (stepText, products) => {
+  if (!products || products.length === 0) return null;
+  const text = (stepText || '').toLowerCase();
+
+  // 1. Cleanser / Nettoyant
+  if (text.includes('nettoyer') || text.includes('nettoyant') || text.includes('cleanse') || text.includes('cleanser')) {
+    const found = products.find(p => {
+      const name = p.productName.toLowerCase();
+      return name.includes('cleanser') || name.includes('nettoyant');
+    });
+    if (found) return found;
+  }
+
+  // 2. Vitamin C / Vitamine C
+  if (text.includes('vitamine c') || text.includes('vitamin c') || text.includes('antioxydant')) {
+    const found = products.find(p => {
+      const name = p.productName.toLowerCase();
+      return name.includes('vitamin c') || name.includes('vitamine c') || name.includes('c-firma') || name.includes('ferulic') || name.includes('ascorbic');
+    });
+    if (found) return found;
+  }
+
+  // 3. Eye Cream / Cernes
+  if (text.includes('cernes') || text.includes('yeux') || text.includes('eye') || text.includes('eyes') || text.includes('orbital') || text.includes('caffeine')) {
+    const found = products.find(p => {
+      const name = p.productName.toLowerCase();
+      return name.includes('eye') || name.includes('yeux') || name.includes('caffeine') || name.includes('avocado') || name.includes('cernes');
+    });
+    if (found) return found;
+  }
+
+  // 4. Retinol / Rétinol
+  if (text.includes('rétinol') || text.includes('retinol')) {
+    const found = products.find(p => {
+      const name = p.productName.toLowerCase();
+      return name.includes('retinol') || name.includes('rétinol');
+    });
+    if (found) return found;
+  }
+
+  // 5. Exfoliant / AHA / BHA
+  if (text.includes('exfolier') || text.includes('exfoliant') || text.includes('bha') || text.includes('aha') || text.includes('acide glycolique') || text.includes('glycolic') || text.includes('salicylic') || text.includes('salicylique')) {
+    const found = products.find(p => {
+      const name = p.productName.toLowerCase();
+      return name.includes('exfoliant') || name.includes('bha') || name.includes('aha') || name.includes('peeling') || name.includes('smoothing') || name.includes('gel');
+    });
+    if (found) return found;
+  }
+
+  // 6. Niacinamide
+  if (text.includes('niacinamide') || text.includes('pores') || text.includes('sebum') || text.includes('sébum') || text.includes('brillance')) {
+    const found = products.find(p => {
+      const name = p.productName.toLowerCase();
+      return name.includes('niacinamide') || name.includes('zinc');
+    });
+    if (found) return found;
+  }
+
+  // 7. Hydration mask
+  if (text.includes('masque') || text.includes('mask') || text.includes('sleeping mask')) {
+    const found = products.find(p => {
+      const name = p.productName.toLowerCase();
+      return name.includes('mask') || name.includes('masque');
+    });
+    if (found) return found;
+  }
+
+  // 8. Moisturizer / Cream
+  if (text.includes('crème') || text.includes('cream') || text.includes('moisturizer') || text.includes('hydratante') || text.includes('hydrater') || text.includes('barrière') || text.includes('barrier') || text.includes('céramides') || text.includes('ceramide')) {
+    const found = products.find(p => {
+      const name = p.productName.toLowerCase();
+      return (name.includes('cream') || name.includes('moisturizer') || name.includes('crème')) && !name.includes('eye');
+    });
+    if (found) return found;
+  }
+
+  return null;
+};
+
+/* ── Custom luxury SVG icons ── */
+function SunIcon({ size = 18 }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="12" cy="12" r="4" stroke="#C9A961" strokeWidth="1.5" />
+      {/* Rays */}
+      <line x1="12" y1="2" x2="12" y2="5" stroke="#C9A961" strokeWidth="1.5" strokeLinecap="round" />
+      <line x1="12" y1="19" x2="12" y2="22" stroke="#C9A961" strokeWidth="1.5" strokeLinecap="round" />
+      <line x1="2" y1="12" x2="5" y2="12" stroke="#C9A961" strokeWidth="1.5" strokeLinecap="round" />
+      <line x1="19" y1="12" x2="22" y2="12" stroke="#C9A961" strokeWidth="1.5" strokeLinecap="round" />
+      <line x1="4.93" y1="4.93" x2="7.05" y2="7.05" stroke="#C9A961" strokeWidth="1.5" strokeLinecap="round" />
+      <line x1="16.95" y1="16.95" x2="19.07" y2="19.07" stroke="#C9A961" strokeWidth="1.5" strokeLinecap="round" />
+      <line x1="4.93" y1="19.07" x2="7.05" y2="16.95" stroke="#C9A961" strokeWidth="1.5" strokeLinecap="round" />
+      <line x1="16.95" y1="7.05" x2="19.07" y2="4.93" stroke="#C9A961" strokeWidth="1.5" strokeLinecap="round" />
+    </svg>
+  );
+}
+
+function MoonIcon({ size = 18 }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+      {/* Elegant crescent */}
+      <path
+        d="M21 12.79A9 9 0 1 1 11.21 3a7 7 0 0 0 9.79 9.79z"
+        stroke="#A87449"
+        strokeWidth="1.5"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        fill="rgba(168,116,73,0.08)"
+      />
+      {/* Small star accent */}
+      <circle cx="17" cy="6" r="0.8" fill="#C9A961" />
+      <circle cx="19.5" cy="9" r="0.5" fill="#C9A961" />
+    </svg>
+  );
+}
+
+function SparkleIcon({ size = 18 }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+      {/* Central 4-pointed star */}
+      <path
+        d="M12 2 L13.2 10.8 L22 12 L13.2 13.2 L12 22 L10.8 13.2 L2 12 L10.8 10.8 Z"
+        stroke="#C9A961"
+        strokeWidth="1.2"
+        strokeLinejoin="round"
+        fill="rgba(201,169,97,0.1)"
+      />
+      {/* Small accent stars */}
+      <path d="M19 3 L19.5 5.5 L22 6 L19.5 6.5 L19 9 L18.5 6.5 L16 6 L18.5 5.5 Z" fill="#C9A961" opacity="0.7" />
+      <path d="M5 16 L5.3 17.7 L7 18 L5.3 18.3 L5 20 L4.7 18.3 L3 18 L4.7 17.7 Z" fill="#A87449" opacity="0.6" />
+    </svg>
+  );
+}
+
+/* ── Inline product card for routine steps ── */
+function InlineProductCard({ product, t }) {
+  const [hov, setHov] = useState(false);
+  const amazonUrl = product.amazonLink || `https://www.amazon.fr/s?k=${encodeURIComponent(product.productName)}&tag=ratemyskin-21`;
+  const sephoraUrl = product.sephoraLink || `https://www.sephora.fr/search/?q=${encodeURIComponent(product.productName)}`;
+  const imgUrl = product.imageUrl || getProductImage(product.productName);
+
+  return (
+    <div
+      onMouseEnter={() => setHov(true)}
+      onMouseLeave={() => setHov(false)}
+      style={{
+        display: "flex",
+        flexDirection: "row",
+        gap: 10,
+        alignItems: "center",
+        background: "rgba(255, 255, 255, 0.65)",
+        border: hov ? "1px solid rgba(168, 116, 73, 0.4)" : "1px solid rgba(168, 116, 73, 0.15)",
+        borderRadius: 12,
+        padding: "8px 10px",
+        marginTop: 6,
+        boxShadow: hov ? "0 4px 12px rgba(168, 116, 73, 0.06)" : "none",
+        transition: "all 0.3s ease"
+      }}
+    >
+      {/* Image */}
+      <img
+        src={imgUrl}
+        alt={product.productName}
+        style={{
+          width: 38,
+          height: 38,
+          objectFit: "cover",
+          borderRadius: 8,
+          background: "#fff",
+          border: "1px solid rgba(168, 116, 73, 0.08)",
+          flexShrink: 0
+        }}
+      />
+
+      {/* Text block: name + description + price */}
+      <div style={{ flex: 1, minWidth: 0 }}>
+        <div style={{
+          fontSize: 11.5,
+          fontWeight: 700,
+          color: "#2C241D",
+          whiteSpace: "nowrap",
+          overflow: "hidden",
+          textOverflow: "ellipsis",
+          fontFamily: "'DM Sans', sans-serif",
+          lineHeight: 1.3
+        }}>
+          {product.productName}
+        </div>
+        {product.description && (
+          <p style={{
+            margin: "2px 0 0",
+            fontSize: 10,
+            lineHeight: 1.45,
+            color: "#8C7A6B",
+            fontFamily: "'DM Sans', sans-serif",
+            display: "-webkit-box",
+            WebkitLineClamp: 2,
+            WebkitBoxOrient: "vertical",
+            overflow: "hidden"
+          }}>
+            {product.description}
+          </p>
+        )}
+        <div style={{
+          fontSize: 10,
+          color: "#A87449",
+          fontWeight: 600,
+          fontFamily: "'DM Sans', sans-serif",
+          marginTop: 2
+        }}>
+          {product.price}
+        </div>
+      </div>
+
+      {/* Buttons: small, stacked vertically on right */}
+      <div style={{ display: "flex", flexDirection: "column", gap: 4, flexShrink: 0, alignItems: "center" }}>
+        {/* "Acheter" notch label */}
+        <div style={{
+          fontSize: 8,
+          fontWeight: 700,
+          letterSpacing: "0.12em",
+          textTransform: "uppercase",
+          color: "#C9A961",
+          fontFamily: "'DM Sans', sans-serif",
+          display: "flex",
+          alignItems: "center",
+          gap: 3,
+          paddingBottom: 2,
+          borderBottom: "1px solid rgba(201,169,97,0.25)",
+          width: "100%",
+          justifyContent: "center"
+        }}>
+          <span style={{ fontSize: 9 }}>🛍</span> Ajouter à ma skin care
+        </div>
+        <a
+          href={amazonUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="btn-liquid-glass-dark"
+          style={{
+            padding: "4px 9px",
+            borderRadius: 5,
+            fontSize: 9,
+            fontWeight: 700,
+            textDecoration: "none",
+            whiteSpace: "nowrap",
+            border: "none",
+            fontFamily: "'DM Sans', sans-serif",
+            textAlign: "center",
+            letterSpacing: "0.03em"
+          }}
+        >
+          Amazon
+        </a>
+        <a
+          href={sephoraUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="btn-liquid-glass"
+          style={{
+            padding: "4px 9px",
+            borderRadius: 5,
+            fontSize: 9,
+            fontWeight: 700,
+            textDecoration: "none",
+            whiteSpace: "nowrap",
+            border: "none",
+            fontFamily: "'DM Sans', sans-serif",
+            textAlign: "center",
+            letterSpacing: "0.03em"
+          }}
+        >
+          Sephora
+        </a>
+      </div>
+    </div>
+  );
+}
+
 /* ── Severity badge ── */
 function SeverityBadge({ severity, t }) {
   const configs = {
@@ -990,7 +1293,81 @@ export default function BeautyReport({ data: rawData, isPaid, onUnlock }) {
   const displayImprovements = isPaid ? (paid.improvements || []) : previewImprovements;
   const displayProducts = isPaid ? (paid.productRecommendations || []) : allProducts;
 
-  const TABS = [t('tabMetrics'), t('tabStrengths'), t('tabImprove'), t('tabRoutine'), t('tabShop'), t('tabLifestyle'), t('tabPlan')];
+  const TABS_CONFIG = [
+    {
+      label: t('tabMetrics'),
+      short: lang === 'fr' ? 'Métriques' : 'Metrics',
+      icon: (
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+          <rect x="3" y="14" width="4" height="7" rx="1"/>
+          <rect x="10" y="9" width="4" height="12" rx="1"/>
+          <rect x="17" y="4" width="4" height="17" rx="1"/>
+        </svg>
+      )
+    },
+    {
+      label: t('tabStrengths'),
+      short: lang === 'fr' ? 'Atouts' : 'Strengths',
+      icon: (
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+        </svg>
+      )
+    },
+    {
+      label: t('tabImprove'),
+      short: lang === 'fr' ? 'Améliorer' : 'Improve',
+      icon: (
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+          <path d="M9 11l3 3L22 4"/>
+        </svg>
+      )
+    },
+    {
+      label: t('tabRoutine'),
+      short: lang === 'fr' ? 'Routine' : 'Routine',
+      icon: (
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M12 2C8 2 5 5 5 9v8a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V9c0-4-3-7-7-7z"/>
+          <line x1="5" y1="13" x2="19" y2="13"/>
+          <path d="M9 17h6"/>
+        </svg>
+      )
+    },
+    {
+      label: t('tabShop'),
+      short: lang === 'fr' ? 'Produits' : 'Shop',
+      icon: (
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/>
+          <line x1="3" y1="6" x2="21" y2="6"/>
+          <path d="M16 10a4 4 0 0 1-8 0"/>
+        </svg>
+      )
+    },
+    {
+      label: t('tabLifestyle'),
+      short: lang === 'fr' ? 'Style de vie' : 'Lifestyle',
+      icon: (
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 8.4 19 14a7 7 0 0 1-8 6z"/>
+          <path d="M11 20V12"/>
+        </svg>
+      )
+    },
+    {
+      label: t('tabPlan'),
+      short: lang === 'fr' ? 'Plan' : 'Plan',
+      icon: (
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M3 3h7v7H3zM14 3h7v7h-7zM14 14h7v7h-7zM3 14h7v7H3z" rx="1"/>
+          <path d="M10 6.5h4M6.5 10v4M17.5 10v4M10 17.5h4" strokeDasharray="2 2"/>
+        </svg>
+      )
+    },
+  ];
+  const TABS = TABS_CONFIG.map(t => t.label);
 
   return (
     <div style={{ background: "transparent", minHeight: "100vh", fontFamily: "'DM Sans', sans-serif", paddingBottom: 80 }}>
@@ -1276,42 +1653,108 @@ export default function BeautyReport({ data: rawData, isPaid, onUnlock }) {
         {shareMsg && <p style={{ margin: "10px 0 0", fontSize: 12, color: "#A87449", textAlign: "center", fontFamily: "'DM Sans', sans-serif" }}>{shareMsg}</p>}
       </div>
 
-      {/* ── Clickable tab preview bar (ALWAYS DISPLAYED) ── */}
-      <div style={{ maxWidth: 680, margin: "24px auto 0", padding: "0 20px" }}>
+      {/* ── Tab navigation: sticky bottom bar on mobile, pill row on desktop ── */}
+      <style>{`
+        @media (max-width: 640px) {
+          .rpt-tabs-desktop { display: none !important; }
+          .rpt-tabs-mobile { display: flex !important; }
+        }
+        @media (min-width: 641px) {
+          .rpt-tabs-desktop { display: flex !important; }
+          .rpt-tabs-mobile { display: none !important; }
+        }
+      `}</style>
+
+      {/* Desktop: scrollable pill row */}
+      <div className="rpt-tabs-desktop" style={{ maxWidth: 680, margin: "24px auto 0", padding: "0 20px" }}>
         {!isPaid && (
           <p style={{ ...LABEL_STYLE, textAlign: "center", marginBottom: 10 }}>
             {t('previewLabel')}
           </p>
         )}
-        <div className="rpt-tabs" style={{
-          display: "flex", gap: 4,
+        <div style={{
+          display: "flex", gap: 4, overflowX: "auto",
           background: "rgba(255,255,255,0.55)",
           backdropFilter: "blur(18px) saturate(150%)", WebkitBackdropFilter: "blur(18px) saturate(150%)",
           border: "1px solid rgba(255,255,255,0.65)",
           borderRadius: 14, padding: 4,
-          boxShadow: "0 8px 32px rgba(168,116,73,0.03), inset 0 1px 1px rgba(255, 255, 255, 0.8)",
+          boxShadow: "0 8px 32px rgba(168,116,73,0.03), inset 0 1px 1px rgba(255,255,255,0.8)",
           scrollbarWidth: "none"
         }}>
-          {TABS.map((label, i) => (
-            <button key={label} onClick={() => setPreviewTab(i)} className="rpt-tab-btn" style={{
-              flex: 1, padding: "11px 4px", borderRadius: 10, textAlign: "center",
-              background: previewTab === i ? "linear-gradient(135deg, rgba(44, 36, 29, 0.85), rgba(28, 22, 17, 0.92))" : "transparent",
+          {TABS_CONFIG.map((tab, i) => (
+            <button key={i} onClick={() => setPreviewTab(i)} className="rpt-tab-btn" style={{
+              flex: "0 0 auto", padding: "10px 14px", borderRadius: 10, textAlign: "center",
+              background: previewTab === i ? "linear-gradient(135deg, rgba(44,36,29,0.88), rgba(28,22,17,0.94))" : "transparent",
               color: previewTab === i ? "#fff" : "#6F6156",
-              fontSize: 9, fontWeight: 600, letterSpacing: "0.06em",
+              fontSize: 9.5, fontWeight: 600, letterSpacing: "0.07em",
               fontFamily: "'DM Sans', sans-serif", textTransform: "uppercase",
-              border: previewTab === i ? "1px solid rgba(255, 255, 255, 0.15)" : "none", cursor: "pointer", transition: "all 0.25s ease",
+              border: previewTab === i ? "1px solid rgba(255,255,255,0.15)" : "none",
+              cursor: "pointer", transition: "all 0.25s ease",
               boxShadow: previewTab === i ? "0 4px 14px rgba(44,36,29,0.15)" : "none",
               whiteSpace: "nowrap",
-            }}>{label}</button>
+            }}>{tab.short}</button>
           ))}
         </div>
+      </div>
+
+      {/* Mobile: sticky bottom navigation bar */}
+      <div className="rpt-tabs-mobile" style={{
+        display: "none",
+        position: "fixed", bottom: 0, left: 0, right: 0, zIndex: 100,
+        background: "rgba(255, 252, 248, 0.92)",
+        backdropFilter: "blur(24px) saturate(180%)",
+        WebkitBackdropFilter: "blur(24px) saturate(180%)",
+        borderTop: "1px solid rgba(201, 169, 97, 0.18)",
+        boxShadow: "0 -8px 32px rgba(44,36,29,0.08)",
+        padding: "6px 4px calc(6px + env(safe-area-inset-bottom))",
+        justifyContent: "space-around", alignItems: "center",
+        gap: 0,
+      }}>
+        {TABS_CONFIG.map((tab, i) => (
+          <button
+            key={i}
+            onClick={() => setPreviewTab(i)}
+            style={{
+              display: "flex", flexDirection: "column", alignItems: "center", gap: 3,
+              background: "none", border: "none", cursor: "pointer",
+              padding: "6px 8px",
+              color: previewTab === i ? "#C9A961" : "#9E8A7A",
+              transition: "all 0.2s ease",
+              minWidth: 0, flex: 1,
+            }}
+          >
+            {/* Icon with active indicator dot */}
+            <div style={{ position: "relative", display: "flex", alignItems: "center", justifyContent: "center" }}>
+              {tab.icon}
+              {previewTab === i && (
+                <div style={{
+                  position: "absolute", top: -6, left: "50%", transform: "translateX(-50%)",
+                  width: 18, height: 2, borderRadius: 2,
+                  background: "linear-gradient(90deg, #C9A961, #A87449)",
+                }} />
+              )}
+            </div>
+            <span style={{
+              fontSize: 8.5, fontWeight: previewTab === i ? 700 : 500,
+              fontFamily: "'DM Sans', sans-serif",
+              letterSpacing: "0.04em",
+              textTransform: "uppercase",
+              whiteSpace: "nowrap",
+              overflow: "hidden", textOverflow: "ellipsis",
+              maxWidth: 52,
+              lineHeight: 1.2,
+            }}>
+              {tab.short}
+            </span>
+          </button>
+        ))}
       </div>
 
       {/* ── Tab content (Blurred for unpaid, interactive and complete for paid) ── */}
       <div style={{
         maxWidth: 680,
         margin: "10px auto 0",
-        padding: "0 20px 60px",
+        padding: "0 20px 100px",
         filter: isPaid ? "none" : "blur(5px)",
         opacity: isPaid ? 1 : 0.3,
         pointerEvents: isPaid ? "auto" : "none",
@@ -1320,6 +1763,88 @@ export default function BeautyReport({ data: rawData, isPaid, onUnlock }) {
         {previewTab === 0 && (
           <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
             {displayMetrics.map((m, i) => <MetricCard key={i} m={m} index={i} t={t} />)}
+
+            <div style={{
+              ...CARD,
+              marginTop: 14,
+              padding: "18px 20px",
+              background: "linear-gradient(135deg, rgba(255, 255, 255, 0.7) 0%, rgba(253, 246, 237, 0.45) 100%)",
+              display: "flex",
+              flexDirection: "column",
+              gap: 12
+            }}>
+              <div style={{
+                fontSize: 10,
+                fontWeight: 700,
+                letterSpacing: "0.1em",
+                textTransform: "uppercase",
+                color: "#A87449",
+                fontFamily: "'DM Sans', sans-serif",
+                borderBottom: "1px solid rgba(168, 116, 73, 0.1)",
+                paddingBottom: 6
+              }}>
+                {lang === 'fr' ? "Comprendre les Notes" : "Understanding the Grades"}
+              </div>
+              <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+                {/* Grade A */}
+                <div style={{ display: "flex", gap: 12, alignItems: "center" }}>
+                  <span style={{
+                    fontSize: 10,
+                    fontWeight: 700,
+                    borderRadius: 6,
+                    padding: "3px 9px",
+                    width: 32,
+                    textAlign: "center",
+                    background: "rgba(168,220,200,0.18)",
+                    color: "#7DBFA8",
+                    border: "1px solid rgba(168,220,200,0.45)",
+                    letterSpacing: "0.06em",
+                    flexShrink: 0
+                  }}>A</span>
+                  <p style={{ margin: 0, fontSize: 12, lineHeight: 1.5, color: "#6F6156" }}>
+                    <strong>{lang === 'fr' ? "Optimal / Excellent" : "Optimal / Excellent"}</strong> : {lang === 'fr' ? "La zone présente une excellente santé cutanée avec une barrière protectrice optimale et aucune imperfection notable." : "The area shows excellent skin health with an optimal protective barrier and no notable concerns."}
+                  </p>
+                </div>
+                {/* Grade B */}
+                <div style={{ display: "flex", gap: 12, alignItems: "center" }}>
+                  <span style={{
+                    fontSize: 10,
+                    fontWeight: 700,
+                    borderRadius: 6,
+                    padding: "3px 9px",
+                    width: 32,
+                    textAlign: "center",
+                    background: "rgba(168,200,232,0.18)",
+                    color: "#82B8D8",
+                    border: "1px solid rgba(168,200,232,0.45)",
+                    letterSpacing: "0.06em",
+                    flexShrink: 0
+                  }}>B</span>
+                  <p style={{ margin: 0, fontSize: 12, lineHeight: 1.5, color: "#6F6156" }}>
+                    <strong>{lang === 'fr' ? "Bon / Léger" : "Good / Mild"}</strong> : {lang === 'fr' ? "Bon état général. De légères variations (sébum, déshydratation passagère) sont détectées et peuvent être facilement corrigées." : "Good overall condition. Mild variations (sebum, temporary dehydration) are detected and can be easily corrected."}
+                  </p>
+                </div>
+                {/* Grade C - D */}
+                <div style={{ display: "flex", gap: 12, alignItems: "center" }}>
+                  <span style={{
+                    fontSize: 10,
+                    fontWeight: 700,
+                    borderRadius: 6,
+                    padding: "3px 9px",
+                    width: 32,
+                    textAlign: "center",
+                    background: "rgba(232,184,212,0.18)",
+                    color: "#D4A0BC",
+                    border: "1px solid rgba(232,184,212,0.45)",
+                    letterSpacing: "0.06em",
+                    flexShrink: 0
+                  }}>C - D</span>
+                  <p style={{ margin: 0, fontSize: 12, lineHeight: 1.5, color: "#6F6156" }}>
+                    <strong>{lang === 'fr' ? "À surveiller / Modéré à Significatif" : "Needs Attention / Moderate to Significant"}</strong> : {lang === 'fr' ? "Imperfections ou déséquilibres plus marqués (cernes prononcés, rougeurs, pores dilatés) nécessitant des soins ciblés." : "More pronounced concerns or imbalances (noticeable dark circles, redness, enlarged pores) requiring targeted care."}
+                  </p>
+                </div>
+              </div>
+            </div>
           </div>
         )}
         {previewTab === 1 && (
@@ -1349,7 +1874,7 @@ export default function BeautyReport({ data: rawData, isPaid, onUnlock }) {
                 {t('routineUnavailable')}
               </div>
             ) : (
-              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: 16 }}>
+              <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
                 {(routine.morning || []).length > 0 && (
                   <div style={{
                     ...CARD,
@@ -1361,18 +1886,28 @@ export default function BeautyReport({ data: rawData, isPaid, onUnlock }) {
                     gap: 12
                   }}>
                     <div style={{ display: "flex", alignItems: "center", gap: 8, borderBottom: "1px solid rgba(168,116,73,0.12)", paddingBottom: 8 }}>
-                      <span style={{ color: "#F6C667", fontSize: 16 }}>☀️</span>
+                      <SunIcon size={18} />
                       <span style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", color: "#3A2E26", fontFamily: "'DM Sans', sans-serif" }}>
                         {t('routineMorning')}
                       </span>
                     </div>
                     <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-                      {(routine.morning || []).map((step, idx) => (
-                        <div key={idx} style={{ display: "flex", gap: 8, alignItems: "flex-start" }}>
-                          <span style={{ color: GOLD, fontSize: 11, fontWeight: 700, minWidth: 16 }}>{idx + 1}.</span>
-                          <p style={{ margin: 0, fontSize: 12.5, lineHeight: 1.6, color: "#6F6156" }}>{step}</p>
-                        </div>
-                      ))}
+                      {(routine.morning || []).map((step, idx) => {
+                        const matchedProduct = findMatchingProduct(step, paid.productRecommendations || []);
+                        return (
+                          <div key={idx} style={{ display: "flex", flexDirection: "column", gap: 4 }}>
+                            <div style={{ display: "flex", gap: 8, alignItems: "flex-start" }}>
+                              <span style={{ color: GOLD, fontSize: 11, fontWeight: 700, minWidth: 16 }}>{idx + 1}.</span>
+                              <p style={{ margin: 0, fontSize: 12.5, lineHeight: 1.6, color: "#6F6156" }}>{step}</p>
+                            </div>
+                            {matchedProduct && (
+                              <div style={{ marginLeft: 24 }}>
+                                <InlineProductCard product={matchedProduct} t={t} />
+                              </div>
+                            )}
+                          </div>
+                        );
+                      })}
                     </div>
                   </div>
                 )}
@@ -1388,18 +1923,28 @@ export default function BeautyReport({ data: rawData, isPaid, onUnlock }) {
                     gap: 12
                   }}>
                     <div style={{ display: "flex", alignItems: "center", gap: 8, borderBottom: "1px solid rgba(168,116,73,0.12)", paddingBottom: 8 }}>
-                      <span style={{ color: "#8C7A6B", fontSize: 16 }}>🌙</span>
+                      <MoonIcon size={18} />
                       <span style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", color: "#3A2E26", fontFamily: "'DM Sans', sans-serif" }}>
                         {t('routineEvening')}
                       </span>
                     </div>
                     <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-                      {(routine.evening || []).map((step, idx) => (
-                        <div key={idx} style={{ display: "flex", gap: 8, alignItems: "flex-start" }}>
-                          <span style={{ color: GOLD, fontSize: 11, fontWeight: 700, minWidth: 16 }}>{idx + 1}.</span>
-                          <p style={{ margin: 0, fontSize: 12.5, lineHeight: 1.6, color: "#6F6156" }}>{step}</p>
-                        </div>
-                      ))}
+                      {(routine.evening || []).map((step, idx) => {
+                        const matchedProduct = findMatchingProduct(step, paid.productRecommendations || []);
+                        return (
+                          <div key={idx} style={{ display: "flex", flexDirection: "column", gap: 4 }}>
+                            <div style={{ display: "flex", gap: 8, alignItems: "flex-start" }}>
+                              <span style={{ color: GOLD, fontSize: 11, fontWeight: 700, minWidth: 16 }}>{idx + 1}.</span>
+                              <p style={{ margin: 0, fontSize: 12.5, lineHeight: 1.6, color: "#6F6156" }}>{step}</p>
+                            </div>
+                            {matchedProduct && (
+                              <div style={{ marginLeft: 24 }}>
+                                <InlineProductCard product={matchedProduct} t={t} />
+                              </div>
+                            )}
+                          </div>
+                        );
+                      })}
                     </div>
                   </div>
                 )}
@@ -1415,18 +1960,28 @@ export default function BeautyReport({ data: rawData, isPaid, onUnlock }) {
                     gap: 12
                   }}>
                     <div style={{ display: "flex", alignItems: "center", gap: 8, borderBottom: "1px solid rgba(168,116,73,0.12)", paddingBottom: 8 }}>
-                      <span style={{ color: GOLD, fontSize: 16 }}>✨</span>
+                      <SparkleIcon size={18} />
                       <span style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", color: "#3A2E26", fontFamily: "'DM Sans', sans-serif" }}>
                         {t('routineWeekly')}
                       </span>
                     </div>
                     <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-                      {(routine.weekly || []).map((step, idx) => (
-                        <div key={idx} style={{ display: "flex", gap: 8, alignItems: "flex-start" }}>
-                          <span style={{ color: GOLD, fontSize: 11, fontWeight: 700, minWidth: 16 }}>{idx + 1}.</span>
-                          <p style={{ margin: 0, fontSize: 12.5, lineHeight: 1.6, color: "#6F6156" }}>{step}</p>
-                        </div>
-                      ))}
+                      {(routine.weekly || []).map((step, idx) => {
+                        const matchedProduct = findMatchingProduct(step, paid.productRecommendations || []);
+                        return (
+                          <div key={idx} style={{ display: "flex", flexDirection: "column", gap: 4 }}>
+                            <div style={{ display: "flex", gap: 8, alignItems: "flex-start" }}>
+                              <span style={{ color: GOLD, fontSize: 11, fontWeight: 700, minWidth: 16 }}>{idx + 1}.</span>
+                              <p style={{ margin: 0, fontSize: 12.5, lineHeight: 1.6, color: "#6F6156" }}>{step}</p>
+                            </div>
+                            {matchedProduct && (
+                              <div style={{ marginLeft: 24 }}>
+                                <InlineProductCard product={matchedProduct} t={t} />
+                              </div>
+                            )}
+                          </div>
+                        );
+                      })}
                     </div>
                   </div>
                 )}

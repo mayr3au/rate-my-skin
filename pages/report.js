@@ -121,6 +121,7 @@ export default function Report() {
             ],
             evening: [
               "Double nettoyage pour éliminer la pollution.",
+              "Appliquer délicatement une crème contour des yeux pour cibler les cernes.",
               "Appliquer du Rétinol 0,3 % pour stimuler le renouvellement cellulaire.",
               "Utiliser une crème riche en céramides pour renforcer la barrière cutanée."
             ],
@@ -136,6 +137,7 @@ export default function Report() {
             ],
             evening: [
               "Double cleanse to remove pollution.",
+              "Gently apply an eye repair cream to target dark circles.",
               "Apply Retinol 0.3% to boost cellular turnover.",
               "Use a ceramide-rich barrier support cream."
             ],
@@ -155,6 +157,61 @@ export default function Report() {
               sephoraLink: "https://www.sephora.fr/search/?q=CeraVe+Eye+Repair+Cream",
               price: "€14.50",
               imageUrl: "https://images.unsplash.com/photo-1608248597481-496100c80836?q=80&w=200&auto=format&fit=crop"
+            },
+            {
+              skinProblem: isFr ? "Nettoyage" : "Cleansing",
+              productName: "CeraVe SA Cleanser",
+              description: isFr
+                ? "Nettoyant doux enrichi en acide salicylique et céramides pour désincruster les pores tout en douceur."
+                : "Gentle cleanser enriched with salicylic acid and ceramides to unclog pores and smooth texture.",
+              amazonLink: "https://www.amazon.fr/s?k=CeraVe+SA+Cleanser&tag=ratemyskin-21",
+              sephoraLink: "https://www.sephora.fr/search/?q=CeraVe+SA+Cleanser",
+              price: "€13.90",
+              imageUrl: "https://images.unsplash.com/photo-1556228578-0d85b1a4d571?q=80&w=240&auto=format&fit=crop"
+            },
+            {
+              skinProblem: isFr ? "Éclat & Antioxydant" : "Radiance & Antioxidant",
+              productName: "SkinCeuticals C E Ferulic",
+              description: isFr
+                ? "Sérum antioxydant de référence à la vitamine C pure pour illuminer le teint et protéger des rayons UV."
+                : "Gold-standard pure Vitamin C antioxidant serum to brighten the skin tone and protect against UV rays.",
+              amazonLink: "https://www.amazon.fr/s?k=SkinCeuticals+C+E+Ferulic&tag=ratemyskin-21",
+              sephoraLink: "https://www.sephora.fr/search/?q=SkinCeuticals+C+E+Ferulic",
+              price: "€165.00",
+              imageUrl: "https://images.unsplash.com/photo-1617897903246-719242758050?q=80&w=240&auto=format&fit=crop"
+            },
+            {
+              skinProblem: isFr ? "Hydratation" : "Hydration",
+              productName: "CeraVe Moisturising Cream",
+              description: isFr
+                ? "Crème riche réparatrice aux 3 céramides essentiels pour hydrater et restaurer la barrière cutanée."
+                : "Rich restorative cream with 3 essential ceramides to hydrate and restore the protective skin barrier.",
+              amazonLink: "https://www.amazon.fr/s?k=CeraVe+Moisturising+Cream&tag=ratemyskin-21",
+              sephoraLink: "https://www.sephora.fr/search/?q=CeraVe+Moisturising+Cream",
+              price: "€15.00",
+              imageUrl: "https://images.unsplash.com/photo-1556228578-0d85b1a4d571?q=80&w=240&auto=format&fit=crop"
+            },
+            {
+              skinProblem: isFr ? "Exfoliation" : "Exfoliation",
+              productName: "Paula's Choice 2% BHA Exfoliant",
+              description: isFr
+                ? "Lotion exfoliante culte à l'acide salicylique qui élimine les points noirs et resserre visiblement les pores."
+                : "Cult-favourite salicylic acid exfoliant that clears blackheads, unclogs pores, and refines texture.",
+              amazonLink: "https://www.amazon.fr/s?k=Paulas+Choice+2%25+BHA&tag=ratemyskin-21",
+              sephoraLink: "https://www.sephora.fr/search/?q=Paulas+Choice+2%25+BHA",
+              price: "€34.00",
+              imageUrl: "https://images.unsplash.com/photo-1556228720-195a672e8a03?q=80&w=240&auto=format&fit=crop"
+            },
+            {
+              skinProblem: isFr ? "Hydratation de nuit" : "Overnight Hydration",
+              productName: "Laneige Water Sleeping Mask",
+              description: isFr
+                ? "Masque de nuit en gel ultra-frais qui désaltère la peau déshydratée pendant le sommeil."
+                : "Ultra-fresh overnight gel mask that deeply rehydrates the skin and supports barrier repair during sleep.",
+              amazonLink: "https://www.amazon.fr/s?k=Laneige+Water+Sleeping+Mask&tag=ratemyskin-21",
+              sephoraLink: "https://www.sephora.fr/search/?q=Laneige+Water+Sleeping+Mask",
+              price: "€29.00",
+              imageUrl: "https://images.unsplash.com/photo-1571781926291-c477ebfd024b?q=80&w=240&auto=format&fit=crop"
             }
           ],
           lifestyle: isFr ? {
