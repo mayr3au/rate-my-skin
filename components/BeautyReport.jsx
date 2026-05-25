@@ -1770,20 +1770,14 @@ export default function BeautyReport({ data: rawData, isPaid, onUnlock }) {
               flex: "0 0 auto",
               display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 4,
               background: "none", border: "none", cursor: "pointer",
-              padding: "8px 10px",
+              padding: "8px 10px 14px",
               color: previewTab === i ? "#C9A961" : "#9E8A7A",
               transition: "all 0.2s ease",
               minWidth: 0,
+              position: "relative"
             }}>
-              <div style={{ position: "relative", display: "flex", alignItems: "center", justifyContent: "center" }}>
+              <div style={{ display: "flex", alignItems: "center", justifyContent: "center" }}>
                 {tab.icon}
-                {previewTab === i && (
-                  <div style={{
-                    position: "absolute", top: -6, left: "50%", transform: "translateX(-50%)",
-                    width: 32, height: 2, borderRadius: 2,
-                    background: "linear-gradient(90deg, #C9A961, #A87449)",
-                  }} />
-                )}
               </div>
               <span style={{
                 fontSize: 8.5, fontWeight: previewTab === i ? 700 : 500,
@@ -1798,6 +1792,13 @@ export default function BeautyReport({ data: rawData, isPaid, onUnlock }) {
               }}>
                 {tab.short}
               </span>
+              {previewTab === i && (
+                <div style={{
+                  position: "absolute", bottom: 4, left: "50%", transform: "translateX(-50%)",
+                  width: 32, height: 2, borderRadius: 2,
+                  background: "linear-gradient(90deg, #C9A961, #A87449)",
+                }} />
+              )}
             </button>
           ))}
         </div>
