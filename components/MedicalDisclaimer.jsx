@@ -3,7 +3,7 @@ import { useLang } from '../lib/LangContext';
 
 const TEXT = {
   fr: {
-    short: "Cette analyse est fournie à titre informatif uniquement et ne remplace pas un avis médical professionnel. Pour tout problème de peau persistant, douloureux ou inhabituel, consultez un dermatologue.",
+    short: "Cette analyse est fournie uniquement à titre informatif et ne remplace pas un avis médical professionnel. Pour tout problème de peau persistant, douloureux ou inhabituel, consultez un dermatologue.",
     readMore: "Lire plus",
   },
   en: {

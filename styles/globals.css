@@ -49,8 +49,8 @@ body::before {
   backdrop-filter: blur(25px) saturate(150%);
   -webkit-backdrop-filter: blur(25px) saturate(150%);
   border: 1px solid rgba(255, 255, 255, 0.75);
-  box-shadow: 
-    0 8px 32px rgba(168, 116, 73, 0.03), 
+  box-shadow:
+    0 8px 32px rgba(168, 116, 73, 0.03),
     inset 0 1px 0 0 rgba(255, 255, 255, 0.75);
   transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
 }
@@ -60,8 +60,8 @@ body::before {
   backdrop-filter: blur(25px) saturate(150%);
   -webkit-backdrop-filter: blur(25px) saturate(150%);
   border: 1px solid rgba(255, 255, 255, 0.85);
-  box-shadow: 
-    0 8px 32px rgba(168, 116, 73, 0.02), 
+  box-shadow:
+    0 8px 32px rgba(168, 116, 73, 0.02),
     inset 0 1px 0 0 rgba(255, 255, 255, 0.95);
   transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
 }
@@ -72,16 +72,16 @@ body::before {
   backdrop-filter: blur(25px) saturate(150%);
   -webkit-backdrop-filter: blur(25px) saturate(150%);
   border: 1px solid rgba(255, 255, 255, 0.85);
-  box-shadow: 
-    0 8px 32px rgba(168, 116, 73, 0.02), 
+  box-shadow:
+    0 8px 32px rgba(168, 116, 73, 0.02),
     inset 0 1px 0 0 rgba(255, 255, 255, 0.95);
   transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .bubble-nacré:hover {
   background: rgba(255, 255, 255, 0.9);
-  box-shadow: 
-    0 14px 40px rgba(168, 116, 73, 0.06), 
+  box-shadow:
+    0 14px 40px rgba(168, 116, 73, 0.06),
     inset 0 1px 0 0 rgba(255, 255, 255, 0.98);
   transform: translateY(-4px) scale(1.03);
 }
@@ -96,8 +96,8 @@ body::before {
   backdrop-filter: blur(15px) saturate(140%) !important;
   -webkit-backdrop-filter: blur(15px) saturate(140%) !important;
   border: 1px solid rgba(255, 255, 255, 0.85) !important;
-  box-shadow: 
-    inset 0 1px 1px rgba(255, 255, 255, 0.95), 
+  box-shadow:
+    inset 0 1px 1px rgba(255, 255, 255, 0.95),
     0 4px 12px rgba(180, 160, 140, 0.03) !important;
   transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
 }
@@ -105,8 +105,8 @@ body::before {
 .input-nacré:focus {
   background: rgba(255, 255, 255, 0.95) !important;
   border-color: rgba(168, 116, 73, 0.45) !important;
-  box-shadow: 
-    inset 0 1px 1px rgba(255, 255, 255, 0.98), 
+  box-shadow:
+    inset 0 1px 1px rgba(255, 255, 255, 0.98),
     0 0 0 2px rgba(168, 116, 73, 0.15),
     0 6px 16px rgba(168, 116, 73, 0.05) !important;
 }
@@ -126,13 +126,16 @@ body::before {
 }
 
 @media (max-width: 600px) {
+
   /* Fix mobile viewport background gradient scroll bug */
   body {
     background-attachment: scroll !important;
   }
 
   /* Keep the organic paper grain texture for high-end tactile feel */
-  body::before { opacity: 0.025; }
+  body::before {
+    opacity: 0.025;
+  }
 
   /* Beautiful high-end glassmorphic mobile navigation */
   .nav-blur {
@@ -354,28 +357,56 @@ body::before {
 }
 
 /* ── Logo sizes ── */
-.logo-text-rate { font-size: 20px; }
-.logo-text-skin { font-size: 27px; }
+.logo-text-rate {
+  font-size: 20px;
+}
+
+.logo-text-skin {
+  font-size: 27px;
+}
 
 /* ── Mobile Ergonomics ── */
 @media (max-width: 600px) {
-  .logo-text-rate { font-size: 16px; }
-  .logo-text-skin { font-size: 22px; }
-  .logo-diamond { font-size: 5px !important; }
+  .logo-text-rate {
+    font-size: 16px;
+  }
 
-  .mobile-hide { display: none !important; }
-  .mobile-padding { padding-left: 16px !important; padding-right: 16px !important; }
-  .mobile-compact-text { font-size: 0.9em !important; line-height: 1.5 !important; }
-  .mobile-small-title { font-size: 24px !important; }
+  .logo-text-skin {
+    font-size: 22px;
+  }
+
+  .logo-diamond {
+    font-size: 5px !important;
+  }
+
+  .mobile-hide {
+    display: none !important;
+  }
+
+  .mobile-padding {
+    padding-left: 16px !important;
+    padding-right: 16px !important;
+  }
+
+  .mobile-compact-text {
+    font-size: 0.9em !important;
+    line-height: 1.5 !important;
+  }
+
+  .mobile-small-title {
+    font-size: 24px !important;
+  }
 }
 
 /* ── Report responsive ── */
 @media (max-width: 600px) {
+
   /* Score hero: vertical stack on mobile */
   .rpt-hero-inner {
     flex-direction: column !important;
     gap: 16px !important;
   }
+
   .rpt-score-block {
     display: flex !important;
     flex-direction: row !important;
@@ -383,53 +414,129 @@ body::before {
     gap: 16px !important;
     width: 100% !important;
   }
-  .rpt-score-number { font-size: 64px !important; }
-  .rpt-score-bar { width: 100% !important; margin: 6px 0 0 !important; }
-  .rpt-hero-summary { min-width: 0 !important; width: 100% !important; }
+
+  .rpt-score-number {
+    font-size: 64px !important;
+  }
+
+  .rpt-score-bar {
+    width: 100% !important;
+    margin: 6px 0 0 !important;
+  }
+
+  .rpt-hero-summary {
+    min-width: 0 !important;
+    width: 100% !important;
+  }
 
   /* Tabs: scrollable, don't shrink labels */
-  .rpt-tabs { overflow-x: auto !important; -webkit-overflow-scrolling: touch !important; padding-bottom: 2px !important; }
-  .rpt-tab-btn { flex-shrink: 0 !important; min-width: 54px !important; padding: 10px 4px !important; font-size: 9px !important; }
+  .rpt-tabs {
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+    padding-bottom: 2px !important;
+  }
+
+  .rpt-tab-btn {
+    flex-shrink: 0 !important;
+    min-width: 54px !important;
+    padding: 10px 4px !important;
+    font-size: 9px !important;
+  }
 
   /* Mini metrics strip */
-  .rpt-mini-metric { padding: 0 8px !important; }
+  .rpt-mini-metric {
+    padding: 0 8px !important;
+  }
 
   /* Product buy buttons: stack vertically */
-  .rpt-product-btns { flex-direction: column !important; width: 100% !important; gap: 8px !important; }
-  .rpt-product-btns a { text-align: center !important; display: block !important; }
+  .rpt-product-btns {
+    flex-direction: column !important;
+    width: 100% !important;
+    gap: 8px !important;
+  }
+
+  .rpt-product-btns a {
+    text-align: center !important;
+    display: block !important;
+  }
 
   /* Metric card: smaller ring — resize wrapper + svg together so overlay stays centred */
-  .rpt-metric-ring { width: 46px !important; height: 46px !important; }
-  .rpt-metric-ring svg { width: 46px !important; height: 46px !important; }
+  .rpt-metric-ring {
+    width: 46px !important;
+    height: 46px !important;
+  }
+
+  .rpt-metric-ring svg {
+    width: 46px !important;
+    height: 46px !important;
+  }
 
   /* Metric detail text: prevent long clinical terms from overflowing */
-  .rpt-metric-detail { font-size: 11px !important; line-height: 1.55 !important; }
+  .rpt-metric-detail {
+    font-size: 11px !important;
+    line-height: 1.55 !important;
+  }
 
   /* Section heading badge: hide on mobile to save space */
-  .rpt-section-badge { display: none !important; }
+  .rpt-section-badge {
+    display: none !important;
+  }
 
   /* Card padding reduction */
-  .rpt-card-compact { padding: 16px !important; }
-  .rpt-card-hero { padding: 20px 16px !important; }
+  .rpt-card-compact {
+    padding: 16px !important;
+  }
+
+  .rpt-card-hero {
+    padding: 20px 16px !important;
+  }
 
   /* Report page nav */
-  .rpt-nav { padding: 10px 16px !important; }
-  .rpt-nav-cta { padding: 8px 14px !important; font-size: 11px !important; border-radius: 8px !important; }
+  .rpt-nav {
+    padding: 10px 16px !important;
+  }
+
+  .rpt-nav-cta {
+    padding: 8px 14px !important;
+    font-size: 11px !important;
+    border-radius: 8px !important;
+  }
 
   /* Report header */
-  .rpt-report-header { padding: 16px 0 14px !important; }
+  .rpt-report-header {
+    padding: 16px 0 14px !important;
+  }
 
   /* Paywall feature rows: tighter on mobile */
-  .rpt-paywall-feature-icon { width: 28px !important; height: 28px !important; }
-  .rpt-paywall-feature-icon svg { width: 14px !important; height: 14px !important; }
-  .rpt-paywall-feature-title { font-size: 11.5px !important; }
-  .rpt-paywall-feature-desc { font-size: 10.5px !important; }
+  .rpt-paywall-feature-icon {
+    width: 28px !important;
+    height: 28px !important;
+  }
+
+  .rpt-paywall-feature-icon svg {
+    width: 14px !important;
+    height: 14px !important;
+  }
+
+  .rpt-paywall-feature-title {
+    font-size: 11.5px !important;
+  }
+
+  .rpt-paywall-feature-desc {
+    font-size: 10.5px !important;
+  }
 
   /* Score hero: compact margin */
-  .rpt-score-hero { margin-bottom: 16px !important; }
+  .rpt-score-hero {
+    margin-bottom: 16px !important;
+  }
 
   /* Home upload buttons: smaller text + padding so they fit side by side */
-  .home-upload-btn { font-size: 11.5px !important; padding: 10px 16px !important; letter-spacing: 0.01em !important; }
+  .home-upload-btn {
+    font-size: 11.5px !important;
+    padding: 10px 16px !important;
+    letter-spacing: 0.01em !important;
+  }
 }
 
 /* ── Full-screen loading overlay — iOS Safari height fix ── */
@@ -487,14 +594,12 @@ body::before {
   left: -150%;
   width: 100%;
   height: 100%;
-  background: linear-gradient(
-    90deg,
-    transparent 0%,
-    rgba(255, 255, 255, 0.0) 25%,
-    rgba(255, 255, 255, 0.65) 50%,
-    rgba(255, 255, 255, 0.0) 75%,
-    transparent 100%
-  );
+  background: linear-gradient(90deg,
+      transparent 0%,
+      rgba(255, 255, 255, 0.0) 25%,
+      rgba(255, 255, 255, 0.65) 50%,
+      rgba(255, 255, 255, 0.0) 75%,
+      transparent 100%);
   transform: skewX(-30deg);
   transition: none;
   pointer-events: none;
@@ -542,12 +647,17 @@ body::before {
   color: #FFFFFF;
   backdrop-filter: blur(25px) saturate(140%);
   -webkit-backdrop-filter: blur(25px) saturate(140%);
-  box-shadow: 
-    0 1px 0 0 rgba(255, 255, 255, 0.35) inset,     /* Top highlight edge */
-    0 -1px 0 0 rgba(0, 0, 0, 0.45) inset,          /* Bottom shadow edge */
-    inset 0 0 0 1px rgba(255, 255, 255, 0.08),     /* Inner border refraction */
-    inset 0 12px 18px rgba(255, 255, 255, 0.06),    /* Curved lens highlight */
-    0 8px 24px rgba(44, 36, 29, 0.18);             /* Floating dark projection */
+  box-shadow:
+    0 1px 0 0 rgba(255, 255, 255, 0.35) inset,
+    /* Top highlight edge */
+    0 -1px 0 0 rgba(0, 0, 0, 0.45) inset,
+    /* Bottom shadow edge */
+    inset 0 0 0 1px rgba(255, 255, 255, 0.08),
+    /* Inner border refraction */
+    inset 0 12px 18px rgba(255, 255, 255, 0.06),
+    /* Curved lens highlight */
+    0 8px 24px rgba(44, 36, 29, 0.18);
+  /* Floating dark projection */
   transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
   overflow: hidden;
   text-decoration: none;
@@ -560,14 +670,12 @@ body::before {
   left: -150%;
   width: 100%;
   height: 100%;
-  background: linear-gradient(
-    90deg,
-    transparent 0%,
-    rgba(255, 255, 255, 0.0) 25%,
-    rgba(255, 255, 255, 0.28) 50%,
-    rgba(255, 255, 255, 0.0) 75%,
-    transparent 100%
-  );
+  background: linear-gradient(90deg,
+      transparent 0%,
+      rgba(255, 255, 255, 0.0) 25%,
+      rgba(255, 255, 255, 0.28) 50%,
+      rgba(255, 255, 255, 0.0) 75%,
+      transparent 100%);
   transform: skewX(-30deg);
   transition: none;
   pointer-events: none;
@@ -582,20 +690,21 @@ body::before {
   transform: translateY(-2px) scale(1.02);
   background: linear-gradient(135deg, rgba(62, 51, 41, 0.92) 0%, rgba(40, 32, 25, 0.98) 100%);
   border-color: rgba(255, 255, 255, 0.45);
-  box-shadow: 
+  box-shadow:
     0 1px 0 0 rgba(255, 255, 255, 0.45) inset,
     0 -1px 0 0 rgba(0, 0, 0, 0.35) inset,
     inset 0 0 0 1px rgba(255, 255, 255, 0.15),
     inset 0 12px 20px rgba(255, 255, 255, 0.1),
     0 16px 36px rgba(44, 36, 29, 0.28),
-    0 0 24px rgba(212, 165, 116, 0.35); /* Luxury champagne gold ambient surbrillance */
+    0 0 24px rgba(212, 165, 116, 0.35);
+  /* Luxury champagne gold ambient surbrillance */
   color: #FFFFFF;
 }
 
 .btn-liquid-glass-dark:active {
   transform: translateY(0px) scale(0.97);
   background: linear-gradient(135deg, rgba(35, 28, 22, 0.94) 0%, rgba(20, 16, 12, 0.98) 100%);
-  box-shadow: 
+  box-shadow:
     0 1px 0 0 rgba(255, 255, 255, 0.2) inset,
     inset 0 0 0 1px rgba(255, 255, 255, 0.05),
     0 4px 12px rgba(44, 36, 29, 0.1);
@@ -636,14 +745,12 @@ body::before {
   left: -150%;
   width: 100%;
   height: 100%;
-  background: linear-gradient(
-    90deg,
-    transparent 0%,
-    rgba(255, 255, 255, 0.0) 25%,
-    rgba(255, 255, 255, 0.75) 50%,
-    rgba(255, 255, 255, 0.0) 75%,
-    transparent 100%
-  );
+  background: linear-gradient(90deg,
+      transparent 0%,
+      rgba(255, 255, 255, 0.0) 25%,
+      rgba(255, 255, 255, 0.75) 50%,
+      rgba(255, 255, 255, 0.0) 75%,
+      transparent 100%);
   transform: skewX(-30deg);
   transition: none;
   pointer-events: none;
@@ -670,4 +777,36 @@ body::before {
   box-shadow:
     inset 0 0 0 1px rgba(140, 100, 70, 0.1),
     0 2px 8px rgba(168, 116, 73, 0.02);
+}
+
+/* Custom button shimmer effect on hover */
+.btn-analyse-cta {
+  position: relative;
+  overflow: hidden;
+}
+
+.btn-analyse-cta::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -150%;
+  width: 130%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0) 30%,
+    rgba(255, 255, 255, 0.22) 50%,
+    rgba(255, 255, 255, 0) 70%,
+    transparent 100%
+  );
+  transform: skewX(-25deg);
+  pointer-events: none;
+  filter: blur(5px);
+  transition: none;
+}
+
+.btn-analyse-cta:hover::after {
+  left: 150%;
+  transition: left 1.5s cubic-bezier(0.25, 1, 0.5, 1);
 }

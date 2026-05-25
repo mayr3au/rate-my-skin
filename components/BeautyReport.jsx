@@ -359,13 +359,10 @@ function ScoreHeroCard({ score, summary, faceShape, skinType, skinTone, badge, m
                 setShowTooltip(!showTooltip);
               }
             }}
+            className="bubble-nacré"
             style={{
-              background: "rgba(255,255,255,0.62)",
-              backdropFilter: "blur(12px)",
-              WebkitBackdropFilter: "blur(12px)",
               borderRadius: 10,
               padding: "7px 14px",
-              border: "1px solid rgba(255,255,255,0.82)",
               cursor: tag.type === 'skinTone' ? 'pointer' : 'default',
               position: 'relative',
               userSelect: 'none',

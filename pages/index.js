@@ -750,7 +750,7 @@ export default function Home() {
                   key={key}
                   onClick={() => handleChip(key, label)}
                   style={{
-                    border: activeChips.includes(key) ? `1.5px solid ${GOLD}` : '1px solid rgba(255, 255, 255, 0.55)',
+                    border: activeChips.includes(key) ? '1.5px solid rgba(197, 160, 40, 0.65)' : '1px solid rgba(168, 116, 73, 0.22)',
                     background: activeChips.includes(key) ? 'rgba(197,160,40,0.12)' : 'rgba(255, 255, 255, 0.45)',
                     color: activeChips.includes(key) ? '#8B6914' : '#887E75',
                     borderRadius: 30, padding: '6px 16px',
