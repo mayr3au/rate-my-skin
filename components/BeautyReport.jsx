@@ -1734,8 +1734,8 @@ export default function BeautyReport({ data: rawData, isPaid, onUnlock }) {
       {/* ── Tab navigation: sticky bottom bar on mobile, pill row on desktop ── */}
       <style>{`
         @media (max-width: 640px) {
-          .rpt-tabs-desktop { display: none !important; }
-          .rpt-tabs-mobile { display: flex !important; }
+          .rpt-tabs-desktop { display: ${isPaid ? 'none' : 'flex'} !important; }
+          .rpt-tabs-mobile { display: ${isPaid ? 'flex' : 'none'} !important; }
         }
         @media (min-width: 641px) {
           .rpt-tabs-desktop { display: flex !important; }
@@ -1821,56 +1821,58 @@ export default function BeautyReport({ data: rawData, isPaid, onUnlock }) {
       </div>
 
       {/* Mobile: sticky bottom navigation bar */}
-      <div className="rpt-tabs-mobile" style={{
-        display: "none",
-        position: "fixed", bottom: "-50px", left: 0, right: 0, zIndex: 100,
-        background: "#FFFDF9",
-        borderTop: "1px solid rgba(201, 169, 97, 0.18)",
-        boxShadow: "0 -8px 32px rgba(44,36,29,0.08)",
-        padding: "6px 4px calc(56px + env(safe-area-inset-bottom))",
-        justifyContent: "space-around", alignItems: "center",
-        gap: 0,
-      }}>
-        {TABS_CONFIG.map((tab, i) => (
-          <button
-            key={i}
-            onClick={() => setPreviewTab(i)}
-            style={{
-              display: "flex", flexDirection: "column", alignItems: "center", gap: 3,
-              background: "none", border: "none", cursor: "pointer",
-              padding: "6px 8px 12px",
-              color: previewTab === i ? "#C9A961" : "#9E8A7A",
-              transition: "all 0.2s ease",
-              minWidth: 0, flex: 1,
-              position: "relative",
-            }}
-          >
-            {/* Icon with active indicator dot */}
-            <div style={{ display: "flex", alignItems: "center", justifyContent: "center" }}>
-              {tab.icon}
-            </div>
-            <span style={{
-              fontSize: 8.5, fontWeight: previewTab === i ? 700 : 500,
-              fontFamily: "'DM Sans', sans-serif",
-              letterSpacing: "0.04em",
-              textTransform: "uppercase",
-              whiteSpace: "nowrap",
-              overflow: "hidden", textOverflow: "ellipsis",
-              maxWidth: 52,
-              lineHeight: 1.2,
-            }}>
-              {tab.short}
-            </span>
-            {previewTab === i && (
-              <div style={{
-                position: "absolute", bottom: 2, left: "50%", transform: "translateX(-50%)",
-                width: 24, height: 2, borderRadius: 2,
-                background: "linear-gradient(90deg, #C9A961, #A87449)",
-              }} />
-            )}
-          </button>
-        ))}
-      </div>
+      {isPaid && (
+        <div className="rpt-tabs-mobile" style={{
+          display: "none",
+          position: "fixed", bottom: "-50px", left: 0, right: 0, zIndex: 100,
+          background: "#FFFDF9",
+          borderTop: "1px solid rgba(201, 169, 97, 0.18)",
+          boxShadow: "0 -8px 32px rgba(44,36,29,0.08)",
+          padding: "6px 4px calc(56px + env(safe-area-inset-bottom))",
+          justifyContent: "space-around", alignItems: "center",
+          gap: 0,
+        }}>
+          {TABS_CONFIG.map((tab, i) => (
+            <button
+              key={i}
+              onClick={() => setPreviewTab(i)}
+              style={{
+                display: "flex", flexDirection: "column", alignItems: "center", gap: 3,
+                background: "none", border: "none", cursor: "pointer",
+                padding: "6px 8px 12px",
+                color: previewTab === i ? "#C9A961" : "#9E8A7A",
+                transition: "all 0.2s ease",
+                minWidth: 0, flex: 1,
+                position: "relative",
+              }}
+            >
+              {/* Icon with active indicator dot */}
+              <div style={{ display: "flex", alignItems: "center", justifyContent: "center" }}>
+                {tab.icon}
+              </div>
+              <span style={{
+                fontSize: 8.5, fontWeight: previewTab === i ? 700 : 500,
+                fontFamily: "'DM Sans', sans-serif",
+                letterSpacing: "0.04em",
+                textTransform: "uppercase",
+                whiteSpace: "nowrap",
+                overflow: "hidden", textOverflow: "ellipsis",
+                maxWidth: 52,
+                lineHeight: 1.2,
+              }}>
+                {tab.short}
+              </span>
+              {previewTab === i && (
+                <div style={{
+                  position: "absolute", bottom: 2, left: "50%", transform: "translateX(-50%)",
+                  width: 24, height: 2, borderRadius: 2,
+                  background: "linear-gradient(90deg, #C9A961, #A87449)",
+                }} />
+              )}
+            </button>
+          ))}
+        </div>
+      )}
 
       <div style={{
         maxWidth: 680,
