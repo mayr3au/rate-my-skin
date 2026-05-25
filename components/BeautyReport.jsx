@@ -450,27 +450,42 @@ function ScoreHeroCard({ score, summary, faceShape, skinType, skinTone, badge, m
         <button
           onClick={onShare}
           disabled={sharing}
-          className="btn-liquid-glass-dark"
           style={{
-            padding: "8px 16px",
+            padding: "9px 18px",
             borderRadius: 20,
             fontSize: 10.5,
-            fontWeight: 600,
-            letterSpacing: "0.02em",
+            fontWeight: 700,
+            letterSpacing: "0.03em",
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
-            gap: 6,
-            border: "none",
+            gap: 8,
+            border: "1px solid rgba(201, 169, 97, 0.35)",
             cursor: "pointer",
             width: "fit-content",
-            boxShadow: "0 4px 12px rgba(44,36,29,0.06)",
+            background: "linear-gradient(135deg, #3D2914 0%, #4E351B 50%, #281B0D 100%)",
+            color: "#FFFDF9",
+            boxShadow: "0 6px 16px rgba(61, 41, 20, 0.12)",
+            fontFamily: "'DM Sans', sans-serif",
+            textTransform: "uppercase",
+            transition: "all 0.3s cubic-bezier(0.16, 1, 0.3, 1)"
           }}
         >
-          {sharing
-            ? <><span style={{ display: "inline-block", width: 10, height: 10, border: "2px solid rgba(185,172,158,0.35)", borderTopColor: "#B9AC9E", borderRadius: "50%", animation: "spin 0.7s linear infinite" }} />{t('shareGenerating')}</>
-            : <><span>📸</span> {t('shareScore')} <span style={{ fontSize: 9, opacity: 0.6, fontWeight: 400 }}>· Instagram / TikTok</span></>
-          }
+          {sharing ? (
+            <>
+              <span style={{ display: "inline-block", width: 10, height: 10, border: "2px solid rgba(255,255,255,0.4)", borderTopColor: "#fff", borderRadius: "50%", animation: "spin 0.7s linear infinite" }} />
+              {t('shareGenerating')}
+            </>
+          ) : (
+            <>
+              <CameraSparkleIcon size={13} color="#C9A961" />
+              <span>{t('shareScore')}</span>
+              <span style={{ display: "inline-flex", gap: 6, alignItems: "center", marginLeft: 4, paddingLeft: 8, borderLeft: "1px solid rgba(255,255,255,0.25)" }}>
+                <InstagramLogo size={11} color="#FFFDF9" />
+                <TikTokLogo size={11} color="#FFFDF9" />
+              </span>
+            </>
+          )}
         </button>
         {shareMsg && <p style={{ margin: "6px 0 0", fontSize: 11, color: "#A87449", textAlign: "center", fontFamily: "'DM Sans', sans-serif" }}>{shareMsg}</p>}
       </div>
@@ -903,6 +918,34 @@ const findMatchingProduct = (stepText, products) => {
 
   return null;
 };
+
+function CameraSparkleIcon({ size = 14, color = "currentColor" }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ display: "block" }}>
+      <path d="M23 19C23 20.1 22.1 21 21 21H3C1.9 21 1 20.1 1 19V8C1 6.9 1.9 6 3 6H7L9 3H15L17 6H21C22.1 6 23 6.9 23 8V19Z" stroke={color} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+      <circle cx="12" cy="13" r="3.5" stroke={color} strokeWidth="1.8" />
+      <path d="M18 9.5L18.3 8.3L19.5 8L18.3 7.7L18 6.5L17.7 7.7L16.5 8L17.7 8.3Z" fill={color} />
+    </svg>
+  );
+}
+
+function InstagramLogo({ size = 13, color = "currentColor" }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ display: "block" }}>
+      <rect x="2" y="2" width="20" height="20" rx="5" ry="5" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+      <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37Z" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+      <line x1="17.5" y1="6.5" x2="17.51" y2="6.5" stroke={color} strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
+function TikTokLogo({ size = 13, color = "currentColor" }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ display: "block" }}>
+      <path d="M9 12a4 4 0 1 0 4 4V4a5 5 0 0 0 5 5" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+}
 
 /* ── Custom luxury SVG icons ── */
 function SunIcon({ size = 18 }) {
