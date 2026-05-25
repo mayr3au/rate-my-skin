@@ -2111,30 +2111,156 @@ export default function BeautyReport({ data: rawData, isPaid, onUnlock }) {
           </div>
         )}
         {previewTab === 6 && (
-          <div style={{ display: "flex", flexDirection: "column", gap: 12, position: "relative" }}>
-            {paid.progression ? (
-              <>
-                <div style={{ position: "absolute", left: 36, top: 20, bottom: 20, width: 2, background: "linear-gradient(180deg, rgba(201,169,97,0.5), rgba(201,169,97,0.05))", zIndex: 0 }} />
-                {paid.progression.map((step, i) => (
-                  <div key={i} style={{ ...CARD, padding: "18px 20px", display: "flex", gap: 16, alignItems: "center", position: "relative", zIndex: 1 }}>
-                    <div style={{ width: 34, height: 34, borderRadius: "50%", background: "#FFF", border: "2px solid #C9A961", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, fontWeight: 700, color: "#A87449", flexShrink: 0, boxShadow: "0 4px 12px rgba(201,169,97,0.2)" }}>
-                      {step.week}
-                    </div>
+          <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+            
+            {/* ── Box: Expectations of the new routine ── */}
+            <div style={{
+              ...CARD,
+              padding: "24px",
+              background: "linear-gradient(135deg, rgba(253, 246, 237, 0.9) 0%, rgba(246, 235, 222, 0.9) 100%)",
+              border: "1px solid rgba(197, 160, 40, 0.25)",
+              boxShadow: "0 10px 30px rgba(168,116,73,0.04)"
+            }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 12 }}>
+                <span style={{ fontSize: 20, color: "#C5A028" }}>✨</span>
+                <span style={{
+                  fontSize: 10, fontWeight: 700, letterSpacing: "0.15em", textTransform: "uppercase",
+                  color: "#B0885E", fontFamily: "'DM Sans', sans-serif"
+                }}>
+                  {lang === 'fr' ? "Espérances de la nouvelle routine" : "Routine Expectations"}
+                </span>
+              </div>
+              <h4 style={{
+                margin: "0 0 16px", fontSize: 18, fontWeight: 600,
+                color: "#3A2E26", fontFamily: "'Cormorant Garamond', serif", lineHeight: 1.3
+              }}>
+                {lang === 'fr' 
+                  ? "Calendrier d'évolution & résultats réels" 
+                  : "What to expect as your skin adapts?"}
+              </h4>
+              <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+                {[
+                  { time: lang === 'fr' ? "1-3 jours" : "1-3 days", title: lang === 'fr' ? "Douceur & Éclat initial" : "Softness & Glow", desc: lang === 'fr' ? "Effet repulpant immédiat. Les agents hydratants ciblent la sécheresse superficielle. Votre teint paraît plus frais." : "Immediate plumping effect. Hydrating actives quench surface dehydration. Complexion looks fresher." },
+                  { time: lang === 'fr' ? "2-4 semaines" : "2-4 weeks", title: lang === 'fr' ? "Régulation du sébum & Pureté" : "Sebum Balance & Clarity", desc: lang === 'fr' ? "Les actifs (acides doux) commencent à désincruster les pores. Diminution visible du sébum et des petites imperfections." : "Exfoliating actives start clearing congestion. Visible reduction in surface oils and minor breakouts." },
+                  { time: lang === 'fr' ? "4-8 semaines" : "4-8 weeks", title: lang === 'fr' ? "Renouvellement & Teint unifié" : "Cellular Turnover & Tone", desc: lang === 'fr' ? "Cycle cellulaire complet de 28 jours. Les pores se resserrent, les taches et ridules s'atténuent." : "Full skin cell cycle completed. Dark spots fade, texture refines, and skin tone becomes more uniform." },
+                  { time: lang === 'fr' ? "12+ semaines" : "12+ weeks", title: lang === 'fr' ? "Reconstruction durable" : "Long-term Resilience", desc: lang === 'fr' ? "La barrière cutanée est profondément réparée et renforcée contre les agressions externes et le vieillissement." : "The moisture barrier is deeply restored. Skin is resilient against external triggers and signs of aging are minimized." }
+                ].map((phase, idx) => (
+                  <div key={idx} style={{ display: "flex", gap: 12, alignItems: "flex-start" }}>
+                    <span style={{
+                      fontSize: 9.5, fontWeight: 700, borderRadius: 6, padding: "3px 8px",
+                      background: "rgba(168,116,73,0.12)", color: "#8C7A6B", width: 78, textAlign: "center",
+                      fontFamily: "'DM Sans', sans-serif", flexShrink: 0
+                    }}>{phase.time}</span>
                     <div>
-                      <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", color: "#8C7A6B", marginBottom: 2 }}>
-                        {lang === 'fr' ? `Semaine ${step.week}` : `Week ${step.week}`}
-                      </div>
-                      <div style={{ fontSize: 16, fontWeight: 600, color: "#2C241D", marginBottom: 4, fontFamily: "'Cormorant Garamond', serif" }}>{step.title}</div>
-                      <p style={{ margin: 0, fontSize: 12.5, lineHeight: 1.5, color: "#6F6156" }}>{step.desc}</p>
+                      <div style={{ fontSize: 12.5, fontWeight: 600, color: "#2C241D", marginBottom: 2 }}>{phase.title}</div>
+                      <p style={{ margin: 0, fontSize: 12, lineHeight: 1.5, color: "#6F6156" }}>{phase.desc}</p>
                     </div>
                   </div>
                 ))}
-              </>
-            ) : (
-              <div style={{ ...CARD, padding: "20px", textAlign: "center", color: "#8C7A6B" }}>
-                {lang === 'fr' ? 'Plan de progression non disponible pour ce rapport.' : 'Progression plan not available for this report.'}
               </div>
-            )}
+            </div>
+
+            {/* ── Box: Graphical Funnel ── */}
+            <div style={{
+              ...CARD,
+              padding: "24px 20px",
+              background: "#FFFDF9",
+            }}>
+              <div style={{ textAlign: "center", marginBottom: 22 }}>
+                <span style={{
+                  fontSize: 9, fontWeight: 700, letterSpacing: "0.15em", textTransform: "uppercase",
+                  color: "#A87449", fontFamily: "'DM Sans', sans-serif"
+                }}>
+                  {lang === 'fr' ? "Courbe d'évolution" : "Skin Evolution Funnel"}
+                </span>
+                <h4 style={{
+                  margin: "6px 0 0", fontSize: 19, fontWeight: 500,
+                  color: "#3A2E26", fontFamily: "'Cormorant Garamond', serif"
+                }}>
+                  {lang === 'fr' ? "Entonnoir de transformation de la peau" : "Your 8-Week Transformation Funnel"}
+                </h4>
+              </div>
+
+              <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+                {[
+                  { range: "S1 - S2", label: lang === 'fr' ? "Apaisement & Tolérance" : "Calming & Tolerance", desc: lang === 'fr' ? "Hydratation superficielle et réduction de l'inflammation de départ." : "Initial hydration boost and skin barrier calming.", width: "100%", percent: "100%", bg: "linear-gradient(90deg, #A87449 0%, #D4A574 100%)" },
+                  { range: "S3 - S4", label: lang === 'fr' ? "Purification Active" : "Active Clarification", desc: lang === 'fr' ? "Désincrustation des pores, texture plus lisse et régulation séborrhéique." : "Exfoliating skin layers, refining pores and surface oils.", width: "85%", percent: "80%", bg: "linear-gradient(90deg, #B0855A 0%, #D8B085 100%)" },
+                  { range: "S5 - S6", label: lang === 'fr' ? "Régénération & Éclat" : "Radiance & Repair", desc: lang === 'fr' ? "Atténuation des cernes et taches, accélération du renouvellement cellulaire." : "Fading under-eye shadows and spots, boosting skin cell turnover.", width: "70%", percent: "60%", bg: "linear-gradient(90deg, #C5A028 0%, #E6C868 100%)" },
+                  { range: "S7 - S8", label: lang === 'fr' ? "Stabilisation & Éclat final" : "Stabilization & Peak Glow", desc: lang === 'fr' ? "Barrière protectrice scellée, texture équilibrée et éclat durable." : "Deeply sealed barrier, balanced hydration, and lasting glow.", width: "55%", percent: "40%", bg: "linear-gradient(90deg, #C59A28 0%, #DDB652 100%)" }
+                ].map((phase, i) => (
+                  <div key={i} style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
+                    <div style={{
+                      width: phase.width,
+                      borderRadius: 14,
+                      padding: "12px 16px",
+                      background: phase.bg,
+                      color: "#FFF",
+                      boxShadow: "0 6px 16px rgba(168,116,73,0.06)",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "space-between",
+                      gap: 12,
+                      minWidth: "260px"
+                    }}>
+                      <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                        <span style={{ fontSize: 9.5, fontWeight: 700, background: "rgba(255,255,255,0.22)", padding: "3px 8px", borderRadius: 6, fontFamily: "'DM Sans', sans-serif" }}>
+                          {phase.range}
+                        </span>
+                        <div style={{ display: "flex", flexDirection: "column" }}>
+                          <span style={{ fontSize: 12, fontWeight: 600, fontFamily: "'DM Sans', sans-serif" }}>
+                            {phase.label}
+                          </span>
+                          <span style={{ fontSize: 10, opacity: 0.85, fontFamily: "'DM Sans', sans-serif", fontWeight: 400, marginTop: 2, display: "none" }}>
+                            {phase.desc}
+                          </span>
+                        </div>
+                      </div>
+                      <span style={{ fontSize: 10.5, fontWeight: 700, fontFamily: "'DM Sans', sans-serif", opacity: 0.9 }}>
+                        {phase.percent}
+                      </span>
+                    </div>
+                    {i < 3 && (
+                      <div style={{
+                        width: 0,
+                        height: 0,
+                        borderLeft: "5px solid transparent",
+                        borderRight: "5px solid transparent",
+                        borderTop: "6px solid #D4A574",
+                        margin: "4px 0",
+                        opacity: 0.6
+                      }} />
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* ── Week-by-Week timeline cards ── */}
+            <div style={{ display: "flex", flexDirection: "column", gap: 12, position: "relative", marginTop: 8 }}>
+              {paid.progression ? (
+                <>
+                  <div style={{ position: "absolute", left: 36, top: 20, bottom: 20, width: 2, background: "linear-gradient(180deg, rgba(201,169,97,0.4), rgba(201,169,97,0.05))", zIndex: 0 }} />
+                  {paid.progression.map((step, i) => (
+                    <div key={i} style={{ ...CARD, padding: "18px 20px", display: "flex", gap: 16, alignItems: "center", position: "relative", zIndex: 1 }}>
+                      <div style={{ width: 34, height: 34, borderRadius: "50%", background: "#FFF", border: "2px solid #C9A961", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, fontWeight: 700, color: "#A87449", flexShrink: 0, boxShadow: "0 4px 12px rgba(201,169,97,0.15)" }}>
+                        {step.week}
+                      </div>
+                      <div>
+                        <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", color: "#8C7A6B", marginBottom: 2 }}>
+                          {lang === 'fr' ? `Semaine ${step.week}` : `Week ${step.week}`}
+                        </div>
+                        <div style={{ fontSize: 16, fontWeight: 600, color: "#2C241D", marginBottom: 4, fontFamily: "'Cormorant Garamond', serif" }}>{step.title}</div>
+                        <p style={{ margin: 0, fontSize: 12.5, lineHeight: 1.5, color: "#6F6156" }}>{step.desc}</p>
+                      </div>
+                    </div>
+                  ))}
+                </>
+              ) : (
+                <div style={{ ...CARD, padding: "20px", textAlign: "center", color: "#8C7A6B" }}>
+                  {lang === 'fr' ? 'Plan de progression non disponible pour ce rapport.' : 'Progression plan not available for this report.'}
+                </div>
+              )}
+            </div>
           </div>
         )}
       </div>
