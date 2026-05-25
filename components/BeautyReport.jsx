@@ -1750,7 +1750,7 @@ export default function BeautyReport({ data: rawData, isPaid, onUnlock }) {
       `}</style>
 
       {/* Desktop: scrollable pill row */}
-      <div className="rpt-tabs-desktop" style={{ maxWidth: 680, margin: "24px auto 0", padding: "0 20px" }}>
+      <div className="rpt-tabs-desktop" style={{ maxWidth: 740, margin: "24px auto 0", padding: "0 20px" }}>
         {!isPaid && (
           <p style={{ ...LABEL_STYLE, textAlign: "center", marginBottom: 10 }}>
             {t('previewLabel')}
@@ -1761,7 +1761,7 @@ export default function BeautyReport({ data: rawData, isPaid, onUnlock }) {
           background: "rgba(255,255,255,0.55)",
           backdropFilter: "blur(18px) saturate(150%)", WebkitBackdropFilter: "blur(18px) saturate(150%)",
           border: "1px solid rgba(255,255,255,0.65)",
-          borderRadius: 14, padding: 4,
+          borderRadius: 14, padding: "6px 8px",
           boxShadow: "0 8px 32px rgba(168,116,73,0.03), inset 0 1px 1px rgba(255,255,255,0.8)",
           scrollbarWidth: "none"
         }}>
@@ -1780,7 +1780,7 @@ export default function BeautyReport({ data: rawData, isPaid, onUnlock }) {
                 {previewTab === i && (
                   <div style={{
                     position: "absolute", top: -6, left: "50%", transform: "translateX(-50%)",
-                    width: 18, height: 2, borderRadius: 2,
+                    width: 32, height: 2, borderRadius: 2,
                     background: "linear-gradient(90deg, #C9A961, #A87449)",
                   }} />
                 )}
