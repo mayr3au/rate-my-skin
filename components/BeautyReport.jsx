@@ -1701,9 +1701,7 @@ export default function BeautyReport({ data: rawData, isPaid, onUnlock }) {
       <div className="rpt-tabs-mobile" style={{
         display: "none",
         position: "fixed", bottom: 0, left: 0, right: 0, zIndex: 100,
-        background: "rgba(255, 252, 248, 0.92)",
-        backdropFilter: "blur(24px) saturate(180%)",
-        WebkitBackdropFilter: "blur(24px) saturate(180%)",
+        background: "#FFFDF9",
         borderTop: "1px solid rgba(201, 169, 97, 0.18)",
         boxShadow: "0 -8px 32px rgba(44,36,29,0.08)",
         padding: "6px 4px calc(6px + env(safe-area-inset-bottom))",
