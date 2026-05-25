@@ -116,7 +116,8 @@ Réponds UNIQUEMENT avec du JSON BRUT (pas de blocs de code markdown, pas de tex
 RÈGLES CRUCIALES :
 - mainProblems doit avoir EXACTEMENT 3 éléments. Valeurs de severity : mild | moderate | significant.
 - metrics doit avoir EXACTEMENT 8 éléments avec les libellés exacts indiqués ci-dessus (Hydratation, Pores, Éclat, Acné, Taches, Cernes, Symétrie, Harmonie).
-- Les recommandations de produits doivent correspondre aux problèmes visibles et utiliser les données exactes sans inventer d'URL ou de prix.
+- SÉLECTION UNIQUE ET FIABLE DES PRODUITS : Tu ne dois proposer QUE des produits présents dans le tableau PRODUITS DISPONIBLES ci-dessus. Il est strictement interdit d'inventer des produits, de modifier leur nom ("productName" doit être identique à "product_name"), ou de mélanger leurs propriétés (par exemple, n'associe pas un produit acné à un problème de cernes). Les liens d'affiliation (amazonLink mappé sur amazon_link, sephoraLink mappé sur sephora_link) et le prix (price mappé sur price_range) doivent correspondre très exactement aux données du produit sélectionné dans le tableau fourni.
+- COHÉRENCE ROUTINE / PRODUITS RECOMMANDÉS : Les étapes de la routine matinale (morning), du soir (evening), hebdomadaire (weekly) et du plan (progression) doivent mentionner explicitement les produits exacts que tu as sélectionnés dans "productRecommendations" pour résoudre les problèmes de peau observés chez le client, afin de lui donner une routine claire et sans contradiction.
 - Ne pas envelopper la réponse dans des blocs de code markdown.`;
   } else {
     return `You are a friendly yet expert skin specialist — think of a knowledgeable dermatologist who also knows how to talk to real people. You analyse skin photographs with accuracy and care, then explain your findings in a warm, clear, reassuring, and VERY SIMPLE tone that anyone can understand.
@@ -220,7 +221,8 @@ CRITICAL RULES:
 - mainProblems MUST have EXACTLY 3 items; severity values: mild | moderate | significant.
 - metrics MUST have EXACTLY 8 items in the exact label order listed above (Hydration, Pores, Radiance, Acne, Dark Spots, Under-Eye, Symmetry, Harmony).
 - For each metric, assign severity based on score: mild (score >= 78), moderate (score 65–77), significant (score < 65).
-- productRecommendations MUST match products to the skin problems visible and use exact data from AVAILABLE PRODUCTS.
+- STRICT AND EXCLUSIVE PRODUCT MATCHING: You must ONLY recommend products that are present in the AVAILABLE PRODUCTS list above. It is strictly forbidden to invent new products, alter their name ("productName" must match "product_name" exactly), or mismatch skin concerns (e.g. do not suggest an acne product for dark circles). The links (amazonLink mapped to amazon_link, sephoraLink mapped to sephora_link) and price (price mapped to price_range) must match the database fields exactly.
+- ROUTINE & RECO COHERENCE: The morning routine steps, evening routine steps, weekly care steps, and the weekly progress plan (progression) must explicitly name the exact products recommended in "productRecommendations" to target the client's needs, ensuring they know exactly when and how to use them.
 - Do NOT wrap output in markdown code blocks.`;
   }
 };
