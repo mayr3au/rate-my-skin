@@ -1748,7 +1748,6 @@ export default function BeautyReport({ data: rawData, isPaid, onUnlock }) {
         ))}
       </div>
 
-      {/* ── Tab content (Blurred for unpaid, interactive and complete for paid) ── */}
       <div style={{
         maxWidth: 680,
         margin: "10px auto 0",
@@ -1758,6 +1757,16 @@ export default function BeautyReport({ data: rawData, isPaid, onUnlock }) {
         pointerEvents: isPaid ? "auto" : "none",
         userSelect: isPaid ? "auto" : "none"
       }}>
+        {isPaid && (
+          <div style={{ marginBottom: 20 }}>
+            <p style={LABEL_STYLE}>
+              {lang === 'fr' ? 'Rapport détaillé' : 'Detailed Report'}
+            </p>
+            <h3 style={{ ...TITLE_STYLE, marginBottom: 0 }}>
+              {TABS_CONFIG[previewTab].label}
+            </h3>
+          </div>
+        )}
         {previewTab === 0 && (
           <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
             {displayMetrics.map((m, i) => <MetricCard key={i} m={m} index={i} t={t} />)}
