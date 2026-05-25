@@ -1491,7 +1491,7 @@ export default function BeautyReport({ data: rawData, isPaid, onUnlock }) {
         <MedicalDisclaimer style={{ marginTop: 16 }} />
 
         {/* ── Main problems ── */}
-        {mainProblems.length > 0 && (
+        {!isPaid && mainProblems.length > 0 && (
           <div style={{ marginTop: 28 }}>
             <SectionHeading label={t('mainProblemsHeading')} title={t('areasToAddress')} />
             <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
