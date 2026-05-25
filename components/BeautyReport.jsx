@@ -2277,6 +2277,57 @@ export default function BeautyReport({ data: rawData, isPaid, onUnlock }) {
                 </div>
               )}
             </div>
+
+            {/* ── Box: Motivation & Safety Disclaimer ── */}
+            <div style={{
+              ...CARD,
+              padding: "22px 24px",
+              marginTop: 12,
+              background: "linear-gradient(135deg, rgba(255, 255, 255, 0.8) 0%, rgba(253, 246, 237, 0.5) 100%)",
+              border: "1px solid rgba(168, 116, 73, 0.15)",
+              display: "flex",
+              flexDirection: "column",
+              gap: 14
+            }}>
+              {/* Motivation Column */}
+              <div>
+                <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8 }}>
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#C5A028" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
+                    <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+                  </svg>
+                  <span style={{ fontSize: 10, fontWeight: 700, letterSpacing: "0.12em", textTransform: "uppercase", color: "#A87449", fontFamily: "'DM Sans', sans-serif" }}>
+                    {lang === 'fr' ? "Le secret de la constance" : "The Key to Consistency"}
+                  </span>
+                </div>
+                <p style={{ margin: 0, fontSize: 12.5, lineHeight: 1.6, color: "#6F6156" }}>
+                  {lang === 'fr'
+                    ? "La peau met environ 28 jours à se renouveler. Les premiers résultats profonds n'apparaissent qu'au bout de 4 à 6 semaines. Restez régulier(e) : la régularité des soins matin et soir est 10 fois plus efficace qu'un soin ponctuel très concentré. Prenez une photo chaque semaine pour suivre votre évolution."
+                    : "Skin takes about 28 days to regenerate, and deep improvements emerge around weeks 4 to 6. Keep going: daily AM/PM consistency is 10 times more effective than occasional treatments. Snap a weekly photo to document your progress."}
+                </p>
+              </div>
+
+              {/* Separator line */}
+              <div style={{ height: "1px", background: "linear-gradient(90deg, transparent, rgba(168,116,73,0.12), transparent)" }} />
+
+              {/* Disclaimer Column */}
+              <div>
+                <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8 }}>
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#B9AC9E" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
+                    <circle cx="12" cy="12" r="10" />
+                    <line x1="12" y1="8" x2="12" y2="12" />
+                    <line x1="12" y1="16" x2="12.01" y2="16" />
+                  </svg>
+                  <span style={{ fontSize: 10, fontWeight: 700, letterSpacing: "0.12em", textTransform: "uppercase", color: "#8C7A6B", fontFamily: "'DM Sans', sans-serif" }}>
+                    {lang === 'fr' ? "Réactions inattendues & Purge" : "Unexpected Reactions & Purging"}
+                  </span>
+                </div>
+                <p style={{ margin: 0, fontSize: 12, lineHeight: 1.55, color: "#8C7A6B" }}>
+                  {lang === 'fr'
+                    ? "Important : L'introduction d'actifs ciblés (comme le Rétinol ou les acides AHA/BHA) peut provoquer une 'purge cutanée' (poussée temporaire de petits boutons) pendant les 2 premières semaines. C'est normal. En revanche, en cas de rougeur persistante, brûlure ou irritation intense, espacez les applications à 1 soir sur 2 ou 3, ou cessez l'utilisation et consultez un professionnel."
+                    : "Note: Introducing active ingredients (like Retinol or AHA/BHA exfoliants) can trigger a temporary 'purging' phase (a brief breakout period) during the first 2 weeks. This is normal. However, if persistent redness, burning, or severe irritation occurs, reduce application frequency (e.g., every 2 or 3 nights) or discontinue use and consult a professional."}
+                </p>
+              </div>
+            </div>
           </div>
         )}
       </div>
