@@ -106,7 +106,7 @@ function solveCubicBezier(x1, y1, x2, y2, t) {
 }
 
 /* ══ Score hero card — dark tech panel ══════════════════════════════════ */
-function ScoreHeroCard({ score, summary, faceShape, skinType, skinTone, badge, miniMetrics, t, lang }) {
+function ScoreHeroCard({ score, summary, faceShape, skinType, skinTone, badge, miniMetrics, t, lang, onShare, sharing, shareMsg }) {
   const [animated, setAnimated] = useState(0);
   const [displayScore, setDisplayScore] = useState(1);
   const [showTooltip, setShowTooltip] = useState(false);
@@ -443,6 +443,36 @@ function ScoreHeroCard({ score, summary, faceShape, skinType, skinTone, badge, m
             )}
           </div>
         ) : null)}
+      </div>
+
+      {/* Share Button (Small version near the score) */}
+      <div style={{ display: "flex", flexDirection: "column", alignItems: "center", marginTop: 16, width: "100%" }}>
+        <button
+          onClick={onShare}
+          disabled={sharing}
+          className="btn-liquid-glass-dark"
+          style={{
+            padding: "8px 16px",
+            borderRadius: 20,
+            fontSize: 10.5,
+            fontWeight: 600,
+            letterSpacing: "0.02em",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            gap: 6,
+            border: "none",
+            cursor: "pointer",
+            width: "fit-content",
+            boxShadow: "0 4px 12px rgba(44,36,29,0.06)",
+          }}
+        >
+          {sharing
+            ? <><span style={{ display: "inline-block", width: 10, height: 10, border: "2px solid rgba(185,172,158,0.35)", borderTopColor: "#B9AC9E", borderRadius: "50%", animation: "spin 0.7s linear infinite" }} />{t('shareGenerating')}</>
+            : <><span>📸</span> {t('shareScore')} <span style={{ fontSize: 9, opacity: 0.6, fontWeight: 400 }}>· Instagram / TikTok</span></>
+          }
+        </button>
+        {shareMsg && <p style={{ margin: "6px 0 0", fontSize: 11, color: "#A87449", textAlign: "center", fontFamily: "'DM Sans', sans-serif" }}>{shareMsg}</p>}
       </div>
 
       {/* Mini-metrics strip (paid view only) */}
@@ -1410,6 +1440,9 @@ export default function BeautyReport({ data: rawData, isPaid, onUnlock }) {
           faceShape={faceShape} skinType={skinType} skinTone={skinTone}
           badge={isPaid ? null : t("freeReportLabel")}
           t={t} lang={lang}
+          onShare={handleShare}
+          sharing={sharing}
+          shareMsg={shareMsg}
         />
 
         <MedicalDisclaimer style={{ marginTop: 16 }} />
@@ -1660,26 +1693,6 @@ export default function BeautyReport({ data: rawData, isPaid, onUnlock }) {
         </div>
       )}
 
-      {/* ── Share button ── */}
-      <div style={{ maxWidth: 680, margin: "24px auto 0", padding: "0 20px" }}>
-        <button
-          onClick={handleShare}
-          disabled={sharing}
-          className="btn-liquid-glass-dark"
-          style={{
-            width: "100%", padding: "14px", borderRadius: 14,
-            fontSize: 13, fontWeight: 600, letterSpacing: "0.04em",
-            display: "flex", alignItems: "center", justifyContent: "center", gap: 10,
-            border: "none",
-          }}
-        >
-          {sharing
-            ? <><span style={{ display: "inline-block", width: 12, height: 12, border: "2px solid rgba(185,172,158,0.35)", borderTopColor: "#B9AC9E", borderRadius: "50%", animation: "spin 0.7s linear infinite" }} />{t('shareGenerating')}</>
-            : <>{t('shareScore')}<span style={{ fontSize: 11, opacity: 0.6, fontWeight: 400 }}>· Instagram / TikTok</span></>
-          }
-        </button>
-        {shareMsg && <p style={{ margin: "10px 0 0", fontSize: 12, color: "#A87449", textAlign: "center", fontFamily: "'DM Sans', sans-serif" }}>{shareMsg}</p>}
-      </div>
 
       {/* ── Tab navigation: sticky bottom bar on mobile, pill row on desktop ── */}
       <style>{`
