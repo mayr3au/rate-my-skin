@@ -215,15 +215,21 @@ export default function Report() {
             }
           ],
           lifestyle: isFr ? {
-            diet: { title: "Plus d'Oméga-3 & Hydratation", desc: "Favorise la barrière lipidique et réduit l'inflammation. Mangez plus de saumon, de noix, de graines de chia et veillez à boire au moins 1,5L d'eau par jour." },
+            diet: { title: "Plus d'Oméga-3 & Hydratation", desc: "Favorise la barrière lipidique et réduit l'inflammation. Mangez plus de saumon, de noix, de graines de chia et veillez à boire au moins 1,5L d'eau par jour pour nourrir la peau de l'intérieur." },
             sleep: { title: "Sommeil réparateur & Taie en Soie", desc: "Dormez 7 à 8 heures par nuit pour la régénération cellulaire. Privilégiez une taie d'oreiller en soie (pour limiter les frictions et préserver l'hydratation) et essayez de dormir sur le dos pour éviter les plis de pression." },
-            stress: { title: "Gestion du cortisol", desc: "Le stress chronique augmente le sébum et l'inflammation. Intégrez 5 min de respiration profonde ou de méditation chaque jour pour apaiser le système nerveux." },
-            hygiene: { title: "Hygiène des taies & du téléphone", desc: "Changez votre taie d'oreiller tous les 2 à 3 jours pour ne pas dormir sur des résidus bactériens accumulés. Désinfectez votre écran de téléphone tous les jours (véritable nid à bactéries) et lavez vos mains avant chaque routine skincare." }
+            stress: { title: "Gestion du cortisol", desc: "Le stress chronique augmente le sébum et l'inflammation. Intégrez 5 min de respiration profonde ou de méditation chaque jour pour apaiser le système nerveux et réguler les hormones cutanées." },
+            hygiene: { title: "Hygiène des taies & du téléphone", desc: "Changez votre taie d'oreiller tous les 2 à 3 jours pour ne pas dormir sur des résidus bactériens accumulés. Désinfectez votre écran de téléphone tous les jours (véritable nid à microbes) et lavez vos mains à l'eau et au savon avant chaque routine skincare." },
+            sun: { title: "Protection UV quotidienne", desc: "Même par temps nuageux ou en intérieur près d'une fenêtre, appliquez quotidiennement un SPF 50+. Les UVA traversent les nuages et le verre, dégradant le collagène et provoquant taches et vieillissement prématuré." },
+            exercise: { title: "Sport & Douche immédiate", desc: "L'activité physique stimule la circulation et l'éclat, mais la sueur séchée obstrue les pores et retient les toxines. Prenez une douche ou nettoyez votre visage immédiatement après l'effort avec un nettoyant doux." },
+            temperature: { title: "Lavage à l'eau tiède", desc: "Ne lavez jamais votre visage à l'eau chaude sous la douche. L'eau chaude dissout les huiles naturelles protectrices de la peau, causant déshydratation et irritations. Utilisez toujours de l'eau tiède ou fraîche au lavabo." }
           } : {
-            diet: { title: "More Omega-3s & Hydration", desc: "Supports the lipid barrier and reduces inflammation. Eat more salmon, walnuts, chia seeds, and aim for at least 1.5L of water daily." },
-            sleep: { title: "Restful Sleep & Silk Pillowcase", desc: "7-8 hours a night is crucial for cell turnover. Use a mulberry silk pillowcase to prevent skin friction and retain moisture, and try sleeping on your back." },
-            stress: { title: "Cortisol Management", desc: "Chronic stress triggers sebum production and inflammation. Practice 5 minutes of deep breathing or mindfulness daily to lower cortisol levels." },
-            hygiene: { title: "Pillowcase Hygiene & Phone Sanitization", desc: "Change your pillowcase every 2-3 days to avoid sleeping on bacteria, saliva, and sweat buildup. Sanitize your mobile screen daily and wash hands before applying any product." }
+            diet: { title: "More Omega-3s & Hydration", desc: "Supports the lipid barrier and reduces inflammation. Eat more salmon, walnuts, chia seeds, and aim for at least 1.5L of water daily to keep your skin hydrated from within." },
+            sleep: { title: "Restful Sleep & Silk Pillowcase", desc: "7-8 hours a night is crucial for cell turnover. Use a mulberry silk pillowcase to prevent skin friction and retain moisture, and try sleeping on your back to avoid sleep creases." },
+            stress: { title: "Cortisol Management", desc: "Chronic stress triggers sebum production and inflammation. Practice 5 minutes of deep breathing or mindfulness daily to lower cortisol levels and calm your nervous system." },
+            hygiene: { title: "Pillowcase Hygiene & Phone Sanitization", desc: "Change your pillowcase every 2-3 days to avoid sleeping on bacteria, saliva, and sweat buildup. Sanitize your mobile screen daily and wash hands before applying any product." },
+            sun: { title: "Daily UV Protection", desc: "Even on cloudy days or indoors near windows, apply a daily SPF 50+. UVA rays penetrate clouds and glass, breaking down collagen, creating dark spots, and causing premature aging." },
+            exercise: { title: "Workout & Immediate Rinse", desc: "Physical activity boosts circulation and radiance, but dried sweat traps bacteria and clogs pores. Always cleanse your face with a gentle wash immediately after working out." },
+            temperature: { title: "Lukewarm Water Only", desc: "Never wash your face with hot shower water. Hot water strips the skin's natural protective oils, leading to severe dehydration and irritation. Always rinse with lukewarm or cool water at the sink." }
           },
           progression: isFr ? [
             { week: 1, title: "Fondations & Tolérance", desc: "Introduction de la nouvelle routine. La barrière cutanée s'adapte en douceur." },
