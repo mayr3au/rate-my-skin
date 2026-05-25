@@ -1700,11 +1700,11 @@ export default function BeautyReport({ data: rawData, isPaid, onUnlock }) {
       {/* Mobile: sticky bottom navigation bar */}
       <div className="rpt-tabs-mobile" style={{
         display: "none",
-        position: "fixed", bottom: 0, left: 0, right: 0, zIndex: 100,
+        position: "fixed", bottom: "-10px", left: 0, right: 0, zIndex: 100,
         background: "#FFFDF9",
         borderTop: "1px solid rgba(201, 169, 97, 0.18)",
         boxShadow: "0 -8px 32px rgba(44,36,29,0.08)",
-        padding: "6px 4px calc(6px + env(safe-area-inset-bottom))",
+        padding: "6px 4px calc(16px + env(safe-area-inset-bottom))",
         justifyContent: "space-around", alignItems: "center",
         gap: 0,
       }}>
