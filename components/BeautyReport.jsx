@@ -1013,79 +1013,73 @@ function InlineProductCard({ product, t }) {
     <div
       onMouseEnter={() => setHov(true)}
       onMouseLeave={() => setHov(false)}
+      className="rpt-inline-product-card"
       style={{
-        display: "flex",
-        flexDirection: "row",
-        gap: 10,
-        alignItems: "center",
-        background: "rgba(255, 255, 255, 0.65)",
         border: hov ? "1px solid rgba(168, 116, 73, 0.4)" : "1px solid rgba(168, 116, 73, 0.15)",
-        borderRadius: 12,
-        padding: "8px 10px",
-        marginTop: 6,
         boxShadow: hov ? "0 4px 12px rgba(168, 116, 73, 0.06)" : "none",
-        transition: "all 0.3s ease"
       }}
     >
-      {/* Image */}
-      <img
-        src={imgUrl}
-        alt={product.productName}
-        style={{
-          width: 38,
-          height: 38,
-          objectFit: "cover",
-          borderRadius: 8,
-          background: "#fff",
-          border: "1px solid rgba(168, 116, 73, 0.08)",
-          flexShrink: 0
-        }}
-      />
+      <div className="rpt-inline-product-card-header">
+        {/* Image */}
+        <img
+          src={imgUrl}
+          alt={product.productName}
+          style={{
+            width: 38,
+            height: 38,
+            objectFit: "cover",
+            borderRadius: 8,
+            background: "#fff",
+            border: "1px solid rgba(168, 116, 73, 0.08)",
+            flexShrink: 0
+          }}
+        />
 
-      {/* Text block: name + description + price */}
-      <div style={{ flex: 1, minWidth: 0 }}>
-        <div style={{
-          fontSize: 11.5,
-          fontWeight: 700,
-          color: "#2C241D",
-          whiteSpace: "nowrap",
-          overflow: "hidden",
-          textOverflow: "ellipsis",
-          fontFamily: "'DM Sans', sans-serif",
-          lineHeight: 1.3
-        }}>
-          {product.productName}
-        </div>
-        {product.description && (
-          <p style={{
-            margin: "2px 0 0",
-            fontSize: 10,
-            lineHeight: 1.45,
-            color: "#8C7A6B",
+        {/* Text block: name + description + price */}
+        <div style={{ flex: 1, minWidth: 0 }}>
+          <div style={{
+            fontSize: 11.5,
+            fontWeight: 700,
+            color: "#2C241D",
+            whiteSpace: "nowrap",
+            overflow: "hidden",
+            textOverflow: "ellipsis",
             fontFamily: "'DM Sans', sans-serif",
-            display: "-webkit-box",
-            WebkitLineClamp: 2,
-            WebkitBoxOrient: "vertical",
-            overflow: "hidden"
+            lineHeight: 1.3
           }}>
-            {product.description}
-          </p>
-        )}
-        <div style={{
-          fontSize: 10,
-          color: "#A87449",
-          fontWeight: 600,
-          fontFamily: "'DM Sans', sans-serif",
-          marginTop: 2
-        }}>
-          {product.price}
+            {product.productName}
+          </div>
+          {product.description && (
+            <p style={{
+              margin: "2px 0 0",
+              fontSize: 10,
+              lineHeight: 1.45,
+              color: "#8C7A6B",
+              fontFamily: "'DM Sans', sans-serif",
+              display: "-webkit-box",
+              WebkitLineClamp: 2,
+              WebkitBoxOrient: "vertical",
+              overflow: "hidden"
+            }}>
+              {product.description}
+            </p>
+          )}
+          <div style={{
+            fontSize: 10,
+            color: "#A87449",
+            fontWeight: 600,
+            fontFamily: "'DM Sans', sans-serif",
+            marginTop: 2
+          }}>
+            {product.price}
+          </div>
         </div>
       </div>
 
       {/* Buttons: small, stacked vertically on right */}
-      <div style={{ display: "flex", flexDirection: "column", gap: 4, flexShrink: 0, alignItems: "center" }}>
+      <div className="rpt-inline-product-card-buttons">
         {/* "Acheter" notch label */}
-        <div style={{
+        <div className="rpt-inline-product-card-notch" style={{
           fontSize: 8,
           fontWeight: 700,
           letterSpacing: "0.12em",
@@ -1750,7 +1744,7 @@ export default function BeautyReport({ data: rawData, isPaid, onUnlock }) {
       `}</style>
 
       {/* Desktop: scrollable pill row */}
-      <div className="rpt-tabs-desktop" style={{ maxWidth: 740, margin: "24px auto 0", padding: "0 20px" }}>
+      <div className="rpt-tabs-desktop" style={{ maxWidth: 680, margin: "24px auto 0", padding: "0 20px" }}>
         {!isPaid && (
           <p style={{ ...LABEL_STYLE, textAlign: "center", marginBottom: 10 }}>
             {t('previewLabel')}
@@ -1822,22 +1816,16 @@ export default function BeautyReport({ data: rawData, isPaid, onUnlock }) {
             style={{
               display: "flex", flexDirection: "column", alignItems: "center", gap: 3,
               background: "none", border: "none", cursor: "pointer",
-              padding: "6px 8px",
+              padding: "6px 8px 12px",
               color: previewTab === i ? "#C9A961" : "#9E8A7A",
               transition: "all 0.2s ease",
               minWidth: 0, flex: 1,
+              position: "relative",
             }}
           >
             {/* Icon with active indicator dot */}
-            <div style={{ position: "relative", display: "flex", alignItems: "center", justifyContent: "center" }}>
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "center" }}>
               {tab.icon}
-              {previewTab === i && (
-                <div style={{
-                  position: "absolute", top: -6, left: "50%", transform: "translateX(-50%)",
-                  width: 18, height: 2, borderRadius: 2,
-                  background: "linear-gradient(90deg, #C9A961, #A87449)",
-                }} />
-              )}
             </div>
             <span style={{
               fontSize: 8.5, fontWeight: previewTab === i ? 700 : 500,
@@ -1851,6 +1839,13 @@ export default function BeautyReport({ data: rawData, isPaid, onUnlock }) {
             }}>
               {tab.short}
             </span>
+            {previewTab === i && (
+              <div style={{
+                position: "absolute", bottom: 2, left: "50%", transform: "translateX(-50%)",
+                width: 24, height: 2, borderRadius: 2,
+                background: "linear-gradient(90deg, #C9A961, #A87449)",
+              }} />
+            )}
           </button>
         ))}
       </div>
@@ -2831,6 +2826,52 @@ export default function BeautyReport({ data: rawData, isPaid, onUnlock }) {
         .trust-sep {
           color: rgba(168, 116, 73, 0.35);
           font-size: 12px;
+        }
+        
+        /* Premium Inline Product Card Responsive CSS */
+        .rpt-inline-product-card {
+          display: flex;
+          flex-direction: row;
+          gap: 10px;
+          align-items: center;
+          background: rgba(255, 255, 255, 0.65);
+          border-radius: 12px;
+          padding: 8px 10px;
+          margin-top: 6px;
+          transition: all 0.3s ease;
+        }
+        .rpt-inline-product-card-header {
+          display: flex;
+          flex-direction: row;
+          gap: 10px;
+          align-items: center;
+          flex: 1;
+          min-width: 0;
+        }
+        .rpt-inline-product-card-buttons {
+          display: flex;
+          flex-direction: column;
+          gap: 4px;
+          flex-shrink: 0;
+          align-items: center;
+        }
+        @media (max-width: 480px) {
+          .rpt-inline-product-card {
+            flex-direction: column;
+            align-items: stretch;
+            padding: 10px;
+          }
+          .rpt-inline-product-card-buttons {
+            flex-direction: row;
+            justify-content: flex-end;
+            margin-top: 6px;
+            padding-top: 8px;
+            border-top: 1px dashed rgba(168, 116, 73, 0.12);
+            width: 100%;
+          }
+          .rpt-inline-product-card-notch {
+            display: none !important;
+          }
         }
       `}</style>
     </div>
