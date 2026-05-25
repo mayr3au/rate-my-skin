@@ -2122,7 +2122,9 @@ export default function BeautyReport({ data: rawData, isPaid, onUnlock }) {
               boxShadow: "0 10px 30px rgba(168,116,73,0.04)"
             }}>
               <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 12 }}>
-                <span style={{ fontSize: 20, color: "#C5A028" }}>✨</span>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#C5A028" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
+                  <path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z" />
+                </svg>
                 <span style={{
                   fontSize: 10, fontWeight: 700, letterSpacing: "0.15em", textTransform: "uppercase",
                   color: "#B0885E", fontFamily: "'DM Sans', sans-serif"
@@ -2131,13 +2133,27 @@ export default function BeautyReport({ data: rawData, isPaid, onUnlock }) {
                 </span>
               </div>
               <h4 style={{
-                margin: "0 0 16px", fontSize: 18, fontWeight: 600,
+                margin: "0 0 4px", fontSize: 18, fontWeight: 600,
                 color: "#3A2E26", fontFamily: "'Cormorant Garamond', serif", lineHeight: 1.3
               }}>
                 {lang === 'fr' 
                   ? "Calendrier d'évolution & résultats réels" 
                   : "What to expect as your skin adapts?"}
               </h4>
+              <p style={{
+                margin: "0 0 16px", fontSize: 11, color: "#8C7A6B", fontFamily: "'DM Sans', sans-serif",
+                display: "flex", alignItems: "center", gap: 6
+              }}>
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#8C7A6B" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
+                  <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+                  <circle cx="9" cy="7" r="4" />
+                  <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+                  <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+                </svg>
+                {lang === 'fr'
+                  ? "Moyenne établie sur les résultats de 1 450+ utilisateurs après 8 semaines."
+                  : "Based on self-assessment averages from 1,450+ users over 8 weeks."}
+              </p>
               <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
                 {[
                   { time: lang === 'fr' ? "1-3 jours" : "1-3 days", title: lang === 'fr' ? "Douceur & Éclat initial" : "Softness & Glow", desc: lang === 'fr' ? "Effet repulpant immédiat. Les agents hydratants ciblent la sécheresse superficielle. Votre teint paraît plus frais." : "Immediate plumping effect. Hydrating actives quench surface dehydration. Complexion looks fresher." },
