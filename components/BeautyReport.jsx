@@ -610,7 +610,7 @@ function MetricCard({ m, index, t }) {
 const getProductImage = (productName) => {
   const name = productName?.toLowerCase() || '';
   if (name.includes('cerave sa cleanser') || name.includes('sa smoothing cleanser')) {
-    return 'https://images.unsplash.com/photo-1608248597481-496100c80836?q=80&w=240&auto=format&fit=crop';
+    return 'https://images.unsplash.com/photo-1556229010-aa3f7ff66b24?q=80&w=240&auto=format&fit=crop';
   }
   if (name.includes("paula's choice 2%") || (name.includes('paula') && name.includes('bha'))) {
     return 'https://images.unsplash.com/photo-1556228720-195a672e8a03?q=80&w=240&auto=format&fit=crop';
@@ -622,7 +622,7 @@ const getProductImage = (productName) => {
     return 'https://images.unsplash.com/photo-1617897903246-719242758050?q=80&w=240&auto=format&fit=crop';
   }
   if (name.includes('cerave moistur') || name.includes('crème hydratante')) {
-    return 'https://images.unsplash.com/photo-1556228578-0d85b1a4d571?q=80&w=240&auto=format&fit=crop';
+    return 'https://images.unsplash.com/photo-1608248597481-496100c80836?q=80&w=240&auto=format&fit=crop';
   }
   if (name.includes('laneige') || name.includes('sleeping mask')) {
     return 'https://images.unsplash.com/photo-1571781926291-c477ebfd024b?q=80&w=240&auto=format&fit=crop';
@@ -634,29 +634,29 @@ const getProductImage = (productName) => {
     return 'https://images.unsplash.com/photo-1598440947619-2c35fc9aa908?q=80&w=240&auto=format&fit=crop';
   }
   if (name.includes('caffeine eye') || name.includes('inkey list')) {
-    return 'https://images.unsplash.com/photo-1601049541289-9b1b7bbbfe19?q=80&w=240&auto=format&fit=crop';
+    return 'https://images.unsplash.com/photo-1629732047847-50b7ecf0cbf1?q=80&w=240&auto=format&fit=crop';
   }
   if (name.includes('avocado') || name.includes('kiehl')) {
-    return 'https://images.unsplash.com/photo-1601049541289-9b1b7bbbfe19?q=80&w=240&auto=format&fit=crop';
+    return 'https://images.unsplash.com/photo-1608571423902-eed4a5ad8108?q=80&w=240&auto=format&fit=crop';
   }
   if (name.includes('glow recipe') || name.includes('watermelon') || name.includes('dew drops')) {
-    return 'https://images.unsplash.com/photo-1601049676099-e7ed07d825b0?q=80&w=240&auto=format&fit=crop';
+    return 'https://images.unsplash.com/photo-1590156546746-c22224b69cd1?q=80&w=240&auto=format&fit=crop';
   }
   if (name.includes('drunk elephant') || name.includes('firma')) {
-    return 'https://images.unsplash.com/photo-1526947425960-945c6e72858f?q=80&w=240&auto=format&fit=crop';
+    return 'https://images.unsplash.com/photo-1611080626919-7cf5a9dbab5b?q=80&w=240&auto=format&fit=crop';
   }
   if (name.includes("paula's choice 8%") || (name.includes('paula') && name.includes('aha'))) {
-    return 'https://images.unsplash.com/photo-1556228720-195a672e8a03?q=80&w=240&auto=format&fit=crop';
+    return 'https://images.unsplash.com/photo-1626806787461-102c1bfaaea1?q=80&w=240&auto=format&fit=crop';
   }
 
   if (name.includes('cleanser') || name.includes('nettoyant')) {
-    return 'https://images.unsplash.com/photo-1556228720-195a672e8a03?q=80&w=240&auto=format&fit=crop';
+    return 'https://images.unsplash.com/photo-1556229010-aa3f7ff66b24?q=80&w=240&auto=format&fit=crop';
   }
   if (name.includes('serum') || name.includes('sérum')) {
     return 'https://images.unsplash.com/photo-1620916566398-39f1143ab7be?q=80&w=240&auto=format&fit=crop';
   }
   if (name.includes('cream') || name.includes('moisturizer') || name.includes('crème')) {
-    return 'https://images.unsplash.com/photo-1556228578-0d85b1a4d571?q=80&w=240&auto=format&fit=crop';
+    return 'https://images.unsplash.com/photo-1608248597481-496100c80836?q=80&w=240&auto=format&fit=crop';
   }
   return 'https://images.unsplash.com/photo-1608248597481-496100c80836?q=80&w=240&auto=format&fit=crop';
 };
@@ -1376,17 +1376,13 @@ export default function BeautyReport({ data: rawData, isPaid, onUnlock }) {
   const mainProblems = freeData.mainProblems || [];
   const basicSummary = freeData.basicSummary || summary || "";
   const paid = data.paid_version || {};
-  const previewMetrics = (paid.metrics || []).slice(0, 4);
-  const previewStrengths = (paid.strengths || []).slice(0, 2);
-  const previewImprovements = (paid.improvements || []).slice(0, 2);
   const routine = paid.routine || {};
-  const previewRoutine = [...(routine.morning || []), ...(routine.evening || [])].slice(0, 4);
-  const allProducts = (paid.productRecommendations || []).slice(0, 3);
 
-  const displayMetrics = isPaid ? (paid.metrics || []) : previewMetrics;
-  const displayStrengths = isPaid ? (paid.strengths || []) : previewStrengths;
-  const displayImprovements = isPaid ? (paid.improvements || []) : previewImprovements;
-  const displayProducts = isPaid ? (paid.productRecommendations || []) : allProducts;
+  const displayMetrics = paid.metrics || [];
+  const displayStrengths = paid.strengths || [];
+  const displayImprovements = paid.improvements || [];
+  const displayProducts = paid.productRecommendations || [];
+  const allProducts = (paid.productRecommendations || []).slice(0, 3);
 
   const TABS_CONFIG = [
     {
@@ -1734,11 +1730,11 @@ export default function BeautyReport({ data: rawData, isPaid, onUnlock }) {
       {/* ── Tab navigation: sticky bottom bar on mobile, pill row on desktop ── */}
       <style>{`
         @media (max-width: 640px) {
-          .rpt-tabs-desktop { display: ${isPaid ? 'none' : 'flex'} !important; }
+          .rpt-tabs-desktop { display: ${isPaid ? 'none' : 'block'} !important; }
           .rpt-tabs-mobile { display: ${isPaid ? 'flex' : 'none'} !important; }
         }
         @media (min-width: 641px) {
-          .rpt-tabs-desktop { display: flex !important; }
+          .rpt-tabs-desktop { display: block !important; }
           .rpt-tabs-mobile { display: none !important; }
         }
       `}</style>
@@ -1883,12 +1879,10 @@ export default function BeautyReport({ data: rawData, isPaid, onUnlock }) {
         pointerEvents: isPaid ? "auto" : "none",
         userSelect: isPaid ? "auto" : "none"
       }}>
-        {isPaid && (
-          <SectionHeading 
-            label={lang === 'fr' ? 'Rapport détaillé' : 'Detailed Report'} 
-            title={TABS_CONFIG[previewTab].label} 
-          />
-        )}
+        <SectionHeading 
+          label={lang === 'fr' ? 'Rapport détaillé' : 'Detailed Report'} 
+          title={TABS_CONFIG[previewTab].label} 
+        />
         {previewTab === 0 && (
           <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
             {displayMetrics.map((m, i) => <MetricCard key={i} m={m} index={i} t={t} />)}
@@ -1997,133 +1991,122 @@ export default function BeautyReport({ data: rawData, isPaid, onUnlock }) {
           </div>
         )}
         {previewTab === 3 && (
-          isPaid ? (
-            (routine.morning || []).length === 0 && (routine.evening || []).length === 0 && (routine.weekly || []).length === 0 ? (
-              <div style={{ ...CARD, padding: "20px", textAlign: "center", color: "#8C7A6B" }}>
-                {t('routineUnavailable')}
-              </div>
-            ) : (
-              <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-                {(routine.morning || []).length > 0 && (
-                  <div style={{
-                    ...CARD,
-                    padding: "20px",
-                    background: "linear-gradient(135deg, rgba(255,255,255,0.75) 0%, rgba(253,246,237,0.50) 100%)",
-                    border: "1px solid rgba(255, 255, 255, 0.8)",
-                    display: "flex",
-                    flexDirection: "column",
-                    gap: 12
-                  }}>
-                    <div style={{ display: "flex", alignItems: "center", gap: 8, borderBottom: "1px solid rgba(168,116,73,0.12)", paddingBottom: 8 }}>
-                      <SunIcon size={18} />
-                      <span style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", color: "#3A2E26", fontFamily: "'DM Sans', sans-serif" }}>
-                        {t('routineMorning')}
-                      </span>
-                    </div>
-                    <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-                      {(routine.morning || []).map((step, idx) => {
-                        const matchedProduct = findMatchingProduct(step, paid.productRecommendations || []);
-                        return (
-                          <div key={idx} style={{ display: "flex", flexDirection: "column", gap: 4 }}>
-                            <div style={{ display: "flex", gap: 8, alignItems: "flex-start" }}>
-                              <span style={{ color: GOLD, fontSize: 11, fontWeight: 700, minWidth: 16 }}>{idx + 1}.</span>
-                              <p style={{ margin: 0, fontSize: 12.5, lineHeight: 1.6, color: "#6F6156" }}>{step}</p>
-                            </div>
-                            {matchedProduct && (
-                              <div style={{ marginLeft: 24 }}>
-                                <InlineProductCard product={matchedProduct} t={t} />
-                              </div>
-                            )}
-                          </div>
-                        );
-                      })}
-                    </div>
-                  </div>
-                )}
-
-                {(routine.evening || []).length > 0 && (
-                  <div style={{
-                    ...CARD,
-                    padding: "20px",
-                    background: "linear-gradient(135deg, rgba(255,255,255,0.75) 0%, rgba(253,246,237,0.50) 100%)",
-                    border: "1px solid rgba(255, 255, 255, 0.8)",
-                    display: "flex",
-                    flexDirection: "column",
-                    gap: 12
-                  }}>
-                    <div style={{ display: "flex", alignItems: "center", gap: 8, borderBottom: "1px solid rgba(168,116,73,0.12)", paddingBottom: 8 }}>
-                      <MoonIcon size={18} />
-                      <span style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", color: "#3A2E26", fontFamily: "'DM Sans', sans-serif" }}>
-                        {t('routineEvening')}
-                      </span>
-                    </div>
-                    <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-                      {(routine.evening || []).map((step, idx) => {
-                        const matchedProduct = findMatchingProduct(step, paid.productRecommendations || []);
-                        return (
-                          <div key={idx} style={{ display: "flex", flexDirection: "column", gap: 4 }}>
-                            <div style={{ display: "flex", gap: 8, alignItems: "flex-start" }}>
-                              <span style={{ color: GOLD, fontSize: 11, fontWeight: 700, minWidth: 16 }}>{idx + 1}.</span>
-                              <p style={{ margin: 0, fontSize: 12.5, lineHeight: 1.6, color: "#6F6156" }}>{step}</p>
-                            </div>
-                            {matchedProduct && (
-                              <div style={{ marginLeft: 24 }}>
-                                <InlineProductCard product={matchedProduct} t={t} />
-                              </div>
-                            )}
-                          </div>
-                        );
-                      })}
-                    </div>
-                  </div>
-                )}
-
-                {(routine.weekly || []).length > 0 && (
-                  <div style={{
-                    ...CARD,
-                    padding: "20px",
-                    background: "linear-gradient(135deg, rgba(255,255,255,0.75) 0%, rgba(253,246,237,0.50) 100%)",
-                    border: "1px solid rgba(255, 255, 255, 0.8)",
-                    display: "flex",
-                    flexDirection: "column",
-                    gap: 12
-                  }}>
-                    <div style={{ display: "flex", alignItems: "center", gap: 8, borderBottom: "1px solid rgba(168,116,73,0.12)", paddingBottom: 8 }}>
-                      <SparkleIcon size={18} />
-                      <span style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", color: "#3A2E26", fontFamily: "'DM Sans', sans-serif" }}>
-                        {t('routineWeekly')}
-                      </span>
-                    </div>
-                    <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-                      {(routine.weekly || []).map((step, idx) => {
-                        const matchedProduct = findMatchingProduct(step, paid.productRecommendations || []);
-                        return (
-                          <div key={idx} style={{ display: "flex", flexDirection: "column", gap: 4 }}>
-                            <div style={{ display: "flex", gap: 8, alignItems: "flex-start" }}>
-                              <span style={{ color: GOLD, fontSize: 11, fontWeight: 700, minWidth: 16 }}>{idx + 1}.</span>
-                              <p style={{ margin: 0, fontSize: 12.5, lineHeight: 1.6, color: "#6F6156" }}>{step}</p>
-                            </div>
-                            {matchedProduct && (
-                              <div style={{ marginLeft: 24 }}>
-                                <InlineProductCard product={matchedProduct} t={t} />
-                              </div>
-                            )}
-                          </div>
-                        );
-                      })}
-                    </div>
-                  </div>
-                )}
-              </div>
-            )
+          (routine.morning || []).length === 0 && (routine.evening || []).length === 0 && (routine.weekly || []).length === 0 ? (
+            <div style={{ ...CARD, padding: "20px", textAlign: "center", color: "#8C7A6B" }}>
+              {t('routineUnavailable')}
+            </div>
           ) : (
-            <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-              {previewRoutine.map((rec, i) => (
-                <div key={i} style={{ ...CARD, padding: "16px 20px", display: "flex", gap: 12, alignItems: "flex-start" }}>
-                  <span style={{ color: GOLD, fontSize: 10, marginTop: 3, flexShrink: 0 }}>✦</span>
-                  <p style={{ margin: 0, fontSize: 13, lineHeight: 1.65, color: "#8C7A6B" }}>{rec}</p>
+            <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+              {(routine.morning || []).length > 0 && (
+                <div style={{
+                  ...CARD,
+                  padding: "20px",
+                  background: "linear-gradient(135deg, rgba(255,255,255,0.75) 0%, rgba(253,246,237,0.50) 100%)",
+                  border: "1px solid rgba(255, 255, 255, 0.8)",
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: 12
+                }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: 8, borderBottom: "1px solid rgba(168,116,73,0.12)", paddingBottom: 8 }}>
+                    <SunIcon size={18} />
+                    <span style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", color: "#3A2E26", fontFamily: "'DM Sans', sans-serif" }}>
+                      {t('routineMorning')}
+                    </span>
+                  </div>
+                  <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+                    {(routine.morning || []).map((step, idx) => {
+                      const matchedProduct = findMatchingProduct(step, paid.productRecommendations || []);
+                      return (
+                        <div key={idx} style={{ display: "flex", flexDirection: "column", gap: 4 }}>
+                          <div style={{ display: "flex", gap: 8, alignItems: "flex-start" }}>
+                            <span style={{ color: GOLD, fontSize: 11, fontWeight: 700, minWidth: 16 }}>{idx + 1}.</span>
+                            <p style={{ margin: 0, fontSize: 12.5, lineHeight: 1.6, color: "#6F6156" }}>{step}</p>
+                          </div>
+                          {matchedProduct && (
+                            <div style={{ marginLeft: 24 }}>
+                              <InlineProductCard product={matchedProduct} t={t} />
+                            </div>
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
                 </div>
-              ))}
+              )}
+
+              {(routine.evening || []).length > 0 && (
+                <div style={{
+                  ...CARD,
+                  padding: "20px",
+                  background: "linear-gradient(135deg, rgba(255,255,255,0.75) 0%, rgba(253,246,237,0.50) 100%)",
+                  border: "1px solid rgba(255, 255, 255, 0.8)",
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: 12
+                }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: 8, borderBottom: "1px solid rgba(168,116,73,0.12)", paddingBottom: 8 }}>
+                    <MoonIcon size={18} />
+                    <span style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", color: "#3A2E26", fontFamily: "'DM Sans', sans-serif" }}>
+                      {t('routineEvening')}
+                    </span>
+                  </div>
+                  <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+                    {(routine.evening || []).map((step, idx) => {
+                      const matchedProduct = findMatchingProduct(step, paid.productRecommendations || []);
+                      return (
+                        <div key={idx} style={{ display: "flex", flexDirection: "column", gap: 4 }}>
+                          <div style={{ display: "flex", gap: 8, alignItems: "flex-start" }}>
+                            <span style={{ color: GOLD, fontSize: 11, fontWeight: 700, minWidth: 16 }}>{idx + 1}.</span>
+                            <p style={{ margin: 0, fontSize: 12.5, lineHeight: 1.6, color: "#6F6156" }}>{step}</p>
+                          </div>
+                          {matchedProduct && (
+                            <div style={{ marginLeft: 24 }}>
+                              <InlineProductCard product={matchedProduct} t={t} />
+                            </div>
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+
+              {(routine.weekly || []).length > 0 && (
+                <div style={{
+                  ...CARD,
+                  padding: "20px",
+                  background: "linear-gradient(135deg, rgba(255,255,255,0.75) 0%, rgba(253,246,237,0.50) 100%)",
+                  border: "1px solid rgba(255, 255, 255, 0.8)",
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: 12
+                }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: 8, borderBottom: "1px solid rgba(168,116,73,0.12)", paddingBottom: 8 }}>
+                    <SparkleIcon size={18} />
+                    <span style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", color: "#3A2E26", fontFamily: "'DM Sans', sans-serif" }}>
+                      {t('routineWeekly')}
+                    </span>
+                  </div>
+                  <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+                    {(routine.weekly || []).map((step, idx) => {
+                      const matchedProduct = findMatchingProduct(step, paid.productRecommendations || []);
+                      return (
+                        <div key={idx} style={{ display: "flex", flexDirection: "column", gap: 4 }}>
+                          <div style={{ display: "flex", gap: 8, alignItems: "flex-start" }}>
+                            <span style={{ color: GOLD, fontSize: 11, fontWeight: 700, minWidth: 16 }}>{idx + 1}.</span>
+                            <p style={{ margin: 0, fontSize: 12.5, lineHeight: 1.6, color: "#6F6156" }}>{step}</p>
+                          </div>
+                          {matchedProduct && (
+                            <div style={{ marginLeft: 24 }}>
+                              <InlineProductCard product={matchedProduct} t={t} />
+                            </div>
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
             </div>
           )
         )}

@@ -149,14 +149,14 @@ export default function Report() {
           productRecommendations: [
             {
               skinProblem: isFr ? "Cernes" : "Under-Eye Hyperpigmentation",
-              productName: "CeraVe Eye Repair Cream",
+              productName: "The Inkey List Caffeine Eye Cream",
               description: isFr
-                ? "Formulé avec des céramides et de l’acide hyaluronique pour cibler les signes de déshydratation et protéger le contour des yeux."
-                : "Formulated with ceramides and hyaluronic acid to target structural dehydration lines and protect the orbital area.",
-              amazonLink: "https://www.amazon.fr/s?k=CeraVe+Eye+Repair+Cream&tag=ratemyskin-21",
-              sephoraLink: "https://www.sephora.fr/search/?q=CeraVe+Eye+Repair+Cream",
-              price: "€14.50",
-              imageUrl: "https://images.unsplash.com/photo-1608248597481-496100c80836?q=80&w=200&auto=format&fit=crop"
+                ? "Formulé avec de la caféine et des peptides pour réduire visiblement le gonflement et estomper les cernes."
+                : "Caffeine + peptides to visibly reduce puffiness and dark circles overnight.",
+              amazonLink: "https://www.amazon.fr/dp/B08JH2JH7Y?tag=ratemyskin-21",
+              sephoraLink: "https://www.sephora.com/product/the-inkey-list-caffeine-eye-cream",
+              price: "€10–14",
+              imageUrl: "https://images.unsplash.com/photo-1629732047847-50b7ecf0cbf1?q=80&w=200&auto=format&fit=crop"
             },
             {
               skinProblem: isFr ? "Nettoyage" : "Cleansing",
@@ -167,7 +167,7 @@ export default function Report() {
               amazonLink: "https://www.amazon.fr/s?k=CeraVe+SA+Cleanser&tag=ratemyskin-21",
               sephoraLink: "https://www.sephora.fr/search/?q=CeraVe+SA+Cleanser",
               price: "€13.90",
-              imageUrl: "https://images.unsplash.com/photo-1556228578-0d85b1a4d571?q=80&w=240&auto=format&fit=crop"
+              imageUrl: "https://images.unsplash.com/photo-1556229010-aa3f7ff66b24?q=80&w=240&auto=format&fit=crop"
             },
             {
               skinProblem: isFr ? "Éclat & Antioxydant" : "Radiance & Antioxidant",
@@ -189,7 +189,7 @@ export default function Report() {
               amazonLink: "https://www.amazon.fr/s?k=CeraVe+Moisturising+Cream&tag=ratemyskin-21",
               sephoraLink: "https://www.sephora.fr/search/?q=CeraVe+Moisturising+Cream",
               price: "€15.00",
-              imageUrl: "https://images.unsplash.com/photo-1556228578-0d85b1a4d571?q=80&w=240&auto=format&fit=crop"
+              imageUrl: "https://images.unsplash.com/photo-1608248597481-496100c80836?q=80&w=240&auto=format&fit=crop"
             },
             {
               skinProblem: isFr ? "Exfoliation" : "Exfoliation",
