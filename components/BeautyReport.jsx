@@ -1757,7 +1757,7 @@ export default function BeautyReport({ data: rawData, isPaid, onUnlock }) {
           </p>
         )}
         <div style={{
-          display: "flex", gap: 4, overflowX: "auto",
+          display: "flex", justifyContent: "center", gap: 4, overflowX: "auto",
           background: "rgba(255,255,255,0.55)",
           backdropFilter: "blur(18px) saturate(150%)", WebkitBackdropFilter: "blur(18px) saturate(150%)",
           border: "1px solid rgba(255,255,255,0.65)",
