@@ -29,7 +29,6 @@ export default async function handler(req, res) {
     cookies.push(makeCookie(EMAIL_COOKIE, normalizedEmail));
     res.setHeader('Set-Cookie', cookies);
 
-    // Link email to users row (best-effort)
     try {
       const supabase = createAdminClient();
       const { data: existingUser } = await supabase
@@ -42,10 +41,16 @@ export default async function handler(req, res) {
         await supabase.from('users').update({ email: normalizedEmail }).eq('id', userId);
       } else {
         await supabase.from('users').insert({
-          id: userId, analyses_used: 0, paid_credits: 0, paid_unlocks: 0, email: normalizedEmail,
+          id: userId,
+          analyses_used: 0,
+          paid_credits: 0,
+          paid_unlocks: 0,
+          email: normalizedEmail,
         });
       }
-    } catch {}
+    } catch (error) {
+      console.error('❌ Email sync failed:', error);
+    }
 
     return res.status(200).json({ ok: true, userId, email: normalizedEmail });
   }
