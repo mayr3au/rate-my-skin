@@ -278,7 +278,7 @@ export default async function handler(req, res) {
     // 2. Call Claude
     const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
     const message = await anthropic.messages.create({
-      model: 'claude-3-5-sonnet-20241022',
+      model: 'claude-sonnet-4-6',
       max_tokens: 8000,
       system: [{ type: 'text', text: buildSystemPrompt(lang, formattedProducts) }],
       messages: [{
