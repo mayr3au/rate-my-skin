@@ -659,7 +659,7 @@ const getProductImage = (productName) => {
 };
 
 /* ── Product card ── */
-function ProductCard({ product, lang, t }) {
+function ProductCard({ product, lang, t, compact = false }) {
   const [hov, setHov] = useState(false);
   const [vis, setVis] = useState(false);
   const [imgFailed, setImgFailed] = useState(false);
@@ -678,14 +678,14 @@ function ProductCard({ product, lang, t }) {
       onMouseLeave={() => setHov(false)}
       style={{
         ...CARD,
-        padding: "20px",
+        padding: compact ? "12px 14px" : "20px",
         border: hov ? "1px solid rgba(168,116,73,0.45)" : "1px solid rgba(255, 255, 255, 0.85)",
-        boxShadow: hov ? "0 16px 40px rgba(168,116,73,0.12), inset 0 1px 0 rgba(255,255,255,0.95)" : "0 8px 32px rgba(168,116,73,0.03), inset 0 1px 0 rgba(255,255,255,0.95)",
+        boxShadow: hov ? "0 12px 28px rgba(168,116,73,0.08), inset 0 1px 0 rgba(255,255,255,0.95)" : "0 6px 20px rgba(168,116,73,0.02), inset 0 1px 0 rgba(255,255,255,0.95)",
         opacity: vis ? 1 : 0,
-        transform: hov ? "translateY(-4px)" : "translateY(0)",
+        transform: hov ? "translateY(-2px)" : "translateY(0)",
         transition: "opacity 0.45s ease, transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.3s, box-shadow 0.3s, background-color 0.3s",
         display: "flex",
-        gap: "20px",
+        gap: compact ? "12px" : "20px",
         alignItems: "stretch",
         overflow: "hidden",
         background: "linear-gradient(135deg, rgba(255, 255, 255, 0.78) 0%, rgba(253, 246, 237, 0.52) 50%, rgba(246, 235, 222, 0.78) 100%)",
@@ -696,13 +696,13 @@ function ProductCard({ product, lang, t }) {
       {/* Product image wrapper */}
       <div style={{
         flexShrink: 0,
-        width: "clamp(90px, 22vw, 110px)",
-        borderRadius: "14px",
+        width: compact ? "clamp(70px, 16vw, 84px)" : "clamp(90px, 22vw, 110px)",
+        borderRadius: "10px",
         overflow: "hidden",
         background: "#FFFFFF",
         border: "1px solid rgba(168,116,73,0.1)",
         position: "relative",
-        boxShadow: "0 6px 18px rgba(168, 116, 73, 0.04)",
+        boxShadow: "0 4px 12px rgba(168, 116, 73, 0.03)",
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
@@ -720,8 +720,8 @@ function ProductCard({ product, lang, t }) {
               padding: "10px",
               textAlign: "center"
             }}>
-              <span style={{ fontSize: "20px", color: "#A87449" }}>✦</span>
-              <span style={{ fontSize: "9px", fontWeight: 700, color: "#8C7A6B", marginTop: 4, letterSpacing: "0.05em", textTransform: "uppercase" }}>CARE</span>
+              <span style={{ fontSize: compact ? "16px" : "20px", color: "#A87449" }}>✦</span>
+              <span style={{ fontSize: "8px", fontWeight: 700, color: "#8C7A6B", marginTop: 2, letterSpacing: "0.05em", textTransform: "uppercase" }}>CARE</span>
             </div>
           ) : (
             <img
@@ -745,23 +745,23 @@ function ProductCard({ product, lang, t }) {
       <div style={{ flex: 1, minWidth: 0, display: "flex", flexDirection: "column", justifyContent: "space-between" }}>
         <div>
           {/* Header row with Category and Price */}
-          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8, flexWrap: "wrap", gap: 8 }}>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: compact ? 4 : 8, flexWrap: "wrap", gap: 6 }}>
             <span style={{
               display: "inline-block",
-              fontSize: 9,
+              fontSize: compact ? 8 : 9,
               fontWeight: 700,
-              letterSpacing: "0.15em",
+              letterSpacing: "0.12em",
               textTransform: "uppercase",
               color: "#A87449",
               background: "rgba(168,116,73,0.06)",
-              border: "1px solid rgba(168,116,73,0.18)",
-              borderRadius: 6,
-              padding: "3px 8px"
+              border: "1px solid rgba(168,116,73,0.14)",
+              borderRadius: 5,
+              padding: compact ? "2px 6px" : "3px 8px"
             }}>
               {product.skinProblem}
             </span>
             <span style={{
-              fontSize: "15px",
+              fontSize: compact ? "13px" : "15px",
               fontWeight: 600,
               color: "#A87449",
               fontFamily: "'DM Sans', sans-serif"
@@ -772,12 +772,12 @@ function ProductCard({ product, lang, t }) {
 
           {/* Product Title */}
           <div style={{
-            fontSize: 17.5,
+            fontSize: compact ? 15 : 17.5,
             fontWeight: 600,
             color: "#2C241D",
-            marginBottom: 6,
+            marginBottom: compact ? 4 : 6,
             fontFamily: "'Cormorant Garamond', serif",
-            lineHeight: 1.25,
+            lineHeight: 1.2,
             wordBreak: "break-word"
           }}>
             {product.productName}
@@ -785,27 +785,31 @@ function ProductCard({ product, lang, t }) {
 
           {/* Product Description */}
           <p style={{
-            margin: "0 0 16px",
-            fontSize: 12.5,
+            margin: "0 0 10px",
+            fontSize: compact ? 11.5 : 12.5,
             color: "#6F6156",
-            lineHeight: 1.6,
-            wordBreak: "break-word"
+            lineHeight: 1.5,
+            wordBreak: "break-word",
+            display: compact ? "-webkit-box" : "block",
+            WebkitLineClamp: compact ? 2 : "none",
+            WebkitBoxOrient: compact ? "vertical" : "none",
+            overflow: compact ? "hidden" : "visible"
           }}>
             {product.description}
           </p>
         </div>
 
         {/* Buttons Row */}
-        <div className="rpt-product-btns" style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
+        <div className="rpt-product-btns" style={{ display: "flex", gap: compact ? 6 : 10, flexWrap: "wrap" }}>
           <a
             href={amazonUrl}
             target="_blank"
             rel="noopener noreferrer"
             className="btn-liquid-glass-dark"
             style={{
-              padding: "9px 18px",
-              fontSize: 11.5,
-              borderRadius: 10,
+              padding: compact ? "6px 12px" : "9px 18px",
+              fontSize: compact ? 10.5 : 11.5,
+              borderRadius: 8,
               border: "none",
               flex: 1,
               textAlign: "center",
@@ -820,9 +824,9 @@ function ProductCard({ product, lang, t }) {
             rel="noopener noreferrer"
             className="btn-liquid-glass"
             style={{
-              padding: "9px 18px",
-              fontSize: 11.5,
-              borderRadius: 10,
+              padding: compact ? "6px 12px" : "9px 18px",
+              fontSize: compact ? 10.5 : 11.5,
+              borderRadius: 8,
               border: "none",
               flex: 1,
               textAlign: "center",
@@ -841,11 +845,35 @@ const findMatchingProduct = (stepText, products) => {
   if (!products || products.length === 0) return null;
   const text = (stepText || '').toLowerCase();
 
+  // 1. Prioritize name-based matching
+  let bestMatch = null;
+  let maxOverlap = 0;
+
+  for (const p of products) {
+    const name = (p.productName || p.product_name || '').toLowerCase();
+    if (!name) continue;
+
+    if (text.includes(name)) {
+      return p;
+    }
+
+    const words = name.split(/\s+/).filter(w => w.length > 2 && w !== 'the');
+    if (words.length > 0 && words.every(word => text.includes(word))) {
+      if (words.length > maxOverlap) {
+        maxOverlap = words.length;
+        bestMatch = p;
+      }
+    }
+  }
+
+  if (bestMatch) return bestMatch;
+
+  // 2. Fallback to keyword-based matching
   // 1. Cleanser / Nettoyant
   if (text.includes('nettoyer') || text.includes('nettoyant') || text.includes('cleanse') || text.includes('cleanser')) {
     const found = products.find(p => {
-      const name = p.productName.toLowerCase();
-      return name.includes('cleanser') || name.includes('nettoyant');
+      const name = (p.productName || '').toLowerCase();
+      return name.includes('cleanser') || name.includes('nettoyant') || name.includes('wash');
     });
     if (found) return found;
   }
@@ -853,7 +881,7 @@ const findMatchingProduct = (stepText, products) => {
   // 2. Vitamin C / Vitamine C
   if (text.includes('vitamine c') || text.includes('vitamin c') || text.includes('antioxydant')) {
     const found = products.find(p => {
-      const name = p.productName.toLowerCase();
+      const name = (p.productName || '').toLowerCase();
       return name.includes('vitamin c') || name.includes('vitamine c') || name.includes('c-firma') || name.includes('ferulic') || name.includes('ascorbic');
     });
     if (found) return found;
@@ -862,7 +890,7 @@ const findMatchingProduct = (stepText, products) => {
   // 3. Eye Cream / Cernes
   if (text.includes('cernes') || text.includes('yeux') || text.includes('eye') || text.includes('eyes') || text.includes('orbital') || text.includes('caffeine')) {
     const found = products.find(p => {
-      const name = p.productName.toLowerCase();
+      const name = (p.productName || '').toLowerCase();
       return name.includes('eye') || name.includes('yeux') || name.includes('caffeine') || name.includes('avocado') || name.includes('cernes');
     });
     if (found) return found;
@@ -871,7 +899,7 @@ const findMatchingProduct = (stepText, products) => {
   // 4. Retinol / Rétinol
   if (text.includes('rétinol') || text.includes('retinol')) {
     const found = products.find(p => {
-      const name = p.productName.toLowerCase();
+      const name = (p.productName || '').toLowerCase();
       return name.includes('retinol') || name.includes('rétinol');
     });
     if (found) return found;
@@ -880,7 +908,7 @@ const findMatchingProduct = (stepText, products) => {
   // 5. Exfoliant / AHA / BHA
   if (text.includes('exfolier') || text.includes('exfoliant') || text.includes('bha') || text.includes('aha') || text.includes('acide glycolique') || text.includes('glycolic') || text.includes('salicylic') || text.includes('salicylique')) {
     const found = products.find(p => {
-      const name = p.productName.toLowerCase();
+      const name = (p.productName || '').toLowerCase();
       return name.includes('exfoliant') || name.includes('bha') || name.includes('aha') || name.includes('peeling') || name.includes('smoothing') || name.includes('gel');
     });
     if (found) return found;
@@ -889,7 +917,7 @@ const findMatchingProduct = (stepText, products) => {
   // 6. Niacinamide
   if (text.includes('niacinamide') || text.includes('pores') || text.includes('sebum') || text.includes('sébum') || text.includes('brillance')) {
     const found = products.find(p => {
-      const name = p.productName.toLowerCase();
+      const name = (p.productName || '').toLowerCase();
       return name.includes('niacinamide') || name.includes('zinc');
     });
     if (found) return found;
@@ -898,7 +926,7 @@ const findMatchingProduct = (stepText, products) => {
   // 7. Hydration mask
   if (text.includes('masque') || text.includes('mask') || text.includes('sleeping mask')) {
     const found = products.find(p => {
-      const name = p.productName.toLowerCase();
+      const name = (p.productName || '').toLowerCase();
       return name.includes('mask') || name.includes('masque');
     });
     if (found) return found;
@@ -907,7 +935,7 @@ const findMatchingProduct = (stepText, products) => {
   // 8. Moisturizer / Cream
   if (text.includes('crème') || text.includes('cream') || text.includes('moisturizer') || text.includes('hydratante') || text.includes('hydrater') || text.includes('barrière') || text.includes('barrier') || text.includes('céramides') || text.includes('ceramide')) {
     const found = products.find(p => {
-      const name = p.productName.toLowerCase();
+      const name = (p.productName || '').toLowerCase();
       return (name.includes('cream') || name.includes('moisturizer') || name.includes('crème')) && !name.includes('eye');
     });
     if (found) return found;
@@ -2020,8 +2048,8 @@ export default function BeautyReport({ data: rawData, isPaid, onUnlock }) {
                             <p style={{ margin: 0, fontSize: 12.5, lineHeight: 1.6, color: "#6F6156" }}>{step}</p>
                           </div>
                           {matchedProduct && (
-                            <div style={{ marginLeft: 24 }}>
-                              <InlineProductCard product={matchedProduct} t={t} />
+                            <div style={{ marginLeft: 24, marginTop: 8 }}>
+                              <ProductCard product={matchedProduct} lang={lang} t={t} />
                             </div>
                           )}
                         </div>
@@ -2057,8 +2085,8 @@ export default function BeautyReport({ data: rawData, isPaid, onUnlock }) {
                             <p style={{ margin: 0, fontSize: 12.5, lineHeight: 1.6, color: "#6F6156" }}>{step}</p>
                           </div>
                           {matchedProduct && (
-                            <div style={{ marginLeft: 24 }}>
-                              <InlineProductCard product={matchedProduct} t={t} />
+                            <div style={{ marginLeft: 24, marginTop: 8 }}>
+                              <ProductCard product={matchedProduct} lang={lang} t={t} />
                             </div>
                           )}
                         </div>
@@ -2094,8 +2122,8 @@ export default function BeautyReport({ data: rawData, isPaid, onUnlock }) {
                             <p style={{ margin: 0, fontSize: 12.5, lineHeight: 1.6, color: "#6F6156" }}>{step}</p>
                           </div>
                           {matchedProduct && (
-                            <div style={{ marginLeft: 24 }}>
-                              <InlineProductCard product={matchedProduct} t={t} />
+                            <div style={{ marginLeft: 24, marginTop: 8 }}>
+                              <ProductCard product={matchedProduct} lang={lang} t={t} />
                             </div>
                           )}
                         </div>

@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 import Head from 'next/head';
 import BeautyReport from '../components/BeautyReport';
-import Logo from '../components/Logo';
+import Logo, { LuxuryFlower } from '../components/Logo';
 import { useLang } from '../lib/LangContext';
 
 function LangToggle() {
@@ -44,6 +44,12 @@ export default function Report() {
   const [notFound, setNotFound] = useState(false);
   const [checkingPayment, setCheckingPayment] = useState(false);
 
+  const [emailCaptured, setEmailCaptured] = useState(true);
+  const [email, setEmail] = useState('');
+  const [emailLoading, setEmailLoading] = useState(false);
+  const [newsletterConsent, setNewsletterConsent] = useState(true);
+  const [showEmailGate, setShowEmailGate] = useState(false);
+
   useEffect(() => {
     if (typeof window !== 'undefined') {
       window.scrollTo(0, 0);
@@ -54,7 +60,23 @@ export default function Report() {
     // 1. Read from sessionStorage
     const stored = sessionStorage.getItem('rms_report');
 
-    // In local development, if no report exists, inject a beautiful mock paid report!
+    const captured = localStorage.getItem('rms_email_captured') === '1';
+    setEmailCaptured(captured);
+    if (!captured) {
+      setShowEmailGate(true);
+    }
+
+    const storedAnalysisId = sessionStorage.getItem('rms_analysis_id');
+    if (storedAnalysisId) setAnalysisId(storedAnalysisId);
+
+    const storedIsPaid = sessionStorage.getItem('rms_is_paid');
+    if (storedIsPaid === 'true') {
+      setIsPaid(true);
+    } else if (process.env.NODE_ENV === 'development') {
+      const urlParams = new URLSearchParams(window.location.search);
+      setIsPaid(urlParams.get('paid') === 'true');
+    }
+
     if (!stored && process.env.NODE_ENV === 'development') {
       const isFr = lang === 'fr';
       const mockReport = {
@@ -81,7 +103,7 @@ export default function Report() {
         },
         paid_version: {
           metrics: isFr ? [
-            { label: "Hydratation", score: 85, grade: "B", detail: "Bonne fonction barrière, quelques légères tiraillements sur le front." },
+            { label: "Hydratation", score: 85, grade: "B", detail: "Bonne fonction barrière, quelques légères tiraillements sur le font." },
             { label: "Pores", score: 79, grade: "B", detail: "Activité sébaceum dans les limites normales, pores légèrement visibles." },
             { label: "Éclat", score: 88, grade: "A", detail: "Excellent renouvellement cellulaire, surface de la peau lumineuse." },
             { label: "Acné", score: 92, grade: "A", detail: "Aucun coumédon actif ni lésion inflammatoire détecté." },
@@ -248,34 +270,43 @@ export default function Report() {
       const urlParams = new URLSearchParams(window.location.search);
       setIsPaid(urlParams.get('paid') === 'true');
     } else {
-      if (!stored) { setNotFound(true); return; }
-      try {
-        setData(JSON.parse(stored));
-      } catch {
+      if (stored) {
+        try {
+          setData(JSON.parse(stored));
+        } catch (err) {
+          setNotFound(true);
+        }
+      } else {
         setNotFound(true);
-        return;
       }
     }
 
-    const storedAnalysisId = sessionStorage.getItem('rms_analysis_id');
-    if (storedAnalysisId) setAnalysisId(storedAnalysisId);
-
-    const storedIsPaid = sessionStorage.getItem('rms_is_paid');
-    if (storedIsPaid === 'true') {
-      setIsPaid(true);
-    } else if (process.env.NODE_ENV === 'development') {
-      const urlParams = new URLSearchParams(window.location.search);
-      setIsPaid(urlParams.get('paid') === 'true');
+    // Force DB synchronization of report data if analysis ID is present
+    if (storedAnalysisId) {
+      fetch(`/api/analysis-status?id=${storedAnalysisId}`)
+        .then(r => r.json())
+        .then(res => {
+          if (res.isPaid) {
+            sessionStorage.setItem('rms_is_paid', 'true');
+            setIsPaid(true);
+            if (res.report) {
+              sessionStorage.setItem('rms_report', JSON.stringify(res.report));
+              setData(res.report);
+            }
+          }
+        })
+        .catch(() => {});
     }
 
     // 2. Fetch identity + paid_unlocks
     fetch('/api/identity')
       .then(r => r.json())
-      .then(({ userId: uid, paidUnlocks: unlocks }) => {
+      .then(data => {
+        const { userId: uid, paidUnlocks: unlocks } = data;
         setUserId(uid);
         if (unlocks > 0) setPaidUnlocks(unlocks);
       })
-      .catch(() => { });
+      .catch(() => {});
   }, [lang]);
 
   // 3. Handle payment=success query param
@@ -286,6 +317,8 @@ export default function Report() {
     const storedAnalysisId = sessionStorage.getItem('rms_analysis_id');
     if (!storedAnalysisId) return;
 
+    const sessionId = router.query.session_id || '';
+
     setCheckingPayment(true);
     // Remove query param from URL
     router.replace('/report', undefined, { shallow: true });
@@ -294,10 +327,14 @@ export default function Report() {
     let attempts = 0;
     const poll = async () => {
       try {
-        const res = await fetch(`/api/analysis-status?id=${storedAnalysisId}`);
-        const { isPaid: paid } = await res.json();
+        const res = await fetch(`/api/analysis-status?id=${storedAnalysisId}&session_id=${encodeURIComponent(sessionId)}`);
+        const { isPaid: paid, report } = await res.json();
         if (paid) {
           sessionStorage.setItem('rms_is_paid', 'true');
+          if (report) {
+            sessionStorage.setItem('rms_report', JSON.stringify(report));
+            setData(report);
+          }
           setIsPaid(true);
           setCheckingPayment(false);
           return;
@@ -312,7 +349,32 @@ export default function Report() {
     };
 
     poll();
-  }, [router.isReady, router.query.payment]);
+  }, [router.isReady, router.query.payment, router.query.session_id]);
+
+  const handleEmailSubmit = async (e) => {
+    e.preventDefault();
+    if (!email.trim()) return;
+    setEmailLoading(true);
+    try {
+      await Promise.all([
+        fetch('/api/newsletter', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email: email.trim(), newsletter: newsletterConsent }),
+        }),
+        fetch('/api/identity', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email: email.trim() }),
+        }),
+      ]);
+    } catch {}
+    localStorage.setItem('rms_email_captured', '1');
+    localStorage.setItem('rms_user_email', email.trim());
+    setEmailCaptured(true);
+    setShowEmailGate(false);
+    setEmailLoading(false);
+  };
 
   // 4. handleUnlock: calls checkout, redirects to Stripe
   const handleUnlock = async (planId) => {
@@ -326,7 +388,19 @@ export default function Report() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ userId, analysisId, planId, email }),
       });
-      const { url, error: err } = await res.json();
+
+      if (!res.ok) {
+        throw new Error('Server error');
+      }
+
+      let json;
+      try {
+        json = await res.json();
+      } catch {
+        throw new Error('Failed to parse checkout response');
+      }
+
+      const { url, error: err } = json;
       if (err) throw new Error(err);
       window.location.href = url;
     } catch (err) {
@@ -459,7 +533,129 @@ export default function Report() {
         </div>
       </div>
 
-      <BeautyReport data={data} isPaid={isPaid} onUnlock={handleUnlock} />
+      <div style={{
+        filter: showEmailGate ? 'blur(12px)' : 'none',
+        pointerEvents: showEmailGate ? 'none' : 'auto',
+        userSelect: showEmailGate ? 'none' : 'auto',
+        transition: 'filter 0.6s cubic-bezier(0.16, 1, 0.3, 1)'
+      }}>
+        <BeautyReport data={data} isPaid={isPaid} onUnlock={handleUnlock} />
+      </div>
+
+      {/* ── Email gate overlay ── */}
+      {showEmailGate && (
+        <div style={{
+          position: 'fixed', inset: 0, zIndex: 300,
+          background: 'rgba(255, 253, 248, 0.45)',
+          backdropFilter: 'blur(8px)', WebkitBackdropFilter: 'blur(8px)',
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          padding: '24px',
+        }}>
+          <div className="card-blur" style={{
+            borderRadius: 32,
+            padding: 'clamp(32px, 6vw, 48px)',
+            maxWidth: 420, width: '100%',
+            boxShadow: '0 32px 80px rgba(130, 100, 80, 0.08), inset 0 1px 1px rgba(255, 255, 255, 0.85)',
+            textAlign: 'center',
+          }}>
+            <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 22 }}>
+              <LuxuryFlower width={72} height={72} />
+            </div>
+
+            <p style={{
+              fontFamily: "'DM Sans', sans-serif",
+              fontSize: 11, letterSpacing: '0.16em', textTransform: 'uppercase',
+              color: '#C5A028', fontWeight: 500, margin: '0 0 10px',
+            }}>
+              {t('reward')}
+            </p>
+
+            <h2 style={{
+              fontFamily: "'Cormorant Garamond', serif",
+              fontSize: 'clamp(22px, 5vw, 30px)', fontWeight: 400,
+              color: '#2C241D', margin: '0 0 10px', lineHeight: 1.2,
+            }}>
+              {t('unlock2ndFree')}
+            </h2>
+
+            <p style={{
+              fontFamily: "'DM Sans', sans-serif",
+              fontSize: 13, color: '#8C7A6B', lineHeight: 1.6,
+              margin: '0 0 24px',
+            }}>
+              {t('emailGateDesc')}
+            </p>
+
+            <form onSubmit={handleEmailSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+              <input
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="your@email.com"
+                required
+                className="input-nacré"
+                style={{
+                  borderRadius: 16,
+                  padding: '14px 18px', fontSize: 14,
+                  fontFamily: "'DM Sans', sans-serif",
+                  outline: 'none', width: '100%', boxSizing: 'border-box',
+                  color: '#3A2E26',
+                }}
+              />
+
+              <label style={{ display: 'flex', alignItems: 'flex-start', gap: 8, cursor: 'pointer', marginTop: 6, textAlign: 'left' }}>
+                <input
+                  type="checkbox"
+                  checked={newsletterConsent}
+                  onChange={(e) => setNewsletterConsent(e.target.checked)}
+                  style={{ marginTop: 3 }}
+                />
+                <span style={{ fontSize: 11, color: '#8C7A6B', lineHeight: 1.45, fontFamily: "'DM Sans', sans-serif" }}>
+                  {t('newsletterConsent')}
+                </span>
+              </label>
+
+              <button
+                type="submit"
+                disabled={emailLoading}
+                className="btn-liquid-glass-dark"
+                style={{
+                  width: '100%',
+                  marginTop: 10,
+                  padding: '14px 20px',
+                  borderRadius: 16,
+                  border: 'none',
+                  fontSize: 14,
+                  fontWeight: 700,
+                  cursor: 'pointer',
+                  fontFamily: "'DM Sans', sans-serif",
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: 10,
+                }}
+              >
+                {emailLoading ? (
+                  <>
+                    <span style={{
+                      display: 'inline-block',
+                      width: 14,
+                      height: 14,
+                      border: '2px solid rgba(255,255,255,0.4)',
+                      borderTopColor: '#fff',
+                      borderRadius: '50%',
+                      animation: 'spin 0.7s linear infinite',
+                    }} />
+                    {t('saving')}
+                  </>
+                ) : (
+                  t('claimFreeAnalysis')
+                )}
+              </button>
+            </form>
+          </div>
+        </div>
+      )}
 
       <style>{`
         @keyframes spin {

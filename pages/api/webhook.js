@@ -74,8 +74,8 @@ export default async function handler(req, res) {
     console.log('[webhook]   product_type:', product_type);
     console.log('[webhook]   payment_status:', paymentStatus);
 
-    if (paymentStatus !== 'paid') {
-      console.warn('[webhook] payment_status is not "paid":', paymentStatus, '— skipping');
+    if (paymentStatus !== 'paid' && paymentStatus !== 'no_payment_required') {
+      console.warn('[webhook] payment_status is not "paid" or "no_payment_required":', paymentStatus, '— skipping');
       return res.status(200).json({ received: true });
     }
 

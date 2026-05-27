@@ -32,12 +32,14 @@ export default async function handler(req, res) {
     }
   }
 
-  const origin = `https://${req.headers.host}`;
+  const protocol = req.headers.host.includes('localhost') ? 'http' : 'https';
+  const origin = `${protocol}://${req.headers.host}`;
   const customerEmail = email && validateEmail(email) ? email.trim().toLowerCase() : undefined;
 
   try {
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ['card'],
+      allow_promotion_codes: true,
       ...(customerEmail ? { customer_email: customerEmail } : {}),
       line_items: [
         {
@@ -55,7 +57,7 @@ export default async function handler(req, res) {
         product_type,
         analysisId,
       },
-      success_url: `${origin}/report?payment=success`,
+      success_url: `${origin}/report?payment=success&session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${origin}/report`,
     });
 

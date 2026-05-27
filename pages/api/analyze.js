@@ -104,11 +104,7 @@ Réponds UNIQUEMENT avec du JSON BRUT (pas de blocs de code markdown, pas de tex
       { "week": 1, "title": "<titre semaine 1 en français simple, ex : 'Semaine 1 — Nettoyage fondamental'>", "desc": "<action principale: établir la routine de base (matin/soir) sans éléments complexes. Inclure : quel produit utiliser, à quelle fréquence, résultat attendu>" },
       { "week": 2, "title": "<titre semaine 2, ex : 'Semaine 2 — Hydratation boostée'>", "desc": "<action: ajouter/renforcer hydratation. Spécifier le soin recommandé de la routine et comment l'intégrer>" },
       { "week": 3, "title": "<titre semaine 3, ex : 'Semaine 3 — Ciblage des problèmes'>", "desc": "<action: introduire soin spécifique pour le problème principal observé (sérums, traitements ciblés)>" },
-      { "week": 4, "title": "<titre semaine 4, ex : 'Semaine 4 — Consolidation et évaluation'>", "desc": "<action: maintenir routine, évaluer premiers résultats (texture, brillance, cernes?), ajuster si besoin>" },
-      { "week": 5, "title": "<titre semaine 5, ex : 'Semaine 5 — Booster secondaire'>", "desc": "<action: ajouter 2e soin ciblé pour problème secondaire (ex: si acné + cernes, ajouter traitement cernes)>" },
-      { "week": 6, "title": "<titre semaine 6, ex : 'Semaine 6 — Protection et soutien'>", "desc": "<action: renforcer protection SPF daily, ajouter antioxydants si pertinent, intégrer soin lifestyle recommandé>" },
-      { "week": 7, "title": "<titre semaine 7, ex : 'Semaine 7 — Affinement et détail'>", "desc": "<action: affiner routine (ajouter exfoliation douce si applicable, traitement 3e problème si identifié), optimiser ordre application>" },
-      { "week": 8, "title": "<titre semaine 8, ex : 'Semaine 8 — Résultats et maintenance'>", "desc": "<action: évaluer transformations majeures attendues, stabiliser meilleure routine, donner conseils maintenance long-terme (fréquence, saisonnalité)>" }
+      { "week": 4, "title": "<titre semaine 4, ex : 'Semaine 4 — Consolidation et évaluation'>", "desc": "<action: maintenir routine, évaluer premiers résultats (texture, brillance, cernes?), ajuster si besoin>" }
     ]
   }
 }
@@ -162,6 +158,7 @@ Respond ONLY with RAW JSON (no markdown, no code blocks). Return EXACTLY this st
     ],
     "basicSummary": "<2-3 warm and simple sentences in English providing a skin health overview based on the photo. End by mentioning that the full report unlocks detailed scores, a custom routine, and matched product picks.>"
   },
+  "paid_version": {
     "metrics": [
       { "label": "Hydration", "score": <0-100>, "grade": "<A|B|C|D>", "severity": "<mild|moderate|significant. Use 'mild' if score >= 78, 'moderate' if 65-77, 'significant' if < 65>", "detail": "<1-2 highly personalized sentences in English based on the image: describe precisely what you see at targeted zones (e.g. fine dehydration lines on the forehead or cheeks, or conversely smooth and plump skin there) and a targeted advice>" },
       { "label": "Pores", "score": <0-100>, "grade": "<A|B|C|D>", "severity": "<mild|moderate|significant>", "detail": "<1-2 highly personalized sentences in English based on the image: indicate precisely where pores are visible on the photo (e.g. on the nose wings, cheeks, or chin) and how to purify or minimize them>" },
@@ -208,11 +205,7 @@ Respond ONLY with RAW JSON (no markdown, no code blocks). Return EXACTLY this st
       { "week": 1, "title": "<week 1 title in simple English, e.g. 'Week 1 — Foundation Cleanse'>", "desc": "<main action: establish the core AM/PM routine with basic steps. Include: which product, frequency, expected result>" },
       { "week": 2, "title": "<week 2 title, e.g. 'Week 2 — Hydration Power'>", "desc": "<main action: boost hydration layer. Specify which recommended product to add and how to layer>" },
       { "week": 3, "title": "<week 3 title, e.g. 'Week 3 — Target Main Issue'>", "desc": "<main action: introduce targeted treatment for primary skin concern (serums, spot treatments, specialized products)>" },
-      { "week": 4, "title": "<week 4 title, e.g. 'Week 4 — Evaluate & Adjust'>", "desc": "<main action: maintain routine, evaluate early results (texture improvements, brightness, under-eye changes?), fine-tune if needed>" },
-      { "week": 5, "title": "<week 5 title, e.g. 'Week 5 — Secondary Boost'>", "desc": "<main action: add second targeted treatment for secondary issue (e.g., if dark circles + acne, add undereye treatment)>" },
-      { "week": 6, "title": "<week 6 title, e.g. 'Week 6 — Protection & Support'>", "desc": "<main action: reinforce daily SPF protection, add antioxidants if relevant, integrate recommended lifestyle change>" },
-      { "week": 7, "title": "<week 7 title, e.g. 'Week 7 — Refinement Phase'>", "desc": "<main action: refine routine (add gentle exfoliation if applicable, address 3rd concern if identified), optimize layering sequence>" },
-      { "week": 8, "title": "<week 8 title, e.g. 'Week 8 — Results & Maintenance'>", "desc": "<main action: assess major transformations expected by now, lock in your best routine, provide long-term maintenance advice (frequency, seasonal adjustments)>" }
+      { "week": 4, "title": "<week 4 title, e.g. 'Week 4 — Evaluate & Adjust'>", "desc": "<main action: maintain routine, evaluate early results (texture improvements, brightness, under-eye changes?), fine-tune if needed>" }
     ]
   }
 }
@@ -269,9 +262,9 @@ export default async function handler(req, res) {
       skin_problem: p.skin_problem,
       product_name: p.product_name,
       description: p.product_description,
-      amazon_link: p.amazon_link,
-      sephora_link: p.sephora_link,
-      price_range: p.price
+      amazon_link: p.amazon_affiliate_link,
+      sephora_link: p.sephora_affiliate_link,
+      price_range: p.price_range
     }));
 
     // Build image lookup map for server-side injection after Claude responds
@@ -285,7 +278,7 @@ export default async function handler(req, res) {
     // 2. Call Claude
     const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
     const message = await anthropic.messages.create({
-      model: 'claude-haiku-4-5-20251001',
+      model: 'claude-3-5-sonnet-20241022',
       max_tokens: 8000,
       system: [{ type: 'text', text: buildSystemPrompt(lang, formattedProducts) }],
       messages: [{
@@ -346,12 +339,13 @@ export default async function handler(req, res) {
     // 4. Read existing user (need paid_unlocks before touching the row)
     const { data: existingUser } = await supabase
       .from('users')
-      .select('analyses_used, paid_unlocks')
+      .select('analyses_used, paid_unlocks, is_premium')
       .eq('id', effectiveUserId)
       .single();
 
     const currentPaidUnlocks = existingUser?.paid_unlocks || 0;
-    console.log('[analyze] user exists:', !!existingUser, '| paid_unlocks:', currentPaidUnlocks);
+    const isPremium = existingUser?.is_premium || false;
+    console.log('[analyze] user exists:', !!existingUser, '| paid_unlocks:', currentPaidUnlocks, '| is_premium:', isPremium);
 
     // 5. Persist user row — update analyses_used only (never touch paid_unlocks here)
     let userSaved = false;
@@ -394,12 +388,12 @@ export default async function handler(req, res) {
       console.log('[analyze] ✅ analysis saved — id:', analysisId);
     }
 
-    // 7. Auto-unlock if user has paid_unlocks remaining
+    // 7. Auto-unlock if user has paid_unlocks remaining or is premium
     let isPaidOnCreate = false;
     let paidUnlocksLeft = currentPaidUnlocks;
 
-    if (currentPaidUnlocks > 0 && !analysisInsertErr) {
-      console.log('[analyze] auto-unlock: paid_unlocks available =', currentPaidUnlocks);
+    if ((isPremium || currentPaidUnlocks > 0) && !analysisInsertErr) {
+      console.log('[analyze] auto-unlock: paid_unlocks available =', currentPaidUnlocks, '| isPremium =', isPremium);
       const { error: unlockErr } = await supabase
         .from('analyses')
         .update({ is_paid: true })
@@ -408,16 +402,21 @@ export default async function handler(req, res) {
       if (unlockErr) {
         console.error('[analyze] ❌ auto-unlock failed:', unlockErr.message);
       } else {
-        const { error: decrErr } = await supabase
-          .from('users')
-          .update({ paid_unlocks: currentPaidUnlocks - 1 })
-          .eq('id', effectiveUserId);
-        if (decrErr) {
-          console.error('[analyze] ❌ paid_unlocks decrement failed:', decrErr.message);
-        } else {
+        if (isPremium) {
           isPaidOnCreate = true;
-          paidUnlocksLeft = currentPaidUnlocks - 1;
-          console.log('[analyze] ✅ auto-unlocked, paid_unlocks remaining:', paidUnlocksLeft);
+          console.log('[analyze] ✅ auto-unlocked for premium user, no decrement required.');
+        } else {
+          const { error: decrErr } = await supabase
+            .from('users')
+            .update({ paid_unlocks: currentPaidUnlocks - 1 })
+            .eq('id', effectiveUserId);
+          if (decrErr) {
+            console.error('[analyze] ❌ paid_unlocks decrement failed:', decrErr.message);
+          } else {
+            isPaidOnCreate = true;
+            paidUnlocksLeft = currentPaidUnlocks - 1;
+            console.log('[analyze] ✅ auto-unlocked, paid_unlocks remaining:', paidUnlocksLeft);
+          }
         }
       }
     }

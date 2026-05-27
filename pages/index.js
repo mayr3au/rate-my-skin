@@ -73,6 +73,248 @@ const ANALYSIS_STEPS = [
   { icon: "M9 12l2 2 4-4M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0z", label: "Génération du rapport final…" },
 ];
 
+/* ── Testimonials ── */
+function Testimonials({ lang }) {
+  const data = [
+    {
+      name: "Sarah",
+      age: 24,
+      concern: lang === 'fr' ? "Peau à tendance acnéique" : "Acne-prone skin",
+      scoreBefore: 64,
+      scoreAfter: 88,
+      quote: lang === 'fr' 
+        ? "L'analyse a immédiatement ciblé mes microkystes sur le front. La routine recommandée a changé ma peau en quelques semaines."
+        : "The analysis instantly targeted my forehead bumps. The recommended routine transformed my skin in just a few weeks."
+    },
+    {
+      name: "Léa",
+      age: 31,
+      concern: lang === 'fr' ? "Peau mixte & sensible" : "Combo & sensitive skin",
+      scoreBefore: 72,
+      scoreAfter: 91,
+      quote: lang === 'fr'
+        ? "Je pensais avoir la peau sèche, mais l'IA a détecté une déshydratation profonde. Ma barrière cutanée est enfin réparée !"
+        : "I thought I had dry skin, but the AI detected deep dehydration. My skin barrier is finally restored!"
+    },
+    {
+      name: "Camille",
+      age: 42,
+      concern: lang === 'fr' ? "Ridules & Teint terne" : "Fine lines & Dullness",
+      scoreBefore: 68,
+      scoreAfter: 85,
+      quote: lang === 'fr'
+        ? "Rapport ultra détaillé et précieux. Les conseils d'application des sérums m'ont permis de retrouver de l'éclat et lisser mes ridules."
+        : "Extremely detailed and valuable report. The serum application tips helped me regain radiance and smooth fine lines."
+    },
+    {
+      name: "Inès",
+      age: 28,
+      concern: lang === 'fr' ? "Pores dilatés & Rougeurs" : "Large pores & Redness",
+      scoreBefore: 70,
+      scoreAfter: 89,
+      quote: lang === 'fr'
+        ? "Impressionnée par la précision. L'IA a repéré mes rougeurs diffuses et m'a évité d'acheter des produits irritants inutiles."
+        : "Impressed by the accuracy. The AI spotted my diffuse redness and saved me from buying irritating products."
+    }
+  ];
+
+  return (
+    <div style={{
+      maxWidth: 960,
+      margin: '0 auto 64px',
+      padding: '0 24px',
+      fontFamily: "'DM Sans', sans-serif"
+    }}>
+      {/* Small badge */}
+      <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 8 }}>
+        <span style={{
+          fontSize: 8.5,
+          fontWeight: 700,
+          letterSpacing: "0.22em",
+          textTransform: "uppercase",
+          color: "#B0885E",
+          background: "rgba(168, 116, 73, 0.05)",
+          border: "1px solid rgba(168, 116, 73, 0.15)",
+          borderRadius: 20,
+          padding: "4px 12px",
+          fontFamily: "'DM Sans', sans-serif"
+        }}>
+          {lang === 'fr' ? "ÉVOLUTION & TÉMOIGNAGES" : "COMMUNITY EVOLUTION"}
+        </span>
+      </div>
+
+      <h3 style={{
+        fontFamily: "'Cormorant Garamond', serif",
+        fontSize: 'clamp(26px, 4.5vw, 36px)',
+        fontWeight: 400,
+        color: '#3A2E26',
+        textAlign: 'center',
+        margin: '0 0 10px',
+        letterSpacing: '-0.01em',
+      }}>
+        {lang === 'fr' ? "Leur peau a changé de score" : "Real results, measured by AI"}
+      </h3>
+      <p style={{
+        fontSize: 13,
+        color: '#A2968B',
+        textAlign: 'center',
+        margin: '0 auto 38px',
+        maxWidth: 500,
+        lineHeight: 1.6,
+        letterSpacing: '0.01em',
+      }}>
+        {lang === 'fr' 
+          ? "Voici l'évolution moyenne et les impressions de la communauté après l'ajustement de leur routine." 
+          : "Read the journeys and routine adjustments of members after unlocking their AI diagnostic."}
+      </p>
+
+      <div style={{
+        display: 'grid',
+        gridTemplateColumns: 'repeat(auto-fit, minmax(270px, 1fr))',
+        gap: 24,
+      }}>
+        {data.map((t, idx) => {
+          const pointsGained = t.scoreAfter - t.scoreBefore;
+          return (
+            <div 
+              key={idx}
+              className="bubble-nacré"
+              style={{
+                borderRadius: 28,
+                padding: '28px 24px 24px',
+                display: 'flex',
+                flexDirection: 'column',
+                justifyContent: 'space-between',
+                transition: 'all 0.4s cubic-bezier(0.16, 1, 0.3, 1)',
+                background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.72) 0%, rgba(253, 246, 237, 0.45) 50%, rgba(246, 235, 222, 0.65) 100%)',
+                backdropFilter: 'blur(20px)',
+                WebkitBackdropFilter: 'blur(20px)',
+                border: '1px solid rgba(168, 116, 73, 0.12)',
+                boxShadow: '0 8px 32px rgba(168, 116, 73, 0.02), inset 0 1px 0 rgba(255, 255, 255, 0.9)',
+                position: 'relative',
+                overflow: 'hidden',
+                cursor: 'default'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.transform = 'translateY(-6px)';
+                e.currentTarget.style.borderColor = 'rgba(168, 116, 73, 0.35)';
+                e.currentTarget.style.boxShadow = '0 16px 40px rgba(168, 116, 73, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.95)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.transform = 'none';
+                e.currentTarget.style.borderColor = 'rgba(168, 116, 73, 0.12)';
+                e.currentTarget.style.boxShadow = '0 8px 32px rgba(168, 116, 73, 0.02), inset 0 1px 0 rgba(255, 255, 255, 0.9)';
+              }}
+            >
+              <div>
+                {/* Header: stars + score progress */}
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+                  <div style={{ color: '#C5A028', fontSize: 11, letterSpacing: 1 }}>
+                    ★★★★★
+                  </div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                    <div style={{
+                      fontSize: 10,
+                      fontWeight: 700,
+                      color: '#8C6A3A',
+                      background: 'rgba(255, 255, 255, 0.6)',
+                      border: '1px solid rgba(168, 116, 73, 0.18)',
+                      borderRadius: 20,
+                      padding: '3px 9px',
+                      fontFamily: "'DM Sans', sans-serif",
+                      boxShadow: '0 2px 6px rgba(168, 116, 73, 0.02)'
+                    }}>
+                      Score: {t.scoreBefore} ➔ {t.scoreAfter}
+                    </div>
+                    <div style={{
+                      fontSize: 9.5,
+                      fontWeight: 800,
+                      color: '#FFFFFF',
+                      background: 'linear-gradient(135deg, #C5A028 0%, #A87449 100%)',
+                      borderRadius: 20,
+                      padding: '3px 8px',
+                      fontFamily: "'DM Sans', sans-serif",
+                      boxShadow: '0 2px 8px rgba(197, 160, 40, 0.2)'
+                    }}>
+                      +{pointsGained}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Quote */}
+                <p style={{
+                  fontFamily: "'Cormorant Garamond', serif",
+                  fontSize: 17,
+                  fontStyle: 'italic',
+                  color: '#4A3E3D',
+                  lineHeight: 1.6,
+                  margin: '0 0 20px',
+                }}>
+                  "{t.quote}"
+                </p>
+              </div>
+
+              {/* Profile footer */}
+              <div style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                borderTop: '1px solid rgba(168, 116, 73, 0.08)',
+                paddingTop: 14,
+                marginTop: 8
+              }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                  {/* Avatar placeholder with luxury gold gradient styling */}
+                  <div style={{
+                    width: 38,
+                    height: 38,
+                    borderRadius: '50%',
+                    background: 'linear-gradient(135deg, #FAF6F0 0%, #D4A574 100%)',
+                    color: '#3A2E26',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    fontWeight: 700,
+                    fontSize: 14,
+                    fontFamily: "'Cormorant Garamond', serif",
+                    boxShadow: '0 2px 8px rgba(168, 116, 73, 0.1)'
+                  }}>
+                    {t.name[0]}
+                  </div>
+                  <div>
+                    <div style={{ fontSize: 13, fontWeight: 600, color: '#3A2E26' }}>
+                      {t.name}, {t.age} {lang === 'fr' ? 'ans' : 'y/o'}
+                    </div>
+                    <div style={{ fontSize: 11, color: '#8C7A6B', marginTop: 1 }}>
+                      {t.concern}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Verified badge */}
+                <span style={{
+                  fontSize: 9,
+                  fontWeight: 600,
+                  color: '#7DBFA8',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 3,
+                  fontFamily: "'DM Sans', sans-serif"
+                }}>
+                  <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                    <polyline points="20 6 9 17 4 12" />
+                  </svg>
+                  {lang === 'fr' ? 'IA vérifié' : 'AI verified'}
+                </span>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
 export default function Home() {
   const router = useRouter();
   const { lang, t } = useLang();
@@ -112,6 +354,18 @@ export default function Home() {
   const [fade, setFade] = useState(true);
   const [analysisStep, setAnalysisStep] = useState(0);
   const [stepFade, setStepFade] = useState(true);
+  const [showAcneSafeTooltip, setShowAcneSafeTooltip] = useState(false);
+
+  useEffect(() => {
+    if (!showAcneSafeTooltip) return;
+    const handleOutsideClick = () => {
+      setShowAcneSafeTooltip(false);
+    };
+    document.addEventListener("click", handleOutsideClick);
+    return () => {
+      document.removeEventListener("click", handleOutsideClick);
+    };
+  }, [showAcneSafeTooltip]);
 
   useEffect(() => {
     // Migrate old localStorage key so returning users are recognised
@@ -369,14 +623,8 @@ export default function Home() {
     }, 200);
   };
 
-  const handleAnalyse = async (bypassEmailCheck = false) => {
+  const handleAnalyse = async () => {
     if (!image) return;
-
-    // Trigger email gate if not captured yet
-    if (!emailCaptured && !bypassEmailCheck) {
-      setOverlayVisible(true);
-      return;
-    }
 
     setLoading(true);
     setError('');
@@ -414,10 +662,31 @@ export default function Home() {
             email: storedEmail,
           }),
         });
-        const json = await res.json();
+
+        if (!res.ok) {
+          let errMsg = t('analysisFailed');
+          try {
+            const errJson = await res.json();
+            if (errJson.error === 'no_face') throw new Error(errJson.message || t('noFaceError'));
+            if (errJson.error) errMsg = errJson.error;
+          } catch {
+            try {
+              const txt = await res.text();
+              if (txt) errMsg = txt.substring(0, 100);
+            } catch {}
+          }
+          throw new Error(errMsg);
+        }
+
+        let json;
+        try {
+          json = await res.json();
+        } catch {
+          throw new Error(t('analysisFailed'));
+        }
 
         if (json.error === 'no_face') throw new Error(json.message || t('noFaceError'));
-        if (!res.ok || json.error) throw new Error(json.error || t('analysisFailed'));
+        if (json.error) throw new Error(json.error || t('analysisFailed'));
         
         return json;
       })();
@@ -474,6 +743,35 @@ export default function Home() {
           offers: { '@type': 'Offer', price: '0', priceCurrency: 'EUR' },
         }) }} />
       </Head>
+
+      {/* ── Welcoming Banner ── */}
+      <div style={{
+        background: 'linear-gradient(90deg, #FDFBF7 0%, #FAF0E6 50%, #FDFBF7 100%)',
+        borderBottom: '1px solid rgba(168, 116, 73, 0.12)',
+        padding: '8px 16px',
+        textAlign: 'center',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        gap: '8px',
+        position: 'relative',
+        zIndex: 210,
+      }}>
+        <span style={{ fontSize: '14px', animation: 'floatBob 3s ease-in-out infinite', display: 'inline-block' }}>🌸</span>
+        <span style={{
+          fontFamily: "'DM Sans', sans-serif",
+          fontSize: '12px',
+          fontWeight: 500,
+          color: '#6B4F3B',
+          letterSpacing: '0.03em',
+          lineHeight: '1.4'
+        }}>
+          {lang === 'fr' 
+            ? 'Bienvenue dans notre espace bienveillant. Révélez l’éclat de votre peau en toute sérénité.' 
+            : 'Welcome to our caring space. Reveal your natural skin radiance with confidence.'}
+        </span>
+        <span style={{ fontSize: '12px', color: '#C5A028' }}>✦</span>
+      </div>
 
       {/* ── Sticky nav ── */}
       <div className="nav-blur" style={{
@@ -662,7 +960,7 @@ export default function Home() {
 
           {/* Upload zone */}
           <div
-            onClick={(e) => !imageUrl && requireEmail('file', e)}
+            onClick={(e) => !imageUrl && fileInputRef.current?.click()}
             className="card-nacré"
             style={{
               border: dragOver ? `1.5px solid ${GOLD}` : undefined,
@@ -708,14 +1006,14 @@ export default function Home() {
                 </p>
                 <div style={{ display: 'flex', gap: 8, justifyContent: 'center', marginTop: 14, flexWrap: 'wrap' }}>
                   <button
-                    onClick={(e) => requireEmail('file', e)}
+                    onClick={() => fileInputRef.current?.click()}
                     className="btn-liquid-glass-dark home-upload-btn"
                     style={{ border: 'none' }}
                   >
                     {t('uploadPhoto')}
                   </button>
                   <button
-                    onClick={(e) => requireEmail('camera', e)}
+                    onClick={() => setShowMultiAngle(true)}
                     className="btn-liquid-glass home-upload-btn"
                     style={{ border: 'none' }}
                   >
@@ -976,6 +1274,93 @@ export default function Home() {
               t('analyseNow')
             )}
           </button>
+          
+          <div style={{ display: 'flex', justifyContent: 'center', marginTop: 10, position: 'relative' }}>
+            <div style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: 5,
+              fontSize: 8.5,
+              fontWeight: 700,
+              letterSpacing: "0.12em",
+              textTransform: "uppercase",
+              color: "#A87449",
+              background: "rgba(168, 116, 73, 0.05)",
+              border: "1px solid rgba(168, 116, 73, 0.15)",
+              borderRadius: 6,
+              padding: "3px 8px",
+              fontFamily: "'DM Sans', sans-serif",
+              position: 'relative'
+            }}>
+              <span>{lang === 'fr' ? 'acné safe' : 'acne free'}</span>
+              <span
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setShowAcneSafeTooltip(!showAcneSafeTooltip);
+                }}
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  width: 12,
+                  height: 12,
+                  borderRadius: '50%',
+                  background: 'rgba(168,116,73,0.12)',
+                  color: '#A87449',
+                  fontSize: 8,
+                  fontWeight: 700,
+                  fontStyle: 'normal',
+                  cursor: 'pointer',
+                  userSelect: 'none'
+                }}
+              >
+                i
+              </span>
+
+              {/* Tooltip box */}
+              {showAcneSafeTooltip && (
+                <div
+                  style={{
+                    position: 'absolute',
+                    bottom: '100%',
+                    left: '50%',
+                    transform: 'translateX(-50%) translateY(-8px)',
+                    width: 240,
+                    background: 'rgba(58, 46, 38, 0.98)',
+                    color: '#FAF6F0',
+                    padding: '10px 14px',
+                    borderRadius: 12,
+                    fontSize: 11,
+                    fontWeight: 500,
+                    lineHeight: 1.45,
+                    boxShadow: '0 8px 24px rgba(44, 36, 29, 0.25)',
+                    zIndex: 100,
+                    fontFamily: "'DM Sans', sans-serif",
+                    textAlign: 'center',
+                    textTransform: 'none',
+                    letterSpacing: 'normal'
+                  }}
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  {lang === 'fr' 
+                    ? "Nos algorithmes et recommandations excluent tout ingrédient comédogène. Nous protégeons votre peau des poussées d'acné réactives."
+                    : "Our algorithms and product recommendations strictly exclude comedogenic ingredients, protecting your skin from reactive breakouts."}
+                  {/* Arrow */}
+                  <div style={{
+                    position: 'absolute',
+                    top: '100%',
+                    left: '50%',
+                    transform: 'translateX(-50%)',
+                    width: 0,
+                    height: 0,
+                    borderLeft: '6px solid transparent',
+                    borderRight: '6px solid transparent',
+                    borderTop: '6px solid rgba(58, 46, 38, 0.98)',
+                  }} />
+                </div>
+              )}
+            </div>
+          </div>
 
           {loading && (
             <p style={{ textAlign: 'center', fontSize: 12, color: '#8C7A6B', marginTop: 10, fontFamily: "'DM Sans', sans-serif" }}>
@@ -1020,6 +1405,8 @@ export default function Home() {
 
           <MedicalDisclaimer style={{ marginTop: 16 }} />
         </div>
+
+        <Testimonials lang={lang} />
 
         {/* SEO section - French keyword visibility */}
         <div style={{ maxWidth: 560, margin: '0 auto', padding: '0 24px 48px', textAlign: 'center' }}>

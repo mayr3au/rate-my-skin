@@ -1,6 +1,8 @@
 import { createAdminClient } from '../../lib/supabase';
+import { applyCors, getClientIp, checkRateLimit } from '../../lib/security';
 
 export default async function handler(req, res) {
+  if (applyCors(req, res)) return;
   if (req.method !== 'POST') return res.status(405).end();
 
   const { email, userId } = req.body;
@@ -15,6 +17,12 @@ export default async function handler(req, res) {
   console.log('[newsletter] service role key present:', !!process.env.SUPABASE_SERVICE_ROLE_KEY);
 
   const supabase = createAdminClient();
+
+  const ip = getClientIp(req);
+  const isLimited = await checkRateLimit(supabase, ip, 5, 60 * 60 * 1000);
+  if (isLimited) {
+    return res.status(429).json({ error: 'Too many subscription attempts. Please try again later.' });
+  }
 
   const { error: insertError } = await supabase
     .from('newsletter')

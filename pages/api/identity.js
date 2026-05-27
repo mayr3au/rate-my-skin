@@ -27,7 +27,9 @@ export default async function handler(req, res) {
       cookies.push(makeCookie(UID_COOKIE, userId));
     }
     cookies.push(makeCookie(EMAIL_COOKIE, normalizedEmail));
-    res.setHeader('Set-Cookie', cookies);
+
+    let isPremium = false;
+    let paidUnlocks = 0;
 
     try {
       const supabase = createAdminClient();
@@ -48,11 +50,28 @@ export default async function handler(req, res) {
           email: normalizedEmail,
         });
       }
+
+      // Après le fetch du user depuis Supabase
+      const { data: userData } = await supabase
+        .from('users')
+        .select('*')
+        .eq('email', normalizedEmail)
+        .single();
+
+      if (userData) {
+        isPremium = userData.is_premium || false;
+        paidUnlocks = userData.paid_unlocks || 0;
+        // Check si premium
+        const isPaid = userData.is_premium || (userData.paid_unlocks > 0);
+        const secure = process.env.NODE_ENV === 'production' ? '; Secure' : '';
+        cookies.push(`rms_is_paid=${isPaid}; Path=/; SameSite=Lax; Max-Age=${MAX_AGE}${secure}`);
+      }
     } catch (error) {
       console.error('❌ Email sync failed:', error);
     }
 
-    return res.status(200).json({ ok: true, userId, email: normalizedEmail });
+    res.setHeader('Set-Cookie', cookies);
+    return res.status(200).json({ ok: true, userId, email: normalizedEmail, isPremium, paidUnlocks });
   }
 
   if (req.method !== 'GET') return res.status(405).end();
@@ -68,18 +87,24 @@ export default async function handler(req, res) {
     userId = crypto.randomUUID();
     cookies.push(makeCookie(UID_COOKIE, userId));
   }
-  if (cookies.length) res.setHeader('Set-Cookie', cookies);
 
   let paidUnlocks = 0;
+  let isPremium = false;
   try {
     const supabase = createAdminClient();
     const { data } = await supabase
       .from('users')
-      .select('paid_unlocks')
+      .select('paid_unlocks, is_premium')
       .eq('id', userId)
       .single();
     paidUnlocks = data?.paid_unlocks || 0;
+    isPremium = data?.is_premium || false;
   } catch {}
 
-  return res.status(200).json({ userId, paidUnlocks, email: emailFromCookie });
+  const isPaid = isPremium || paidUnlocks > 0;
+  const secure = process.env.NODE_ENV === 'production' ? '; Secure' : '';
+  cookies.push(`rms_is_paid=${isPaid}; Path=/; SameSite=Lax; Max-Age=${MAX_AGE}${secure}`);
+  if (cookies.length) res.setHeader('Set-Cookie', cookies);
+
+  return res.status(200).json({ userId, paidUnlocks, isPremium, email: emailFromCookie });
 }
