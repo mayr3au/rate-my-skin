@@ -746,9 +746,9 @@ export default function Home() {
 
       {/* ── Welcoming Banner ── */}
       <div style={{
-        background: 'linear-gradient(90deg, #FDFBF7 0%, #FAF0E6 50%, #FDFBF7 100%)',
-        borderBottom: '1px solid rgba(168, 116, 73, 0.12)',
-        padding: '8px 16px',
+        background: 'linear-gradient(90deg, #FDFCF9 0%, #FAF2EA 50%, #FDFCF9 100%)',
+        borderBottom: '1px solid rgba(197, 160, 40, 0.12)',
+        padding: '7px 16px',
         textAlign: 'center',
         display: 'flex',
         alignItems: 'center',
@@ -757,20 +757,24 @@ export default function Home() {
         position: 'relative',
         zIndex: 210,
       }}>
-        <span style={{ fontSize: '14px', animation: 'floatBob 3s ease-in-out infinite', display: 'inline-block' }}>🌸</span>
+        <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor" style={{ color: '#C5A028', opacity: 0.85, animation: 'floatBob 3s ease-in-out infinite' }}>
+          <path d="M12 0l3 9 9 3-9 3-3 9-3-9-9-3 9-3z" />
+        </svg>
         <span style={{
           fontFamily: "'DM Sans', sans-serif",
-          fontSize: '12px',
+          fontSize: '11px',
           fontWeight: 500,
-          color: '#6B4F3B',
-          letterSpacing: '0.03em',
+          color: '#8C6A4F',
+          letterSpacing: '0.04em',
           lineHeight: '1.4'
         }}>
           {lang === 'fr' 
-            ? 'Bienvenue dans notre espace bienveillant. Révélez l’éclat de votre peau en toute sérénité.' 
-            : 'Welcome to our caring space. Reveal your natural skin radiance with confidence.'}
+            ? 'Bienvenue ! Révélons ensemble l’éclat naturel de votre peau.' 
+            : 'Welcome! Let’s reveal your skin’s natural radiance together.'}
         </span>
-        <span style={{ fontSize: '12px', color: '#C5A028' }}>✦</span>
+        <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor" style={{ color: '#C5A028', opacity: 0.85, animation: 'floatBob 3s ease-in-out infinite' }}>
+          <path d="M12 0l3 9 9 3-9 3-3 9-3-9-9-3 9-3z" />
+        </svg>
       </div>
 
       {/* ── Sticky nav ── */}
