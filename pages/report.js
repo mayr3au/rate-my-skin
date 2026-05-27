@@ -32,6 +32,51 @@ function LangToggle() {
   );
 }
 
+const FACTS = [
+  {
+    title: "Le mythe du 'trop propre'",
+    desc: "Nettoyer sa peau plus de 2 fois par jour détruit la barrière cutanée et peut paradoxalement causer plus d'imperfections."
+  },
+  {
+    title: "L'impact du stress",
+    desc: "Le cortisol stimule la production de sébum. La gestion du stress fait partie intégrante d'une routine peau efficace."
+  },
+  {
+    title: "L'ordre compte",
+    desc: "Appliquer ses soins du plus fluide au plus épais maximise leur absorption. Sérum avant crème, jamais l'inverse."
+  },
+  {
+    title: "Le SPF est non-négociable",
+    desc: "80% du vieillissement cutané est lié aux UV. Même par temps nuageux, même en intérieur près d'une fenêtre."
+  },
+  {
+    title: "La règle des 60 secondes",
+    desc: "Laisser un nettoyant agir 60 secondes sur la peau améliore significativement la dissolution du sébum et des impûretés."
+  },
+  {
+    title: "L'hydratation de l'intérieur",
+    desc: "Boire 1,5 L d'eau par jour améliore l'éclat et la souplesse de la peau dès les premières semaines."
+  },
+];
+
+const PREMIUM_STEPS_FR = [
+  { icon: "M12 2a7 7 0 1 0 0 14A7 7 0 0 0 12 2zm0 3v4l3 3", label: "Calcul du score d'hydratation…" },
+  { icon: "M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7z M12 9a3 3 0 1 0 0 6 3 3 0 0 0 0-6z", label: "Recherche d'imperfections & acné…" },
+  { icon: "M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z", label: "Analyse des ridules et de la fermeté…" },
+  { icon: "M3 12h18M3 6h18M3 18h18", label: "Sélection des ingrédients actifs…" },
+  { icon: "M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z", label: "Génération de la routine sur-mesure…" },
+  { icon: "M9 12l2 2 4-4M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0z", label: "Finalisation de votre ordonnance beauté…" },
+];
+
+const PREMIUM_STEPS_EN = [
+  { icon: "M12 2a7 7 0 1 0 0 14A7 7 0 0 0 12 2zm0 3v4l3 3", label: "Calculating hydration score…" },
+  { icon: "M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7z M12 9a3 3 0 1 0 0 6 3 3 0 0 0 0-6z", label: "Scanning for blemishes & acne…" },
+  { icon: "M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z", label: "Analyzing fine lines & elasticity…" },
+  { icon: "M3 12h18M3 6h18M3 18h18", label: "Selecting active ingredients…" },
+  { icon: "M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z", label: "Generating your custom routine…" },
+  { icon: "M9 12l2 2 4-4M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0z", label: "Finalizing your skin prescription…" },
+];
+
 export default function Report() {
   const router = useRouter();
   const { lang, t } = useLang();
@@ -43,6 +88,12 @@ export default function Report() {
   const [paidUnlocks, setPaidUnlocks] = useState(0);
   const [notFound, setNotFound] = useState(false);
   const [checkingPayment, setCheckingPayment] = useState(false);
+
+  const [progress, setProgress] = useState(0);
+  const [analysisStep, setAnalysisStep] = useState(0);
+  const [factIndex, setFactIndex] = useState(0);
+  const [fade, setFade] = useState(true);
+  const [stepFade, setStepFade] = useState(true);
 
   const [emailCaptured, setEmailCaptured] = useState(true);
   const [email, setEmail] = useState('');
@@ -310,6 +361,78 @@ export default function Report() {
   }, [lang]);
 
   // 3. Handle payment=success query param
+  const unlockBody = () => {
+    const top = document.body.style.top;
+    document.body.style.position = '';
+    document.body.style.top = '';
+    document.body.style.left = '';
+    document.body.style.right = '';
+    document.body.style.overflow = '';
+    if (top) window.scrollTo(0, -parseInt(top || '0'));
+  };
+
+  useEffect(() => {
+    let progressInterval;
+    let factInterval;
+    let stepInterval;
+    let fadeTimeout;
+    let stepFadeTimeout;
+
+    if (checkingPayment) {
+      const startTime = Date.now();
+      const totalDuration = 18000; // 18 seconds max
+
+      progressInterval = setInterval(() => {
+        const elapsed = Math.min(Date.now() - startTime, totalDuration);
+        const t = elapsed / totalDuration;
+        const eased = 1 - Math.pow(1 - t, 2.8);
+        const currentProgress = Math.min(eased * 99, 99);
+        setProgress(currentProgress);
+      }, 80);
+
+      // Facts rotate every 5 seconds
+      factInterval = setInterval(() => {
+        setFade(false);
+        fadeTimeout = setTimeout(() => {
+          setFactIndex(prev => (prev + 1) % FACTS.length);
+          setFade(true);
+        }, 400);
+      }, 5000);
+
+      // Analysis steps rotate every 2.8s
+      stepInterval = setInterval(() => {
+        setStepFade(false);
+        stepFadeTimeout = setTimeout(() => {
+          setAnalysisStep(prev => Math.min(prev + 1, (lang === 'fr' ? PREMIUM_STEPS_FR : PREMIUM_STEPS_EN).length - 1));
+          setStepFade(true);
+        }, 350);
+      }, 2800);
+
+      const scrollY = window.scrollY;
+      document.body.style.position = 'fixed';
+      document.body.style.top = `-${scrollY}px`;
+      document.body.style.left = '0';
+      document.body.style.right = '0';
+      document.body.style.overflow = 'hidden';
+    } else {
+      setProgress(0);
+      setFactIndex(0);
+      setFade(true);
+      setAnalysisStep(0);
+      setStepFade(true);
+      unlockBody();
+    }
+
+    return () => {
+      clearInterval(progressInterval);
+      clearInterval(factInterval);
+      clearInterval(stepInterval);
+      clearTimeout(fadeTimeout);
+      clearTimeout(stepFadeTimeout);
+      unlockBody();
+    };
+  }, [checkingPayment, lang]);
+
   useEffect(() => {
     if (!router.isReady) return;
     if (router.query.payment !== 'success') return;
@@ -323,7 +446,7 @@ export default function Report() {
     // Remove query param from URL
     router.replace('/report', undefined, { shallow: true });
 
-    // Poll analysis status — up to 10 attempts × 2s = 20s coverage for slow webhooks
+    // Poll analysis status — up to 12 attempts × 2s = 24s coverage for Claude generation
     let attempts = 0;
     const poll = async () => {
       try {
@@ -336,12 +459,15 @@ export default function Report() {
             setData(report);
           }
           setIsPaid(true);
-          setCheckingPayment(false);
+          setProgress(100);
+          setTimeout(() => {
+            setCheckingPayment(false);
+          }, 350);
           return;
         }
       } catch { }
       attempts++;
-      if (attempts < 10) {
+      if (attempts < 12) {
         setTimeout(poll, 2000);
       } else {
         setCheckingPayment(false);
@@ -449,22 +575,208 @@ export default function Report() {
         <meta name="twitter:image" content="https://ratemyskin.co/og-image.png" />
       </Head>
 
-      {/* Payment checking overlay */}
+      {/* ── Full-screen Premium Generation Loading Page ── */}
       {checkingPayment && (
-        <div style={{
-          position: 'fixed', inset: 0,
-          background: 'rgba(253,250,247,0.97)',
-          backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)',
+        <div className="analysis-loading-overlay" style={{
+          position: 'fixed',
+          inset: 0,
+          zIndex: 2000,
+          background: 'linear-gradient(160deg, #FDFAF7 0%, #FBF6F0 35%, #F5EDE3 70%, #EDD9C5 100%)',
           display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
-          zIndex: 2000, gap: 16,
-          fontFamily: "'DM Sans', sans-serif",
+          padding: '32px 24px',
+          paddingTop: 'max(32px, env(safe-area-inset-top))',
+          paddingBottom: 'max(32px, env(safe-area-inset-bottom))',
+          textAlign: 'center',
+          animation: 'fadeIn 0.6s ease-out forwards',
+          gap: 0,
         }}>
+          {/* Silk texture */}
           <div style={{
-            width: 32, height: 32,
-            border: '2px solid #0d0d0d', borderTopColor: 'transparent',
-            borderRadius: '50%', animation: 'spin 0.7s linear infinite',
+            position: 'absolute', inset: 0, opacity: 0.35, pointerEvents: 'none',
+            background: 'url("data:image/svg+xml,%3Csvg viewBox=\'0 0 1000 1000\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cfilter id=\'silk\'%3E%3CfeTurbulence type=\'fractalNoise\' baseFrequency=\'0.005\' numOctaves=\'2\' stitchTiles=\'stitch\'/%3E%3CfeColorMatrix type=\'saturate\' values=\'0\'/%3E%3CfeComponentTransfer%3E%3CfeFuncA type=\'linear\' slope=\'0.03\'/%3E%3C/feComponentTransfer%3E%3C/filter%3E%3Crect width=\'100%25\' height=\'100%25\' filter=\'url(%23silk)\'/%3E%3C/svg%3E")',
           }} />
-          <p style={{ fontSize: 14, color: '#0d0d0d' }}>{t('checkingPayment')}</p>
+
+          <div style={{
+            position: 'relative', zIndex: 1,
+            width: '100%', maxWidth: '440px',
+            display: 'flex', flexDirection: 'column',
+            alignItems: 'center', gap: '28px',
+          }}>
+
+            {/* ── TOP: Flower + Live step ── */}
+            <div style={{
+              display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '14px',
+              background: 'rgba(255,255,255,0.55)',
+              backdropFilter: 'blur(16px)',
+              WebkitBackdropFilter: 'blur(16px)',
+              border: '1px solid rgba(201,169,97,0.2)',
+              borderRadius: '24px',
+              padding: '20px 28px',
+              width: '100%',
+              boxShadow: '0 4px 20px rgba(168,116,73,0.05)',
+            }}>
+              {/* Flower spinning */}
+              <div style={{
+                filter: 'drop-shadow(0 0 12px rgba(201,169,97,0.35))',
+                animation: 'floatBob 3s ease-in-out infinite',
+              }}>
+                <LuxuryFlower width={52} height={52} />
+              </div>
+
+              {/* Title */}
+              <div>
+                <h2 style={{
+                  fontFamily: "'Playfair Display', serif",
+                  fontSize: '22px', fontWeight: 700,
+                  color: '#3D2914', margin: '0 0 4px',
+                  letterSpacing: '0.01em',
+                }}>
+                  {lang === 'fr' ? 'Génération de votre rapport Premium…' : 'Generating your Premium report…'}
+                </h2>
+                <p style={{
+                  fontFamily: "'Inter', sans-serif",
+                  fontSize: '13px', color: '#8C7A6B', margin: 0,
+                }}>
+                  {lang === 'fr' ? 'Diagnostic avancé par IA en cours' : 'Advanced AI Diagnosis in progress'}
+                </p>
+              </div>
+
+              {/* Live step pill */}
+              <div style={{
+                display: 'flex', alignItems: 'center', gap: '8px',
+                background: 'linear-gradient(135deg, rgba(201,169,97,0.12), rgba(197,160,40,0.06))',
+                border: '1px solid rgba(201,169,97,0.28)',
+                borderRadius: '9999px',
+                padding: '7px 16px',
+                opacity: stepFade ? 1 : 0,
+                transition: 'opacity 350ms ease-in-out',
+              }}>
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#C9A961" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0, animation: 'stepIconPulse 1.5s ease-in-out infinite' }}>
+                  <path d={(lang === 'fr' ? PREMIUM_STEPS_FR : PREMIUM_STEPS_EN)[analysisStep]?.icon} />
+                </svg>
+                <span style={{
+                  fontFamily: "'Inter', sans-serif",
+                  fontSize: '12px', fontWeight: 600,
+                  color: '#6B4E2A', letterSpacing: '0.01em',
+                }}>
+                  {(lang === 'fr' ? PREMIUM_STEPS_FR : PREMIUM_STEPS_EN)[analysisStep]?.label}
+                </span>
+              </div>
+            </div>
+
+            {/* ── CENTER: Progress ring ── */}
+            <div style={{
+              position: 'relative', width: 160, height: 160,
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+            }}>
+              {/* Outer glow ring */}
+              <div style={{
+                position: 'absolute', inset: -8,
+                borderRadius: '50%',
+                background: `conic-gradient(rgba(201,169,97,${(progress/100)*0.25}) ${progress * 3.6}deg, transparent 0deg)`,
+                filter: 'blur(8px)',
+                transition: 'background 0.5s ease',
+              }} />
+              <svg width="160" height="160" viewBox="0 0 160 160" style={{ transform: 'rotate(-90deg)', position: 'relative', zIndex: 1 }}>
+                {/* Dashed track */}
+                <circle cx="80" cy="80" r="66" fill="none" stroke="rgba(201,169,97,0.12)" strokeWidth="8" strokeDasharray="4 6" />
+                {/* Solid track */}
+                <circle cx="80" cy="80" r="66" fill="none" stroke="rgba(201,169,97,0.08)" strokeWidth="8" />
+                {/* Progress arc */}
+                <circle
+                  cx="80" cy="80" r="66"
+                  fill="none"
+                  stroke="url(#progressGradPaid)"
+                  strokeWidth="8"
+                  strokeDasharray={414.69}
+                  strokeDashoffset={414.69 * (1 - progress / 100)}
+                  strokeLinecap="round"
+                  style={{ transition: 'stroke-dashoffset 0.3s cubic-bezier(0.4,0,0.2,1)' }}
+                />
+                <defs>
+                  <linearGradient id="progressGradPaid" x1="0%" y1="0%" x2="100%" y2="0%">
+                    <stop offset="0%" stopColor="#A87449" />
+                    <stop offset="50%" stopColor="#C9A961" />
+                    <stop offset="100%" stopColor="#E5C583" />
+                  </linearGradient>
+                </defs>
+              </svg>
+              {/* Center content */}
+              <div style={{
+                position: 'absolute', display: 'flex', flexDirection: 'column',
+                alignItems: 'center', gap: '2px',
+              }}>
+                <span style={{
+                  fontFamily: "'Playfair Display', serif",
+                  fontSize: '42px', fontWeight: 700,
+                  color: '#3D2914', lineHeight: 1,
+                }}>{Math.round(progress)}%</span>
+                <span style={{
+                  fontFamily: "'Inter', sans-serif",
+                  fontSize: '10px', fontWeight: 600,
+                  color: '#B0885E', letterSpacing: '0.15em',
+                  textTransform: 'uppercase',
+                }}>{lang === 'fr' ? 'ANALYSE' : 'DIAGNOSIS'}</span>
+              </div>
+            </div>
+
+            {/* ── BOTTOM: Facts card ── */}
+            <div style={{
+              width: '100%',
+              background: 'rgba(255,255,255,0.75)',
+              backdropFilter: 'blur(20px)',
+              WebkitBackdropFilter: 'blur(20px)',
+              border: '1px solid rgba(201,169,97,0.18)',
+              borderRadius: '20px',
+              padding: '20px 22px',
+              boxShadow: '0 8px 28px rgba(61,41,20,0.04)',
+              textAlign: 'left',
+              boxSizing: 'border-box',
+            }}>
+              {/* Card Header */}
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px' }}>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#C9A961" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A5 5 0 0 0 8 8c0 1.3.5 2.6 1.5 3.5.8.8 1.3 1.5 1.5 2.5" />
+                  <path d="M9 18h6" /><path d="M10 22h4" />
+                </svg>
+                <span style={{
+                  fontFamily: "'Inter', sans-serif",
+                  fontSize: '11px', fontWeight: 700,
+                  letterSpacing: '0.1em', textTransform: 'uppercase',
+                  color: '#C9A961',
+                }}>{lang === 'fr' ? 'Le saviez-vous ?' : 'Did you know?'}</span>
+                {/* Dots indicator */}
+                <div style={{ marginLeft: 'auto', display: 'flex', gap: '4px' }}>
+                  {FACTS.map((_, i) => (
+                    <div key={i} style={{
+                      width: i === factIndex ? 16 : 5, height: 5,
+                      borderRadius: '9999px',
+                      background: i === factIndex ? '#C9A961' : 'rgba(201,169,97,0.25)',
+                      transition: 'all 0.4s ease',
+                    }} />
+                  ))}
+                </div>
+              </div>
+
+              {/* Fading fact content */}
+              <div style={{
+                opacity: fade ? 1 : 0,
+                transition: 'opacity 400ms ease-in-out',
+                minHeight: '72px',
+              }}>
+                <h3 style={{
+                  fontFamily: "'Playfair Display', serif",
+                  fontSize: '16px', fontWeight: 700,
+                  color: '#3D2914', margin: '0 0 6px', lineHeight: 1.3,
+                }}>{FACTS[factIndex]?.title}</h3>
+                <p style={{
+                  fontFamily: "'Inter', sans-serif",
+                  fontSize: '13px', color: '#6B6B6B',
+                  lineHeight: '1.6', margin: 0,
+                }}>{FACTS[factIndex]?.desc}</p>
+              </div>
+            </div>
+          </div>
         </div>
       )}
 
@@ -658,8 +970,22 @@ export default function Report() {
       )}
 
       <style>{`
-        @keyframes spin {
-          to { transform: rotate(360deg); }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes floatBob {
+          0%, 100% { transform: translateY(0px); }
+          50% { transform: translateY(-5px); }
+        }
+        @keyframes stepIconPulse {
+          0%, 100% { opacity: 0.8; transform: scale(1); }
+          50% { opacity: 1; transform: scale(1.2); }
+        }
+        .analysis-loading-overlay {
+          position: fixed;
+          inset: 0;
+        }
+        @media (max-width: 480px) {
+          .analysis-loading-overlay > div > div { gap: 18px !important; }
         }
       `}</style>
     </>
