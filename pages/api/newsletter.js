@@ -18,7 +18,7 @@ export default async function handler(req, res) {
 
   const { error: insertError } = await supabase
     .from('newsletter')
-    .insert({ email: cleanEmail });
+    .upsert({ email: cleanEmail }, { onConflict: 'email' });
 
   if (insertError) {
     console.error('[newsletter] insert error — code:', insertError.code);
