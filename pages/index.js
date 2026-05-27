@@ -1004,26 +1004,28 @@ export default function Home() {
               <>
                 <CreamDrop width={110} height={55} />
                 <p style={{ margin: '14px 0 4px', fontSize: 14, color: '#6F6156', fontWeight: 500, fontFamily: "'DM Sans', sans-serif" }}>
-                  {t('dragDrop')}
+                  {lang === 'fr' ? 'Glissez ou d\u00e9posez votre photo ici' : 'Drag and drop your photo here'}
                 </p>
-                <p style={{ margin: 0, fontSize: 11, color: '#B9AC9E', fontFamily: "'DM Sans', sans-serif" }}>{t('fileTypes')}</p>
+                <p style={{ margin: 0, fontSize: 11, color: '#B9AC9E', fontFamily: "'DM Sans', sans-serif" }}>
+                  {lang === 'fr' ? 'JPG, PNG, WebP \u00b7 jusqu\u2019\u00e0 20 Mo' : 'JPG, PNG, WebP \u00b7 up to 20MB'}
+                </p>
                 <p style={{ margin: '16px 0 0', fontSize: 11, color: '#CBAA8D', letterSpacing: '0.08em', textTransform: 'uppercase', fontFamily: "'DM Sans', sans-serif" }}>
-                  {t('or')}
+                  {lang === 'fr' ? 'OU' : 'OR'}
                 </p>
                 <div style={{ display: 'flex', gap: 8, justifyContent: 'center', marginTop: 14, flexWrap: 'wrap' }}>
                   <button
-                    onClick={() => fileInputRef.current?.click()}
+                    onClick={(e) => { e.stopPropagation(); fileInputRef.current?.click(); }}
                     className="btn-liquid-glass-dark home-upload-btn"
                     style={{ border: 'none' }}
                   >
-                    {t('uploadPhoto')}
+                    {lang === 'fr' ? 'Importer' : 'Import'}
                   </button>
                   <button
-                    onClick={() => setShowMultiAngle(true)}
+                    onClick={(e) => { e.stopPropagation(); startCamera(); }}
                     className="btn-liquid-glass home-upload-btn"
                     style={{ border: 'none' }}
                   >
-                    {t('scan')}
+                    {lang === 'fr' ? '\uD83D\uDCF7 Scanner' : '\uD83D\uDCF7 Scan'}
                   </button>
                 </div>
               </>
