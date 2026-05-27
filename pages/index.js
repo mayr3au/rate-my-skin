@@ -552,6 +552,7 @@ export default function Home() {
   /* ── Skin concern chips ── */
   const quickConcerns = [
     { key: 'Acne', label: t('quickConcernAcne') },
+    { key: 'Pimples', label: t('quickConcernPimples') },
     { key: 'Dryness', label: t('quickConcernDryness') },
     { key: 'Oily', label: t('quickConcernOily') },
     { key: 'Sensitivity', label: t('quickConcernSensitivity') },
