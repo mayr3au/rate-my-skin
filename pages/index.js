@@ -748,31 +748,32 @@ export default function Home() {
       <div style={{
         background: 'linear-gradient(90deg, #FDFCF9 0%, #FAF2EA 50%, #FDFCF9 100%)',
         borderBottom: '1px solid rgba(197, 160, 40, 0.12)',
-        padding: '7px 16px',
+        padding: '6px 12px',
         textAlign: 'center',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        gap: '8px',
+        gap: '6px',
         position: 'relative',
         zIndex: 210,
       }}>
-        <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor" style={{ color: '#C5A028', opacity: 0.85, animation: 'floatBob 3s ease-in-out infinite' }}>
+        <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor" style={{ color: '#C5A028', opacity: 0.85, animation: 'floatBob 3s ease-in-out infinite', flexShrink: 0 }}>
           <path d="M12 0l3 9 9 3-9 3-3 9-3-9-9-3 9-3z" />
         </svg>
         <span style={{
           fontFamily: "'DM Sans', sans-serif",
-          fontSize: '11px',
+          fontSize: 'clamp(9.5px, 2.7vw, 11px)',
           fontWeight: 500,
           color: '#8C6A4F',
           letterSpacing: '0.04em',
-          lineHeight: '1.4'
+          lineHeight: '1.4',
+          textAlign: 'center'
         }}>
           {lang === 'fr' 
             ? 'Bienvenue ! Révélons ensemble l’éclat naturel de votre peau.' 
             : 'Welcome! Let’s reveal your skin’s natural radiance together.'}
         </span>
-        <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor" style={{ color: '#C5A028', opacity: 0.85, animation: 'floatBob 3s ease-in-out infinite' }}>
+        <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor" style={{ color: '#C5A028', opacity: 0.85, animation: 'floatBob 3s ease-in-out infinite', flexShrink: 0 }}>
           <path d="M12 0l3 9 9 3-9 3-3 9-3-9-9-3 9-3z" />
         </svg>
       </div>
