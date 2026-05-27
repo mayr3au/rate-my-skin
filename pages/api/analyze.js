@@ -167,19 +167,36 @@ export default async function handler(req, res) {
 
     // 2. Generate IDs
     const analysisId = crypto.randomUUID();
-    const effectiveUserId = userId || crypto.randomUUID();
 
-    // 3. Read existing user (need paid_unlocks before updating)
-    const { data: existingUser } = await supabase
-      .from('users')
-      .select('analyses_used, paid_unlocks, is_premium')
-      .eq('id', effectiveUserId)
-      .single();
+    // 3. Find existing user — prefer email lookup to avoid duplicates
+    let existingUser = null;
+    let effectiveUserId = userId || crypto.randomUUID();
+
+    if (normalizedEmail) {
+      const { data: byEmail } = await supabase
+        .from('users')
+        .select('id, analyses_used, paid_unlocks, is_premium')
+        .eq('email', normalizedEmail)
+        .maybeSingle();
+      if (byEmail) {
+        existingUser = byEmail;
+        effectiveUserId = byEmail.id; // reuse the canonical id for this email
+      }
+    }
+
+    if (!existingUser) {
+      const { data: byId } = await supabase
+        .from('users')
+        .select('id, analyses_used, paid_unlocks, is_premium')
+        .eq('id', effectiveUserId)
+        .maybeSingle();
+      if (byId) existingUser = byId;
+    }
 
     const currentPaidUnlocks = existingUser?.paid_unlocks || 0;
     const isPremium = existingUser?.is_premium || false;
 
-    // 4. Persist user row
+    // 4. Persist user row (upsert on id to be safe)
     let userSaved = false;
     if (existingUser) {
       const { error: updateErr } = await supabase
@@ -190,7 +207,7 @@ export default async function handler(req, res) {
     } else {
       const { error: insertErr } = await supabase
         .from('users')
-        .insert({ id: effectiveUserId, analyses_used: 1, paid_credits: 0, paid_unlocks: 0 });
+        .insert({ id: effectiveUserId, email: normalizedEmail || null, analyses_used: 1, paid_credits: 0, paid_unlocks: 0 });
       userSaved = !insertErr;
     }
 
