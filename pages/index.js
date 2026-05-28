@@ -585,29 +585,31 @@ export default function Home() {
   /* ── Email submit ── */
   const handleEmailSubmit = async (e) => {
     e.preventDefault();
-    if (!firstName.trim()) return;
-    setEmailLoading(true);
     const trimmedEmail = email.trim();
-    if (trimmedEmail) {
-      try {
-        await Promise.all([
-          fetch('/api/newsletter', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ email: trimmedEmail, newsletter: newsletterConsent }),
-          }),
-          // Sets httpOnly email cookie so this device is auto-identified on return
-          fetch('/api/identity', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ email: trimmedEmail }),
-          }),
-        ]);
-      } catch { }
-    }
+    if (!trimmedEmail) return;
+    setEmailLoading(true);
+    try {
+      await Promise.all([
+        fetch('/api/newsletter', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email: trimmedEmail, newsletter: newsletterConsent }),
+        }),
+        // Sets httpOnly email cookie so this device is auto-identified on return
+        fetch('/api/identity', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email: trimmedEmail }),
+        }),
+      ]);
+    } catch { }
     localStorage.setItem('rms_email_captured', '1');
     localStorage.setItem('rms_user_email', trimmedEmail);
-    localStorage.setItem('rms_first_name', firstName.trim());
+    if (firstName.trim()) {
+      localStorage.setItem('rms_first_name', firstName.trim());
+    } else {
+      localStorage.removeItem('rms_first_name');
+    }
     setEmailCaptured(true);
 
     // Smooth transition: close overlay, then resume the action the user originally triggered

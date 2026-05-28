@@ -480,7 +480,8 @@ export default function Report() {
 
   const handleEmailSubmit = async (e) => {
     e.preventDefault();
-    if (!firstName.trim()) return;
+    // Require email, first name optional
+    if (!email.trim()) return;
     setEmailLoading(true);
     const trimmedEmail = email.trim();
     if (trimmedEmail) {
@@ -501,7 +502,10 @@ export default function Report() {
     }
     localStorage.setItem('rms_email_captured', '1');
     localStorage.setItem('rms_user_email', trimmedEmail);
-    localStorage.setItem('rms_first_name', firstName.trim());
+    // Store first name if provided (optional)
+    if (firstName.trim()) {
+      localStorage.setItem('rms_first_name', firstName.trim());
+    }
     setEmailCaptured(true);
     setShowEmailGate(false);
     setEmailLoading(false);
@@ -901,9 +905,7 @@ export default function Report() {
                 type="text"
                 value={firstName}
                 onChange={(e) => setFirstName(e.target.value)}
-                placeholder={lang === 'fr' ? 'Votre prénom' : 'Your first name'}
-                required
-                autoFocus
+                placeholder={lang === 'fr' ? 'Votre prénom (optionnel)' : 'Your first name (optional)'}
                 className="input-nacré"
                 style={{
                   borderRadius: 16,
@@ -917,7 +919,8 @@ export default function Report() {
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                placeholder={lang === 'fr' ? 'Votre email (optionnel)' : 'Your email (optional)'}
+                placeholder={lang === 'fr' ? 'Votre email' : 'Your email'}
+                required
                 className="input-nacré"
                 style={{
                   borderRadius: 16,
@@ -999,6 +1002,18 @@ export default function Report() {
         }
         @media (max-width: 480px) {
           .analysis-loading-overlay > div > div { gap: 18px !important; }
+          .card-blur {
+            padding: clamp(24px,5vw,36px) !important;
+            max-width: 90% !important;
+          }
+          .input-nacré {
+            font-size: 13px !important;
+            padding: 12px 16px !important;
+          }
+          .btn-liquid-glass-dark {
+            font-size: 13px !important;
+            padding: 12px 18px !important;
+          }
         }
       ` }} />
     </>
