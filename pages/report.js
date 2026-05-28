@@ -107,6 +107,7 @@ export default function Report() {
 
   const [emailCaptured, setEmailCaptured] = useState(true);
   const [email, setEmail] = useState('');
+  const [firstName, setFirstName] = useState('');
   const [emailLoading, setEmailLoading] = useState(false);
   const [newsletterConsent, setNewsletterConsent] = useState(true);
   const [showEmailGate, setShowEmailGate] = useState(false);
@@ -479,24 +480,28 @@ export default function Report() {
 
   const handleEmailSubmit = async (e) => {
     e.preventDefault();
-    if (!email.trim()) return;
+    if (!firstName.trim()) return;
     setEmailLoading(true);
-    try {
-      await Promise.all([
-        fetch('/api/newsletter', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ email: email.trim(), newsletter: newsletterConsent }),
-        }),
-        fetch('/api/identity', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ email: email.trim() }),
-        }),
-      ]);
-    } catch {}
+    const trimmedEmail = email.trim();
+    if (trimmedEmail) {
+      try {
+        await Promise.all([
+          fetch('/api/newsletter', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email: trimmedEmail, newsletter: newsletterConsent }),
+          }),
+          fetch('/api/identity', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email: trimmedEmail }),
+          }),
+        ]);
+      } catch {}
+    }
     localStorage.setItem('rms_email_captured', '1');
-    localStorage.setItem('rms_user_email', email.trim());
+    localStorage.setItem('rms_user_email', trimmedEmail);
+    localStorage.setItem('rms_first_name', firstName.trim());
     setEmailCaptured(true);
     setShowEmailGate(false);
     setEmailLoading(false);
@@ -893,11 +898,26 @@ export default function Report() {
 
             <form onSubmit={handleEmailSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
               <input
+                type="text"
+                value={firstName}
+                onChange={(e) => setFirstName(e.target.value)}
+                placeholder={lang === 'fr' ? 'Votre prénom' : 'Your first name'}
+                required
+                autoFocus
+                className="input-nacré"
+                style={{
+                  borderRadius: 16,
+                  padding: '14px 18px', fontSize: 14,
+                  fontFamily: "'DM Sans', sans-serif",
+                  outline: 'none', width: '100%', boxSizing: 'border-box',
+                  color: '#3A2E26',
+                }}
+              />
+              <input
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                placeholder="your@email.com"
-                required
+                placeholder={lang === 'fr' ? 'Votre email (optionnel)' : 'Your email (optional)'}
                 className="input-nacré"
                 style={{
                   borderRadius: 16,
