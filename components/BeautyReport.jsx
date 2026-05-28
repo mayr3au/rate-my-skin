@@ -1186,23 +1186,22 @@ const SEVERITY_ACCENT = { mild: "#A8DCC8", moderate: "#A8C8E8", significant: "#E
 /* ── Shared report header ── */
 function ReportHeader({ t, lang }) {
   const dossier = useMemo(() => {
-    let email = "";
-    let age = "";
+    // Extract user details for the report header
+    const email = typeof window !== "undefined" ? localStorage.getItem("rms_user_email") || "" : "";
+    const storedFirstName = typeof window !== "undefined" ? localStorage.getItem("rms_first_name") || "" : "";
+    const age = sessionStorage.getItem("rms_age") || "";
+    const timestamp = sessionStorage.getItem("rms_generation_finished_at");
     let dateStr = "";
-
-    if (typeof window !== "undefined") {
-      email = localStorage.getItem("rms_user_email") || "";
-      age = sessionStorage.getItem("rms_age") || "";
-      const timestamp = sessionStorage.getItem("rms_generation_finished_at");
-      if (timestamp) {
-        dateStr = new Date(parseInt(timestamp, 10)).toLocaleDateString(lang === 'fr' ? 'fr-FR' : 'en-US');
-      } else {
-        dateStr = new Date().toLocaleDateString(lang === 'fr' ? 'fr-FR' : 'en-US');
-      }
+    if (timestamp) {
+      dateStr = new Date(parseInt(timestamp, 10)).toLocaleDateString(lang === 'fr' ? 'fr-FR' : 'en-US');
+    } else {
+      dateStr = new Date().toLocaleDateString(lang === 'fr' ? 'fr-FR' : 'en-US');
     }
 
     let firstName = "";
-    if (email) {
+    if (storedFirstName) {
+      firstName = storedFirstName;
+    } else if (email) {
       const part = email.split("@")[0];
       const subPart = part.split(/[._-]/)[0];
       firstName = subPart.charAt(0).toUpperCase() + subPart.slice(1);
@@ -1351,14 +1350,8 @@ export default function BeautyReport({ data: rawData, isPaid, onUnlock }) {
 
   // Social Proof Counter
   const [socialProofN, setSocialProofN] = useState(() => {
-    if (typeof window !== "undefined") {
-      const stored = localStorage.getItem("rms_social_proof_n");
-      if (stored) {
-        const val = parseInt(stored, 10);
-        if (!isNaN(val)) return val;
-      }
-    }
-    return 847;
+    // Force a low starting value for the social proof counter
+    return 200;
   });
 
   useEffect(() => {
