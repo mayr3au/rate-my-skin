@@ -334,8 +334,8 @@ function ScoreHeroCard({ score, summary, faceShape, skinType, skinTone, badge, m
 
       {/* Summary */}
       <p style={{
-        margin: "0 0 16px", fontSize: 13.5, lineHeight: 1.72, textAlign: "center", position: "relative",
-        color: "#6F6156", fontStyle: "italic", fontFamily: "'Cormorant Garamond', serif",
+        margin: "0 0 16px", fontSize: 13, lineHeight: 1.72, textAlign: "center", position: "relative",
+        color: "#8C7A6B", fontFamily: "'DM Sans', sans-serif",
         wordBreak: "break-word"
       }}>
         {summary}
