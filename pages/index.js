@@ -434,6 +434,16 @@ export default function Home() {
   const videoRef = useRef(null);
   const canvasRef = useRef(null);
   const streamRef = useRef(null);
+  const touchStartX = useRef(0);
+  const touchEndX = useRef(0);
+
+  const handleFactChange = (newIndex) => {
+    setFade(false);
+    setTimeout(() => {
+      setFactIndex(newIndex);
+      setFade(true);
+    }, 200);
+  };
 
   const [showCamera, setShowCamera] = useState(false);
   const [showMultiAngle, setShowMultiAngle] = useState(false);
@@ -534,15 +544,6 @@ export default function Home() {
         setProgress(currentProgress);
       }, 80);
 
-      // Facts rotate every 5 seconds
-      factInterval = setInterval(() => {
-        setFade(false);
-        fadeTimeout = setTimeout(() => {
-          setFactIndex(prev => (prev + 1) % FACTS.length);
-          setFade(true);
-        }, 400);
-      }, 5000);
-
       // Analysis steps rotate every ~3.2s, synced with progress stages
       stepInterval = setInterval(() => {
         setStepFade(false);
@@ -569,7 +570,6 @@ export default function Home() {
 
     return () => {
       clearInterval(progressInterval);
-      clearInterval(factInterval);
       clearInterval(stepInterval);
       clearTimeout(fadeTimeout);
       clearTimeout(stepFadeTimeout);
@@ -1722,14 +1722,7 @@ export default function Home() {
             {/* ── TOP: Flower + Live step ── */}
             <div style={{
               display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '14px',
-              background: 'rgba(255,255,255,0.55)',
-              backdropFilter: 'blur(16px)',
-              WebkitBackdropFilter: 'blur(16px)',
-              border: '1px solid rgba(201,169,97,0.2)',
-              borderRadius: '24px',
-              padding: '20px 28px',
               width: '100%',
-              boxShadow: '0 4px 20px rgba(168,116,73,0.05)',
             }}>
               {/* Flower spinning */}
               <div style={{
@@ -1774,75 +1767,66 @@ export default function Home() {
               </div>
             </div>
 
-            {/* ── CENTER: Progress ring ── */}
-            <div style={{
-              position: 'relative', width: 160, height: 160,
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-            }}>
-              {/* Outer glow ring */}
+            {/* ── CENTER: Horizontal progress bar (even thinner + shorter + centered) ── */}
+            <div style={{ width: '100%', marginTop: '12px', marginBottom: '12px', textAlign: 'center' }}>
               <div style={{
-                position: 'absolute', inset: -8,
-                borderRadius: '50%',
-                background: `conic-gradient(rgba(201,169,97,${(progress / 100) * 0.25}) ${progress * 3.6}deg, transparent 0deg)`,
-                filter: 'blur(8px)',
-                transition: 'background 0.5s ease',
-              }} />
-              <svg width="160" height="160" viewBox="0 0 160 160" style={{ transform: 'rotate(-90deg)', position: 'relative', zIndex: 1 }}>
-                {/* Dashed track */}
-                <circle cx="80" cy="80" r="66" fill="none" stroke="rgba(201,169,97,0.12)" strokeWidth="8" strokeDasharray="4 6" />
-                {/* Solid track */}
-                <circle cx="80" cy="80" r="66" fill="none" stroke="rgba(201,169,97,0.08)" strokeWidth="8" />
-                {/* Progress arc */}
-                <circle
-                  cx="80" cy="80" r="66"
-                  fill="none"
-                  stroke="url(#progressGrad)"
-                  strokeWidth="8"
-                  strokeDasharray={414.69}
-                  strokeDashoffset={414.69 * (1 - progress / 100)}
-                  strokeLinecap="round"
-                  style={{ transition: 'stroke-dashoffset 0.3s cubic-bezier(0.4,0,0.2,1)' }}
-                />
-                <defs>
-                  <linearGradient id="progressGrad" x1="0%" y1="0%" x2="100%" y2="0%">
-                    <stop offset="0%" stopColor="#A87449" />
-                    <stop offset="50%" stopColor="#C9A961" />
-                    <stop offset="100%" stopColor="#E5C583" />
-                  </linearGradient>
-                </defs>
-              </svg>
-              {/* Center content */}
-              <div style={{
-                position: 'absolute', display: 'flex', flexDirection: 'column',
-                alignItems: 'center', gap: '2px',
+                fontFamily: "'Playfair Display', serif",
+                fontSize: '36px',
+                fontWeight: 700,
+                color: '#3D2914',
+                lineHeight: 1,
+                marginBottom: '14px',
               }}>
-                <span style={{
-                  fontFamily: "'Playfair Display', serif",
-                  fontSize: '42px', fontWeight: 700,
-                  color: '#3D2914', lineHeight: 1,
-                }}>{Math.round(progress)}%</span>
-                <span style={{
-                  fontFamily: "'Inter', sans-serif",
-                  fontSize: '10px', fontWeight: 600,
-                  color: '#B0885E', letterSpacing: '0.15em',
-                  textTransform: 'uppercase',
-                }}>analyse</span>
+                {Math.round(progress)}%
+              </div>
+              <div style={{
+                width: '180px',
+                height: '1px',
+                background: 'rgba(168, 116, 73, 0.12)',
+                margin: '0 auto',
+                overflow: 'hidden',
+              }}>
+                <div style={{
+                  width: `${progress}%`,
+                  height: '100%',
+                  background: 'linear-gradient(90deg, #A87449 0%, #C9A961 100%)',
+                  transition: 'width 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                }} />
               </div>
             </div>
 
             {/* ── BOTTOM: Facts card ── */}
-            <div style={{
-              width: '100%',
-              background: 'rgba(255,255,255,0.75)',
-              backdropFilter: 'blur(20px)',
-              WebkitBackdropFilter: 'blur(20px)',
-              border: '1px solid rgba(201,169,97,0.18)',
-              borderRadius: '20px',
-              padding: '20px 22px',
-              boxShadow: '0 8px 28px rgba(61,41,20,0.04)',
-              textAlign: 'left',
-              boxSizing: 'border-box',
-            }}>
+            <div 
+              onTouchStart={(e) => {
+                touchStartX.current = e.targetTouches[0].clientX;
+                touchEndX.current = e.targetTouches[0].clientX;
+              }}
+              onTouchMove={(e) => {
+                touchEndX.current = e.targetTouches[0].clientX;
+              }}
+              onTouchEnd={() => {
+                const diff = touchStartX.current - touchEndX.current;
+                if (diff > 50) {
+                  handleFactChange((factIndex + 1) % FACTS.length);
+                } else if (diff < -50) {
+                  handleFactChange((factIndex - 1 + FACTS.length) % FACTS.length);
+                }
+              }}
+              style={{
+                width: '100%',
+                background: 'rgba(255,255,255,0.75)',
+                backdropFilter: 'blur(20px)',
+                WebkitBackdropFilter: 'blur(20px)',
+                border: '1px solid rgba(201,169,97,0.18)',
+                borderRadius: '20px',
+                padding: '20px 22px',
+                boxShadow: '0 8px 28px rgba(61,41,20,0.04)',
+                textAlign: 'left',
+                boxSizing: 'border-box',
+                cursor: 'grab',
+                userSelect: 'none',
+              }}
+            >
               {/* Card Header */}
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px' }}>
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#C9A961" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
@@ -1854,16 +1838,21 @@ export default function Home() {
                   fontSize: '11px', fontWeight: 700,
                   letterSpacing: '0.1em', textTransform: 'uppercase',
                   color: '#C9A961',
-                }}>Le saviez-vous ?</span>
+                }}>{lang === 'fr' ? 'Le saviez-vous ?' : 'Did you know?'}</span>
                 {/* Dots indicator */}
-                <div style={{ marginLeft: 'auto', display: 'flex', gap: '4px' }}>
+                <div style={{ marginLeft: 'auto', display: 'flex', gap: '6px' }}>
                   {FACTS.map((_, i) => (
-                    <div key={i} style={{
-                      width: i === factIndex ? 16 : 5, height: 5,
-                      borderRadius: '9999px',
-                      background: i === factIndex ? '#C9A961' : 'rgba(201,169,97,0.25)',
-                      transition: 'all 0.4s ease',
-                    }} />
+                    <div 
+                      key={i} 
+                      onClick={() => handleFactChange(i)}
+                      style={{
+                        width: i === factIndex ? 16 : 5, height: 5,
+                        borderRadius: '9999px',
+                        background: i === factIndex ? '#C9A961' : 'rgba(201,169,97,0.25)',
+                        transition: 'all 0.4s ease',
+                        cursor: 'pointer',
+                      }} 
+                    />
                   ))}
                 </div>
               </div>
