@@ -67,9 +67,13 @@ const FACTS = [
 const ANALYSIS_STEPS = [
   { icon: "M12 2a7 7 0 1 0 0 14A7 7 0 0 0 12 2zm0 3v4l3 3", label: "Détection du type de peau…" },
   { icon: "M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7z M12 9a3 3 0 1 0 0 6 3 3 0 0 0 0-6z", label: "Analyse des pores et texture…" },
+  { icon: "M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6", label: "Mesure de l'hydratation…" },
   { icon: "M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z", label: "Cartographie des zones sensibles…" },
+  { icon: "M12 8v4l3 3", label: "Recherche des ridules…" },
   { icon: "M3 12h18M3 6h18M3 18h18", label: "Évaluation du teint et phototype…" },
+  { icon: "M12 2v20M17 5", label: "Calcul de l'uniformité cutanée…" },
   { icon: "M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z", label: "Scoring global de votre peau…" },
+  { icon: "M12 2v20", label: "Sélection des actifs skincare…" },
   { icon: "M9 12l2 2 4-4M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0z", label: "Génération du rapport final…" },
 ];
 
@@ -544,14 +548,14 @@ export default function Home() {
         setProgress(currentProgress);
       }, 80);
 
-      // Analysis steps rotate every ~3.2s, synced with progress stages
+      // Analysis steps rotate every 2s, synced with progress stages
       stepInterval = setInterval(() => {
         setStepFade(false);
         stepFadeTimeout = setTimeout(() => {
           setAnalysisStep(prev => Math.min(prev + 1, ANALYSIS_STEPS.length - 1));
           setStepFade(true);
         }, 350);
-      }, 3200);
+      }, 2000);
 
       const scrollY = window.scrollY;
       document.body.style.position = 'fixed';
@@ -1746,23 +1750,27 @@ export default function Home() {
                 }}>Intelligence artificielle dermatologique</p>
               </div>
 
-              {/* Live step pill */}
+              {/* Live step pill (clean capsule style) */}
               <div style={{
                 display: 'flex', alignItems: 'center', gap: '8px',
-                background: 'linear-gradient(135deg, rgba(201,169,97,0.12), rgba(197,160,40,0.06))',
-                border: '1px solid rgba(201,169,97,0.28)',
-                borderRadius: '9999px',
-                padding: '7px 16px',
+                background: 'rgba(255, 255, 255, 0.45)',
+                border: '1px solid rgba(168, 116, 73, 0.12)',
+                borderRadius: '30px',
+                padding: '6px 14px',
                 opacity: stepFade ? 1 : 0,
                 transition: 'opacity 350ms ease-in-out',
+                marginTop: '8px',
+                width: 'fit-content',
+                margin: '8px auto 0',
               }}>
                 <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#C9A961" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0, animation: 'stepIconPulse 1.5s ease-in-out infinite' }}>
                   <path d={ANALYSIS_STEPS[analysisStep]?.icon} />
                 </svg>
                 <span style={{
-                  fontFamily: "'Inter', sans-serif",
-                  fontSize: '12px', fontWeight: 600,
-                  color: '#6B4E2A', letterSpacing: '0.01em',
+                  fontFamily: "'DM Sans', sans-serif",
+                  fontSize: '11px', fontWeight: 500,
+                  color: '#8C7A6B', letterSpacing: '0.01em',
+                  whiteSpace: 'nowrap',
                 }}>{ANALYSIS_STEPS[analysisStep]?.label}</span>
               </div>
             </div>
