@@ -112,7 +112,7 @@ export default function Privacy() {
       <Head>
         <title>{activeContent.title} — Rate My Skin</title>
         <meta name="description" content={lang === 'fr' ? "Politique de confidentialité de Rate My Skin — analyse de peau par IA." : "Privacy policy for Rate My Skin — AI skin analysis."} />
-        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
         <link rel="canonical" href="https://ratemyskin.co/privacy" />
         <meta property="og:type" content="website" />
         <meta property="og:url" content="https://ratemyskin.co/privacy" />
@@ -128,7 +128,7 @@ export default function Privacy() {
       {/* Sticky nav */}
       <div className="nav-blur" style={{
         position: 'sticky', top: 0, zIndex: 100,
-        padding: '13px 26px',
+        padding: 'calc(13px + env(safe-area-inset-top, 0px)) 26px 13px',
         display: 'flex', alignItems: 'center', justifyContent: 'space-between',
         animation: 'slideDown 0.55s ease',
       }}>

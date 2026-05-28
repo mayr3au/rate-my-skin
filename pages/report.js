@@ -562,7 +562,7 @@ export default function Report() {
         <title>{t('reportTitle')}</title>
         <meta name="description" content={t('reportMetaDesc')} />
         <meta name="robots" content="noindex, nofollow" />
-        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
         <link rel="canonical" href="https://ratemyskin.co/report" />
         <meta property="og:type" content="website" />
         <meta property="og:url" content="https://ratemyskin.co/report" />
@@ -787,7 +787,7 @@ export default function Report() {
         backdropFilter: 'blur(18px)',
         WebkitBackdropFilter: 'blur(18px)',
         borderBottom: '1px solid rgba(255, 255, 255, 0.5)',
-        padding: '13px 26px',
+        padding: 'calc(13px + env(safe-area-inset-top, 0px)) 26px 13px',
         display: 'flex', alignItems: 'center', justifyContent: 'space-between',
         animation: 'slideDown 0.55s ease',
       }}>

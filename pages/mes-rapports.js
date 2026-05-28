@@ -110,7 +110,7 @@ export default function MesRapports() {
       <Head>
         <title>{t('myReportsPageTitle')}</title>
         <meta name="description" content={lang === 'fr' ? "Retrouvez tous vos rapports d'analyse de peau payés en entrant votre email." : "Access all your paid skin analysis reports by entering your email."} />
-        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
         <link rel="canonical" href="https://ratemyskin.co/mes-rapports" />
         <meta property="og:type" content="website" />
         <meta property="og:url" content="https://ratemyskin.co/mes-rapports" />
@@ -129,7 +129,7 @@ export default function MesRapports() {
         background: 'rgba(255, 255, 255, 0.45)',
         backdropFilter: 'blur(18px)', WebkitBackdropFilter: 'blur(18px)',
         borderBottom: '1px solid rgba(255, 255, 255, 0.5)',
-        padding: '13px 26px',
+        padding: 'calc(13px + env(safe-area-inset-top, 0px)) 26px 13px',
         display: 'flex', alignItems: 'center', justifyContent: 'space-between',
       }}>
         <Logo />

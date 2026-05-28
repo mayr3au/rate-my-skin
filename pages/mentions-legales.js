@@ -111,14 +111,14 @@ export default function MentionsLegales() {
           : "Medical disclaimer for Rate My Skin. This AI analysis is not a medical diagnosis."
         } />
         <meta name="robots" content="noindex, follow" />
-        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
         <link rel="canonical" href="https://ratemyskin.co/mentions-legales" />
       </Head>
 
       {/* Sticky nav */}
       <div className="nav-blur" style={{
         position: 'sticky', top: 0, zIndex: 100,
-        padding: '13px 26px',
+        padding: 'calc(13px + env(safe-area-inset-top, 0px)) 26px 13px',
         display: 'flex', alignItems: 'center', justifyContent: 'space-between',
         animation: 'slideDown 0.55s ease',
       }}>

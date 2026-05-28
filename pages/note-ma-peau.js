@@ -52,7 +52,7 @@ export default function NoteMaPeau() {
         <title>Note Ma Peau - Test Gratuit IA | Rate My Skin</title>
         <meta name="description" content="Note ma peau gratuitement avec l'IA. Test de peau en 30 secondes, score personnalisé et conseils experts." />
         <meta name="keywords" content="note ma peau, noter sa peau, test peau ia, score peau gratuit, analyse peau ia, diagnostic peau" />
-        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
         <link rel="canonical" href="https://ratemyskin.co/note-ma-peau" />
         <meta property="og:type" content="website" />
         <meta property="og:url" content="https://ratemyskin.co/note-ma-peau" />
@@ -77,7 +77,7 @@ export default function NoteMaPeau() {
       {/* Nav */}
       <div className="nav-blur" style={{
         position: 'sticky', top: 0, zIndex: 200,
-        padding: '13px 26px',
+        padding: 'calc(13px + env(safe-area-inset-top, 0px)) 26px 13px',
         display: 'flex', alignItems: 'center', justifyContent: 'space-between',
         boxShadow: '0 4px 20px rgba(180,160,140,0.04)',
       }}>

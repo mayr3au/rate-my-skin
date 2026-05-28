@@ -82,7 +82,7 @@ function Testimonials({ lang }) {
       concern: lang === 'fr' ? "Peau à tendance acnéique" : "Acne-prone skin",
       scoreBefore: 64,
       scoreAfter: 88,
-      quote: lang === 'fr' 
+      quote: lang === 'fr'
         ? "L'analyse a immédiatement ciblé mes microkystes sur le front. La routine recommandée a changé ma peau en quelques semaines."
         : "The analysis instantly targeted my forehead bumps. The recommended routine transformed my skin in just a few weeks."
     },
@@ -163,8 +163,8 @@ function Testimonials({ lang }) {
         lineHeight: 1.6,
         letterSpacing: '0.01em',
       }}>
-        {lang === 'fr' 
-          ? "Voici l'évolution moyenne et les impressions de la communauté après l'ajustement de leur routine." 
+        {lang === 'fr'
+          ? "Voici l'évolution moyenne et les impressions de la communauté après l'ajustement de leur routine."
           : "Read the journeys and routine adjustments of members after unlocking their AI diagnostic."}
       </p>
 
@@ -176,7 +176,7 @@ function Testimonials({ lang }) {
         {data.map((t, idx) => {
           const pointsGained = t.scoreAfter - t.scoreBefore;
           return (
-            <div 
+            <div
               key={idx}
               className="bubble-nacré"
               style={{
@@ -243,11 +243,11 @@ function Testimonials({ lang }) {
 
                 {/* Quote */}
                 <p style={{
-                  fontFamily: "'Cormorant Garamond', serif",
-                  fontSize: 17,
-                  fontStyle: 'italic',
-                  color: '#4A3E3D',
+                  fontFamily: "'DM Sans', sans-serif",
+                  fontSize: 13,
+                  color: '#A2968B',
                   lineHeight: 1.6,
+                  letterSpacing: '0.01em',
                   margin: '0 0 20px',
                 }}>
                   "{t.quote}"
@@ -306,6 +306,117 @@ function Testimonials({ lang }) {
                   </svg>
                   {lang === 'fr' ? 'IA vérifié' : 'AI verified'}
                 </span>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+function FAQ({ lang, t }) {
+  const faqData = [
+    { q: t('faqQ1'), a: t('faqA1') },
+    { q: t('faqQ2'), a: t('faqA2') },
+    { q: t('faqQ3'), a: t('faqA3') },
+    { q: t('faqQ4'), a: t('faqA4') },
+  ];
+
+  const [openIndex, setOpenIndex] = useState(null);
+
+  const toggle = (index) => {
+    setOpenIndex(openIndex === index ? null : index);
+  };
+
+  return (
+    <div style={{ maxWidth: 520, margin: '0 auto 64px', padding: '0 20px' }}>
+      {/* Small badge */}
+      <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 8 }}>
+        <span style={{
+          fontSize: 8.5,
+          fontWeight: 700,
+          letterSpacing: "0.22em",
+          textTransform: "uppercase",
+          color: "#B0885E",
+          background: "rgba(168, 116, 73, 0.05)",
+          border: "1px solid rgba(168, 116, 73, 0.15)",
+          borderRadius: 20,
+          padding: "4px 12px",
+          fontFamily: "'DM Sans', sans-serif"
+        }}>
+          {lang === 'fr' ? "Questions fréquentes" : "FAQ"}
+        </span>
+      </div>
+
+      <h3 style={{
+        fontFamily: "'Cormorant Garamond', serif",
+        fontSize: 'clamp(20px, 3.5vw, 26px)',
+        fontWeight: 400,
+        color: '#3A2E26',
+        textAlign: 'center',
+        marginBottom: 20,
+        letterSpacing: '-0.01em',
+      }}>
+        FAQ
+      </h3>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+        {faqData.map((item, idx) => {
+          const isOpen = openIndex === idx;
+          return (
+            <div
+              key={idx}
+              style={{
+                borderRadius: 12,
+                padding: '12px 16px',
+                cursor: 'pointer',
+                transition: 'all 0.25s ease',
+                border: '1px solid rgba(168, 116, 73, 0.08)',
+                background: isOpen ? 'rgba(255, 255, 255, 0.45)' : 'rgba(255, 255, 255, 0.25)',
+                boxShadow: isOpen ? '0 4px 16px rgba(168, 116, 73, 0.02)' : 'none',
+              }}
+              onClick={() => toggle(idx)}
+            >
+              <div style={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                gap: 16,
+              }}>
+                <span style={{
+                  fontFamily: "'DM Sans', sans-serif",
+                  fontSize: 13,
+                  fontWeight: 500,
+                  color: '#3A2E26',
+                  textAlign: 'left',
+                }}>
+                  {item.q}
+                </span>
+                <span style={{
+                  fontSize: 9,
+                  color: '#C5A028',
+                  transition: 'transform 0.3s ease',
+                  transform: isOpen ? 'rotate(180deg)' : 'rotate(0deg)',
+                }}>
+                  ▼
+                </span>
+              </div>
+              <div style={{
+                maxHeight: isOpen ? 250 : 0,
+                opacity: isOpen ? 1 : 0,
+                overflow: 'hidden',
+                transition: 'all 0.25s cubic-bezier(0.4, 0, 0.2, 1)',
+              }}>
+                <p style={{
+                  fontFamily: "'DM Sans', sans-serif",
+                  fontSize: 12,
+                  color: '#8C7A6B',
+                  lineHeight: 1.55,
+                  margin: '8px 0 0',
+                  textAlign: 'left',
+                }}>
+                  {item.a}
+                </p>
               </div>
             </div>
           );
@@ -390,7 +501,7 @@ export default function Home() {
           localStorage.setItem('rms_email_captured', '1');
         }
       })
-      .catch(() => {});
+      .catch(() => { });
   }, []);
 
   const unlockBody = () => {
@@ -485,11 +596,11 @@ export default function Home() {
           body: JSON.stringify({ email: email.trim() }),
         }),
       ]);
-    } catch {}
+    } catch { }
     localStorage.setItem('rms_email_captured', '1');
     localStorage.setItem('rms_user_email', email.trim());
     setEmailCaptured(true);
-    
+
     // Smooth transition: close overlay, then resume the action the user originally triggered
     setTimeout(() => {
       setOverlayVisible(false);
@@ -629,10 +740,10 @@ export default function Home() {
 
     setLoading(true);
     setError('');
-    
+
     // Start min 8s promise
     const minDurationPromise = new Promise(resolve => setTimeout(resolve, 8000));
-    
+
     try {
       // Convert File to base64 (chunked to avoid stack overflow on large files)
       const arrayBuffer = await image.arrayBuffer();
@@ -646,7 +757,7 @@ export default function Home() {
       const mimeType = image.type;
 
       const storedEmail = localStorage.getItem('rms_user_email') || localStorage.getItem('rms_email') || null;
-      
+
       const apiCallPromise = (async () => {
         const res = await fetch('/api/analyze', {
           method: 'POST',
@@ -674,7 +785,7 @@ export default function Home() {
             try {
               const txt = await res.text();
               if (txt) errMsg = txt.substring(0, 100);
-            } catch {}
+            } catch { }
           }
           throw new Error(errMsg);
         }
@@ -688,7 +799,7 @@ export default function Home() {
 
         if (json.error === 'no_face') throw new Error(json.message || t('noFaceError'));
         if (json.error) throw new Error(json.error || t('analysisFailed'));
-        
+
         return json;
       })();
 
@@ -703,7 +814,7 @@ export default function Home() {
       if (json.userId && !userId) setUserId(json.userId);
       // Update paid_unlocks counter from server response
       if (typeof json.paidUnlocksLeft === 'number') setPaidUnlocks(json.paidUnlocksLeft);
-      
+
       setProgress(100);
       // Give a tiny moment for 100% to display before router navigates
       setTimeout(() => {
@@ -720,8 +831,7 @@ export default function Home() {
       <Head>
         <title>Note Ma Peau - Analyse IA Gratuite de ta Peau | Rate My Skin</title>
         <meta name="description" content="Note ma peau gratuitement avec notre IA. Diagnostic de peau personnalisé en 30 secondes. Score, conseils et produits adaptés." />
-        <meta name="keywords" content="note ma peau, analyse ma peau, diagnostic peau, score peau, ia skincare, test peau gratuit, rate my skin" />
-        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
         <link rel="canonical" href="https://ratemyskin.co/" />
         <link rel='alternate' hreflang='fr' href='https://ratemyskin.co/' />
         <link rel='alternate' hreflang='x-default' href='https://ratemyskin.co/' />
@@ -734,22 +844,24 @@ export default function Home() {
         <meta name="twitter:title" content="Note Ma Peau - Analyse IA Gratuite" />
         <meta name="twitter:description" content="Note ma peau gratuitement avec notre IA. Diagnostic de peau personnalisé en 30 secondes. Score, conseils et produits adaptés." />
         <meta name="twitter:image" content="https://ratemyskin.co/og-image.png" />
-        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify({
-          '@context': 'https://schema.org',
-          '@type': 'WebApplication',
-          name: 'Rate My Skin',
-          url: 'https://ratemyskin.co',
-          applicationCategory: 'HealthApplication',
-          description: 'Analyse IA de peau gratuite. Obtenez votre score de peau et des recommandations skincare personnalisées en 30 secondes.',
-          offers: { '@type': 'Offer', price: '0', priceCurrency: 'EUR' },
-        }) }} />
+        <script type="application/ld+json" dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            '@context': 'https://schema.org',
+            '@type': 'WebApplication',
+            name: 'Rate My Skin',
+            url: 'https://ratemyskin.co',
+            applicationCategory: 'HealthApplication',
+            description: 'Analyse IA de peau gratuite. Obtenez votre score de peau et des recommandations skincare personnalisées en 30 secondes.',
+            offers: { '@type': 'Offer', price: '0', priceCurrency: 'EUR' },
+          })
+        }} />
       </Head>
 
       {/* ── Welcoming Banner ── */}
       <div style={{
         background: 'linear-gradient(90deg, #FDFCF9 0%, #FAF2EA 50%, #FDFCF9 100%)',
         borderBottom: '1px solid rgba(197, 160, 40, 0.12)',
-        padding: '6px 12px',
+        padding: 'calc(6px + env(safe-area-inset-top, 0px)) 12px 6px',
         textAlign: 'center',
         display: 'flex',
         alignItems: 'center',
@@ -770,8 +882,8 @@ export default function Home() {
           lineHeight: '1.4',
           textAlign: 'center'
         }}>
-          {lang === 'fr' 
-            ? 'Bienvenue ! Révélons ensemble l’éclat naturel de votre peau.' 
+          {lang === 'fr'
+            ? 'Bienvenue ! Révélons ensemble l’éclat naturel de votre peau.'
             : 'Welcome! Let’s reveal your skin’s natural radiance together.'}
         </span>
         <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor" style={{ color: '#C5A028', opacity: 0.85, animation: 'floatBob 3s ease-in-out infinite', flexShrink: 0 }}>
@@ -902,8 +1014,8 @@ export default function Home() {
 
         {/* Trust row (Three separate bubbles) */}
         <div style={{
-          display: 'flex', 
-          justifyContent: 'center', 
+          display: 'flex',
+          justifyContent: 'center',
           alignItems: 'stretch',
           gap: 12,
           flexWrap: 'wrap',
@@ -915,7 +1027,7 @@ export default function Home() {
             { num: t('trust2Num'), label: t('trust2Label') },
             { num: t('trust3Num'), label: t('trust3Label') },
           ].map(({ num, label }) => (
-            <div key={label} className="bubble-nacré" style={{ 
+            <div key={label} className="bubble-nacré" style={{
               flex: '1 1 110px',
               textAlign: 'center',
               padding: '12px 14px',
@@ -925,9 +1037,9 @@ export default function Home() {
               justifyContent: 'center',
               alignItems: 'center'
             }}>
-              <div style={{ 
-                fontSize: 22, 
-                fontWeight: 500, 
+              <div style={{
+                fontSize: 22,
+                fontWeight: 500,
                 fontFamily: "'Cormorant Garamond', serif",
                 background: 'linear-gradient(90deg, #A87449 0%, #D4A574 100%)',
                 WebkitBackgroundClip: 'text',
@@ -936,13 +1048,13 @@ export default function Home() {
               }}>
                 {num}
               </div>
-              <div style={{ 
-                fontSize: 9, 
-                color: '#8C7A6B', 
-                letterSpacing: '0.06em', 
-                textTransform: 'uppercase', 
-                marginTop: 2, 
-                fontFamily: "'DM Sans', sans-serif", 
+              <div style={{
+                fontSize: 9,
+                color: '#8C7A6B',
+                letterSpacing: '0.06em',
+                textTransform: 'uppercase',
+                marginTop: 2,
+                fontFamily: "'DM Sans', sans-serif",
                 fontWeight: 600,
                 lineHeight: 1.3
               }}>
@@ -970,8 +1082,8 @@ export default function Home() {
             className="card-nacré"
             style={{
               border: dragOver ? `1.5px solid ${GOLD}` : undefined,
-              boxShadow: dragOver 
-                ? 'inset 0 0 0 2px #C5A028, inset 0 4px 12px rgba(0,0,0,0.02)' 
+              boxShadow: dragOver
+                ? 'inset 0 0 0 2px #C5A028, inset 0 4px 12px rgba(0,0,0,0.02)'
                 : undefined,
               borderRadius: 24,
               padding: imageUrl ? 0 : '40px 24px',
@@ -1025,7 +1137,7 @@ export default function Home() {
                     className="btn-liquid-glass home-upload-btn"
                     style={{ border: 'none' }}
                   >
-                    {lang === 'fr' ? '\uD83D\uDCF7 Scanner' : '\uD83D\uDCF7 Scan'}
+                    {lang === 'fr' ? 'Scanner' : 'Scan'}
                   </button>
                 </div>
               </>
@@ -1282,7 +1394,7 @@ export default function Home() {
               t('analyseNow')
             )}
           </button>
-          
+
           <div style={{ display: 'flex', justifyContent: 'center', marginTop: 10, position: 'relative' }}>
             <div style={{
               display: 'inline-flex',
@@ -1350,7 +1462,7 @@ export default function Home() {
                   }}
                   onClick={(e) => e.stopPropagation()}
                 >
-                  {lang === 'fr' 
+                  {lang === 'fr'
                     ? "Nos algorithmes et recommandations excluent tout ingrédient comédogène. Nous protégeons votre peau des poussées d'acné réactives."
                     : "Our algorithms and product recommendations strictly exclude comedogenic ingredients, protecting your skin from reactive breakouts."}
                   {/* Arrow */}
@@ -1416,22 +1528,7 @@ export default function Home() {
 
         <Testimonials lang={lang} />
 
-        {/* SEO section - French keyword visibility */}
-        <div style={{ maxWidth: 560, margin: '0 auto', padding: '0 24px 48px', textAlign: 'center' }}>
-          <h2 style={{
-            fontFamily: "'Cormorant Garamond', serif",
-            fontSize: 'clamp(18px, 3.5vw, 24px)', fontWeight: 400,
-            color: '#3A2E26', margin: '0 0 12px',
-          }}>
-            {t('pourquoiH2')}
-          </h2>
-          <p style={{
-            fontSize: 13, color: '#8C7A6B', lineHeight: 1.75,
-            fontFamily: "'DM Sans', sans-serif", margin: 0,
-          }}>
-            {t('pourquoiDesc')}
-          </p>
-        </div>
+        <FAQ lang={lang} t={t} />
       </main>
 
       {/* ── Email gate overlay (always in DOM, fades away after submit) ── */}
@@ -1686,7 +1783,7 @@ export default function Home() {
               <div style={{
                 position: 'absolute', inset: -8,
                 borderRadius: '50%',
-                background: `conic-gradient(rgba(201,169,97,${(progress/100)*0.25}) ${progress * 3.6}deg, transparent 0deg)`,
+                background: `conic-gradient(rgba(201,169,97,${(progress / 100) * 0.25}) ${progress * 3.6}deg, transparent 0deg)`,
                 filter: 'blur(8px)',
                 transition: 'background 0.5s ease',
               }} />
@@ -1815,12 +1912,12 @@ export default function Home() {
           >
             <defs>
               <mask id="faceMask">
-                <rect width="100" height="100" fill="white"/>
-                <ellipse cx="50" cy="46" rx="36" ry="44" fill="black"/>
+                <rect width="100" height="100" fill="white" />
+                <ellipse cx="50" cy="46" rx="36" ry="44" fill="black" />
               </mask>
             </defs>
-            <rect width="100" height="100" fill="rgba(0,0,0,0.48)" mask="url(#faceMask)"/>
-            <ellipse cx="50" cy="46" rx="36" ry="44" fill="none" stroke="rgba(255,255,255,0.8)" strokeWidth="0.6" strokeDasharray="2.5 1.8"/>
+            <rect width="100" height="100" fill="rgba(0,0,0,0.48)" mask="url(#faceMask)" />
+            <ellipse cx="50" cy="46" rx="36" ry="44" fill="none" stroke="rgba(255,255,255,0.8)" strokeWidth="0.6" strokeDasharray="2.5 1.8" />
           </svg>
 
           {/* Instruction */}
