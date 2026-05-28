@@ -65,16 +65,16 @@ const FACTS = [
 ];
 
 const ANALYSIS_STEPS = [
-  { icon: "M12 2a7 7 0 1 0 0 14A7 7 0 0 0 12 2zm0 3v4l3 3", label: "Détection du type de peau…" },
-  { icon: "M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7z M12 9a3 3 0 1 0 0 6 3 3 0 0 0 0-6z", label: "Analyse des pores et texture…" },
-  { icon: "M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6", label: "Mesure de l'hydratation…" },
-  { icon: "M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z", label: "Cartographie des zones sensibles…" },
-  { icon: "M12 8v4l3 3", label: "Recherche des ridules…" },
-  { icon: "M3 12h18M3 6h18M3 18h18", label: "Évaluation du teint et phototype…" },
-  { icon: "M12 2v20M17 5", label: "Calcul de l'uniformité cutanée…" },
-  { icon: "M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z", label: "Scoring global de votre peau…" },
-  { icon: "M12 2v20", label: "Sélection des actifs skincare…" },
-  { icon: "M9 12l2 2 4-4M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0z", label: "Génération du rapport final…" },
+  { icon: "M12 2v3m0 14v3M2 12h3m14 0h3M12 12m-7 0a7 7 0 1 0 14 0a7 7 0 1 0 -14 0", label: "Détection du type de peau…" },
+  { icon: "M3 3h18v18H3zm0 6h18M3 15h18M9 3v18M15 3v18", label: "Analyse des pores et texture…" },
+  { icon: "M12 22a7 7 0 0 0 7-7c0-4.3-7-11-7-11S5 10.7 5 15a7 7 0 0 0 7 7z", label: "Mesure de l'hydratation…" },
+  { icon: "M12 2a8 8 0 0 0-8 8c0 5.25 8 12 8 12s8-6.75 8-12a8 8 0 0 0-8-8zm0 11a3 3 0 1 1 0-6 3 3 0 0 1 0 6z", label: "Cartographie des zones sensibles…" },
+  { icon: "M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7zm10-3a3 3 0 1 0 0 6 3 3 0 0 0 0-6z", label: "Recherche des ridules…" },
+  { icon: "M12 12m-4 0a4 4 0 1 0 8 0a4 4 0 1 0 -8 0M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41", label: "Évaluation du teint et phototype…" },
+  { icon: "M4 21v-7M4 10V3M12 21v-9M12 8V3M20 21v-5M20 12V3M1 14h6M9 8h6M17 16h6", label: "Calcul de l'uniformité cutanée…" },
+  { icon: "M12 2l3.09 6.26 6.91 1.01-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z", label: "Scoring global de votre peau…" },
+  { icon: "M9 3H15M10 3V9L5.3 18.4A2 2 0 0 0 7.1 21H16.9A2 2 0 0 0 18.7 18.4L14 9V3M14 9H10", label: "Sélection des actifs skincare…" },
+  { icon: "M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z M14 2v6h6 M16 13H8M16 17H8", label: "Génération du rapport final…" },
 ];
 
 /* ── Testimonials ── */
@@ -469,7 +469,7 @@ export default function Home() {
   const [activeChips, setActiveChips] = useState([]);
   const [dragOver, setDragOver] = useState(false);
 
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [userId, setUserId] = useState(null);
   const [paidUnlocks, setPaidUnlocks] = useState(0);

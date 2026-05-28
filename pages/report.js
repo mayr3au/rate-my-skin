@@ -60,21 +60,21 @@ const FACTS = [
 ];
 
 const PREMIUM_STEPS_FR = [
-  { icon: "M12 2a7 7 0 1 0 0 14A7 7 0 0 0 12 2zm0 3v4l3 3", label: "Calcul du score d'hydratation…" },
-  { icon: "M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7z M12 9a3 3 0 1 0 0 6 3 3 0 0 0 0-6z", label: "Recherche d'imperfections & acné…" },
-  { icon: "M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z", label: "Analyse des ridules et de la fermeté…" },
-  { icon: "M3 12h18M3 6h18M3 18h18", label: "Sélection des ingrédients actifs…" },
-  { icon: "M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z", label: "Génération de la routine sur-mesure…" },
-  { icon: "M9 12l2 2 4-4M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0z", label: "Finalisation de votre ordonnance beauté…" },
+  { icon: "M12 22a7 7 0 0 0 7-7c0-4.3-7-11-7-11S5 10.7 5 15a7 7 0 0 0 7 7z", label: "Calcul du score d'hydratation…" },
+  { icon: "M12 2v3m0 14v3M2 12h3m14 0h3M12 12m-7 0a7 7 0 1 0 14 0a7 7 0 1 0 -14 0", label: "Recherche d'imperfections & acné…" },
+  { icon: "M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7zm10-3a3 3 0 1 0 0 6 3 3 0 0 0 0-6z", label: "Analyse des ridules et de la fermeté…" },
+  { icon: "M9 3H15M10 3V9L5.3 18.4A2 2 0 0 0 7.1 21H16.9A2 2 0 0 0 18.7 18.4L14 9V3M14 9H10", label: "Sélection des ingrédients actifs…" },
+  { icon: "M4 21v-7M4 10V3M12 21v-9M12 8V3M20 21v-5M20 12V3M1 14h6M9 8h6M17 16h6", label: "Génération de la routine sur-mesure…" },
+  { icon: "M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z M14 2v6h6 M16 13H8M16 17H8", label: "Finalisation de votre ordonnance beauté…" },
 ];
 
 const PREMIUM_STEPS_EN = [
-  { icon: "M12 2a7 7 0 1 0 0 14A7 7 0 0 0 12 2zm0 3v4l3 3", label: "Calculating hydration score…" },
-  { icon: "M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7z M12 9a3 3 0 1 0 0 6 3 3 0 0 0 0-6z", label: "Scanning for blemishes & acne…" },
-  { icon: "M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z", label: "Analyzing fine lines & elasticity…" },
-  { icon: "M3 12h18M3 6h18M3 18h18", label: "Selecting active ingredients…" },
-  { icon: "M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z", label: "Generating your custom routine…" },
-  { icon: "M9 12l2 2 4-4M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0z", label: "Finalizing your skin prescription…" },
+  { icon: "M12 22a7 7 0 0 0 7-7c0-4.3-7-11-7-11S5 10.7 5 15a7 7 0 0 0 7 7z", label: "Calculating hydration score…" },
+  { icon: "M12 2v3m0 14v3M2 12h3m14 0h3M12 12m-7 0a7 7 0 1 0 14 0a7 7 0 1 0 -14 0", label: "Scanning for blemishes & acne…" },
+  { icon: "M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7zm10-3a3 3 0 1 0 0 6 3 3 0 0 0 0-6z", label: "Analyzing fine lines & elasticity…" },
+  { icon: "M9 3H15M10 3V9L5.3 18.4A2 2 0 0 0 7.1 21H16.9A2 2 0 0 0 18.7 18.4L14 9V3M14 9H10", label: "Selecting active ingredients…" },
+  { icon: "M4 21v-7M4 10V3M12 21v-9M12 8V3M20 21v-5M20 12V3M1 14h6M9 8h6M17 16h6", label: "Generating your custom routine…" },
+  { icon: "M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z M14 2v6h6 M16 13H8M16 17H8", label: "Finalizing your skin prescription…" },
 ];
 
 export default function Report() {
