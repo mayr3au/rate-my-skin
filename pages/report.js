@@ -962,7 +962,7 @@ export default function Report() {
         </div>
       )}
 
-      <style>{`
+      <style dangerouslySetInnerHTML={{ __html: `
         @keyframes spin { to { transform: rotate(360deg); } }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
         @keyframes floatBob {
@@ -980,7 +980,7 @@ export default function Report() {
         @media (max-width: 480px) {
           .analysis-loading-overlay > div > div { gap: 18px !important; }
         }
-      `}</style>
+      ` }} />
     </>
   );
 }

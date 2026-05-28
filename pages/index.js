@@ -1946,7 +1946,7 @@ export default function Home() {
         />
       )}
 
-      <style>{`
+      <style dangerouslySetInnerHTML={{ __html: `
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
         @keyframes fadeInUp { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
         @keyframes spin { to { transform: rotate(360deg); } }
@@ -1972,7 +1972,7 @@ export default function Home() {
           100% { transform: translateX(200%); }
         }
         * { box-sizing: border-box; }
-      `}</style>
+      ` }} />
     </>
   );
 }
