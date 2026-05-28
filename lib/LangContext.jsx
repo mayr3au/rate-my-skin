@@ -4,7 +4,7 @@ import { translations } from './translations';
 const LangContext = createContext();
 
 export function LangProvider({ children }) {
-  const [lang, setLangState] = useState('en');
+  const [lang, setLangState] = useState('fr');
 
   useEffect(() => {
     const saved = localStorage.getItem('rms_lang');
