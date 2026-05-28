@@ -1614,7 +1614,7 @@ export default function BeautyReport({ data: rawData, isPaid, onUnlock }) {
         )}
 
         {/* ── Products (free) ── */}
-        {showAllFree && allProducts.length > 0 && (
+        {!isPaid && allProducts.length > 0 && (
           <div style={{ marginTop: 32 }}>
             <div style={{ display: "flex", alignItems: "flex-end", justifyContent: "space-between", marginBottom: 14, gap: 8 }}>
               <SectionHeading label={t('shopSubtitle')} title={t('shopTitle')} />
