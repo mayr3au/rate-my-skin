@@ -138,12 +138,16 @@ body::before {
   }
 
   /* Beautiful high-end glassmorphic mobile navigation */
-  .nav-blur {
-    background: linear-gradient(180deg, rgba(255, 255, 255, 0.8) 0%, rgba(253, 246, 237, 0.65) 100%) !important;
-    backdrop-filter: blur(20px) saturate(140%) !important;
-    -webkit-backdrop-filter: blur(20px) saturate(140%) !important;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.65) !important;
+  .nav-blur, .rpt-nav {
+    background: #FAF6F0 !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    border-bottom: 1px solid rgba(168, 116, 73, 0.12) !important;
+    position: sticky !important;
+    top: 0 !important;
+    z-index: 9999 !important;
   }
+
 
   /* Beautiful translucent report cards & interactive containers on mobile */
   .card-blur {

@@ -124,7 +124,7 @@ export default function MesRapports() {
       </Head>
 
       {/* Nav */}
-      <div style={{
+      <div className="nav-blur" style={{
         position: 'sticky', top: 0, zIndex: 100,
         background: 'rgba(255, 255, 255, 0.45)',
         backdropFilter: 'blur(18px)', WebkitBackdropFilter: 'blur(18px)',
