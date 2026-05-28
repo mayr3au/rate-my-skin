@@ -469,7 +469,7 @@ export default function Home() {
   const [activeChips, setActiveChips] = useState([]);
   const [dragOver, setDragOver] = useState(false);
 
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [userId, setUserId] = useState(null);
   const [paidUnlocks, setPaidUnlocks] = useState(0);
