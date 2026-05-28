@@ -480,18 +480,6 @@ export default function Home() {
   const [fade, setFade] = useState(true);
   const [analysisStep, setAnalysisStep] = useState(0);
   const [stepFade, setStepFade] = useState(true);
-  const [showAcneSafeTooltip, setShowAcneSafeTooltip] = useState(false);
-
-  useEffect(() => {
-    if (!showAcneSafeTooltip) return;
-    const handleOutsideClick = () => {
-      setShowAcneSafeTooltip(false);
-    };
-    document.addEventListener("click", handleOutsideClick);
-    return () => {
-      document.removeEventListener("click", handleOutsideClick);
-    };
-  }, [showAcneSafeTooltip]);
 
   useEffect(() => {
     // Migrate old localStorage key so returning users are recognised
@@ -1407,92 +1395,7 @@ export default function Home() {
             )}
           </button>
 
-          <div style={{ display: 'flex', justifyContent: 'center', marginTop: 10, position: 'relative' }}>
-            <div style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: 5,
-              fontSize: 8.5,
-              fontWeight: 700,
-              letterSpacing: "0.12em",
-              textTransform: "uppercase",
-              color: "#A87449",
-              background: "rgba(168, 116, 73, 0.05)",
-              border: "1px solid rgba(168, 116, 73, 0.15)",
-              borderRadius: 6,
-              padding: "3px 8px",
-              fontFamily: "'DM Sans', sans-serif",
-              position: 'relative'
-            }}>
-              <span>{lang === 'fr' ? 'acné safe' : 'acne free'}</span>
-              <span
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setShowAcneSafeTooltip(!showAcneSafeTooltip);
-                }}
-                style={{
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  width: 12,
-                  height: 12,
-                  borderRadius: '50%',
-                  background: 'rgba(168,116,73,0.12)',
-                  color: '#A87449',
-                  fontSize: 8,
-                  fontWeight: 700,
-                  fontStyle: 'normal',
-                  cursor: 'pointer',
-                  userSelect: 'none'
-                }}
-              >
-                i
-              </span>
 
-              {/* Tooltip box */}
-              {showAcneSafeTooltip && (
-                <div
-                  style={{
-                    position: 'absolute',
-                    bottom: '100%',
-                    left: '50%',
-                    transform: 'translateX(-50%) translateY(-8px)',
-                    width: 240,
-                    background: 'rgba(58, 46, 38, 0.98)',
-                    color: '#FAF6F0',
-                    padding: '10px 14px',
-                    borderRadius: 12,
-                    fontSize: 11,
-                    fontWeight: 500,
-                    lineHeight: 1.45,
-                    boxShadow: '0 8px 24px rgba(44, 36, 29, 0.25)',
-                    zIndex: 100,
-                    fontFamily: "'DM Sans', sans-serif",
-                    textAlign: 'center',
-                    textTransform: 'none',
-                    letterSpacing: 'normal'
-                  }}
-                  onClick={(e) => e.stopPropagation()}
-                >
-                  {lang === 'fr'
-                    ? "Nos algorithmes et recommandations excluent tout ingrédient comédogène. Nous protégeons votre peau des poussées d'acné réactives."
-                    : "Our algorithms and product recommendations strictly exclude comedogenic ingredients, protecting your skin from reactive breakouts."}
-                  {/* Arrow */}
-                  <div style={{
-                    position: 'absolute',
-                    top: '100%',
-                    left: '50%',
-                    transform: 'translateX(-50%)',
-                    width: 0,
-                    height: 0,
-                    borderLeft: '6px solid transparent',
-                    borderRight: '6px solid transparent',
-                    borderTop: '6px solid rgba(58, 46, 38, 0.98)',
-                  }} />
-                </div>
-              )}
-            </div>
-          </div>
 
           {loading && (
             <p style={{ textAlign: 'center', fontSize: 12, color: '#8C7A6B', marginTop: 10, fontFamily: "'DM Sans', sans-serif" }}>
