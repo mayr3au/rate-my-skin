@@ -814,6 +814,7 @@ export default function Home() {
       sessionStorage.setItem('rms_analysis_id', json.analysisId);
       sessionStorage.setItem('rms_is_paid', json.isPaid ? 'true' : 'false');
       sessionStorage.setItem('rms_generation_finished_at', Date.now().toString());
+      sessionStorage.setItem('rms_age', age.trim());
       // Sync userId from server response in case it was server-generated
       if (json.userId && !userId) setUserId(json.userId);
       // Update paid_unlocks counter from server response

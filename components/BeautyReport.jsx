@@ -1184,7 +1184,37 @@ function SeverityBadge({ severity, t }) {
 const SEVERITY_ACCENT = { mild: "#A8DCC8", moderate: "#A8C8E8", significant: "#E8B8D4" };
 
 /* ── Shared report header ── */
-function ReportHeader({ t }) {
+function ReportHeader({ t, lang }) {
+  const dossier = useMemo(() => {
+    let email = "";
+    let age = "";
+    let dateStr = "";
+
+    if (typeof window !== "undefined") {
+      email = localStorage.getItem("rms_user_email") || "";
+      age = sessionStorage.getItem("rms_age") || "";
+      const timestamp = sessionStorage.getItem("rms_generation_finished_at");
+      if (timestamp) {
+        dateStr = new Date(parseInt(timestamp, 10)).toLocaleDateString(lang === 'fr' ? 'fr-FR' : 'en-US');
+      } else {
+        dateStr = new Date().toLocaleDateString(lang === 'fr' ? 'fr-FR' : 'en-US');
+      }
+    }
+
+    let firstName = "";
+    if (email) {
+      const part = email.split("@")[0];
+      const subPart = part.split(/[._-]/)[0];
+      firstName = subPart.charAt(0).toUpperCase() + subPart.slice(1);
+    }
+
+    return {
+      name: firstName || (lang === 'fr' ? "Non renseigné" : "Not specified"),
+      age: age ? `${age} ${lang === 'fr' ? 'ans' : 'y/o'}` : (lang === 'fr' ? "Non renseigné" : "Not specified"),
+      date: dateStr
+    };
+  }, [lang]);
+
   return (
     <div className="rpt-report-header" style={{
       background: "rgba(255,255,255,0.55)",
@@ -1196,29 +1226,71 @@ function ReportHeader({ t }) {
       overflow: "hidden"
     }}>
       <div style={{ position: "absolute", inset: 0, pointerEvents: "none", background: "radial-gradient(ellipse 80% 100% at 50% -20%, rgba(168,116,73,0.02) 0%, transparent 100%)" }} />
-      <div className="mobile-padding" style={{ maxWidth: 680, margin: "0 auto", position: "relative" }}>
-        <p className="mobile-hide" style={{
-          margin: "0 0 6px", fontSize: 10, fontWeight: 600,
-          letterSpacing: "0.18em", textTransform: "uppercase",
-          fontFamily: "'DM Sans', sans-serif", color: "#B0885E",
-        }}>{t('aestheticAnalysis')}</p>
-        <h1 style={{
-          margin: "0 0 4px",
-          fontSize: "clamp(20px, 5vw, 28px)",
-          fontWeight: 600,
+      <div className="mobile-padding" style={{
+        maxWidth: 680, margin: "0 auto", position: "relative",
+        display: "flex", justifyContent: "space-between", alignItems: "center",
+        flexWrap: "wrap", gap: 16
+      }}>
+        <div>
+          <p className="mobile-hide" style={{
+            margin: "0 0 6px", fontSize: 10, fontWeight: 600,
+            letterSpacing: "0.18em", textTransform: "uppercase",
+            fontFamily: "'DM Sans', sans-serif", color: "#B0885E",
+          }}>{t('aestheticAnalysis')}</p>
+          <h1 style={{
+            margin: "0 0 4px",
+            fontSize: "clamp(20px, 5vw, 28px)",
+            fontWeight: 600,
+            fontFamily: "'DM Sans', sans-serif",
+            fontStyle: "normal",
+            letterSpacing: "0.01em",
+            lineHeight: 1.2,
+            background: "linear-gradient(180deg, #2C241D 0%, #6B4828 12%, #A87449 50%, #6B4828 88%, #2C241D 100%)",
+            backgroundSize: "100% 150%",
+            WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent",
+            backgroundClip: "text",
+            animation: "logoShimmer 20s ease-in-out infinite",
+          }}>
+            {t('yourFacialReport')}
+          </h1>
+          <p className="mobile-hide" style={{ margin: 0, fontSize: 11.5, color: "#8C7A6B", letterSpacing: "0.02em", fontFamily: "'DM Sans', sans-serif" }}>{t('notMedicalAdvice')}</p>
+        </div>
+
+        {/* Dossier Card Panel */}
+        <div style={{
+          background: "rgba(255, 255, 255, 0.45)",
+          border: "1px solid rgba(168, 116, 73, 0.12)",
+          borderRadius: 14,
+          padding: "10px 14px",
+          display: "grid",
+          gridTemplateColumns: "auto auto",
+          columnGap: 16,
+          rowGap: 4,
+          fontSize: 11,
           fontFamily: "'DM Sans', sans-serif",
-          fontStyle: "normal",
-          letterSpacing: "0.01em",
-          lineHeight: 1.2,
-          background: "linear-gradient(180deg, #2C241D 0%, #6B4828 12%, #A87449 50%, #6B4828 88%, #2C241D 100%)",
-          backgroundSize: "100% 150%",
-          WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent",
-          backgroundClip: "text",
-          animation: "logoShimmer 20s ease-in-out infinite",
+          color: "#8C7A6B",
+          minWidth: 160,
+          boxShadow: "0 4px 12px rgba(168, 116, 73, 0.02)",
         }}>
-          {t('yourFacialReport')}
-        </h1>
-        <p className="mobile-hide" style={{ margin: 0, fontSize: 11.5, color: "#8C7A6B", letterSpacing: "0.02em", fontFamily: "'DM Sans', sans-serif" }}>{t('notMedicalAdvice')}</p>
+          <div style={{ display: "flex", gap: 3, flexDirection: "column" }}>
+            <span style={{ fontSize: 9, fontWeight: 700, letterSpacing: "0.08em", color: "#B0885E", textTransform: "uppercase" }}>
+              {lang === 'fr' ? "Prénom" : "First Name"}
+            </span>
+            <span style={{ fontWeight: 600, color: "#3A2E26" }}>{dossier.name}</span>
+          </div>
+          <div style={{ display: "flex", gap: 3, flexDirection: "column" }}>
+            <span style={{ fontSize: 9, fontWeight: 700, letterSpacing: "0.08em", color: "#B0885E", textTransform: "uppercase" }}>
+              {lang === 'fr' ? "Âge" : "Age"}
+            </span>
+            <span style={{ fontWeight: 600, color: "#3A2E26" }}>{dossier.age}</span>
+          </div>
+          <div style={{ display: "flex", gap: 3, flexDirection: "column", gridColumn: "span 2", borderTop: "1px solid rgba(168, 116, 73, 0.08)", paddingTop: 4 }}>
+            <span style={{ fontSize: 8, fontWeight: 700, letterSpacing: "0.08em", color: "#B0885E", textTransform: "uppercase" }}>
+              {lang === 'fr' ? "Date du diagnostic" : "Diagnosis Date"}
+            </span>
+            <span style={{ fontWeight: 500, fontSize: 10.5, color: "#6F6156" }}>{dossier.date}</span>
+          </div>
+        </div>
       </div>
     </div>
   );
@@ -1487,7 +1559,7 @@ export default function BeautyReport({ data: rawData, isPaid, onUnlock }) {
 
   return (
     <div style={{ background: "transparent", minHeight: "100vh", fontFamily: "'DM Sans', sans-serif", paddingBottom: 80 }}>
-      <ReportHeader t={t} />
+      <ReportHeader t={t} lang={lang} />
 
       <div style={{ maxWidth: 680, margin: "0 auto", padding: "24px 20px 0" }}>
 
