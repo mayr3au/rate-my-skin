@@ -1162,7 +1162,7 @@ export default function Home() {
               }}>
                 {t('skinConcernLabel')}
               </label>
-              <span style={{ fontSize: 11, color: '#B9AC9E', fontFamily: "'DM Sans', sans-serif" }}>{t('skinConcernOptional')}</span>
+              <span style={{ fontSize: 11, color: '#B9AC9E', fontFamily: "'DM Sans', sans-serif", marginLeft: 'auto', textAlign: 'right' }}>{t('skinConcernOptional')}</span>
             </div>
 
             {/* Quick-select chips */}
