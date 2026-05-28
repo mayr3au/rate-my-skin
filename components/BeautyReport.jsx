@@ -1262,29 +1262,22 @@ function ReportHeader({ t, lang }) {
           border: "1px solid rgba(168, 116, 73, 0.12)",
           borderRadius: 14,
           padding: "10px 14px",
-          display: "grid",
-          gridTemplateColumns: "auto auto",
-          columnGap: 16,
-          rowGap: 4,
+          display: "flex",
+          flexDirection: "column",
+          gap: 6,
           fontSize: 11,
           fontFamily: "'DM Sans', sans-serif",
           color: "#8C7A6B",
-          minWidth: 160,
+          minWidth: 150,
           boxShadow: "0 4px 12px rgba(168, 116, 73, 0.02)",
         }}>
-          <div style={{ display: "flex", gap: 3, flexDirection: "column" }}>
+          <div style={{ display: "flex", gap: 2, flexDirection: "column" }}>
             <span style={{ fontSize: 9, fontWeight: 700, letterSpacing: "0.08em", color: "#B0885E", textTransform: "uppercase" }}>
               {lang === 'fr' ? "Prénom" : "First Name"}
             </span>
             <span style={{ fontWeight: 600, color: "#3A2E26" }}>{dossier.name}</span>
           </div>
-          <div style={{ display: "flex", gap: 3, flexDirection: "column" }}>
-            <span style={{ fontSize: 9, fontWeight: 700, letterSpacing: "0.08em", color: "#B0885E", textTransform: "uppercase" }}>
-              {lang === 'fr' ? "Âge" : "Age"}
-            </span>
-            <span style={{ fontWeight: 600, color: "#3A2E26" }}>{dossier.age}</span>
-          </div>
-          <div style={{ display: "flex", gap: 3, flexDirection: "column", gridColumn: "span 2", borderTop: "1px solid rgba(168, 116, 73, 0.08)", paddingTop: 4 }}>
+          <div style={{ display: "flex", gap: 2, flexDirection: "column", borderTop: "1px solid rgba(168, 116, 73, 0.08)", paddingTop: 4 }}>
             <span style={{ fontSize: 8, fontWeight: 700, letterSpacing: "0.08em", color: "#B0885E", textTransform: "uppercase" }}>
               {lang === 'fr' ? "Date du diagnostic" : "Diagnosis Date"}
             </span>
