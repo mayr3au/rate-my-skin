@@ -1465,7 +1465,7 @@ export default function BeautyReport({ data: rawData, isPaid, onUnlock }) {
   const displayStrengths = paid.strengths || [];
   const displayImprovements = paid.improvements || [];
   const displayProducts = paid.productRecommendations || [];
-  const allProducts = (paid.productRecommendations || []).slice(0, 3);
+  const allProducts = (freeData.productRecommendations || paid.productRecommendations || []).slice(0, 3);
 
   const TABS_CONFIG = [
     {
