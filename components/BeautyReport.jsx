@@ -666,11 +666,31 @@ function ProductCard({ product, lang, t, compact = false }) {
   
   useEffect(() => { const t = setTimeout(() => setVis(true), 60); return () => clearTimeout(t); }, []);
 
-  const amazonUrl = product.amazonLink || `https://www.amazon.fr/s?k=${encodeURIComponent(product.productName)}&tag=ratemyskin-21`;
-  const sephoraUrl = product.sephoraLink || `https://www.sephora.fr/search/?q=${encodeURIComponent(product.productName)}`;
-  const primaryLink = amazonUrl;
+  const getBrandAndName = (p) => {
+    if (p.brand) return { brand: p.brand, name: p.productName || p.product_name };
+    if (p.product_brand) return { brand: p.product_brand, name: p.productName || p.product_name };
+    
+    const fullName = p.productName || p.product_name || "";
+    const brands = [
+      "Paula's Choice", "The Ordinary", "SkinCeuticals", "Sunday Riley", 
+      "The Inkey List", "Glow Recipe", "Drunk Elephant", "CeraVe", 
+      "Laneige", "Kiehl's", "La Roche-Posay", "Vichy", "Avene", "Bioderma"
+    ];
+    
+    for (const b of brands) {
+      if (fullName.toLowerCase().startsWith(b.toLowerCase())) {
+        const remainingName = fullName.substring(b.length).trim().replace(/^[—\-\s]+/, '');
+        return { brand: b, name: remainingName };
+      }
+    }
+    
+    return { brand: "", name: fullName };
+  };
 
-  const imgUrl = product.imageUrl || getProductImage(product.productName);
+  const { brand, name } = getBrandAndName(product);
+  const imgUrl = product.product_image_url || product.productImageUrl || product.imageUrl || product.image_url || getProductImage(product.productName || product.product_name);
+  const descriptionText = product.description || product.product_description || product.productDescription || "";
+  const buyUrl = product.amazon_link || product.amazonLink || product.sephora_link || product.sephoraLink || `https://www.amazon.fr/s?k=${encodeURIComponent(product.productName || product.product_name || '')}&tag=ratemyskin-21`;
 
   return (
     <div
@@ -678,162 +698,120 @@ function ProductCard({ product, lang, t, compact = false }) {
       onMouseLeave={() => setHov(false)}
       style={{
         ...CARD,
-        padding: compact ? "12px 14px" : "20px",
+        padding: compact ? "12px 16px" : "20px",
         border: hov ? "1px solid rgba(168,116,73,0.45)" : "1px solid rgba(255, 255, 255, 0.85)",
         boxShadow: hov ? "0 12px 28px rgba(168,116,73,0.08), inset 0 1px 0 rgba(255,255,255,0.95)" : "0 6px 20px rgba(168,116,73,0.02), inset 0 1px 0 rgba(255,255,255,0.95)",
         opacity: vis ? 1 : 0,
         transform: hov ? "translateY(-2px)" : "translateY(0)",
         transition: "opacity 0.45s ease, transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.3s, box-shadow 0.3s, background-color 0.3s",
-        display: "flex",
-        gap: compact ? "12px" : "20px",
-        alignItems: "stretch",
-        overflow: "hidden",
         background: "linear-gradient(135deg, rgba(255, 255, 255, 0.78) 0%, rgba(253, 246, 237, 0.52) 50%, rgba(246, 235, 222, 0.78) 100%)",
         backdropFilter: "blur(20px) saturate(140%)",
         WebkitBackdropFilter: "blur(20px) saturate(140%)",
       }}
     >
-      {/* Product image wrapper */}
-      <div style={{
-        flexShrink: 0,
-        width: compact ? "clamp(70px, 16vw, 84px)" : "clamp(90px, 22vw, 110px)",
-        borderRadius: "10px",
-        overflow: "hidden",
-        background: "#FFFFFF",
-        border: "1px solid rgba(168,116,73,0.1)",
-        position: "relative",
-        boxShadow: "0 4px 12px rgba(168, 116, 73, 0.03)",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-      }}>
-        <a href={primaryLink} target="_blank" rel="noopener noreferrer" style={{ display: "block", width: "100%", height: "100%" }}>
-          {imgFailed ? (
-            <div style={{
-              width: "100%",
-              height: "100%",
-              background: "linear-gradient(135deg, #FBF6F0 0%, #EEDCD0 100%)",
-              display: "flex",
-              flexDirection: "column",
-              alignItems: "center",
-              justifyContent: "center",
-              padding: "10px",
-              textAlign: "center"
-            }}>
-              <span style={{ fontSize: compact ? "16px" : "20px", color: "#A87449" }}>✦</span>
-              <span style={{ fontSize: "8px", fontWeight: 700, color: "#8C7A6B", marginTop: 2, letterSpacing: "0.05em", textTransform: "uppercase" }}>CARE</span>
-            </div>
-          ) : (
-            <img
-              src={imgUrl}
-              alt={product.productName}
-              onError={() => setImgFailed(true)}
-              style={{
+      <div className="premium-product-card">
+        {/* Product image container */}
+        <div className="premium-product-img-wrapper">
+          <a href={buyUrl} target="_blank" rel="noopener noreferrer" style={{ display: "block", width: "100%", height: "100%" }}>
+            {imgFailed || !imgUrl ? (
+              <div style={{
                 width: "100%",
                 height: "100%",
-                objectFit: "cover",
-                display: "block",
-                transition: "transform 0.5s cubic-bezier(0.16, 1, 0.3, 1)",
-                transform: hov ? "scale(1.06)" : "scale(1)",
-              }}
-            />
-          )}
-        </a>
-      </div>
+                background: "linear-gradient(135deg, #FBF6F0 0%, #EEDCD0 100%)",
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                justifyContent: "center",
+                padding: "10px",
+                textAlign: "center"
+              }}>
+                <span style={{ fontSize: "20px", color: "#A87449" }}>✦</span>
+                <span style={{ fontSize: "8px", fontWeight: 700, color: "#8C7A6B", marginTop: 2, letterSpacing: "0.05em", textTransform: "uppercase" }}>CARE</span>
+              </div>
+            ) : (
+              <img
+                src={imgUrl}
+                alt={product.productName || product.product_name}
+                onError={() => setImgFailed(true)}
+                style={{
+                  width: "100%",
+                  height: "100%",
+                  objectFit: "cover",
+                  display: "block",
+                  transition: "transform 0.5s cubic-bezier(0.16, 1, 0.3, 1)",
+                  transform: hov ? "scale(1.06)" : "scale(1)",
+                }}
+              />
+            )}
+          </a>
+        </div>
 
-      {/* Content wrapper */}
-      <div style={{ flex: 1, minWidth: 0, display: "flex", flexDirection: "column", justifyContent: "space-between" }}>
-        <div>
+        {/* Content wrapper */}
+        <div className="premium-product-info">
           {/* Header row with Category and Price */}
-          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: compact ? 4 : 8, flexWrap: "wrap", gap: 6 }}>
-            <span style={{
-              display: "inline-block",
-              fontSize: compact ? 8 : 9,
-              fontWeight: 700,
-              letterSpacing: "0.12em",
-              textTransform: "uppercase",
-              color: "#A87449",
-              background: "rgba(168,116,73,0.06)",
-              border: "1px solid rgba(168,116,73,0.14)",
-              borderRadius: 5,
-              padding: compact ? "2px 6px" : "3px 8px"
-            }}>
-              {product.skinProblem}
-            </span>
-            <span style={{
-              fontSize: compact ? "13px" : "15px",
-              fontWeight: 600,
-              color: "#A87449",
-              fontFamily: "'DM Sans', sans-serif"
-            }}>
-              {product.price}
-            </span>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 2, flexWrap: "wrap", gap: 6 }}>
+            {(product.skinProblem || product.skin_problem) && (
+              <span style={{
+                display: "inline-block",
+                fontSize: 8,
+                fontWeight: 700,
+                letterSpacing: "0.12em",
+                textTransform: "uppercase",
+                color: "#A87449",
+                background: "rgba(168,116,73,0.06)",
+                border: "1px solid rgba(168,116,73,0.14)",
+                borderRadius: 5,
+                padding: "2px 6px"
+              }}>
+                {product.skinProblem || product.skin_problem}
+              </span>
+            )}
+            {(product.price || product.price_range) && (
+              <span style={{
+                fontSize: "13px",
+                fontWeight: 600,
+                color: "#A87449",
+                fontFamily: "'DM Sans', sans-serif"
+              }}>
+                {product.price || product.price_range}
+              </span>
+            )}
           </div>
 
-          {/* Product Title */}
+          {/* Product Title (Brand + Name) */}
           <div style={{
-            fontSize: compact ? 15 : 17.5,
-            fontWeight: 600,
+            fontSize: "17px",
+            fontWeight: "700",
             color: "#2C241D",
-            marginBottom: compact ? 4 : 6,
             fontFamily: "'Cormorant Garamond', serif",
-            lineHeight: 1.2,
+            lineHeight: 1.25,
+            marginBottom: "4px",
             wordBreak: "break-word"
           }}>
-            {product.productName}
+            {brand ? (
+              <>
+                <span style={{ color: "#B0885E", fontWeight: "700" }}>{brand}</span>
+                <span style={{ color: "#2C241D", fontWeight: "300", margin: "0 6px" }}>|</span>
+                <span>{name}</span>
+              </>
+            ) : name}
           </div>
 
           {/* Product Description */}
-          <p style={{
-            margin: "0 0 10px",
-            fontSize: compact ? 11.5 : 12.5,
-            color: "#6F6156",
-            lineHeight: 1.5,
-            wordBreak: "break-word",
-            display: compact ? "-webkit-box" : "block",
-            WebkitLineClamp: compact ? 2 : "none",
-            WebkitBoxOrient: compact ? "vertical" : "none",
-            overflow: compact ? "hidden" : "visible"
-          }}>
-            {product.description}
+          <p className="premium-product-desc">
+            {descriptionText}
           </p>
         </div>
 
-        {/* Buttons Row */}
-        <div className="rpt-product-btns" style={{ display: "flex", gap: compact ? 6 : 10, flexWrap: "wrap" }}>
+        {/* Buy Button wrapper */}
+        <div className="premium-product-btn-wrapper">
           <a
-            href={amazonUrl}
+            href={buyUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="btn-liquid-glass-dark"
-            style={{
-              padding: compact ? "6px 12px" : "9px 18px",
-              fontSize: compact ? 10.5 : 11.5,
-              borderRadius: 8,
-              border: "none",
-              flex: 1,
-              textAlign: "center",
-              whiteSpace: "nowrap"
-            }}
+            className="premium-product-btn"
           >
-            {t('buyAmazon')}
-          </a>
-          <a
-            href={sephoraUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="btn-liquid-glass"
-            style={{
-              padding: compact ? "6px 12px" : "9px 18px",
-              fontSize: compact ? 10.5 : 11.5,
-              borderRadius: 8,
-              border: "none",
-              flex: 1,
-              textAlign: "center",
-              whiteSpace: "nowrap"
-            }}
-          >
-            {t('buySephora')}
+            Voir le produit
           </a>
         </div>
       </div>
