@@ -749,7 +749,7 @@ function ProductCard({ product, lang, t, compact = false }) {
       onMouseLeave={() => setHov(false)}
       style={{
         ...CARD,
-        padding: compact ? "12px 16px" : "20px",
+        padding: "12px 16px",
         border: hov ? "1px solid rgba(168,116,73,0.45)" : "1px solid rgba(255, 255, 255, 0.85)",
         boxShadow: hov ? "0 12px 28px rgba(168,116,73,0.08), inset 0 1px 0 rgba(255,255,255,0.95)" : "0 6px 20px rgba(168,116,73,0.02), inset 0 1px 0 rgba(255,255,255,0.95)",
         opacity: vis ? 1 : 0,
