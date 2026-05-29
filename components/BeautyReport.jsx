@@ -927,7 +927,7 @@ const findMatchingProduct = (stepText, products) => {
   // 1. Cleanser / Nettoyant
   if (text.includes('nettoyer') || text.includes('nettoyant') || text.includes('cleanse') || text.includes('cleanser')) {
     const found = products.find(p => {
-      const name = (p.productName || '').toLowerCase();
+      const name = (p.productName || p.product_name || '').toLowerCase();
       return name.includes('cleanser') || name.includes('nettoyant') || name.includes('wash');
     });
     if (found) return found;
@@ -936,7 +936,7 @@ const findMatchingProduct = (stepText, products) => {
   // 2. Vitamin C / Vitamine C
   if (text.includes('vitamine c') || text.includes('vitamin c') || text.includes('antioxydant')) {
     const found = products.find(p => {
-      const name = (p.productName || '').toLowerCase();
+      const name = (p.productName || p.product_name || '').toLowerCase();
       return name.includes('vitamin c') || name.includes('vitamine c') || name.includes('c-firma') || name.includes('ferulic') || name.includes('ascorbic');
     });
     if (found) return found;
@@ -945,7 +945,7 @@ const findMatchingProduct = (stepText, products) => {
   // 3. Eye Cream / Cernes
   if (text.includes('cernes') || text.includes('yeux') || text.includes('eye') || text.includes('eyes') || text.includes('orbital') || text.includes('caffeine')) {
     const found = products.find(p => {
-      const name = (p.productName || '').toLowerCase();
+      const name = (p.productName || p.product_name || '').toLowerCase();
       return name.includes('eye') || name.includes('yeux') || name.includes('caffeine') || name.includes('avocado') || name.includes('cernes');
     });
     if (found) return found;
@@ -954,7 +954,7 @@ const findMatchingProduct = (stepText, products) => {
   // 4. Retinol / Rétinol
   if (text.includes('rétinol') || text.includes('retinol')) {
     const found = products.find(p => {
-      const name = (p.productName || '').toLowerCase();
+      const name = (p.productName || p.product_name || '').toLowerCase();
       return name.includes('retinol') || name.includes('rétinol');
     });
     if (found) return found;
@@ -963,7 +963,7 @@ const findMatchingProduct = (stepText, products) => {
   // 5. Exfoliant / AHA / BHA
   if (text.includes('exfolier') || text.includes('exfoliant') || text.includes('bha') || text.includes('aha') || text.includes('acide glycolique') || text.includes('glycolic') || text.includes('salicylic') || text.includes('salicylique')) {
     const found = products.find(p => {
-      const name = (p.productName || '').toLowerCase();
+      const name = (p.productName || p.product_name || '').toLowerCase();
       return name.includes('exfoliant') || name.includes('bha') || name.includes('aha') || name.includes('peeling') || name.includes('smoothing') || name.includes('gel');
     });
     if (found) return found;
@@ -972,7 +972,7 @@ const findMatchingProduct = (stepText, products) => {
   // 6. Niacinamide
   if (text.includes('niacinamide') || text.includes('pores') || text.includes('sebum') || text.includes('sébum') || text.includes('brillance')) {
     const found = products.find(p => {
-      const name = (p.productName || '').toLowerCase();
+      const name = (p.productName || p.product_name || '').toLowerCase();
       return name.includes('niacinamide') || name.includes('zinc');
     });
     if (found) return found;
@@ -981,7 +981,7 @@ const findMatchingProduct = (stepText, products) => {
   // 7. Hydration mask
   if (text.includes('masque') || text.includes('mask') || text.includes('sleeping mask')) {
     const found = products.find(p => {
-      const name = (p.productName || '').toLowerCase();
+      const name = (p.productName || p.product_name || '').toLowerCase();
       return name.includes('mask') || name.includes('masque');
     });
     if (found) return found;
@@ -990,7 +990,7 @@ const findMatchingProduct = (stepText, products) => {
   // 8. Moisturizer / Cream
   if (text.includes('crème') || text.includes('cream') || text.includes('moisturizer') || text.includes('hydratante') || text.includes('hydrater') || text.includes('barrière') || text.includes('barrier') || text.includes('céramides') || text.includes('ceramide')) {
     const found = products.find(p => {
-      const name = (p.productName || '').toLowerCase();
+      const name = (p.productName || p.product_name || '').toLowerCase();
       return (name.includes('cream') || name.includes('moisturizer') || name.includes('crème')) && !name.includes('eye');
     });
     if (found) return found;
