@@ -1521,6 +1521,7 @@ export default function BeautyReport({ data: rawData, isPaid, onUnlock }) {
   const displayImprovements = paid.improvements || [];
   const displayProducts = paid.productRecommendations || [];
   const allProducts = (freeData.productRecommendations || paid.productRecommendations || []).slice(0, 3);
+  const catalogProducts = data.catalog || paid.productRecommendations || freeData.productRecommendations || [];
 
   const TABS_CONFIG = [
     {
@@ -2153,7 +2154,7 @@ export default function BeautyReport({ data: rawData, isPaid, onUnlock }) {
                   </div>
                   <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
                     {(routine.morning || []).map((step, idx) => {
-                      const matchedProduct = findMatchingProduct(step, paid.productRecommendations || []);
+                      const matchedProduct = findMatchingProduct(step, catalogProducts);
                       return (
                         <div key={idx} style={{ display: "flex", flexDirection: "column", gap: 4 }}>
                           <div style={{ display: "flex", gap: 8, alignItems: "flex-start" }}>
@@ -2190,7 +2191,7 @@ export default function BeautyReport({ data: rawData, isPaid, onUnlock }) {
                   </div>
                   <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
                     {(routine.evening || []).map((step, idx) => {
-                      const matchedProduct = findMatchingProduct(step, paid.productRecommendations || []);
+                      const matchedProduct = findMatchingProduct(step, catalogProducts);
                       return (
                         <div key={idx} style={{ display: "flex", flexDirection: "column", gap: 4 }}>
                           <div style={{ display: "flex", gap: 8, alignItems: "flex-start" }}>
@@ -2227,7 +2228,7 @@ export default function BeautyReport({ data: rawData, isPaid, onUnlock }) {
                   </div>
                   <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
                     {(routine.weekly || []).map((step, idx) => {
-                      const matchedProduct = findMatchingProduct(step, paid.productRecommendations || []);
+                      const matchedProduct = findMatchingProduct(step, catalogProducts);
                       return (
                         <div key={idx} style={{ display: "flex", flexDirection: "column", gap: 4 }}>
                           <div style={{ display: "flex", gap: 8, alignItems: "flex-start" }}>

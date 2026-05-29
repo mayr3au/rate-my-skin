@@ -315,7 +315,14 @@ export default async function handler(req, res) {
         mainProblems: baseAnalysis.mainProblems,
         productRecommendations: recData.productRecommendations || [],
         basicSummary: recData.basicSummary || ''
-      }
+      },
+      catalog: formattedProducts.map(p => ({
+        ...p,
+        productName: p.product_name || p.productName,
+        amazonLink: p.amazon_link || p.amazonLink,
+        sephoraLink: p.sephora_link || p.sephoraLink,
+        imageUrl: imageByName[(p.product_name || p.productName || '').toLowerCase()] || null
+      }))
     };
 
     analysisData = sanitizeReport(analysisData, lang);

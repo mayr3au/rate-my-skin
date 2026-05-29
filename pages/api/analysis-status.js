@@ -258,6 +258,21 @@ export default async function handler(req, res) {
   let report = data.report_json;
   const isPaid = data.is_paid;
 
+  if (report && !report.catalog) {
+    try {
+      const { formattedProducts, imageByName } = await fetchProducts(supabase);
+      report.catalog = formattedProducts.map(p => ({
+        ...p,
+        productName: p.product_name || p.productName,
+        amazonLink: p.amazon_link || p.amazonLink,
+        sephoraLink: p.sephora_link || p.sephoraLink,
+        imageUrl: imageByName[(p.product_name || p.productName || '').toLowerCase()] || null
+      }));
+    } catch (err) {
+      console.error('[analysis-status] Failed to inject catalog:', err.message);
+    }
+  }
+
   // Lazy premium generation: if paid but paid_version is not yet generated
   if (isPaid && report && !report.paid_version) {
     const context = report._input_context;
