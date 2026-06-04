@@ -418,9 +418,13 @@ export default async function handler(req, res) {
           let premiumData = JSON.parse(raw.substring(start, end + 1));
           premiumData = sanitizeReport(premiumData, activeLang);
 
-          // ── Post-generation: hard slot validation & logging ──────────────
+          // ── Post-generation: hard slot validation, dedup & logging ────────
           const validatedRoutine = { morning: [], evening: [], weekly: [] };
           const logs = [];
+          // Track product IDs already assigned (for post-selection deduplication).
+          // Cleanser is the ONLY step allowed to repeat morning + evening.
+          const ALLOW_DUPLICATE_STEPS = new Set(['cleanser']);
+          const usedProductIds = new Set();
           
           for (const timeOfDay of ['morning', 'evening', 'weekly']) {
             const steps = premiumData.paid_version?.routine?.[timeOfDay] || [];
@@ -450,14 +454,44 @@ export default async function handler(req, res) {
               );
 
               // HARD VALIDATION: routine_step must match expectedRoutineStep
-              const validated = validateSlotMatch(slot, aiChosen, candidates);
+              let validated = validateSlotMatch(slot, aiChosen, candidates);
 
-              const finalId   = validated ? validated.id : null;
-              const finalName = validated ? (validated.productName || validated.product_name) : null;
+              // ── POST-SELECTION DEDUP ──────────────────────────────────────
+              // If the validated product was already assigned to a previous slot
+              // AND this slot type doesn't allow duplicates, find an alternative.
+              const allowDuplicate = ALLOW_DUPLICATE_STEPS.has(slot.expectedRoutineStep || slot.slot);
+              if (validated && usedProductIds.has(validated.id) && !allowDuplicate) {
+                const expectedStep = slot.expectedRoutineStep || slot.filters?.routine_step;
+                // Find the first candidate not yet used and with correct routine_step
+                const alternative = candidates.find(c =>
+                  !usedProductIds.has(c.id) &&
+                  (c.routine_step === expectedStep || c.routineStep === expectedStep ||
+                   (slot.slot === 'exfoliant' && (c.routine_step === 'toner' || c.routine_step === 'exfoliant')))
+                );
+                if (alternative) {
+                  console.log(
+                    `[DEDUP] Slot "${slot.slot}" | ${timeOfDay}: ` +
+                    `replacing duplicate ${validated.brand} ${validated.product_name || validated.productName} ` +
+                    `→ ${alternative.brand} ${alternative.product_name || alternative.productName}`
+                  );
+                  validated = alternative;
+                } else {
+                  console.warn(
+                    `[DEDUP] Slot "${slot.slot}" | ${timeOfDay}: ` +
+                    `no unused alternative found for ${validated.brand} ${validated.product_name || validated.productName}. Keeping duplicate.`
+                  );
+                }
+              }
+
+              const finalId    = validated ? validated.id : null;
+              const finalName  = validated ? (validated.productName || validated.product_name) : null;
               const finalBrand = validated ? validated.brand : null;
               const validationNote = !aiChosen ? 'ai_returned_null'
-                : (validated?.id !== aiChosen?.id) ? 'mismatch_fallback'
+                : (validated?.id !== aiChosen?.id && !usedProductIds.has(validated?.id ?? '')) ? 'mismatch_or_dedup_fallback'
                 : 'ok';
+
+              // Register product as used (even if duplicate allowed, to detect further clashes)
+              if (finalId) usedProductIds.add(finalId);
 
               console.log(`[SLOT: ${slot.slot} | ${timeOfDay}] Final product: ${finalBrand} ${finalName} | validation=${validationNote}`);
 
