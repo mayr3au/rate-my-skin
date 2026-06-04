@@ -1775,6 +1775,34 @@ export default function BeautyReport({ data: rawData, isPaid, onUnlock, analyses
     };
   }, [routineData, catalogProducts, userSkinTypeNorm, userConcerns, lang]);
 
+const mapUiStepToDb = (uiStep) => {
+  switch (uiStep) {
+    case 'cleanser': return ['cleanser', 'oil_cleanser'];
+    case 'toner': return ['toner', 'exfoliant'];
+    case 'serum': return ['serum'];
+    case 'moisturizer': return ['moisturizer'];
+    case 'sunscreen': return ['spf'];
+    case 'mask': return ['mask', 'treatment'];
+    case 'eye': return ['eye'];
+    default: return [];
+  }
+};
+
+const mapUiConcernToDb = (uiConcern) => {
+  switch (uiConcern) {
+    case 'acne': return ['acne'];
+    case 'pores': return ['pores', 'blackheads'];
+    case 'dryness': return ['dehydration', 'dryness'];
+    case 'radiance': return ['dullness', 'radiance'];
+    case 'dark_spots': return ['hypertension', 'hyperpigmentation', 'dark_spots'];
+    case 'dark_circles': return ['dark_circles'];
+    case 'redness': return ['redness', 'sensitivity'];
+    case 'aging': return ['aging'];
+    case 'texture': return ['texture'];
+    default: return [];
+  }
+};
+
   const sortedAndFilteredProducts = useMemo(() => {
     // Always prefer the Supabase catalog (data.catalog) over static fallback
     const rawCatalog = (data?.catalog && Array.isArray(data.catalog) && data.catalog.length > 0)
@@ -1807,8 +1835,19 @@ export default function BeautyReport({ data: rawData, isPaid, onUnlock, analyses
       };
     })
     .filter(p => {
-      if (activeStep !== "all" && p.routineStep !== activeStep) return false;
-      if (activeConcern !== "all" && !p.concerns.includes(activeConcern)) return false;
+      if (activeStep !== "all") {
+        const allowedSteps = mapUiStepToDb(activeStep);
+        if (allowedSteps.length > 0 && !allowedSteps.includes(p.routineStep)) {
+          return false;
+        }
+      }
+      if (activeConcern !== "all") {
+        const allowedConcerns = mapUiConcernToDb(activeConcern);
+        if (allowedConcerns.length > 0) {
+          const hasMatch = p.concerns.some(c => allowedConcerns.includes(c));
+          if (!hasMatch) return false;
+        }
+      }
       if (onlyMyMatch) {
         return p.matchesSkinType || p.matchesConcern;
       }
