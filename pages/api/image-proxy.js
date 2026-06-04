@@ -16,19 +16,48 @@ export const config = {
 };
 
 // Domains we are willing to proxy. Prevents open-proxy abuse.
+// To discover ALL domains in use: SELECT DISTINCT substring(product_image_url FROM 'https?://([^/]+)')
+// FROM products WHERE product_image_url IS NOT NULL;
 const ALLOWED_DOMAINS = [
+  // Amazon
   'm.media-amazon.com',
   'images-na.ssl-images-amazon.com',
   'images.amazon.com',
-  'media.sephora.com',
-  'media.sephora.fr',
+  // Sephora
   'sephora.com',
+  'media.sephora.com',
   'sephora.fr',
-  'static.beautytocare.com',
+  'media.sephora.fr',
+  // French parapharmacies
+  'nocibe.fr',
+  'media.nocibe.fr',
+  'static.nocibe.fr',
+  'img.nocibe.fr',
+  'marionnaud.fr',
+  'media.marionnaud.fr',
+  'static.marionnaud.fr',
+  'pharmacie-en-ligne.com',
+  'beautycoiffeuse.com',
+  // General e-commerce CDNs
   'cdn.shopify.com',
-  // Cloudinary / other common skincare CDNs
+  'shopify.com',
   'res.cloudinary.com',
+  'static.beautytocare.com',
+  // Retailer CDNs
+  'i5.walmartimages.com',
+  'cdn-images.kiehls.com',
+  'media.loccitane.com',
+  'www.clarins.fr',
+  'media.clarins.com',
+  'www.lancome.fr',
+  'media.lancome.com',
+  'www.nuxe.com',
+  'shop.nuxe.com',
   'images.ctfassets.net',
+  'cdn.powerreviews.com',
+  // Unsplash (fallback, no hotlink protection needed but listed for completeness)
+  'images.unsplash.com',
+  'plus.unsplash.com',
 ];
 
 export default async function handler(req, res) {
@@ -56,10 +85,11 @@ export default async function handler(req, res) {
   );
 
   if (!isAllowed) {
-    console.warn(`[image-proxy] Blocked request for domain: ${parsedUrl.hostname}`);
-    return res.status(403).json({ error: 'Domain not allowed' });
+    console.warn(`[image-proxy] BLOCKED domain not in allowlist: ${parsedUrl.hostname} | full url: ${url.substring(0, 120)}`);
+    return res.status(403).json({ error: 'Domain not allowed', domain: parsedUrl.hostname });
   }
 
+  console.log(`[image-proxy] Proxying: ${parsedUrl.hostname}${parsedUrl.pathname.substring(0, 60)}`);
   // ── Proxy the image ───────────────────────────────────────────────────────
   try {
     const response = await fetch(url, {

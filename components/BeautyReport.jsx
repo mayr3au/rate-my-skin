@@ -788,6 +788,18 @@ function ProductCard({ product, lang, t, userSkinType, userConcerns, isPriorityR
   };
 
   const { brand, name } = getBrandAndName(product);
+
+  // ── Diagnostic: trace image URL selection (remove after confirming fix) ──
+  if (typeof window !== 'undefined') {
+    const _pname = product.productName || product.product_name || '?';
+    console.log(`[ProductCard: ${_pname}] raw object image fields:`, {
+      product_image_url: product.product_image_url,
+      productImageUrl: product.productImageUrl,
+      imageUrl: product.imageUrl,
+      image_url: product.image_url
+    });
+  }
+
   const rawImgUrl = product.product_image_url || product.productImageUrl || product.imageUrl || product.image_url || getProductImage(product.productName || product.product_name);
   const imgUrl = getProxiedImageUrl(rawImgUrl);
   

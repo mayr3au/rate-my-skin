@@ -460,6 +460,12 @@ export default async function handler(req, res) {
               // If the validated product was already assigned to a previous slot
               // AND this slot type doesn't allow duplicates, find an alternative.
               const allowDuplicate = ALLOW_DUPLICATE_STEPS.has(slot.expectedRoutineStep || slot.slot);
+              
+              console.log(`[DEDUP CHECK] Slot: ${slot.slot} | ${timeOfDay}, expectedStep: ${slot.expectedRoutineStep}`);
+              console.log(`[DEDUP CHECK] AI selected product: ${validated?.id} (${validated?.brand} ${validated?.product_name || validated?.productName})`);
+              console.log(`[DEDUP CHECK] usedProductIds so far:`, Array.from(usedProductIds));
+              console.log(`[DEDUP CHECK] allowDuplicate: ${allowDuplicate}, alreadyUsed: ${validated ? usedProductIds.has(validated.id) : false}`);
+
               if (validated && usedProductIds.has(validated.id) && !allowDuplicate) {
                 const expectedStep = slot.expectedRoutineStep || slot.filters?.routine_step;
                 // Find the first candidate not yet used and with correct routine_step
@@ -554,6 +560,19 @@ export default async function handler(req, res) {
           
           // Re-populate routine
           premiumData.paid_version.routine = validatedRoutine;
+
+          // ── Image URL audit ──────────────────────────────────────────────
+          // Logs visible in Vercel: confirms product_image_url travels with steps
+          console.log('[image-audit] Routine steps and their image URLs:');
+          for (const [tod, steps] of Object.entries(validatedRoutine)) {
+            steps.forEach((step, i) => {
+              const imgUrl = step.productData?.imageUrl || step.productData?.image_url || step.productData?.product_image_url || null;
+              console.log(
+                `[image-audit] ${tod}[${i}] ${step.brand || ''} ${step.productName || '(no product)'} →`,
+                imgUrl ? `image: ${imgUrl.substring(0, 80)}` : 'image: NULL (will show Unsplash fallback)'
+              );
+            });
+          }
 
           // Re-populate and map productRecommendations
           if (premiumData.paid_version?.productRecommendations) {
