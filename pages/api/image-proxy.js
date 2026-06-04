@@ -28,7 +28,8 @@ const ALLOWED_DOMAINS = [
   'media.sephora.com',
   'sephora.fr',
   'media.sephora.fr',
-  // French parapharmacies
+  'media.sephora.eu',
+  // French parapharmacies & pharmacies
   'nocibe.fr',
   'media.nocibe.fr',
   'static.nocibe.fr',
@@ -38,7 +39,20 @@ const ALLOWED_DOMAINS = [
   'static.marionnaud.fr',
   'pharmacie-en-ligne.com',
   'beautycoiffeuse.com',
-  // General e-commerce CDNs
+  'images-1.eucerin.com',
+  'pharmacieloreto.fr',
+  'yoonah.fr',
+  'www.pharmaciepolygone.com',
+  'www.easypara.fr',
+  'pharmacie-citypharma.fr',
+  'www.boticinal.com',
+  'www.laroche-posay.fr',
+  // CDNs and other domains
+  'caudalie-europe.imgix.net',
+  'media.paulaschoice-eu.com',
+  'encrypted-tbn1.gstatic.com',
+  'i.ytimg.com',
+  's3.konvy.com',
   'cdn.shopify.com',
   'shopify.com',
   'res.cloudinary.com',

@@ -657,5 +657,16 @@ export default async function handler(req, res) {
     console.error('[analysis-status] Failed to fetch weekly count:', err.message);
   }
 
+  if (report && report.paid_version && report.paid_version.routine) {
+    console.log('[API] === ROUTINE BEING SENT TO FRONTEND ===');
+    for (const [timeOfDay, steps] of Object.entries(report.paid_version.routine)) {
+      steps.forEach((step, i) => {
+        console.log(`[API] Step ${timeOfDay}_${i}: ${step.productName}`);
+        console.log(`[API]   productData exists:`, !!step.productData);
+        console.log(`[API]   product_image_url:`, step.productData?.product_image_url || 'MISSING');
+      });
+    }
+  }
+
   return res.status(200).json({ isPaid, report, analysesCount });
 }

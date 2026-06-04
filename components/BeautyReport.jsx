@@ -868,6 +868,14 @@ function ProductCard({ product, lang, t, userSkinType, userConcerns, isPriorityR
         <div className="premium-product-img-wrapper">
           <a href={amazonUrl} target="_blank" rel="noopener noreferrer" style={{ display: "block", width: "100%", height: "100%" }}>
             {/* Always render the <img>; fall back to placeholder SVG on error or missing URL */}
+            {(() => {
+              console.log('[CARD]', product.productName || product.product_name || product.name);
+              console.log('[CARD]   product.product_image_url:', product.product_image_url);
+              console.log('[CARD]   product.imageUrl:', product.imageUrl);
+              console.log('[CARD]   rawImgUrl computed:', rawImgUrl);
+              console.log('[CARD]   finalUrl after proxy:', imgUrl);
+              return null;
+            })()}
             <img
               src={imgFailed || !imgUrl ? PLACEHOLDER_IMAGE : imgUrl}
               alt={product.productName || product.product_name}
@@ -1367,6 +1375,14 @@ function InlineProductCard({ product, lang, t }) {
       <div className="rpt-inline-product-card-header">
         {/* Image */}
         {/* Always render img; fallback to branded SVG placeholder on missing or broken URL */}
+        {(() => {
+          console.log('[CARD:INLINE]', product.productName || product.product_name || product.name);
+          console.log('[CARD:INLINE]   product.product_image_url:', product.product_image_url);
+          console.log('[CARD:INLINE]   product.imageUrl:', product.imageUrl);
+          console.log('[CARD:INLINE]   rawImgUrl computed:', rawImgUrl);
+          console.log('[CARD:INLINE]   finalUrl after proxy:', imgUrl);
+          return null;
+        })()}
         <img
           src={imgFailed || !imgUrl ? PLACEHOLDER_IMAGE : imgUrl}
           alt={productName}
@@ -1693,6 +1709,14 @@ export default function BeautyReport({ data: rawData, isPaid, onUnlock, analyses
     const hasMask = stepsInCatalog.includes('mask');
 
     const mapSteps = (stepsList, timeOfDay, isWeekly = false) => {
+      console.log('[FRONTEND MAP] === RECEIVED STEPS ===');
+      if (stepsList && Array.isArray(stepsList)) {
+        stepsList.forEach((step, i) => {
+          console.log(`[FRONTEND MAP] Step ${i}:`, step?.productName || step?.product_name || step);
+          console.log(`[FRONTEND MAP]   step.productData:`, step?.productData);
+          console.log(`[FRONTEND MAP]   image URL value:`, step?.productData?.product_image_url);
+        });
+      }
       if (!stepsList || !Array.isArray(stepsList)) return [];
       
       const mapped = stepsList.map((stepText, idx) => {
