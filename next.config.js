@@ -7,7 +7,12 @@ const nextConfig = {
       'media-amazon.com',
       'images-na.ssl-images-amazon.com',
       'images.unsplash.com',
-      'ratemyskin.co'
+      'ratemyskin.co',
+      'sephora.com',
+      'media.sephora.com',
+      'sephora.fr',
+      'media.sephora.fr',
+      'media.sephora.eu'
     ],
   },
 };
