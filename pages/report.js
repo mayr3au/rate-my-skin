@@ -94,6 +94,7 @@ export default function Report() {
   const [data, setData] = useState(null);
   const [analysisId, setAnalysisId] = useState(null);
   const [isPaid, setIsPaid] = useState(false);
+  const [analysesCount, setAnalysesCount] = useState(142);
   const [userId, setUserId] = useState(null);
   const [paidUnlocks, setPaidUnlocks] = useState(0);
   const [notFound, setNotFound] = useState(false);
@@ -348,6 +349,9 @@ export default function Report() {
       fetch(`/api/analysis-status?id=${storedAnalysisId}`)
         .then(r => r.json())
         .then(res => {
+          if (res.analysesCount) {
+            setAnalysesCount(res.analysesCount);
+          }
           if (res.isPaid) {
             sessionStorage.setItem('rms_is_paid', 'true');
             setIsPaid(true);
@@ -853,7 +857,7 @@ export default function Report() {
         userSelect: showEmailGate ? 'none' : 'auto',
         transition: 'filter 0.6s cubic-bezier(0.16, 1, 0.3, 1)'
       }}>
-        <BeautyReport data={data} isPaid={isPaid} onUnlock={handleUnlock} />
+        <BeautyReport data={data} isPaid={isPaid} onUnlock={handleUnlock} analysesCount={analysesCount} />
       </div>
 
       {/* ── Email gate overlay ── */}

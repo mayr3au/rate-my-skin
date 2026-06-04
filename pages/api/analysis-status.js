@@ -2,68 +2,111 @@ import { createAdminClient } from '../../lib/supabase';
 import Stripe from 'stripe';
 import Anthropic from '@anthropic-ai/sdk';
 import { sanitizeReport } from '../../lib/textSanitizer';
-import { getDetectedConcerns, filterRelevantProducts } from '../../lib/productFilter';
+import { getDetectedConcerns, filterRelevantProducts, buildRoutineFilters, findCandidatesForSlot, validateSlotMatch, deduplicateSlots } from '../../lib/productFilter';
+import { STATIC_PRODUCTS } from '../../lib/catalog';
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
-// Curated fallback catalog — used when the products table is empty or unreachable.
-const FALLBACK_PRODUCTS = [
-  { skin_problem: 'acne', product_name: 'CeraVe SA Cleanser', description: 'Salicylic acid + ceramides — gently unclogs pores without stripping moisture.', amazon_link: 'https://www.amazon.fr/dp/B00U1YCGVQ?tag=ratemyskin-21', sephora_link: 'https://www.sephora.com/product/cerave-sa-smoothing-cleanser', price_range: '€10–16', image_url: 'https://images.unsplash.com/photo-1556229010-aa3f7ff66b24?q=80&w=240&auto=format&fit=crop' },
-  { skin_problem: 'acne', product_name: "Paula's Choice 2% BHA Exfoliant", description: 'Leave-on liquid exfoliant that clears blackheads and visibly shrinks pores.', amazon_link: 'https://www.amazon.fr/dp/B00949CTQQ?tag=ratemyskin-21', sephora_link: 'https://www.sephora.com/product/paulas-choice-skin-perfecting-2-bha-liquid-exfoliant', price_range: '€30–38', image_url: 'https://images.unsplash.com/photo-1556228720-195a672e8a03?q=80&w=240&auto=format&fit=crop' },
-  { skin_problem: 'hyperpigmentation', product_name: 'The Ordinary Alpha Arbutin 2%', description: 'Brightens dark spots and post-blemish marks without irritation.', amazon_link: 'https://www.amazon.fr/dp/B071WNRQJY?tag=ratemyskin-21', sephora_link: 'https://www.sephora.com/product/the-ordinary-alpha-arbutin-2-ha', price_range: '€8–12', image_url: 'https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?q=80&w=240&auto=format&fit=crop' },
-  { skin_problem: 'hyperpigmentation', product_name: 'SkinCeuticals C E Ferulic', description: 'Gold-standard vitamin C serum — brightens, protects from UV damage, evens tone.', amazon_link: 'https://www.amazon.fr/dp/B000FGDQAS?tag=ratemyskin-21', sephora_link: 'https://www.sephora.com/product/skinceuticals-c-e-ferulic-with-15-l-ascorbic-acid', price_range: '€155–185', image_url: 'https://images.unsplash.com/photo-1617897903246-719242758050?q=80&w=240&auto=format&fit=crop' },
-  { skin_problem: 'dryness', product_name: 'CeraVe Moisturising Cream', description: 'Ceramides + hyaluronic acid in a rich, non-greasy formula for lasting hydration.', amazon_link: 'https://www.amazon.fr/dp/B00TTD9BRC?tag=ratemyskin-21', sephora_link: 'https://www.sephora.com/product/cerave-moisturizing-cream', price_range: '€12–18', image_url: 'https://images.unsplash.com/photo-1608248597481-496100c80836?q=80&w=240&auto=format&fit=crop' },
-  { skin_problem: 'dryness', product_name: 'Laneige Water Sleeping Mask', description: 'Overnight gel mask that restores the skin barrier and quenches dehydrated skin.', amazon_link: 'https://www.amazon.fr/dp/B07HCP72JV?tag=ratemyskin-21', sephora_link: 'https://www.sephora.com/product/laneige-water-sleeping-mask-lavender', price_range: '€25–32', image_url: 'https://images.unsplash.com/photo-1571781926291-c477ebfd024b?q=80&w=240&auto=format&fit=crop' },
-  { skin_problem: 'pores', product_name: 'The Ordinary Niacinamide 10% + Zinc 1%', description: 'Minimises pore appearance, controls excess sebum, and smooths uneven texture.', amazon_link: 'https://www.amazon.fr/dp/B07PG5VDF4?tag=ratemyskin-21', sephora_link: 'https://www.sephora.com/product/the-ordinary-niacinamide-10-zinc-1', price_range: '€5–8', image_url: 'https://images.unsplash.com/photo-1620916566398-39f1143ab7be?q=80&w=240&auto=format&fit=crop' },
-  { skin_problem: 'dark_circles', product_name: 'The Inkey List Caffeine Eye Cream', description: 'Caffeine + peptides to visibly reduce puffiness and dark circles overnight.', amazon_link: 'https://www.amazon.fr/dp/B08JH2JH7Y?tag=ratemyskin-21', sephora_link: 'https://www.sephora.com/product/the-inkey-list-caffeine-eye-cream', price_range: '€10–14', image_url: 'https://images.unsplash.com/photo-1629732047847-50b7ecf0cbf1?q=80&w=240&auto=format&fit=crop' },
-  { skin_problem: 'dark_circles', product_name: "Kiehl's Creamy Eye Treatment with Avocado", description: 'Rich avocado + beta-carotene formula that firms and brightens the eye area.', amazon_link: 'https://www.amazon.fr/dp/B000G0WVKA?tag=ratemyskin-21', sephora_link: 'https://www.sephora.com/product/kiehls-creamy-eye-treatment-with-avocado', price_range: '€28–36', image_url: 'https://images.unsplash.com/photo-1608571423902-eed4a5ad8108?q=80&w=240&auto=format&fit=crop' },
-  { skin_problem: 'radiance', product_name: 'Glow Recipe Watermelon Glow Niacinamide Dew Drops', description: 'Lightweight serum that delivers an immediate dewy glow while evening skin tone.', amazon_link: 'https://www.amazon.fr/dp/B07YCY4K31?tag=ratemyskin-21', sephora_link: 'https://www.sephora.com/product/glow-recipe-watermelon-glow-niacinamide-dew-drops', price_range: '€38–48', image_url: 'https://images.unsplash.com/photo-1590156546746-c22224b69cd1?q=80&w=240&auto=format&fit=crop' },
-  { skin_problem: 'radiance', product_name: 'Drunk Elephant C-Firma Fresh Day Serum', description: '15% vitamin C + ferulic acid for brightening, firming, and UV protection.', amazon_link: 'https://www.amazon.fr/dp/B00LKCWF4O?tag=ratemyskin-21', sephora_link: 'https://www.sephora.com/product/drunk-elephant-c-firma-fresh-day-serum', price_range: '€78–95', image_url: 'https://images.unsplash.com/photo-1611080626919-7cf5a9dbab5b?q=80&w=240&auto=format&fit=crop' },
-  { skin_problem: 'texture', product_name: "Paula's Choice 8% AHA Gel Exfoliant", description: 'Glycolic + lactic acid blend that resurfaces rough texture and fades fine lines.', amazon_link: 'https://www.amazon.fr/dp/B000FGDQAS?tag=ratemyskin-21', sephora_link: 'https://www.sephora.com/product/paulas-choice-skin-perfecting-8-aha-gel-exfoliant', price_range: '€32–40', image_url: 'https://images.unsplash.com/photo-1626806787461-102c1bfaaea1?q=80&w=240&auto=format&fit=crop' },
-];
-
 const fetchProducts = async (supabase) => {
-  const { data: products } = await supabase.from('products').select('*');
-  // Use fallback catalog if the table is empty or unreachable
-  const safeProducts = (products && products.length > 0) ? products : FALLBACK_PRODUCTS.map(p => ({
-    skin_problem: p.skin_problem,
-    product_name: p.product_name,
-    product_description: p.description,
-    amazon_affiliate_link: p.amazon_link,
-    sephora_affiliate_link: p.sephora_link,
-    price_range: p.price_range,
-    product_image_url: p.image_url,
-    concerns: [p.skin_problem],
-    skin_types: ['normal', 'dry', 'oily', 'combination', 'sensitive'],
-    routine_step: 'cleanser',
-    time_of_day: 'any',
-    actives: []
-  }));
-  const formattedProducts = safeProducts.map(p => ({
-    skin_problem: p.skin_problem,
-    product_name: p.product_name,
-    description: p.product_description,
-    amazon_link: p.amazon_affiliate_link,
-    sephora_link: p.sephora_affiliate_link,
-    price_range: p.price_range,
-    concerns: p.concerns || [],
+  let dbProducts = [];
+  try {
+    const { data, error } = await supabase
+      .from('products')
+      .select('*');
+    if (error) {
+      console.error('[fetchProducts] Supabase error:', error.message);
+    } else if (data && data.length > 0) {
+      dbProducts = data;
+    }
+  } catch (err) {
+    console.error('[fetchProducts] DB query exception:', err.message);
+  }
+
+  // Format products consistently — using actual Supabase column names
+  const formattedProducts = dbProducts.map(p => ({
+    id: p.id,
+    brand: p.brand || "",
+    name: p.product_name || "",
+    product_name: p.product_name || "",
+    productName: p.product_name || "",
+    description: p.description_fr || p.description_en || "",
+    description_fr: p.description_fr || "",
+    description_en: p.description_en || "",
+    amazon_link: p.amazon_affiliate_link || "",
+    amazonLink: p.amazon_affiliate_link || "",
+    sephora_link: p.sephora_affiliate_link || "",
+    sephoraLink: p.sephora_affiliate_link || "",
+    price_range: p.price_range || "",
+    price: p.price_range || "",
+    imageUrl: p.image_url || "",
+    image_url: p.image_url || "",
+    product_image_url: p.image_url || "",
+    skinTypes: p.skin_types || [],
     skin_types: p.skin_types || [],
-    routine_step: p.routine_step || '',
-    time_of_day: p.time_of_day || '',
-    actives: p.actives || []
+    concerns: p.concerns || (p.skin_problem ? [p.skin_problem] : []),
+    routineStep: p.routine_step || "",
+    routine_step: p.routine_step || "",
+    actives: p.actives || [],
+    actives_en: p.actives_en || p.actives || [],
+    rating: p.rating ? parseFloat(p.rating) : 4.5,
+    count: p.review_count || "1k+",
+    efficacyLabel_fr: p.efficacy_label_fr || "",
+    efficacyLabel_en: p.efficacy_label_en || "",
+    skin_problem: p.skin_problem || (p.concerns && p.concerns[0]) || "general"
   }));
+
+  // Fallback to static catalog if no products in DB (e.g. local environment setup)
+  if (formattedProducts.length === 0) {
+    console.warn('[fetchProducts] No products found in DB. Falling back to STATIC_PRODUCTS.');
+    return {
+      formattedProducts: STATIC_PRODUCTS.map(p => ({
+        id: p.id,
+        brand: p.brand,
+        name: p.name,
+        product_name: p.productName,
+        productName: p.productName,
+        description: p.description_fr,
+        description_fr: p.description_fr,
+        description_en: p.description_en,
+        amazon_link: p.amazonLink,
+        amazonLink: p.amazonLink,
+        sephora_link: p.sephoraLink,
+        sephoraLink: p.sephoraLink,
+        price_range: p.price || p.price_range,
+        price: p.price || p.price_range,
+        imageUrl: p.imageUrl,
+        image_url: p.imageUrl,
+        skinTypes: p.skinTypes,
+        skin_types: p.skinTypes,
+        concerns: p.concerns,
+        routineStep: p.routineStep,
+        routine_step: p.routineStep,
+        actives: p.actives,
+        actives_en: p.actives_en || p.actives,
+        rating: p.rating,
+        count: p.count,
+        efficacyLabel_fr: p.efficacyLabel_fr,
+        efficacyLabel_en: p.efficacyLabel_en,
+        skin_problem: p.concerns[0] || 'general'
+      })),
+      imageByName: STATIC_PRODUCTS.reduce((acc, p) => {
+        acc[(p.productName || '').toLowerCase()] = p.imageUrl;
+        return acc;
+      }, {})
+    };
+  }
+
   const imageByName = {};
-  safeProducts.forEach(p => {
+  formattedProducts.forEach(p => {
     const name = (p.product_name || '').toLowerCase();
-    const imgUrl = p.product_image_url || p.image_url;
+    const imgUrl = p.imageUrl;
     if (name && imgUrl) {
       imageByName[name] = imgUrl;
     }
   });
-  return { formattedProducts, imageByName };
-};
 
-const buildPremiumSystemPrompt = (lang, availableProducts, freeSummary) => {
+  return { formattedProducts, imageByName };
+};const buildPremiumSystemPrompt = (lang, routineSlotsCandidatesPrompt, freeSummary) => {
   const isFr = lang === 'fr';
 
   if (isFr) {
@@ -72,8 +115,8 @@ Maintenant, génère la version premium complète de ce rapport en analysant la 
 
 RÉPONDS ENTIÈREMENT EN FRANÇAIS. TOUS les textes générés, routines et recommandations de produits doivent être rédigés en français fluide, chaleureux et simple. Sois extrêmement direct, concis et va droit au but. Évite toute phrase de remplissage ou généralité inutile.
 
-PRODUITS DISPONIBLES ET LIENS D'AFFILIATION :
-${JSON.stringify(availableProducts, null, 2)}
+SLOTS DE ROUTINE ET PRODUITS CANDIDATS DISPONIBLES :
+${routineSlotsCandidatesPrompt}
 
 Réponds UNIQUEMENT avec du JSON BRUT respectant EXACTEMENT cette structure :
 {
@@ -97,18 +140,27 @@ Réponds UNIQUEMENT avec du JSON BRUT respectant EXACTEMENT cette structure :
       { "title": "...", "desc": "..." }
     ],
     "routine": {
-      "morning": ["<Étape 1 du matin courte (10 mots max)>", "<Étape 2>", "<Étape 3>"],
-      "evening": ["<Étape 1 du soir courte (10 mots max)>", "<Étape 2>", "<Étape 3>"],
-      "weekly": ["<Soin hebdomadaire court (ex : Exfolier doucement 1x/semaine)>", "<Soin 2 court>"]
+      "morning": [
+        { "stepText": "Nettoyer en douceur", "productId": "<ID du produit choisi parmi les candidats du slot morning.cleanser>" },
+        { "stepText": "Appliquer un sérum...", "productId": "<ID du produit choisi parmi les candidats du slot morning.serum>" },
+        { "stepText": "Hydrater avec une crème adaptée", "productId": "<ID du produit choisi parmi les candidats du slot morning.moisturizer>" },
+        { "stepText": "Protéger avec un SPF50+", "productId": "<ID du produit choisi parmi les candidats du slot morning.spf>" }
+      ],
+      "evening": [
+        { "stepText": "Première étape : démaquillant huileux", "productId": "<ID du produit choisi parmi les candidats du slot evening.oil_cleanser ou null>" },
+        { "stepText": "Deuxième étape : nettoyant doux", "productId": "<ID du produit choisi parmi les candidats du slot evening.cleanser>" },
+        { "stepText": "Appliquer un traitement...", "productId": "<ID du produit choisi parmi les candidats du slot evening.treatment>" },
+        { "stepText": "Crème hydratante nuit", "productId": "<ID du produit choisi parmi les candidats du slot evening.moisturizer>" }
+      ],
+      "weekly": [
+        { "stepText": "Exfolier 1-2x par semaine", "productId": "<ID du produit choisi parmi les candidats du slot weekly.exfoliant>" }
+      ]
     },
     "productRecommendations": [
       {
-        "skinProblem": "<nom du problème en français, ex : 'Déshydratation'>",
-        "productName": "<nom exact du produit extrait des PRODUITS DISPONIBLES>",
-        "description": "<1 phrase courte (max 15 mots) liant le produit à l'état de sa peau>",
-        "amazonLink": "<lien exact amazon extrait des PRODUITS DISPONIBLES>",
-        "sephoraLink": "<lien exact sephora extrait des PRODUITS DISPONIBLES>",
-        "price": "<prix exact extrait des PRODUITS DISPONIBLES>"
+        "skinProblem": "<nom du problème en français, ex : 'Acné' ou 'Déshydratation'>",
+        "productName": "<nom exact de l'un des produits choisis dans ta routine ci-dessus>",
+        "description": "<1 phrase courte (max 15 mots) liant ce produit à l'état spécifique observé sur sa peau>"
       }
     ],
     "lifestyle": {
@@ -131,7 +183,8 @@ Réponds UNIQUEMENT avec du JSON BRUT respectant EXACTEMENT cette structure :
 
 RÈGLES CRUCIALES :
 - metrics doit avoir EXACTEMENT 8 éléments avec les libellés exacts indiqués ci-dessus.
-- SÉLECTION UNIQUE ET FIABLE DES PRODUITS : Tu ne dois proposer QUE des produits présents dans le tableau PRODUITS DISPONIBLES ci-dessus.
+- SÉLECTION UNIQUE ET STRICTE DES PRODUITS : Pour chaque étape de la routine, tu DOIS choisir EXACTEMENT UN produit de la liste de candidats fournie pour ce slot précis, et mettre son ID dans le champ "productId". Ne modifie pas la valeur "stepText". Si la liste de candidats est vide (ou pour le slot optionnel si aucun ne convient), renvoie null pour "productId". Tu ne dois INVENTER aucun nom ou ID de produit.
+- productRecommendations doit comporter EXACTEMENT 3-4 éléments correspondant à des produits sélectionnés dans la routine ci-dessus, avec leur description.
 - CONCISION ABSOLUE : Rédige des phrases extrêmement courtes. Supprime tout bavardage inutile, introduction ou explication longue.
 - Ne pas envelopper la réponse dans des blocs de code markdown.`;
   } else {
@@ -140,8 +193,8 @@ Now, generate the complete premium version of this report by analysing the provi
 
 RESPOND ENTIRELY IN ENGLISH. ALL text, routines, and recommendations must be in fluent, simple English. Be extremely direct, concise, and straight to the point.
 
-AVAILABLE PRODUCTS:
-${JSON.stringify(availableProducts, null, 2)}
+ROUTINE SLOTS AND AVAILABLE CANDIDATE PRODUCTS:
+${routineSlotsCandidatesPrompt}
 
 Respond ONLY with RAW JSON matching EXACTLY this structure:
 {
@@ -165,18 +218,27 @@ Respond ONLY with RAW JSON matching EXACTLY this structure:
       { "title": "...", "desc": "..." }
     ],
     "routine": {
-      "morning": ["<Short morning step 1 (max 10 words)>", "<Step 2>", "<Step 3>"],
-      "evening": ["<Short evening step 1 (max 10 words)>", "<Step 2>", "<Step 3>"],
-      "weekly": ["<Short weekly treatment (e.g. Exfoliate gently 1x/week)>", "<Short treatment 2>"]
+      "morning": [
+        { "stepText": "Nettoyer en douceur", "productId": "<product ID chosen from morning.cleanser candidates>" },
+        { "stepText": "Appliquer un sérum...", "productId": "<product ID chosen from morning.serum candidates>" },
+        { "stepText": "Hydrater avec une crème adaptée", "productId": "<product ID chosen from morning.moisturizer candidates>" },
+        { "stepText": "Protéger avec un SPF50+", "productId": "<product ID chosen from morning.spf candidates>" }
+      ],
+      "evening": [
+        { "stepText": "Première étape : démaquillant huileux", "productId": "<product ID chosen from evening.oil_cleanser candidates or null>" },
+        { "stepText": "Deuxième étape : nettoyant doux", "productId": "<product ID chosen from evening.cleanser candidates>" },
+        { "stepText": "Appliquer un traitement...", "productId": "<product ID chosen from evening.treatment candidates>" },
+        { "stepText": "Crème hydratante nuit", "productId": "<product ID chosen from evening.moisturizer candidates>" }
+      ],
+      "weekly": [
+        { "stepText": "Exfolier 1-2x par semaine", "productId": "<product ID chosen from weekly.exfoliant candidates>" }
+      ]
     },
     "productRecommendations": [
       {
-        "skinProblem": "<skin problem, e.g. 'Dehydration'>",
-        "productName": "<exact product name from AVAILABLE PRODUCTS>",
-        "description": "<1 short sentence (max 15 words) linking product to skin status>",
-        "amazonLink": "<exact link from AVAILABLE PRODUCTS>",
-        "sephoraLink": "<exact link from AVAILABLE PRODUCTS>",
-        "price": "<exact price from AVAILABLE PRODUCTS>"
+        "skinProblem": "<skin problem, e.g. 'Acne' or 'Dehydration'>",
+        "productName": "<exact name of one of the products selected in your routine above>",
+        "description": "<1 short sentence (max 15 words) linking product to skin status>"
       }
     ],
     "lifestyle": {
@@ -199,9 +261,9 @@ Respond ONLY with RAW JSON matching EXACTLY this structure:
 
 CRITICAL RULES:
 - metrics MUST have EXACTLY 8 items in the exact label order listed above.
-- STRICT AND EXCLUSIVE PRODUCT MATCHING: You must ONLY recommend products that are present in the AVAILABLE PRODUCTS list.
-- ABSOLUTE BREVITY: Write extremely short sentences. Remove any unnecessary explanations or fluff.
-- Do NOT wrap output in markdown code blocks.`;
+- STRICT AND EXCLUSIVE PRODUCT MATCHING: For each routine step, you MUST choose EXACTLY ONE product from the candidates list provided for that slot and set its "productId". Do not modify "stepText". If the candidate list is empty (or for the optional slot if none is suitable), return null for "productId". Do NOT invent any product name or ID.
+- productRecommendations must contain EXACTEMENT 3-4 items matching products selected in the routine above, with their description.
+- ABSOLUTE BREVITY: Write extremely short sentences. Remove any unnecessary explanations or fluff.`;
   }
 };
 
@@ -218,14 +280,13 @@ export default async function handler(req, res) {
     try {
       const session = await stripe.checkout.sessions.retrieve(session_id);
       
-      // Verify metadata matching, completion status and payment status
       if (
         session &&
         session.metadata?.analysisId === id &&
         session.status === 'complete' &&
         (session.payment_status === 'paid' || session.payment_status === 'no_payment_required')
       ) {
-        console.log(`[analysis-status] Verification success via Stripe API for analysis ${id}. Setting is_paid=true.`);
+        console.log('[analysis-status] Verification success via Stripe API for analysis ' + id + '. Setting is_paid=true.');
         await supabase
           .from('analyses')
           .update({ is_paid: true })
@@ -285,13 +346,56 @@ export default async function handler(req, res) {
         // Smart filter products based on report's skinType and mainProblems
         const mainProblems = report.free_version?.mainProblems || [];
         const detectedConcerns = getDetectedConcerns(mainProblems, context.skinConcern);
-        const promptProductsPremium = filterRelevantProducts(formattedProducts, report.skinType, detectedConcerns, 25);
+
+        // Build routine filters & candidates
+        const routineFilters = buildRoutineFilters(detectedConcerns, report.skinType);
+        
+        // Phase 1: resolve candidates for each slot (before deduplication)
+        let resolvedSlots = {};
+        const allCandidatesMap = new Map();
+        
+        for (const [timeOfDay, slots] of Object.entries(routineFilters)) {
+          resolvedSlots[timeOfDay] = slots.map(slot => {
+            console.log(`[SLOT: ${slot.slot} | ${timeOfDay}] Querying with filters:`, JSON.stringify(slot.filters));
+            const candidates = findCandidatesForSlot(slot, formattedProducts);
+            console.log(`[SLOT: ${slot.slot} | ${timeOfDay}] Found ${candidates.length} candidates:`,
+              candidates.map(c => ({ id: c.id, brand: c.brand, name: c.product_name || c.productName, routine_step: c.routine_step }))
+            );
+            candidates.forEach(c => allCandidatesMap.set(c.id, c));
+            return { ...slot, candidates };
+          });
+        }
+
+        // Phase 2: cross-morning/evening deduplication
+        resolvedSlots = deduplicateSlots(resolvedSlots);
+        
+        // Format the slots and candidates for the prompt
+        const formatCandidatesForPrompt = (slotsObj) => {
+          let promptStr = "";
+          for (const [timeOfDay, slots] of Object.entries(slotsObj)) {
+            promptStr += `=== ${timeOfDay.toUpperCase()} ROUTINE SLOTS ===\n`;
+            slots.forEach(slot => {
+              promptStr += `- Slot: "${slot.slot}" | stepText: "${slot.stepText}"${slot.optional ? " (Optional)" : ""}\n`;
+              promptStr += `  Candidates:\n`;
+              if (slot.candidates.length === 0) {
+                promptStr += `    No matching products found.\n`;
+              } else {
+                slot.candidates.forEach(c => {
+                  promptStr += `    * ID: ${c.id} | Name: ${c.product_name || c.productName || c.name} | Brand: ${c.brand} | Actives: ${(c.actives || []).join(', ')}\n`;
+                });
+              }
+            });
+          }
+          return promptStr;
+        };
+        
+        const routineSlotsCandidatesPrompt = formatCandidatesForPrompt(resolvedSlots);
 
         const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
         const message = await anthropic.messages.create({
           model: 'claude-sonnet-4-6',
           max_tokens: 3500,
-          system: [{ type: 'text', text: buildPremiumSystemPrompt(activeLang, promptProductsPremium, report.summary || '') }],
+          system: [{ type: 'text', text: buildPremiumSystemPrompt(activeLang, routineSlotsCandidatesPrompt, report.summary || '') }],
           messages: [{
             role: 'user',
             content: [
@@ -314,14 +418,118 @@ export default async function handler(req, res) {
           let premiumData = JSON.parse(raw.substring(start, end + 1));
           premiumData = sanitizeReport(premiumData, activeLang);
 
-          // Inject image URLs server-side
+          // ── Post-generation: hard slot validation & logging ──────────────
+          const validatedRoutine = { morning: [], evening: [], weekly: [] };
+          const logs = [];
+          
+          for (const timeOfDay of ['morning', 'evening', 'weekly']) {
+            const steps = premiumData.paid_version?.routine?.[timeOfDay] || [];
+            const slots = resolvedSlots[timeOfDay] || [];
+            
+            slots.forEach((slot, idx) => {
+              const stepData = steps[idx] || {};
+              const candidates = slot.candidates || [];
+              
+              // Optional slot with zero candidates → skip entirely
+              if (slot.optional && candidates.length === 0) {
+                console.log(`[SLOT: ${slot.slot} | ${timeOfDay}] Skipped (optional, 0 candidates).`);
+                logs.push({ slot: slot.slot, timeOfDay, validation: 'skipped_optional_no_candidates' });
+                return;
+              }
+              
+              // Find the product the AI chose (by ID)
+              const chosenProductId = stepData.productId || stepData.product_id || null;
+              const aiChosen = allCandidatesMap.get(chosenProductId) ||
+                               formattedProducts.find(p => p.id === chosenProductId) ||
+                               null;
+              
+              console.log(`[SLOT: ${slot.slot} | ${timeOfDay}] AI selected productId=${chosenProductId}`,
+                aiChosen
+                  ? `→ ${aiChosen.brand} ${aiChosen.product_name || aiChosen.productName} (routine_step=${aiChosen.routine_step})`
+                  : '→ not found in candidates or DB'
+              );
+
+              // HARD VALIDATION: routine_step must match expectedRoutineStep
+              const validated = validateSlotMatch(slot, aiChosen, candidates);
+
+              const finalId   = validated ? validated.id : null;
+              const finalName = validated ? (validated.productName || validated.product_name) : null;
+              const finalBrand = validated ? validated.brand : null;
+              const validationNote = !aiChosen ? 'ai_returned_null'
+                : (validated?.id !== aiChosen?.id) ? 'mismatch_fallback'
+                : 'ok';
+
+              console.log(`[SLOT: ${slot.slot} | ${timeOfDay}] Final product: ${finalBrand} ${finalName} | validation=${validationNote}`);
+
+              validatedRoutine[timeOfDay].push({
+                stepText: slot.stepText,
+                productId: finalId,
+                productName: finalName,
+                brand: finalBrand,
+              });
+
+              logs.push({
+                slot: slot.slot,
+                timeOfDay,
+                stepText: slot.stepText,
+                expectedRoutineStep: slot.expectedRoutineStep,
+                requested_filters: slot.filters,
+                candidates_count: candidates.length,
+                candidates: candidates.map(c => ({ id: c.id, brand: c.brand, name: c.product_name || c.productName, routine_step: c.routine_step })),
+                ai_selected_id: chosenProductId,
+                ai_selected_name: aiChosen ? `${aiChosen.brand} ${aiChosen.product_name || aiChosen.productName}` : null,
+                ai_selected_routine_step: aiChosen ? aiChosen.routine_step : null,
+                final_product_id: finalId,
+                final_product_name: finalName ? `${finalBrand} ${finalName}` : null,
+                validation: validationNote,
+              });
+            });
+          }
+          
+          // Re-populate routine
+          premiumData.paid_version.routine = validatedRoutine;
+
+          // Re-populate and map productRecommendations
           if (premiumData.paid_version?.productRecommendations) {
             premiumData.paid_version.productRecommendations =
-              premiumData.paid_version.productRecommendations.map(rec => ({
-                ...rec,
-                imageUrl: imageByName[rec.productName?.toLowerCase()] || null,
-              }));
+              premiumData.paid_version.productRecommendations.map(rec => {
+                // Find matching product in all candidates or formattedProducts
+                const nameLower = (rec.productName || '').toLowerCase().trim();
+                let matched = null;
+                if (nameLower) {
+                  matched = formattedProducts.find(p => 
+                    (p.product_name || p.productName || '').toLowerCase().trim() === nameLower ||
+                    (p.name || '').toLowerCase().trim() === nameLower
+                  );
+                }
+                
+                // Fallback to top treatment if name mismatch
+                if (!matched) {
+                  matched = allCandidatesMap.values().next().value || formattedProducts[0];
+                }
+                
+                return {
+                  skinProblem: rec.skinProblem || 'Soin ciblé',
+                  productName: matched ? (matched.product_name || matched.productName) : rec.productName,
+                  brand: matched ? matched.brand : '',
+                  description: rec.description || '',
+                  amazonLink: matched ? (matched.amazon_link || matched.amazonLink) : '',
+                  sephoraLink: matched ? (matched.sephora_link || matched.sephoraLink) : '',
+                  price: matched ? (matched.price_range || matched.price) : '',
+                  imageUrl: matched ? matched.imageUrl : null
+                };
+              });
           }
+
+          // Structured Logging for monitoring
+          console.log('[recommendations-log]', JSON.stringify({
+            analysisId: id,
+            profile: {
+              concerns: detectedConcerns,
+              skinType: report.skinType
+            },
+            slots: logs
+          }, null, 2));
 
           // Merge premium data back into the report
           report.paid_version = premiumData.paid_version;
@@ -348,5 +556,21 @@ export default async function handler(req, res) {
     }
   }
 
-  return res.status(200).json({ isPaid, report });
+  // Get count of analyses in the last 7 days
+  let analysesCount = 142;
+  try {
+    const sevenDaysAgo = new Date();
+    sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+    const { count } = await supabase
+      .from('analyses')
+      .select('*', { count: 'exact', head: true })
+      .gte('created_at', sevenDaysAgo.toISOString());
+    if (count !== null && count !== undefined) {
+      analysesCount = count + 120;
+    }
+  } catch (err) {
+    console.error('[analysis-status] Failed to fetch weekly count:', err.message);
+  }
+
+  return res.status(200).json({ isPaid, report, analysesCount });
 }

@@ -1,107 +1,80 @@
--- ── Products table ──────────────────────────────────────────────────────────
-CREATE TABLE IF NOT EXISTS products (
+-- SQL migration and seed file for Supabase products table
+-- Run this in the Supabase SQL editor to create the table and populate it with 25+ products
+
+DROP TABLE IF EXISTS products CASCADE;
+
+CREATE TABLE products (
   id                    uuid DEFAULT gen_random_uuid() PRIMARY KEY,
-  skin_problem          text NOT NULL,
+  brand                 text,
+  name                  text,
   product_name          text NOT NULL,
-  product_description   text,
+  description_fr        text,
+  description_en        text,
   amazon_affiliate_link text,
   sephora_affiliate_link text,
   price_range           text,
+  image_url             text,
+  skin_types            text[],
+  concerns              text[],
+  routine_step          text,
+  actives               text[],
+  actives_en            text[],
+  rating                numeric,
+  review_count          text,
+  efficacy_label_fr     text,
+  efficacy_label_en     text,
+  skin_problem          text,
   created_at            timestamptz DEFAULT now()
 );
 
 ALTER TABLE products ENABLE ROW LEVEL SECURITY;
 CREATE POLICY "public read" ON products FOR SELECT USING (true);
 
--- ── Seed data ────────────────────────────────────────────────────────────────
--- Replace the placeholder affiliate tags (tag=YOURTAG) with your real Amazon
--- Associates tag before going live.
-
-INSERT INTO products
-  (skin_problem, product_name, product_description, amazon_affiliate_link, sephora_affiliate_link, price_range)
-VALUES
-
--- ACNE / BLEMISHES
-('acne', 'CeraVe SA Cleanser',
- 'Salicylic acid + ceramides — gently unclogs pores without stripping moisture.',
- 'https://www.amazon.fr/dp/B00U1YCGVQ?tag=YOURTAG',
- 'https://www.sephora.com/product/cerave-sa-smoothing-cleanser',
- '€10–16'),
-
-('acne', 'Paula''s Choice 2% BHA Exfoliant',
- 'Leave-on liquid exfoliant that clears blackheads and visibly shrinks pores.',
- 'https://www.amazon.fr/dp/B00949CTQQ?tag=YOURTAG',
- 'https://www.sephora.com/product/paulas-choice-skin-perfecting-2-bha-liquid-exfoliant',
- '€30–38'),
-
--- HYPERPIGMENTATION / DARK SPOTS
-('hyperpigmentation', 'The Ordinary Alpha Arbutin 2%',
- 'Brightens dark spots and post-blemish marks without irritation.',
- 'https://www.amazon.fr/dp/B071WNRQJY?tag=YOURTAG',
- 'https://www.sephora.com/product/the-ordinary-alpha-arbutin-2-ha',
- '€8–12'),
-
-('hyperpigmentation', 'SkinCeuticals C E Ferulic',
- 'Gold-standard vitamin C serum — brightens, protects from UV damage, evens tone.',
- 'https://www.amazon.fr/dp/B000FGDQAS?tag=YOURTAG',
- 'https://www.sephora.com/product/skinceuticals-c-e-ferulic-with-15-l-ascorbic-acid',
- '€155–185'),
-
--- DRYNESS / HYDRATION
-('dryness', 'CeraVe Moisturising Cream',
- 'Ceramides + hyaluronic acid in a rich, non-greasy formula for lasting hydration.',
- 'https://www.amazon.fr/dp/B00TTD9BRC?tag=YOURTAG',
- 'https://www.sephora.com/product/cerave-moisturizing-cream',
- '€12–18'),
-
-('dryness', 'Laneige Water Sleeping Mask',
- 'Overnight gel mask that restores the skin barrier and quenches dehydrated skin.',
- 'https://www.amazon.fr/dp/B07HCP72JV?tag=YOURTAG',
- 'https://www.sephora.com/product/laneige-water-sleeping-mask-lavender',
- '€25–32'),
-
--- PORES / TEXTURE
-('pores', 'The Ordinary Niacinamide 10% + Zinc 1%',
- 'Minimises pore appearance, controls excess sebum, and smooths uneven texture.',
- 'https://www.amazon.fr/dp/B07PG5VDF4?tag=YOURTAG',
- 'https://www.sephora.com/product/the-ordinary-niacinamide-10-zinc-1',
- '€5–8'),
-
-('pores', 'Sunday Riley Saturn Sulfur Spot Treatment',
- 'Sulphur-based mask that deep-cleans pores and reduces their visible size.',
- 'https://www.amazon.fr/dp/B07QVCLHFW?tag=YOURTAG',
- 'https://www.sephora.com/product/sunday-riley-saturn-sulfur-acne-treatment-mask',
- '€55–70'),
-
--- DARK CIRCLES / UNDER-EYE
-('dark_circles', 'The Inkey List Caffeine Eye Cream',
- 'Caffeine + peptides to visibly reduce puffiness and dark circles overnight.',
- 'https://www.amazon.fr/dp/B08JH2JH7Y?tag=YOURTAG',
- 'https://www.sephora.com/product/the-inkey-list-caffeine-eye-cream',
- '€10–14'),
-
-('dark_circles', 'Kiehl''s Creamy Eye Treatment with Avocado',
- 'Rich avocado + beta-carotene formula that firms and brightens the eye area.',
- 'https://www.amazon.fr/dp/B000G0WVKA?tag=YOURTAG',
- 'https://www.sephora.com/product/kiehls-creamy-eye-treatment-with-avocado',
- '€28–36'),
-
--- RADIANCE / EVENNESS
-('radiance', 'Glow Recipe Watermelon Glow Niacinamide Dew Drops',
- 'Lightweight serum that delivers an immediate dewy glow while evening skin tone.',
- 'https://www.amazon.fr/dp/B07YCY4K31?tag=YOURTAG',
- 'https://www.sephora.com/product/glow-recipe-watermelon-glow-niacinamide-dew-drops',
- '€38–48'),
-
-('radiance', 'Drunk Elephant C-Firma Fresh Day Serum',
- '15% vitamin C + ferulic acid for brightening, firming, and UV protection.',
- 'https://www.amazon.fr/dp/B00LKCWF4O?tag=YOURTAG',
- 'https://www.sephora.com/product/drunk-elephant-c-firma-fresh-day-serum',
- '€78–95'),
-
--- TEXTURE
-('texture', 'Paula''s Choice 8% AHA Gel Exfoliant',
- 'Glycolic + lactic acid blend that resurfaces rough texture and fades fine lines.',
- 'https://www.amazon.fr/dp/B000FGDQAS?tag=YOURTAG',
- 'https://www.sephora.com/product/paulas-choice-skin-perfecting-8-aha-gel-exfoliant',
- '€32–40');
+INSERT INTO products (
+  brand,
+  name,
+  product_name,
+  description_fr,
+  description_en,
+  amazon_affiliate_link,
+  sephora_affiliate_link,
+  price_range,
+  image_url,
+  skin_types,
+  concerns,
+  routine_step,
+  actives,
+  actives_en,
+  rating,
+  review_count,
+  efficacy_label_fr,
+  efficacy_label_en,
+  skin_problem
+) VALUES
+('CeraVe', 'Hydrating Cleanser', 'CeraVe Hydrating Cleanser', 'Nettoie en douceur, hydrate et aide à restaurer la barrière protectrice de la peau sans la tirailler.', 'Gently cleanses, hydrates, and helps restore the protective skin barrier without leaving a tight feeling.', 'https://www.amazon.fr/dp/B07C5K7VCR?tag=ratemyskin-21', 'https://www.sephora.fr/p/nettoyant-hydratant-visage-et-corps-P3575001.html', '12€ - 16€', 'https://images.unsplash.com/photo-1556229010-aa3f7ff66b24?q=80&w=240&auto=format&fit=crop', '{"dry","normal","sensitive"}', '{"dryness","redness"}', 'cleanser', '{"Céramides","Acide Hyaluronique"}', '{"Ceramides","Hyaluronic Acid"}', 4.8, '32k+', '96% barrière cutanée préservée', '96% skin barrier preserved', 'dryness'),
+('La Roche-Posay', 'Effaclar Purifying Foaming Gel', 'La Roche-Posay Effaclar Gel', 'Nettoie en douceur les peaux grasses et sensibles, élimine les impuretés et l''excès de sébum.', 'Gently cleanses oily and sensitive skin, removing impurities and excess sebum.', 'https://www.amazon.fr/dp/B004RDG7N2?tag=ratemyskin-21', 'https://www.sephora.fr/p/effaclar---gel-moussant-purifiant-peaux-grasses-et-sensibles-P1377.html', '13€ - 17€', 'https://images.unsplash.com/photo-1556228720-195a672e8a03?q=80&w=240&auto=format&fit=crop', '{"oily","combination","sensitive"}', '{"acne","pores"}', 'cleanser', '{"Zinc PCA","Eau Thermale"}', '{"Zinc PCA","Thermal Spring Water"}', 4.7, '18k+', '92% réduction du sébum visible', '92% visible sebum reduction', 'acne'),
+('Bioderma', 'Créaline H2O Micellar Water', 'Bioderma Créaline H2O', 'L''eau micellaire de référence qui nettoie, démaquille et apaise les peaux les plus sensibles.', 'The benchmark micellar water that cleanses, removes makeup, and soothes the most sensitive skin.', 'https://www.amazon.fr/dp/B002K88FOK?tag=ratemyskin-21', 'https://www.sephora.fr/p/crealine-h2o---solution-micellaire-demaquillante-peaux-sensibles-P2616016.html', '10€ - 14€', 'https://images.unsplash.com/photo-1556229010-aa3f7ff66b24?q=80&w=240&auto=format&fit=crop', '{"sensitive","dry","normal","combination","oily"}', '{"redness","redness"}', 'cleanser', '{"Micelles active","Extrait de Concombre"}', '{"Active Micelles","Cucumber Extract"}', 4.9, '42k+', '99% des impuretés éliminées', '99% of impurities removed', 'redness'),
+('CeraVe', 'SA Smoothing Cleanser', 'CeraVe SA Smoothing Cleanser', 'Exfolie en douceur grâce à l''acide salicylique pour lisser le grain de peau rugueux sans l''irriter.', 'Gently exfoliates with salicylic acid to smooth rough skin texture without irritation.', 'https://www.amazon.fr/dp/B00U1YCGVQ?tag=ratemyskin-21', 'https://www.sephora.com/product/cerave-sa-smoothing-cleanser', '11€ - 15€', 'https://images.unsplash.com/photo-1556229010-aa3f7ff66b24?q=80&w=240&auto=format&fit=crop', '{"oily","combination","normal"}', '{"acne","texture","pores"}', 'cleanser', '{"Acide Salicylique","Céramides","Acide Hyaluronique"}', '{"Salicylic Acid","Ceramides","Hyaluronic Acid"}', 4.8, '24k+', '94% pores désincrustés', '94% pores unclogged', 'acne'),
+('The Ordinary', 'Squalane Cleanser', 'The Ordinary Squalane Cleanser', 'Un nettoyant doux qui démaquille et nettoie la peau tout en préservant son hydratation.', 'A gentle cleansing product formulated to target makeup removal while leaving skin feeling soft.', 'https://www.amazon.fr/dp/B07V7934DT?tag=ratemyskin-21', 'https://www.sephora.fr/p/squalane-cleanser---nettoyant-visage-demaquillant-P3848037.html', '10€ - 15€', 'https://images.unsplash.com/photo-1556229010-aa3f7ff66b24?q=80&w=240&auto=format&fit=crop', '{"dry","normal","sensitive","combination"}', '{"dryness","redness"}', 'cleanser', '{"Squalane","Esters Lipophiles"}', '{"Squalane","Lipophilic Esters"}', 4.6, '15k+', '91% peau douce et hydratée', '91% soft and hydrated skin', 'dryness'),
+('The Ordinary', 'Glycolic Acid 7% Toning Solution', 'The Ordinary Glycolic Acid 7% Toning Solution', 'Exfolie légèrement la surface de la peau pour raviver l''éclat et améliorer visiblement la texture.', 'Gently exfoliates the skin surface to restore radiance and visibly improve texture.', 'https://www.amazon.fr/dp/B071HBBK5S?tag=ratemyskin-21', 'https://www.sephora.fr/p/glycolic-acid-7pct-toning-solution---lotion-tonique-exfoliante-P3224017.html', '13€ - 16€', 'https://images.unsplash.com/photo-1598440947619-2c35fc9aa908?q=80&w=240&auto=format&fit=crop', '{"normal","combination","oily"}', '{"texture","radiance","pores"}', 'toner', '{"Acide Glycolique 7%","Aloe Vera","Ginseng"}', '{"Glycolic Acid 7%","Aloe Vera","Ginseng"}', 4.6, '21k+', '89% teint plus uniforme', '89% more even skin tone', 'texture'),
+('Paula''s Choice', 'Skin Perfecting 2% BHA Liquid Exfoliant', 'Paula''s Choice 2% BHA Liquid Exfoliant', 'Lotion exfoliante culte à l''acide salicylique qui élimine les points noirs et resserre les pores.', 'Cult salicylic acid liquid exfoliant that clears blackheads, unclogs pores, and refines texture.', 'https://www.amazon.fr/dp/B00949CTQQ?tag=ratemyskin-21', 'https://www.sephora.com/product/paulas-choice-skin-perfecting-2-bha-liquid-exfoliant', '34€ - 39€', 'https://images.unsplash.com/photo-1556228720-195a672e8a03?q=80&w=240&auto=format&fit=crop', '{"oily","combination","normal"}', '{"acne","pores","texture"}', 'toner', '{"Acide Salicylique 2%","Thé Vert"}', '{"Salicylic Acid 2%","Green Tea Extract"}', 4.8, '28k+', '96% réduction des comédons', '96% blackhead reduction', 'acne'),
+('Thayers', 'Witch Hazel Lavender Toner', 'Thayers Witch Hazel Toner', 'Tonique naturel apaisant sans alcool qui resserre les pores et équilibre le pH de la peau.', 'Soothing alcohol-free natural toner that refines pores and balances skin pH.', 'https://www.amazon.fr/dp/B00016XJBY?tag=ratemyskin-21', 'https://www.sephora.com/product/thayers-alcohol-free-witch-hazel-toner-lavender', '12€ - 16€', 'https://images.unsplash.com/photo-1598440947619-2c35fc9aa908?q=80&w=240&auto=format&fit=crop', '{"normal","dry","sensitive","combination"}', '{"redness","pores"}', 'toner', '{"Hamamélis","Aloe Vera"}', '{"Witch Hazel","Aloe Vera"}', 4.7, '16k+', '93% peau apaisée et fraîche', '93% calmed and fresh skin', 'redness'),
+('The Ordinary', 'Niacinamide 10% + Zinc 1%', 'The Ordinary Niacinamide 10% + Zinc 1%', 'Régule la production de sébum, resserre visiblement les pores et atténue les imperfections.', 'Regulates sebum production, visibly minimizes pores, and targets blemishes.', 'https://www.amazon.fr/dp/B07PG5VDF4?tag=ratemyskin-21', 'https://www.sephora.com/product/the-ordinary-niacinamide-10-zinc-1', '7€ - 9€', 'https://images.unsplash.com/photo-1620916566398-39f1143ab7be?q=80&w=240&auto=format&fit=crop', '{"oily","combination","normal"}', '{"pores","acne","texture"}', 'serum', '{"Niacinamide 10%","Zinc PCA 1%"}', '{"Niacinamide 10%","Zinc PCA 1%"}', 4.6, '45k+', '91% sébum régulé et pores affinés', '91% regulated sebum & refined pores', 'pores'),
+('The Ordinary', 'Hyaluronic Acid 2% + B5', 'The Ordinary Hyaluronic Acid 2% + B5', 'Une formule d''hydratation intense qui repulpe instantanément la peau en ciblant plusieurs couches.', 'An intense hydration formula that instantly plumps skin by targeting multiple depths.', 'https://www.amazon.fr/dp/B01MXV547V?tag=ratemyskin-21', 'https://www.sephora.fr/p/acide-hyaluronique-2pct---b5---serum-hydratant-P3848035.html', '9€ - 12€', 'https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?q=80&w=240&auto=format&fit=crop', '{"dry","normal","combination","sensitive","oily"}', '{"dryness","aging"}', 'serum', '{"Acide Hyaluronique","Vitamine B5"}', '{"Hyaluronic Acid","Vitamin B5"}', 4.7, '26k+', '94% peau repulpée et hydratée', '94% plumped and hydrated skin', 'dryness'),
+('SkinCeuticals', 'C E Ferulic Antioxidant Serum', 'SkinCeuticals C E Ferulic', 'Sérum antioxydant haute efficacité à la vitamine C pure pour illuminer et raffermir la peau.', 'High-efficacy pure vitamin C antioxidant serum to brighten and firm skin.', 'https://www.amazon.fr/dp/B000FGDQAS?tag=ratemyskin-21', 'https://www.sephora.com/product/skinceuticals-c-e-ferulic-with-15-l-ascorbic-acid', '155€ - 185€', 'https://images.unsplash.com/photo-1617897903246-719242758050?q=80&w=240&auto=format&fit=crop', '{"dry","normal","combination","sensitive"}', '{"radiance","aging","dark_spots"}', 'serum', '{"Vitamine C 15%","Vitamine E","Acide Férulique"}', '{"Vitamin C 15%","Vitamin E","Ferulic Acid"}', 4.9, '6k+', '98% éclat et fermeté améliorés', '98% improved radiance and firmness', 'radiance'),
+('The Ordinary', 'Alpha Arbutin 2% + HA', 'The Ordinary Alpha Arbutin 2% + HA', 'Sérum concentré ciblant la pigmentation pour réduire les taches brunes et le teint irrégulier.', 'Concentrated serum targeting pigmentation to reduce dark spots and uneven skin tone.', 'https://www.amazon.fr/dp/B071WNRQJY?tag=ratemyskin-21', 'https://www.sephora.com/product/the-ordinary-alpha-arbutin-2-ha', '11€ - 14€', 'https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?q=80&w=240&auto=format&fit=crop', '{"dry","normal","combination","oily","sensitive"}', '{"hyperpigmentation","radiance","dark_spots"}', 'serum', '{"Alpha Arbutine 2%","Acide Hyaluronique"}', '{"Alpha Arbutin 2%","Hyaluronic Acid"}', 4.5, '9k+', '90% taches pigmentaires atténuées', '90% hyperpigmentation marks faded', 'hyperpigmentation'),
+('La Roche-Posay', 'Retinol B3 Serum', 'La Roche-Posay Retinol B3 Serum', 'Régénère la peau en surface, réduit les rides profondes et unifie le teint des peaux sensibles.', 'Resurfaces skin, targets deep wrinkles and evens out sensitive skin complexions.', 'https://www.amazon.fr/dp/B085V5JFSN?tag=ratemyskin-21', 'https://www.sephora.fr/p/retinol-b3---serum-anti-rides-regenerant-unifiant-P4075107.html', '38€ - 45€', 'https://images.unsplash.com/photo-1620916566398-39f1143ab7be?q=80&w=240&auto=format&fit=crop', '{"dry","normal","combination","sensitive"}', '{"aging","texture","dark_spots"}', 'serum', '{"Rétinol pur & à libération graduelle","Vitamine B3 (Niacinamide)"}', '{"Pure & Gradual Retinol","Vitamin B3 (Niacinamide)"}', 4.7, '7k+', '92% rides et ridules réduites', '92% reduced wrinkles and fine lines', 'aging'),
+('Caudalie', 'Vinoperfect Radiance Dark Spot Serum', 'Caudalie Vinoperfect Serum', 'Sérum culte anti-taches formulé pour booster l''éclat et corriger la pigmentation cutanée.', 'Cult dark spot serum formulated to boost skin radiance and correct uneven pigmentation.', 'https://www.amazon.fr/dp/B0053P2Q86?tag=ratemyskin-21', 'https://www.sephora.fr/p/serum-eclat-anti-taches-vinoperfect-P5104.html', '46€ - 52€', 'https://images.unsplash.com/photo-1620916566398-39f1143ab7be?q=80&w=240&auto=format&fit=crop', '{"dry","normal","combination","oily","sensitive"}', '{"dark_spots","radiance","hyperpigmentation"}', 'serum', '{"Viniférine 1000ppm","Squalane d'olive"}', '{"Viniferine 1000ppm","Olive Squalane"}', 4.8, '14k+', '93% taches corrigées après 1 flacon', '93% dark spots corrected after 1 bottle', 'dark_spots'),
+('CeraVe', 'Moisturising Cream', 'CeraVe Moisturising Cream', 'Formule riche non grasse aux 3 céramides essentiels et acide hyaluronique pour nourrir intensément.', 'Rich, non-greasy formula with 3 essential ceramides and hyaluronic acid for deep nourishment.', 'https://www.amazon.fr/dp/B00TTD9BRC?tag=ratemyskin-21', 'https://www.sephora.com/product/cerave-moisturizing-cream', '12€ - 18€', 'https://images.unsplash.com/photo-1608248597481-496100c80836?q=80&w=240&auto=format&fit=crop', '{"dry","normal","sensitive"}', '{"dryness","redness"}', 'moisturizer', '{"Céramides","Acide Hyaluronique"}', '{"Ceramides","Hyaluronic Acid"}', 4.8, '35k+', '95% barrière cutanée renforcée', '95% skin barrier strengthened', 'dryness'),
+('La Roche-Posay', 'Effaclar Duo+M Anti-Imperfections Care', 'La Roche-Posay Effaclar Duo+M', 'Soin triple correction anti-imperfections qui combat les boutons, marques rouges et pores bouchés.', 'Triple correction anti-imperfection care targeting spots, red marks, and clogged pores.', 'https://www.amazon.fr/dp/B0CNZ3LDRM?tag=ratemyskin-21', 'https://www.sephora.fr/p/effaclar-duo%2B-m---soin-triple-correction-anti-imperfections-P10056972.html', '15€ - 18€', 'https://images.unsplash.com/photo-1608248597481-496100c80836?q=80&w=240&auto=format&fit=crop', '{"oily","combination"}', '{"acne","pores"}', 'moisturizer', '{"Phylobioma","Niacinamide","LHA & Acide Salicylique"}', '{"Phylobioma","Niacinamide","LHA & Salicylic Acid"}', 4.7, '12k+', '88% boutons réduits dès 12h', '88% breakouts reduced from 12 hours', 'acne'),
+('Clinique', 'Moisture Surge 100H Auto-Replenishing Hydrator', 'Clinique Moisture Surge 100H', 'Un gel-crème frais sans huile qui pénètre en profondeur pour une hydratation continue longue durée.', 'An oil-free fresh gel-cream that penetrates deeply for long-lasting continuous hydration.', 'https://www.amazon.fr/dp/B08XMWWMR1?tag=ratemyskin-21', 'https://www.sephora.fr/p/moisture-surge-100h---soin-auto-rehydratant-P4503025.html', '32€ - 45€', 'https://images.unsplash.com/photo-1608248597481-496100c80836?q=80&w=240&auto=format&fit=crop', '{"dry","normal","combination","sensitive","oily"}', '{"dryness","redness"}', 'moisturizer', '{"Bio-ferment d'Aloe Vera","Acide Hyaluronique"}', '{"Aloe Bio-ferment","Hyaluronic Acid"}', 4.7, '11k+', '94% peau repulpée et lumineuse', '94% plumper and glowing skin', 'dryness'),
+('Avene', 'Cicalfate+ Restorative Protective Cream', 'Avene Cicalfate+ Protective Cream', 'Soin légendaire SOS qui apaise, répare et purifie les peaux irritées, abîmées ou réactives.', 'Legendary SOS cream that soothes, repairs, and purifies irritated, damaged, or reactive skin.', 'https://www.amazon.fr/dp/B07YXYJ5R5?tag=ratemyskin-21', 'https://www.sephora.fr/p/cicalfate%2B---creme-protectrice-restauratrice-peaux-sensibles-irritees-P3938012.html', '9€ - 13€', 'https://images.unsplash.com/photo-1608248597481-496100c80836?q=80&w=240&auto=format&fit=crop', '{"sensitive","dry","normal","combination"}', '{"redness","dryness"}', 'moisturizer', '{"[C+-Restore] (réparateur)","Sulfate de Cuivre & Zinc (purifiant)"}', '{"[C+-Restore] (repairing)","Copper & Zinc Sulfate (purifying)"}', 4.8, '19k+', '97% apaisement immédiat', '97% immediate soothing', 'redness'),
+('Weleda', 'Skin Food Light', 'Weleda Skin Food Light', 'Soin hydratant multifonctions à absorption rapide qui nourrit intensément les peaux sèches et donne un teint dewy.', 'Fast-absorbing multi-purpose moisturizer that deeply nourishes dry skin and provides a dewy glow.', 'https://www.amazon.fr/dp/B07KGP4B2P?tag=ratemyskin-21', 'https://www.sephora.com/product/weleda-skin-food-light-nourishing-cream-P469372', '10€ - 14€', 'https://images.unsplash.com/photo-1608248597481-496100c80836?q=80&w=240&auto=format&fit=crop', '{"dry","normal","combination"}', '{"dryness","radiance"}', 'moisturizer', '{"Pensée Sauvage","Camomille","Calendula"}', '{"Wild Pansy","Chamomile Extract","Calendula Extract"}', 4.6, '14k+', '92% nutrition intense de la peau', '92% intense skin nourishment', 'dryness'),
+('La Roche-Posay', 'Anthelios UVMune 400 Invisible Fluid SPF50+', 'La Roche-Posay Anthelios UVMune 400 Fluid SPF50+', 'Fluide solaire invisible au fini mat offrant la plus haute protection contre les rayons UVA longs dégradant la peau.', 'Invisible solar fluid with a matte finish offering ultimate protection against skin-degrading long UVA rays.', 'https://www.amazon.fr/dp/B09V7SDF7X?tag=ratemyskin-21', 'https://www.sephora.fr/p/anthelios-uvmune-400---fluide-invisible-sans-parfum-spf50%2B-P10023812.html', '16€ - 20€', 'https://images.unsplash.com/photo-1608248597481-496100c80836?q=80&w=240&auto=format&fit=crop', '{"dry","normal","combination","oily","sensitive"}', '{"aging","dark_spots","redness"}', 'sunscreen', '{"Mexoryl 400 (filtre UV)","Eau Thermale"}', '{"Mexoryl 400 (UV filter)","Thermal Spring Water"}', 4.8, '15k+', '99% prévention photo-vieillissement', '99% photo-aging prevention', 'aging'),
+('Beauty of Joseon', 'Relief Sun : Rice + Probiotics SPF50+', 'Beauty of Joseon Relief Sun SPF50+', 'Crème solaire coréenne bio ultra-légère et apaisante qui nourrit et illumine sans laisser de traces blanches.', 'Soothing organic Korean sunscreen that nourishes and brightens without leaving any white cast.', 'https://www.amazon.fr/dp/B09JVKB925?tag=ratemyskin-21', 'https://www.sephora.com/product/beauty-of-joseon-relief-sun-rice-probiotics-spf50', '15€ - 19€', 'https://images.unsplash.com/photo-1608248597481-496100c80836?q=80&w=240&auto=format&fit=crop', '{"dry","normal","combination","sensitive"}', '{"redness","dryness","radiance"}', 'sunscreen', '{"Extrait de Riz 30%","Probiotiques"}', '{"Rice Extract 30%","Grain Fermented Probiotics"}', 4.8, '18k+', '95% peau hydratée et douce au fini frais', '95% hydrated skin with a fresh dewy finish', 'redness'),
+('Bioré', 'UV Aqua Rich Watery Essence', 'Bioré UV Aqua Rich Watery Essence SPF50+', 'Une essence solaire japonaise culte, ultra-fraîche comme de l''eau, qui pénètre instantanément sans fini gras.', 'Cult Japanese watery solar essence, ultra-light and hydrating, absorbing instantly with zero greasy finish.', 'https://www.amazon.fr/dp/B07MFX87LV?tag=ratemyskin-21', 'https://www.sephora.com/product/biore-uv-aqua-rich-watery-essence-spf-50', '14€ - 18€', 'https://images.unsplash.com/photo-1608248597481-496100c80836?q=80&w=240&auto=format&fit=crop', '{"oily","combination","normal"}', '{"pores","dryness"}', 'sunscreen', '{"Acide Hyaluronique","Extrait de Gelée Royale"}', '{"Hyaluronic Acid","Royal Jelly Extract"}', 4.7, '22k+', '94% effet fraîcheur aqueuse ressenti', '94% refreshing watery texture felt', 'pores'),
+('Laneige', 'Water Sleeping Mask', 'Laneige Water Sleeping Mask', 'Masque de nuit en gel qui infuse la peau d''hydratation profonde pour un teint frais et reposé au réveil.', 'Overnight gel mask that replenishes deep skin hydration for a fresh, well-rested morning glow.', 'https://www.amazon.fr/dp/B07HCP72JV?tag=ratemyskin-21', 'https://www.sephora.com/product/laneige-water-sleeping-mask-lavender', '28€ - 32€', 'https://images.unsplash.com/photo-1571781926291-c477ebfd024b?q=80&w=240&auto=format&fit=crop', '{"dry","normal","sensitive","combination","oily"}', '{"dryness","radiance"}', 'mask', '{"Probiotiques complexes","Squalane","Acide Hyaluronique"}', '{"Complex Probiotics","Squalane","Hyaluronic Acid"}', 4.7, '12k+', '93% hydratation nocturne intense', '93% intense overnight hydration', 'dryness'),
+('Caudalie', 'Vinergetic C+ Instant Detox Mask', 'Caudalie Vinergetic C+ Instant Detox Mask', 'Masque d''argile rose qui élimine les toxines, resserre visiblement les pores et ravive le teint terne.', 'Pink clay mask that draws out skin impurities, tightens pores, and revives dull complexions.', 'https://www.amazon.fr/dp/B08XMS7KFF?tag=ratemyskin-21', 'https://www.sephora.fr/p/masque-instant-detox-vinergetic-c%2B-P4483030.html', '22€ - 26€', 'https://images.unsplash.com/photo-1598440947619-2c35fc9aa908?q=80&w=240&auto=format&fit=crop', '{"oily","combination","normal"}', '{"pores","acne","radiance"}', 'mask', '{"Argile Rose","Marc de Raisin","Caféine"}', '{"Pink Clay","Grape Marc","Caffeine"}', 4.6, '8k+', '91% pores resserrés immédiatement', '91% pores tightened immediately', 'pores'),
+('The Inkey List', 'Caffeine Eye Cream', 'The Inkey List Caffeine Eye Cream', 'Légère et hydratante, elle réduit instantanément le gonflement et les cernes sous les yeux.', 'Lightweight and hydrating, it targets puffiness and dark circles around the eye contour area.', 'https://www.amazon.fr/dp/B08JH2JH7Y?tag=ratemyskin-21', 'https://www.sephora.com/product/the-inkey-list-caffeine-eye-cream', '11€ - 14€', 'https://images.unsplash.com/photo-1629732047847-50b7ecf0cbf1?q=80&w=240&auto=format&fit=crop', '{"dry","normal","combination","oily","sensitive"}', '{"dark_circles","redness"}', 'eye', '{"Caféine","Peptide Matrixyl 3000"}', '{"Caffeine","Matrixyl 3000 Peptide"}', 4.4, '10k+', '88% gonflement & cernes estompés', '88% puffiness & dark circles reduced', 'dark_circles'),
+('Kiehl''s', 'Creamy Eye Treatment with Avocado', 'Kiehl''s Creamy Eye Treatment with Avocado', 'Soin extrêmement nourrissant qui hydrate en profondeur la zone délicate sous l''œil et lisse les ridules.', 'Rich creamy avocado formula that deeply hydrates and softens the delicate under-eye area.', 'https://www.amazon.fr/dp/B000G0WVKA?tag=ratemyskin-21', 'https://www.sephora.com/product/kiehls-creamy-eye-treatment-with-avocado', '32€ - 42€', 'https://images.unsplash.com/photo-1608571423902-eed4a5ad8108?q=80&w=240&auto=format&fit=crop', '{"dry","normal","sensitive"}', '{"dark_circles","dryness","aging"}', 'eye', '{"Huile d'Avocat","Bêta-Carotène","Beurre de Karité"}', '{"Avocado Oil","Beta-Carotene","Shea Butter"}', 4.7, '6k+', '92% contour de l''œil souple et hydraté', '92% soft and deeply moisturized eye contour', 'dark_circles'),
+('CeraVe', 'Eye Repair Cream', 'CeraVe Eye Repair Cream', 'Réduit l''apparence des cernes et des poches tout en restaurant la barrière protectrice du contour de l''œil.', 'Reduces the appearance of dark circles and puffiness while restoring the delicate eye area barrier.', 'https://www.amazon.fr/dp/B00T725EQW?tag=ratemyskin-21', 'https://www.sephora.fr/p/creme-contour-des-yeux---anti-cernes-et-anti-poches-P3575003.html', '13€ - 17€', 'https://images.unsplash.com/photo-1608571423902-eed4a5ad8108?q=80&w=240&auto=format&fit=crop', '{"dry","normal","combination","sensitive"}', '{"dark_circles","redness","dryness"}', 'eye', '{"Céramides","Acide Hyaluronique","Complexe Marin"}', '{"Ceramides","Hyaluronic Acid","Marine & Botanical Complex"}', 4.6, '15k+', '89% regard plus frais et reposé', '89% fresher, more rested look', 'dark_circles');

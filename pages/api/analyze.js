@@ -7,66 +7,110 @@ import {
 } from '../../lib/security';
 import { sanitizeReport } from '../../lib/textSanitizer';
 import { getDetectedConcerns, filterRelevantProducts } from '../../lib/productFilter';
+import { STATIC_PRODUCTS } from '../../lib/catalog';
 
 export const config = {
   api: { bodyParser: { sizeLimit: '10mb' } },
 };
 
-// Curated fallback catalog — used when the products table is empty or unreachable.
-// These are the exact same products seeded in supabase/products_seed.sql.
-const FALLBACK_PRODUCTS = [
-  { skin_problem: 'acne', product_name: 'CeraVe SA Cleanser', description: 'Salicylic acid + ceramides — gently unclogs pores without stripping moisture.', amazon_link: 'https://www.amazon.fr/dp/B00U1YCGVQ?tag=ratemyskin-21', sephora_link: 'https://www.sephora.com/product/cerave-sa-smoothing-cleanser', price_range: '€10–16', image_url: 'https://images.unsplash.com/photo-1556229010-aa3f7ff66b24?q=80&w=240&auto=format&fit=crop' },
-  { skin_problem: 'acne', product_name: "Paula's Choice 2% BHA Exfoliant", description: 'Leave-on liquid exfoliant that clears blackheads and visibly shrinks pores.', amazon_link: 'https://www.amazon.fr/dp/B00949CTQQ?tag=ratemyskin-21', sephora_link: 'https://www.sephora.com/product/paulas-choice-skin-perfecting-2-bha-liquid-exfoliant', price_range: '€30–38', image_url: 'https://images.unsplash.com/photo-1556228720-195a672e8a03?q=80&w=240&auto=format&fit=crop' },
-  { skin_problem: 'hyperpigmentation', product_name: 'The Ordinary Alpha Arbutin 2%', description: 'Brightens dark spots and post-blemish marks without irritation.', amazon_link: 'https://www.amazon.fr/dp/B071WNRQJY?tag=ratemyskin-21', sephora_link: 'https://www.sephora.com/product/the-ordinary-alpha-arbutin-2-ha', price_range: '€8–12', image_url: 'https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?q=80&w=240&auto=format&fit=crop' },
-  { skin_problem: 'hyperpigmentation', product_name: 'SkinCeuticals C E Ferulic', description: 'Gold-standard vitamin C serum — brightens, protects from UV damage, evens tone.', amazon_link: 'https://www.amazon.fr/dp/B000FGDQAS?tag=ratemyskin-21', sephora_link: 'https://www.sephora.com/product/skinceuticals-c-e-ferulic-with-15-l-ascorbic-acid', price_range: '€155–185', image_url: 'https://images.unsplash.com/photo-1617897903246-719242758050?q=80&w=240&auto=format&fit=crop' },
-  { skin_problem: 'dryness', product_name: 'CeraVe Moisturising Cream', description: 'Ceramides + hyaluronic acid in a rich, non-greasy formula for lasting hydration.', amazon_link: 'https://www.amazon.fr/dp/B00TTD9BRC?tag=ratemyskin-21', sephora_link: 'https://www.sephora.com/product/cerave-moisturizing-cream', price_range: '€12–18', image_url: 'https://images.unsplash.com/photo-1608248597481-496100c80836?q=80&w=240&auto=format&fit=crop' },
-  { skin_problem: 'dryness', product_name: 'Laneige Water Sleeping Mask', description: 'Overnight gel mask that restores the skin barrier and quenches dehydrated skin.', amazon_link: 'https://www.amazon.fr/dp/B07HCP72JV?tag=ratemyskin-21', sephora_link: 'https://www.sephora.com/product/laneige-water-sleeping-mask-lavender', price_range: '€25–32', image_url: 'https://images.unsplash.com/photo-1571781926291-c477ebfd024b?q=80&w=240&auto=format&fit=crop' },
-  { skin_problem: 'pores', product_name: 'The Ordinary Niacinamide 10% + Zinc 1%', description: 'Minimises pore appearance, controls excess sebum, and smooths uneven texture.', amazon_link: 'https://www.amazon.fr/dp/B07PG5VDF4?tag=ratemyskin-21', sephora_link: 'https://www.sephora.com/product/the-ordinary-niacinamide-10-zinc-1', price_range: '€5–8', image_url: 'https://images.unsplash.com/photo-1620916566398-39f1143ab7be?q=80&w=240&auto=format&fit=crop' },
-  { skin_problem: 'dark_circles', product_name: 'The Inkey List Caffeine Eye Cream', description: 'Caffeine + peptides to visibly reduce puffiness and dark circles overnight.', amazon_link: 'https://www.amazon.fr/dp/B08JH2JH7Y?tag=ratemyskin-21', sephora_link: 'https://www.sephora.com/product/the-inkey-list-caffeine-eye-cream', price_range: '€10–14', image_url: 'https://images.unsplash.com/photo-1629732047847-50b7ecf0cbf1?q=80&w=240&auto=format&fit=crop' },
-  { skin_problem: 'dark_circles', product_name: "Kiehl's Creamy Eye Treatment with Avocado", description: 'Rich avocado + beta-carotene formula that firms and brightens the eye area.', amazon_link: 'https://www.amazon.fr/dp/B000G0WVKA?tag=ratemyskin-21', sephora_link: 'https://www.sephora.com/product/kiehls-creamy-eye-treatment-with-avocado', price_range: '€28–36', image_url: 'https://images.unsplash.com/photo-1608571423902-eed4a5ad8108?q=80&w=240&auto=format&fit=crop' },
-  { skin_problem: 'radiance', product_name: 'Glow Recipe Watermelon Glow Niacinamide Dew Drops', description: 'Lightweight serum that delivers an immediate dewy glow while evening skin tone.', amazon_link: 'https://www.amazon.fr/dp/B07YCY4K31?tag=ratemyskin-21', sephora_link: 'https://www.sephora.com/product/glow-recipe-watermelon-glow-niacinamide-dew-drops', price_range: '€38–48', image_url: 'https://images.unsplash.com/photo-1590156546746-c22224b69cd1?q=80&w=240&auto=format&fit=crop' },
-  { skin_problem: 'radiance', product_name: 'Drunk Elephant C-Firma Fresh Day Serum', description: '15% vitamin C + ferulic acid for brightening, firming, and UV protection.', amazon_link: 'https://www.amazon.fr/dp/B00LKCWF4O?tag=ratemyskin-21', sephora_link: 'https://www.sephora.com/product/drunk-elephant-c-firma-fresh-day-serum', price_range: '€78–95', image_url: 'https://images.unsplash.com/photo-1611080626919-7cf5a9dbab5b?q=80&w=240&auto=format&fit=crop' },
-  { skin_problem: 'texture', product_name: "Paula's Choice 8% AHA Gel Exfoliant", description: 'Glycolic + lactic acid blend that resurfaces rough texture and fades fine lines.', amazon_link: 'https://www.amazon.fr/dp/B000FGDQAS?tag=ratemyskin-21', sephora_link: 'https://www.sephora.com/product/paulas-choice-skin-perfecting-8-aha-gel-exfoliant', price_range: '€32–40', image_url: 'https://images.unsplash.com/photo-1626806787461-102c1bfaaea1?q=80&w=240&auto=format&fit=crop' },
-];
-
 const fetchProducts = async (supabase) => {
-  const { data: products } = await supabase.from('products').select('*');
-  // Use fallback catalog if the table is empty or unreachable
-  const safeProducts = (products && products.length > 0) ? products : FALLBACK_PRODUCTS.map(p => ({
-    skin_problem: p.skin_problem,
-    product_name: p.product_name,
-    product_description: p.description,
-    amazon_affiliate_link: p.amazon_link,
-    sephora_affiliate_link: p.sephora_link,
-    price_range: p.price_range,
-    product_image_url: p.image_url,
-    concerns: [p.skin_problem],
-    skin_types: ['normal', 'dry', 'oily', 'combination', 'sensitive'],
-    routine_step: 'cleanser',
-    time_of_day: 'any',
-    actives: []
-  }));
-  const formattedProducts = safeProducts.map(p => ({
-    skin_problem: p.skin_problem,
-    product_name: p.product_name,
-    description: p.product_description,
-    amazon_link: p.amazon_affiliate_link,
-    sephora_link: p.sephora_affiliate_link,
-    price_range: p.price_range,
-    concerns: p.concerns || [],
+  let dbProducts = [];
+  try {
+    const { data, error } = await supabase
+      .from('products')
+      .select('*');
+    if (error) {
+      console.error('[fetchProducts] Supabase error:', error.message);
+    } else if (data && data.length > 0) {
+      dbProducts = data;
+    }
+  } catch (err) {
+    console.error('[fetchProducts] DB query exception:', err.message);
+  }
+
+  // Format products consistently — using actual Supabase column names
+  const formattedProducts = dbProducts.map(p => ({
+    id: p.id,
+    brand: p.brand || "",
+    name: p.product_name || "",
+    product_name: p.product_name || "",
+    productName: p.product_name || "",
+    description: p.description_fr || p.description_en || "",
+    description_fr: p.description_fr || "",
+    description_en: p.description_en || "",
+    amazon_link: p.amazon_affiliate_link || "",
+    amazonLink: p.amazon_affiliate_link || "",
+    sephora_link: p.sephora_affiliate_link || "",
+    sephoraLink: p.sephora_affiliate_link || "",
+    price_range: p.price_range || "",
+    price: p.price_range || "",
+    imageUrl: p.image_url || "",
+    image_url: p.image_url || "",
+    product_image_url: p.image_url || "",
+    skinTypes: p.skin_types || [],
     skin_types: p.skin_types || [],
-    routine_step: p.routine_step || '',
-    time_of_day: p.time_of_day || '',
-    actives: p.actives || []
+    concerns: p.concerns || (p.skin_problem ? [p.skin_problem] : []),
+    routineStep: p.routine_step || "",
+    routine_step: p.routine_step || "",
+    actives: p.actives || [],
+    actives_en: p.actives_en || p.actives || [],
+    rating: p.rating ? parseFloat(p.rating) : 4.5,
+    count: p.review_count || "1k+",
+    efficacyLabel_fr: p.efficacy_label_fr || "",
+    efficacyLabel_en: p.efficacy_label_en || "",
+    skin_problem: p.skin_problem || (p.concerns && p.concerns[0]) || "general"
   }));
+
+  // Fallback to static catalog if no products in DB (e.g. local environment setup)
+  if (formattedProducts.length === 0) {
+    console.warn('[fetchProducts] No products found in DB. Falling back to STATIC_PRODUCTS.');
+    return {
+      formattedProducts: STATIC_PRODUCTS.map(p => ({
+        id: p.id,
+        brand: p.brand,
+        name: p.name,
+        product_name: p.productName,
+        productName: p.productName,
+        description: p.description_fr,
+        description_fr: p.description_fr,
+        description_en: p.description_en,
+        amazon_link: p.amazonLink,
+        amazonLink: p.amazonLink,
+        sephora_link: p.sephoraLink,
+        sephoraLink: p.sephoraLink,
+        price_range: p.price || p.price_range,
+        price: p.price || p.price_range,
+        imageUrl: p.imageUrl,
+        image_url: p.imageUrl,
+        skinTypes: p.skinTypes,
+        skin_types: p.skinTypes,
+        concerns: p.concerns,
+        routineStep: p.routineStep,
+        routine_step: p.routineStep,
+        actives: p.actives,
+        actives_en: p.actives_en || p.actives,
+        rating: p.rating,
+        count: p.count,
+        efficacyLabel_fr: p.efficacyLabel_fr,
+        efficacyLabel_en: p.efficacyLabel_en,
+        skin_problem: p.concerns[0] || 'general'
+      })),
+      imageByName: STATIC_PRODUCTS.reduce((acc, p) => {
+        acc[(p.productName || '').toLowerCase()] = p.imageUrl;
+        return acc;
+      }, {})
+    };
+  }
+
   const imageByName = {};
-  safeProducts.forEach(p => {
+  formattedProducts.forEach(p => {
     const name = (p.product_name || '').toLowerCase();
-    const imgUrl = p.product_image_url || p.image_url;
+    const imgUrl = p.imageUrl;
     if (name && imgUrl) {
       imageByName[name] = imgUrl;
     }
   });
+
   return { formattedProducts, imageByName };
 };
 

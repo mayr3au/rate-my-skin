@@ -1,0 +1,55 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="240" height="240" viewBox="0 0 240 240">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#FBF6F0;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#EED9C8;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="gold" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#C9A961;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#A87449;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+
+  <!-- Background -->
+  <rect width="240" height="240" fill="url(#bg)" rx="16" />
+
+  <!-- Outer decorative border -->
+  <rect x="10" y="10" width="220" height="220" rx="12" fill="none"
+        stroke="url(#gold)" stroke-width="1" stroke-opacity="0.35" />
+
+  <!-- Bottle silhouette: body -->
+  <rect x="88" y="90" width="64" height="88" rx="10"
+        fill="none" stroke="url(#gold)" stroke-width="2" stroke-opacity="0.7" />
+
+  <!-- Bottle silhouette: neck -->
+  <rect x="104" y="70" width="32" height="24" rx="5"
+        fill="none" stroke="url(#gold)" stroke-width="2" stroke-opacity="0.7" />
+
+  <!-- Bottle silhouette: cap -->
+  <rect x="109" y="58" width="22" height="16" rx="4"
+        fill="url(#gold)" fill-opacity="0.55" />
+
+  <!-- Label lines on bottle -->
+  <line x1="100" y1="120" x2="140" y2="120"
+        stroke="url(#gold)" stroke-width="1.5" stroke-opacity="0.4" stroke-linecap="round" />
+  <line x1="104" y1="132" x2="136" y2="132"
+        stroke="url(#gold)" stroke-width="1" stroke-opacity="0.28" stroke-linecap="round" />
+  <line x1="107" y1="142" x2="133" y2="142"
+        stroke="url(#gold)" stroke-width="1" stroke-opacity="0.22" stroke-linecap="round" />
+
+  <!-- Decorative sparkle top-right -->
+  <path d="M192 38 L193.4 43.6 L199 45 L193.4 46.4 L192 52 L190.6 46.4 L185 45 L190.6 43.6 Z"
+        fill="url(#gold)" fill-opacity="0.6" />
+
+  <!-- Tiny sparkle bottom-left -->
+  <path d="M46 172 L46.8 175.2 L50 176 L46.8 176.8 L46 180 L45.2 176.8 L42 176 L45.2 175.2 Z"
+        fill="url(#gold)" fill-opacity="0.45" />
+
+  <!-- Brand watermark text -->
+  <text x="120" y="200" text-anchor="middle"
+        font-family="Georgia, 'Times New Roman', serif"
+        font-size="9" letter-spacing="3" fill="#A87449" fill-opacity="0.55"
+        font-weight="400">
+    RATE MY SKIN
+  </text>
+</svg>

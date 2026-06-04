@@ -2,6 +2,14 @@
   "functions": {
     "pages/api/analyze.js": {
       "maxDuration": 60
+    },
+    "pages/api/generate-pdf.js": {
+      "maxDuration": 60,
+      "memory": 1024
+    },
+    "pages/api/send-email-report.js": {
+      "maxDuration": 60,
+      "memory": 1024
     }
   }
 }

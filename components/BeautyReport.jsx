@@ -3,6 +3,9 @@ import { useLang } from "../lib/LangContext";
 import { shareScore } from "../lib/shareImage";
 import { sanitizeReport } from "../lib/textSanitizer";
 import MedicalDisclaimer from "./MedicalDisclaimer";
+import { STATIC_PRODUCTS } from "../lib/catalog";
+import { ScanFace, Sparkles, ShoppingBag, Heart, TrendingUp, FileText } from 'lucide-react';
+import { getRelevantActivesForConcerns } from "../lib/productFilter";
 
 const GOLD = "#C5A028";
 const CARD = {
@@ -20,57 +23,12 @@ const TITLE_STYLE = { margin: "0 0 16px", fontSize: 22, fontWeight: 300, fontFam
 const ICONS = ["✦", "◈", "◉", "▲", "◆", "●"];
 
 const CUSTOM_PAYWALL_ICONS = {
-  scan: (
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#C9A961" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M4 6c3-1.5 5 1.5 8 0s5-1.5 8 0" />
-      <path d="M4 11c3-1.5 5 1.5 8 0s5-1.5 8 0" opacity="0.6" />
-      <path d="M4 16c3-1.5 5 1.5 8 0s5-1.5 8 0" opacity="0.35" />
-      <circle cx="12" cy="11" r="5" strokeDasharray="3 3" />
-      <path d="M12 8v6M10 10l2-2 2 2" />
-    </svg>
-  ),
-  routine: (
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#C9A961" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M5 11a4 4 0 0 1 4-4h6a4 4 0 0 1 4 4v7a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2z" />
-      <path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
-      <line x1="5" y1="12" x2="19" y2="12" />
-      <path d="m12 15 .5-1.5 1.5-.5-1.5-.5L12 11l-.5 1.5-1.5.5 1.5.5z" fill="#C9A961" stroke="none" />
-      <path d="m17 10 .3-.7.7-.3-.7-.3-.3-.7-.3.7-.7.3.7.3z" fill="#C9A961" stroke="none" />
-    </svg>
-  ),
-  dropper: (
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#C9A961" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M12 2v3" strokeWidth="2" />
-      <path d="M9 5h6" />
-      <rect x="10" y="6" width="4" height="2" rx="0.5" />
-      <path d="M7 11v8a3 3 0 0 0 3 3h4a3 3 0 0 0 3-3v-8a3 3 0 0 0-3-3h-4a3 3 0 0 0-3 3z" />
-      <line x1="12" y1="8" x2="12" y2="16" opacity="0.6" />
-      <path d="M12 19a1.5 1.5 0 0 0 0 3 1.5 1.5 0 0 0 0-3z" fill="#C9A961" stroke="none" />
-    </svg>
-  ),
-  lifestyle: (
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#C9A961" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 8.4 19 14a7 7 0 0 1-8 6Z" />
-      <path d="M9 11a3 3 0 0 1 3-3" />
-      <path d="M11 20V12" />
-      <path d="M17 6.5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0Z" fill="#C9A961" stroke="none" />
-    </svg>
-  ),
-  progression: (
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#C9A961" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M3 20c2-3 4-8 7-8s5 4 8 0" />
-      <path d="m15 11 3-3 3 3" />
-      <circle cx="18" cy="12" r="2" fill="#C9A961" stroke="none" />
-      <circle cx="12" cy="12" r="10" strokeDasharray="4 4" opacity="0.5" />
-    </svg>
-  ),
-  chat: (
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#C9A961" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z" />
-      <path d="m11 11 .3-.7.7-.3-.7-.3-.3-.7-.3.7-.7.3.7.3z" fill="#C9A961" stroke="none" />
-      <path d="m15 9 .2-.5.5-.2-.5-.2-.2-.5-.2.5-.5.2.5.2z" fill="#C9A961" stroke="none" />
-    </svg>
-  ),
+  scan: <ScanFace size={28} strokeWidth={1.5} color="#C9A961" />,
+  routine: <Sparkles size={28} strokeWidth={1.5} color="#C9A961" />,
+  dropper: <ShoppingBag size={28} strokeWidth={1.5} color="#C9A961" />,
+  lifestyle: <Heart size={28} strokeWidth={1.5} color="#C9A961" />,
+  progression: <TrendingUp size={28} strokeWidth={1.5} color="#C9A961" />,
+  pdf: <FileText size={28} strokeWidth={1.5} color="#C9A961" />
 };
 
 // Helper to solve cubic-bezier(x1, y1, x2, y2) at progress t
@@ -603,6 +561,24 @@ function MetricCard({ m, index, t }) {
   );
 }
 
+/* ── Image proxy helper ─────────────────────────────────────────────────────
+   Routes product images through our server-side proxy so that Amazon and
+   Sephora anti-hotlinking headers are bypassed reliably.
+   Falls back to null (which triggers the SVG placeholder) for empty URLs.
+── */
+const PLACEHOLDER_IMAGE = '/images/product-placeholder.svg';
+
+const getProxiedImageUrl = (originalUrl) => {
+  if (!originalUrl || originalUrl === '' || originalUrl === 'placeholder') {
+    return null;
+  }
+  // Only proxy external URLs; relative/local paths are served directly
+  if (originalUrl.startsWith('/') || originalUrl.startsWith('data:')) {
+    return originalUrl;
+  }
+  return `/api/image-proxy?url=${encodeURIComponent(originalUrl)}`;
+};
+
 /* ── Product image lookup ── */
 const getProductImage = (productName) => {
   const name = productName?.toLowerCase() || '';
@@ -708,13 +684,83 @@ const getProductEfficacy = (productName) => {
   return { rating: parseFloat(rating), count: "1k+", label: `${percent}% satisfaction globale` };
 };
 
+const getNormalizedUserSkinType = (skinType) => {
+  if (!skinType) return '';
+  const clean = skinType.toLowerCase().trim();
+  if (clean.includes('grasse') || clean.includes('oily')) return 'oily';
+  if (clean.includes('sèche') || clean.includes('seche') || clean.includes('dry')) return 'dry';
+  if (clean.includes('mixte') || clean.includes('combination')) return 'combination';
+  if (clean.includes('sensible') || clean.includes('sensitive')) return 'sensitive';
+  if (clean.includes('normale') || clean.includes('normal')) return 'normal';
+  return clean;
+};
+
+const getSkinTypeLabel = (type, lang) => {
+  const mapping = {
+    dry: lang === 'fr' ? 'Peau Sèche' : 'Dry Skin',
+    oily: lang === 'fr' ? 'Peau Grasse' : 'Oily Skin',
+    combination: lang === 'fr' ? 'Peau Mixte' : 'Combination Skin',
+    sensitive: lang === 'fr' ? 'Peau Sensible' : 'Sensitive Skin',
+    normal: lang === 'fr' ? 'Peau Normale' : 'Normal Skin'
+  };
+  return mapping[type] || type;
+};
+
+const getConcernLabel = (concern, lang) => {
+  const mapping = {
+    acne: lang === 'fr' ? 'Acné & Boutons' : 'Acne',
+    pores: lang === 'fr' ? 'Pores' : 'Pores',
+    dryness: lang === 'fr' ? 'Déshydratation' : 'Dehydration',
+    radiance: lang === 'fr' ? 'Éclat' : 'Radiance',
+    dark_spots: lang === 'fr' ? 'Taches' : 'Dark Spots',
+    dark_circles: lang === 'fr' ? 'Cernes' : 'Dark Circles',
+    redness: lang === 'fr' ? 'Rougeurs' : 'Redness',
+    aging: lang === 'fr' ? 'Anti-âge' : 'Aging',
+    texture: lang === 'fr' ? 'Texture' : 'Texture'
+  };
+  return mapping[concern] || concern;
+};
+
+const getUserConcernsList = (reportData) => {
+  const concernsSet = new Set();
+  const mapTextToConcerns = (text) => {
+    if (!text) return;
+    const t = text.toLowerCase();
+    if (t.includes('acne') || t.includes('bouton') || t.includes('imperfection') || t.includes('blemish') || t.includes('acné')) concernsSet.add('acne');
+    if (t.includes('pigment') || t.includes('tache') || t.includes('spot') || t.includes('hyperpigmentation')) {
+      concernsSet.add('hyperpigmentation');
+      concernsSet.add('dark_spots');
+    }
+    if (t.includes('dry') || t.includes('sec') || t.includes('sèche') || t.includes('dehydr') || t.includes('déhydr') || t.includes('déshydratation')) concernsSet.add('dryness');
+    if (t.includes('pore')) concernsSet.add('pores');
+    if (t.includes('cerne') || t.includes('dark circle') || t.includes('eye') || t.includes('oeil') || t.includes('yeux') || t.includes('cernes')) concernsSet.add('dark_circles');
+    if (t.includes('éclat') || t.includes('glow') || t.includes('radiance') || t.includes('terne') || t.includes('dull')) concernsSet.add('radiance');
+    if (t.includes('texture') || t.includes('rugos') || t.includes('grain') || t.includes('rêche')) concernsSet.add('texture');
+    if (t.includes('rougeur') || t.includes('redness') || t.includes('sensib') || t.includes('irrit')) concernsSet.add('redness');
+    if (t.includes('ride') || t.includes('ridule') || t.includes('aging') || t.includes('wrinkle') || t.includes('fine line')) concernsSet.add('aging');
+  };
+
+  if (reportData.free_version?.mainProblems) {
+    reportData.free_version.mainProblems.forEach(p => {
+      mapTextToConcerns(p.title);
+      mapTextToConcerns(p.description);
+    });
+  }
+  if (reportData.summary) {
+    mapTextToConcerns(reportData.summary);
+  }
+  return Array.from(concernsSet);
+};
+
 /* ── Product card ── */
-function ProductCard({ product, lang, t, compact = false }) {
+function ProductCard({ product, lang, t, userSkinType, userConcerns, isPriorityRecommendation = false, compact = false, requiredActives = [] }) {
   const [hov, setHov] = useState(false);
   const [vis, setVis] = useState(false);
   const [imgFailed, setImgFailed] = useState(false);
   
   useEffect(() => { const t = setTimeout(() => setVis(true), 60); return () => clearTimeout(t); }, []);
+
+  if (!product) return null;
 
   const getBrandAndName = (p) => {
     if (p.brand) return { brand: p.brand, name: p.productName || p.product_name };
@@ -738,10 +784,47 @@ function ProductCard({ product, lang, t, compact = false }) {
   };
 
   const { brand, name } = getBrandAndName(product);
-  const imgUrl = product.product_image_url || product.productImageUrl || product.imageUrl || product.image_url || getProductImage(product.productName || product.product_name);
-  const descriptionText = product.description || product.product_description || product.productDescription || "";
-  const buyUrl = product.amazon_link || product.amazonLink || product.sephora_link || product.sephoraLink || `https://www.amazon.fr/s?k=${encodeURIComponent(product.productName || product.product_name || '')}&tag=ratemyskin-21`;
-  const { rating, count, label } = getProductEfficacy(product.productName || product.product_name);
+  const rawImgUrl = product.product_image_url || product.productImageUrl || product.imageUrl || product.image_url || getProductImage(product.productName || product.product_name);
+  const imgUrl = getProxiedImageUrl(rawImgUrl);
+  
+  // Custom description based on locale if static, or direct AI generated description
+  const descriptionText = lang === 'fr' 
+    ? (product.description_fr || product.description || product.product_description || product.productDescription || "")
+    : (product.description_en || product.description || product.product_description || product.productDescription || "");
+  
+  const amazonUrl = product.amazon_link || product.amazonLink || `https://www.amazon.fr/s?k=${encodeURIComponent(product.productName || product.product_name || '')}&tag=ratemyskin-21`;
+  const sephoraUrl = product.sephora_link || product.sephoraLink || `https://www.sephora.fr/search/?q=${encodeURIComponent(product.productName || product.product_name || '')}`;
+  
+  // Get ratings and efficacy labels
+  const defaultEfficacy = getProductEfficacy(product.productName || product.product_name);
+  const rating = product.rating || defaultEfficacy.rating;
+  const count = product.count || defaultEfficacy.count;
+  const label = lang === 'fr' 
+    ? (product.efficacyLabel_fr || defaultEfficacy.label) 
+    : (product.efficacyLabel_en || defaultEfficacy.label);
+
+  // Compute profile matches
+  const pSkinTypes = product.skinTypes || product.skin_types || ['normal', 'dry', 'oily', 'combination', 'sensitive'];
+  const pConcerns = product.concerns || (product.skin_problem ? [product.skin_problem] : []);
+  
+  const normUserSkinType = userSkinType ? getNormalizedUserSkinType(userSkinType) : "";
+  const matchesSkinType = normUserSkinType ? pSkinTypes.includes(normUserSkinType) : false;
+  const matchesConcern = (userConcerns && userConcerns.length > 0) ? pConcerns.some(c => userConcerns.includes(c)) : false;
+
+  // Find matching concern keys for badge labels
+  const matchedConcernsList = userConcerns ? pConcerns.filter(c => userConcerns.includes(c)) : [];
+
+  const hasActiveOverlap = requiredActives && requiredActives.length > 0
+    ? (product.actives || []).some(a => requiredActives.some(ra => a.toLowerCase().includes(ra.toLowerCase())))
+    : true;
+
+  const hasConcernOverlap = userConcerns && userConcerns.length > 0
+    ? (matchedConcernsList.length / userConcerns.length >= 0.5 || matchedConcernsList.length / Math.max(1, pConcerns.length) >= 0.5)
+    : matchesConcern;
+
+  const isPerfectMatch = requiredActives && requiredActives.length > 0
+    ? (hasActiveOverlap && hasConcernOverlap && matchesSkinType)
+    : (matchesSkinType && matchesConcern);
 
   return (
     <div
@@ -750,12 +833,16 @@ function ProductCard({ product, lang, t, compact = false }) {
       style={{
         ...CARD,
         padding: "12px 16px",
-        border: hov ? "1px solid rgba(168,116,73,0.45)" : "1px solid rgba(255, 255, 255, 0.85)",
-        boxShadow: hov ? "0 12px 28px rgba(168,116,73,0.08), inset 0 1px 0 rgba(255,255,255,0.95)" : "0 6px 20px rgba(168,116,73,0.02), inset 0 1px 0 rgba(255,255,255,0.95)",
+        border: hov ? "1px solid rgba(168,116,73,0.45)" : (isPerfectMatch ? "1px solid rgba(201, 169, 97, 0.45)" : "1px solid rgba(255, 255, 255, 0.85)"),
+        boxShadow: hov 
+          ? "0 12px 28px rgba(168,116,73,0.08), inset 0 1px 0 rgba(255,255,255,0.95)" 
+          : (isPerfectMatch ? "0 6px 20px rgba(201, 169, 97, 0.05), inset 0 1px 0 rgba(255,255,255,0.95)" : "0 6px 20px rgba(168,116,73,0.02), inset 0 1px 0 rgba(255,255,255,0.95)"),
         opacity: vis ? 1 : 0,
         transform: hov ? "translateY(-2px)" : "translateY(0)",
         transition: "opacity 0.45s ease, transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.3s, box-shadow 0.3s, background-color 0.3s",
-        background: "linear-gradient(135deg, rgba(255, 255, 255, 0.78) 0%, rgba(253, 246, 237, 0.52) 50%, rgba(246, 235, 222, 0.78) 100%)",
+        background: isPerfectMatch 
+          ? "linear-gradient(135deg, rgba(255, 255, 255, 0.85) 0%, rgba(253, 246, 237, 0.65) 50%, rgba(201, 169, 97, 0.08) 100%)" 
+          : "linear-gradient(135deg, rgba(255, 255, 255, 0.78) 0%, rgba(253, 246, 237, 0.52) 50%, rgba(246, 235, 222, 0.78) 100%)",
         backdropFilter: "blur(20px) saturate(140%)",
         WebkitBackdropFilter: "blur(20px) saturate(140%)",
       }}
@@ -763,64 +850,122 @@ function ProductCard({ product, lang, t, compact = false }) {
       <div className="premium-product-card">
         {/* Product image container */}
         <div className="premium-product-img-wrapper">
-          <a href={buyUrl} target="_blank" rel="noopener noreferrer" style={{ display: "block", width: "100%", height: "100%" }}>
-            {imgFailed || !imgUrl ? (
-              <div style={{
+          <a href={amazonUrl} target="_blank" rel="noopener noreferrer" style={{ display: "block", width: "100%", height: "100%" }}>
+            {/* Always render the <img>; fall back to placeholder SVG on error or missing URL */}
+            <img
+              src={imgFailed || !imgUrl ? PLACEHOLDER_IMAGE : imgUrl}
+              alt={product.productName || product.product_name}
+              loading="lazy"
+              onError={(e) => {
+                if (!imgFailed) {
+                  setImgFailed(true);
+                  e.target.src = PLACEHOLDER_IMAGE;
+                }
+              }}
+              style={{
                 width: "100%",
                 height: "100%",
+                objectFit: imgFailed || !imgUrl ? "contain" : "cover",
+                display: "block",
+                transition: "transform 0.5s cubic-bezier(0.16, 1, 0.3, 1)",
+                transform: hov ? "scale(1.06)" : "scale(1)",
                 background: "linear-gradient(135deg, #FBF6F0 0%, #EEDCD0 100%)",
-                display: "flex",
-                flexDirection: "column",
-                alignItems: "center",
-                justifyContent: "center",
-                padding: "10px",
-                textAlign: "center"
-              }}>
-                <span style={{ fontSize: "20px", color: "#A87449" }}>✦</span>
-                <span style={{ fontSize: "8px", fontWeight: 700, color: "#8C7A6B", marginTop: 2, letterSpacing: "0.05em", textTransform: "uppercase" }}>CARE</span>
-              </div>
-            ) : (
-              <img
-                src={imgUrl}
-                alt={product.productName || product.product_name}
-                onError={() => setImgFailed(true)}
-                style={{
-                  width: "100%",
-                  height: "100%",
-                  objectFit: "cover",
-                  display: "block",
-                  transition: "transform 0.5s cubic-bezier(0.16, 1, 0.3, 1)",
-                  transform: hov ? "scale(1.06)" : "scale(1)",
-                }}
-              />
-            )}
+                padding: imgFailed || !imgUrl ? "16px" : 0,
+              }}
+            />
           </a>
         </div>
 
         {/* Content wrapper */}
         <div className="premium-product-info">
-          {/* Header row with Category and Price */}
-          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 2, flexWrap: "wrap", gap: 6 }}>
-            {(product.skinProblem || product.skin_problem) && (
+          {/* Header row with Matching Badges / Category and Price */}
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 2, flexWrap: "wrap", gap: 6 }}>
+            <div style={{ display: "flex", flexWrap: "wrap", gap: 4 }}>
+              {isPriorityRecommendation && (
+                <span style={{
+                  display: "inline-block",
+                  fontSize: 8,
+                  fontWeight: 700,
+                  letterSpacing: "0.08em",
+                  textTransform: "uppercase",
+                  color: "#FFF",
+                  background: "linear-gradient(135deg, #C5A028 0%, #A87449 100%)",
+                  borderRadius: 5,
+                  padding: "2px 6px",
+                  boxShadow: "0 2px 4px rgba(168,116,73,0.15)"
+                }}>
+                  ✨ {lang === 'fr' ? "Conseillé pour vous" : "Recommended for you"}
+                </span>
+              )}
+              {!isPriorityRecommendation && isPerfectMatch && (
+                <span style={{
+                  display: "inline-block",
+                  fontSize: 8,
+                  fontWeight: 700,
+                  letterSpacing: "0.08em",
+                  textTransform: "uppercase",
+                  color: "#FFF",
+                  background: "linear-gradient(135deg, #C9A961 0%, #E5C583 100%)",
+                  borderRadius: 5,
+                  padding: "2px 6px",
+                  boxShadow: "0 2px 4px rgba(201,169,97,0.15)"
+                }}>
+                  ✨ Match Parfait
+                </span>
+              )}
+              {!isPriorityRecommendation && !isPerfectMatch && matchesSkinType && userSkinType && (
+                <span style={{
+                  display: "inline-block",
+                  fontSize: 8,
+                  fontWeight: 700,
+                  letterSpacing: "0.06em",
+                  textTransform: "uppercase",
+                  color: "#5CA18B",
+                  background: "rgba(168,220,200,0.18)",
+                  border: "1px solid rgba(168,220,200,0.45)",
+                  borderRadius: 5,
+                  padding: "2px 6px"
+                }}>
+                  ✓ {getSkinTypeLabel(normUserSkinType, lang)}
+                </span>
+              )}
+              {!isPriorityRecommendation && !isPerfectMatch && matchesConcern && matchedConcernsList.length > 0 && (
+                <span style={{
+                  display: "inline-block",
+                  fontSize: 8,
+                  fontWeight: 700,
+                  letterSpacing: "0.06em",
+                  textTransform: "uppercase",
+                  color: "#B67C9D",
+                  background: "rgba(232,184,212,0.18)",
+                  border: "1px solid rgba(232,184,212,0.45)",
+                  borderRadius: 5,
+                  padding: "2px 6px"
+                }}>
+                  ✦ {getConcernLabel(matchedConcernsList[0], lang)}
+                </span>
+              )}
+              {/* Category tag */}
               <span style={{
                 display: "inline-block",
                 fontSize: 8,
                 fontWeight: 700,
-                letterSpacing: "0.12em",
+                letterSpacing: "0.08em",
                 textTransform: "uppercase",
-                color: "#A87449",
+                color: "#8C7A6B",
                 background: "rgba(168,116,73,0.06)",
-                border: "1px solid rgba(168,116,73,0.14)",
+                border: "1px solid rgba(168,116,73,0.12)",
                 borderRadius: 5,
                 padding: "2px 6px"
               }}>
-                {product.skinProblem || product.skin_problem}
+                {product.routineStep || product.routine_step || "skincare"}
               </span>
-            )}
+            </div>
+            
             {(product.price || product.price_range) && (
               <span style={{
-                fontSize: "13px",
-                fontWeight: 600,
+                fontSize: "12.5px",
+                fontWeight: 700,
                 color: "#A87449",
                 fontFamily: "'DM Sans', sans-serif"
               }}>
@@ -836,7 +981,7 @@ function ProductCard({ product, lang, t, compact = false }) {
             color: "#2C241D",
             fontFamily: "'Cormorant Garamond', serif",
             lineHeight: 1.25,
-            marginBottom: "4px",
+            marginBottom: "2px",
             wordBreak: "break-word"
           }}>
             {brand ? (
@@ -849,7 +994,7 @@ function ProductCard({ product, lang, t, compact = false }) {
           </div>
 
           {/* Efficacy Rating Badge */}
-          <div style={{ display: "flex", alignItems: "center", gap: 6, margin: "2px 0 6px", flexWrap: "wrap" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 6, margin: "2px 0 4px", flexWrap: "wrap" }}>
             <div style={{
               display: "inline-flex",
               alignItems: "center",
@@ -862,49 +1007,141 @@ function ProductCard({ product, lang, t, compact = false }) {
               <span>★</span>
               <span>{rating}/5</span>
             </div>
-            <span style={{ fontSize: "11px", color: "#A0938A" }}>({count} avis)</span>
-            <span style={{ color: "#E3C9B5" }}>•</span>
-            <span style={{
-              fontSize: "11px",
-              fontWeight: "600",
-              color: "#A87449",
-              fontFamily: "'DM Sans', sans-serif"
-            }}>
-              {label}
-            </span>
+            <span style={{ fontSize: "11px", color: "#A0938A" }}>({count} {lang === 'fr' ? 'avis' : 'reviews'})</span>
+            {label && (
+              <>
+                <span style={{ color: "#E3C9B5" }}>•</span>
+                <span style={{
+                  fontSize: "11px",
+                  fontWeight: "600",
+                  color: "#A87449",
+                  fontFamily: "'DM Sans', sans-serif"
+                }}>
+                  {label}
+                </span>
+              </>
+            )}
           </div>
 
           {/* Product Description */}
-          <p className="premium-product-desc">
+          <p className="premium-product-desc" style={{ marginBottom: 4 }}>
             {descriptionText}
           </p>
+
+          {/* Key Actives list */}
+          {product.actives && product.actives.length > 0 && (
+            <div style={{ 
+              display: "flex", 
+              alignItems: "center", 
+              gap: 4, 
+              marginTop: 2, 
+              fontSize: 10.5, 
+              color: "#8C7A6B", 
+              fontFamily: "'DM Sans', sans-serif",
+              flexWrap: "wrap"
+            }}>
+              <span style={{ fontWeight: 700, color: "#B0885E" }}>
+                {lang === 'fr' ? "Actifs :" : "Actives:"}
+              </span>
+              <span style={{ fontStyle: "italic" }}>
+                {(lang === 'fr' ? product.actives : (product.actives_en || product.actives)).join(', ')}
+              </span>
+            </div>
+          )}
         </div>
 
-        {/* Buy Button wrapper */}
-        <div className="premium-product-btn-wrapper">
-          <a
-            href={buyUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="premium-product-btn"
-          >
-            Voir le produit
-          </a>
+        {/* Buy Buttons wrapper */}
+        <div className="rpt-product-buttons-container">
+          {amazonUrl && (
+            <a
+              href={amazonUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="premium-product-btn"
+              style={{
+                background: "linear-gradient(135deg, #3D2914 0%, #281B0D 100%)",
+                color: "#FAF6F0",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                fontSize: 10,
+                fontWeight: 700,
+                padding: "8px 12px",
+                borderRadius: 10,
+                textDecoration: "none",
+                fontFamily: "'DM Sans', sans-serif",
+                textTransform: "uppercase",
+                letterSpacing: "0.05em",
+                transition: "all 0.3s ease",
+                border: "1px solid rgba(255,255,255,0.1)",
+                boxShadow: "0 2px 6px rgba(0,0,0,0.15)"
+              }}
+            >
+              Amazon
+            </a>
+          )}
+          {sephoraUrl && (
+            <a
+              href={sephoraUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="premium-product-btn"
+              style={{
+                background: "rgba(255,255,255,0.85)",
+                color: "#3D2914",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                fontSize: 10,
+                fontWeight: 700,
+                padding: "8px 12px",
+                borderRadius: 10,
+                textDecoration: "none",
+                fontFamily: "'DM Sans', sans-serif",
+                textTransform: "uppercase",
+                letterSpacing: "0.05em",
+                transition: "all 0.3s ease",
+                border: "1px solid rgba(168, 116, 73, 0.22)",
+                boxShadow: "0 2px 6px rgba(168,116,73,0.04)"
+              }}
+            >
+              Sephora
+            </a>
+          )}
         </div>
       </div>
     </div>
   );
 }
 
-const findMatchingProduct = (stepText, products) => {
+const getNormalizedConcerns = (concernsList) => {
+  if (!concernsList) return [];
+  const normalized = new Set();
+  concernsList.forEach(c => {
+    if (!c) return;
+    const clean = c.toLowerCase().trim();
+    normalized.add(clean);
+    if (clean === 'hyperpigmentation' || clean === 'pigmentation') {
+      normalized.add('dark_spots');
+    }
+    if (clean === 'dark_spots') {
+      normalized.add('hyperpigmentation');
+    }
+  });
+  return Array.from(normalized);
+};
+
+const findMatchingProduct = (stepText, products, userSkinType, userConcerns, alreadySelectedIds = []) => {
   if (!products || products.length === 0) return null;
+  const validProducts = products.filter(Boolean);
+  if (validProducts.length === 0) return null;
   const text = (stepText || '').toLowerCase();
 
-  // 1. Prioritize name-based matching
+  // 1. Precise name-based matching
   let bestMatch = null;
   let maxOverlap = 0;
 
-  for (const p of products) {
+  for (const p of validProducts) {
     const name = (p.productName || p.product_name || '').toLowerCase();
     if (!name) continue;
 
@@ -923,80 +1160,85 @@ const findMatchingProduct = (stepText, products) => {
 
   if (bestMatch) return bestMatch;
 
-  // 2. Fallback to keyword-based matching
-  // 1. Cleanser / Nettoyant
-  if (text.includes('nettoyer') || text.includes('nettoyant') || text.includes('cleanse') || text.includes('cleanser')) {
-    const found = products.find(p => {
-      const name = (p.productName || p.product_name || '').toLowerCase();
-      return name.includes('cleanser') || name.includes('nettoyant') || name.includes('wash');
-    });
-    if (found) return found;
+  // 2. Identify the product category from the step text
+  let category = null;
+  if (text.includes('nettoyer') || text.includes('nettoyant') || text.includes('cleanse') || text.includes('cleanser') || text.includes('gel moussant') || text.includes('eau micellaire') || text.includes('démaquillant') || text.includes('wash') || text.includes('lavant') || text.includes('lotion micellaire')) {
+    category = 'cleanser';
+  } else if (text.includes('lotion') || text.includes('toner') || text.includes('tonique') || text.includes('exfolier') || text.includes('exfoliant') || text.includes('bha') || text.includes('aha') || text.includes('glycolique') || text.includes('salicylique') || text.includes('peeling') || text.includes('solution tonique')) {
+    category = 'toner';
+  } else if (text.includes('sérum') || text.includes('serum') || text.includes('concentré') || text.includes('vitamine c') || text.includes('retinol') || text.includes('rétinol') || text.includes('arbutine') || text.includes('arbutin') || text.includes('niacinamide') || text.includes('hyaluronique') || text.includes('acide') || text.includes('ampoule')) {
+    category = 'serum';
+  } else if (text.includes('spf') || text.includes('solaire') || text.includes('soleil') || text.includes('sunscreen') || text.includes('protection') || text.includes('fluide invisible') || text.includes('relief sun') || text.includes('uvmune') || text.includes('protection solaire')) {
+    category = 'sunscreen';
+  } else if (text.includes('masque') || text.includes('mask') || text.includes('sleeping mask') || text.includes('détox') || text.includes('detox') || text.includes('argile rose')) {
+    category = 'mask';
+  } else if (text.includes('contour') || text.includes('yeux') || text.includes('eye') || text.includes('cernes') || text.includes('poches') || text.includes('caffeine') || text.includes('caféine') || text.includes('avocado')) {
+    category = 'eye';
+  } else if (text.includes('crème') || text.includes('cream') || text.includes('moisturizer') || text.includes('hydratant') || text.includes('hydrater') || text.includes('nourrir') || text.includes('nourrissant') || text.includes('cicalfate') || text.includes('skin food') || text.includes('baume') || text.includes('gel-crème') || text.includes('soin auto-réhydratant')) {
+    category = 'moisturizer';
   }
 
-  // 2. Vitamin C / Vitamine C
-  if (text.includes('vitamine c') || text.includes('vitamin c') || text.includes('antioxydant')) {
-    const found = products.find(p => {
-      const name = (p.productName || p.product_name || '').toLowerCase();
-      return name.includes('vitamin c') || name.includes('vitamine c') || name.includes('c-firma') || name.includes('ferulic') || name.includes('ascorbic');
+  // 3. Fallback filtering based on the identified category & user profile
+  if (category) {
+    const candidates = validProducts.filter(p => {
+      const pStep = p.routineStep || p.routine_step || "";
+      return pStep === category;
     });
-    if (found) return found;
+
+    if (candidates.length > 0) {
+      // Score candidates based on profile match
+      const scored = candidates.map(p => {
+        const pSkinTypes = p.skinTypes || p.skin_types || [];
+        const pConcerns = getNormalizedConcerns(p.concerns || (p.skin_problem ? [p.skin_problem] : []));
+        
+        const matchesSkinType = pSkinTypes.includes(userSkinType);
+        const matchesConcern = pConcerns.some(c => (userConcerns || []).includes(c));
+        const isPerfectMatch = matchesSkinType && matchesConcern;
+        
+        let score = 0;
+        if (isPerfectMatch) score = 3;
+        else if (matchesConcern) score = 2;
+        else if (matchesSkinType) score = 1;
+
+        // Penalty if already selected in the routine to promote variety
+        const isAlreadySelected = alreadySelectedIds.includes(p.id);
+        if (isAlreadySelected) {
+          score -= 5;
+        }
+
+        return { product: p, score };
+      });
+
+      // Sort by score descending, then by rating
+      scored.sort((a, b) => {
+        if (b.score !== a.score) return b.score - a.score;
+        const rB = b.product.rating || 4.5;
+        const rA = a.product.rating || 4.5;
+        return rB - rA;
+      });
+
+      return scored[0].product;
+    }
   }
 
-  // 3. Eye Cream / Cernes
-  if (text.includes('cernes') || text.includes('yeux') || text.includes('eye') || text.includes('eyes') || text.includes('orbital') || text.includes('caffeine')) {
-    const found = products.find(p => {
-      const name = (p.productName || p.product_name || '').toLowerCase();
-      return name.includes('eye') || name.includes('yeux') || name.includes('caffeine') || name.includes('avocado') || name.includes('cernes');
-    });
-    if (found) return found;
-  }
+  // 4. Absolute ultimate fallback (if no category could be parsed)
+  const unselectedProducts = validProducts.filter(p => !alreadySelectedIds.includes(p.id));
+  const pool = unselectedProducts.length > 0 ? unselectedProducts : validProducts;
+  
+  const scoredPool = pool.map(p => {
+    const pSkinTypes = p.skinTypes || p.skin_types || [];
+    const pConcerns = getNormalizedConcerns(p.concerns || (p.skin_problem ? [p.skin_problem] : []));
+    const matchesSkinType = pSkinTypes.includes(userSkinType);
+    const matchesConcern = pConcerns.some(c => (userConcerns || []).includes(c));
+    let score = 0;
+    if (matchesSkinType && matchesConcern) score = 3;
+    else if (matchesConcern) score = 2;
+    else if (matchesSkinType) score = 1;
+    return { product: p, score };
+  });
 
-  // 4. Retinol / Rétinol
-  if (text.includes('rétinol') || text.includes('retinol')) {
-    const found = products.find(p => {
-      const name = (p.productName || p.product_name || '').toLowerCase();
-      return name.includes('retinol') || name.includes('rétinol');
-    });
-    if (found) return found;
-  }
-
-  // 5. Exfoliant / AHA / BHA
-  if (text.includes('exfolier') || text.includes('exfoliant') || text.includes('bha') || text.includes('aha') || text.includes('acide glycolique') || text.includes('glycolic') || text.includes('salicylic') || text.includes('salicylique')) {
-    const found = products.find(p => {
-      const name = (p.productName || p.product_name || '').toLowerCase();
-      return name.includes('exfoliant') || name.includes('bha') || name.includes('aha') || name.includes('peeling') || name.includes('smoothing') || name.includes('gel');
-    });
-    if (found) return found;
-  }
-
-  // 6. Niacinamide
-  if (text.includes('niacinamide') || text.includes('pores') || text.includes('sebum') || text.includes('sébum') || text.includes('brillance')) {
-    const found = products.find(p => {
-      const name = (p.productName || p.product_name || '').toLowerCase();
-      return name.includes('niacinamide') || name.includes('zinc');
-    });
-    if (found) return found;
-  }
-
-  // 7. Hydration mask
-  if (text.includes('masque') || text.includes('mask') || text.includes('sleeping mask')) {
-    const found = products.find(p => {
-      const name = (p.productName || p.product_name || '').toLowerCase();
-      return name.includes('mask') || name.includes('masque');
-    });
-    if (found) return found;
-  }
-
-  // 8. Moisturizer / Cream
-  if (text.includes('crème') || text.includes('cream') || text.includes('moisturizer') || text.includes('hydratante') || text.includes('hydrater') || text.includes('barrière') || text.includes('barrier') || text.includes('céramides') || text.includes('ceramide')) {
-    const found = products.find(p => {
-      const name = (p.productName || p.product_name || '').toLowerCase();
-      return (name.includes('cream') || name.includes('moisturizer') || name.includes('crème')) && !name.includes('eye');
-    });
-    if (found) return found;
-  }
-
-  return null;
+  scoredPool.sort((a, b) => b.score - a.score);
+  return scoredPool[0]?.product || null;
 };
 
 function CameraSparkleIcon({ size = 14, color = "currentColor" }) {
@@ -1083,11 +1325,18 @@ function SparkleIcon({ size = 18 }) {
 }
 
 /* ── Inline product card for routine steps ── */
-function InlineProductCard({ product, t }) {
+function InlineProductCard({ product, lang, t }) {
   const [hov, setHov] = useState(false);
-  const amazonUrl = product.amazonLink || `https://www.amazon.fr/s?k=${encodeURIComponent(product.productName)}&tag=ratemyskin-21`;
-  const sephoraUrl = product.sephoraLink || `https://www.sephora.fr/search/?q=${encodeURIComponent(product.productName)}`;
-  const imgUrl = product.imageUrl || getProductImage(product.productName);
+  const [imgFailed, setImgFailed] = useState(false);
+  const productName = product.productName || product.product_name || "";
+  const amazonUrl = product.amazonLink || product.amazon_link || `https://www.amazon.fr/s?k=${encodeURIComponent(productName)}&tag=ratemyskin-21`;
+  const sephoraUrl = product.sephoraLink || product.sephora_link || `https://www.sephora.fr/search/?q=${encodeURIComponent(productName)}`;
+  const rawImgUrl = product.product_image_url || product.imageUrl || product.image_url || "";
+  const imgUrl = getProxiedImageUrl(rawImgUrl);
+  const descText = lang === 'fr'
+    ? (product.description_fr || product.description || "")
+    : (product.description_en || product.description || "");
+  const priceText = product.price || product.price_range || "";
 
   return (
     <div
@@ -1101,58 +1350,51 @@ function InlineProductCard({ product, t }) {
     >
       <div className="rpt-inline-product-card-header">
         {/* Image */}
+        {/* Always render img; fallback to branded SVG placeholder on missing or broken URL */}
         <img
-          src={imgUrl}
-          alt={product.productName}
+          src={imgFailed || !imgUrl ? PLACEHOLDER_IMAGE : imgUrl}
+          alt={productName}
+          loading="lazy"
+          onError={(e) => {
+            if (!imgFailed) {
+              setImgFailed(true);
+              e.target.src = PLACEHOLDER_IMAGE;
+            }
+          }}
           style={{
-            width: 38,
-            height: 38,
-            objectFit: "cover",
-            borderRadius: 8,
-            background: "#fff",
+            width: 38, height: 38,
+            objectFit: imgFailed || !imgUrl ? "contain" : "cover",
+            borderRadius: 8, flexShrink: 0,
+            background: "linear-gradient(135deg, #FBF6F0 0%, #EEDCD0 100%)",
             border: "1px solid rgba(168, 116, 73, 0.08)",
-            flexShrink: 0
+            padding: imgFailed || !imgUrl ? "4px" : 0,
           }}
         />
 
         {/* Text block: name + description + price */}
         <div style={{ flex: 1, minWidth: 0 }}>
           <div style={{
-            fontSize: 11.5,
-            fontWeight: 700,
-            color: "#2C241D",
-            whiteSpace: "nowrap",
-            overflow: "hidden",
-            textOverflow: "ellipsis",
-            fontFamily: "'DM Sans', sans-serif",
-            lineHeight: 1.3
+            fontSize: 11.5, fontWeight: 700, color: "#2C241D",
+            whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis",
+            fontFamily: "'DM Sans', sans-serif", lineHeight: 1.3
           }}>
-            {product.productName}
+            {productName}
           </div>
-          {product.description && (
+          {descText && (
             <p style={{
-              margin: "2px 0 0",
-              fontSize: 10,
-              lineHeight: 1.45,
-              color: "#8C7A6B",
+              margin: "2px 0 0", fontSize: 10, lineHeight: 1.45, color: "#8C7A6B",
               fontFamily: "'DM Sans', sans-serif",
-              display: "-webkit-box",
-              WebkitLineClamp: 2,
-              WebkitBoxOrient: "vertical",
-              overflow: "hidden"
+              display: "-webkit-box", WebkitLineClamp: 2,
+              WebkitBoxOrient: "vertical", overflow: "hidden"
             }}>
-              {product.description}
+              {descText}
             </p>
           )}
-          <div style={{
-            fontSize: 10,
-            color: "#A87449",
-            fontWeight: 600,
-            fontFamily: "'DM Sans', sans-serif",
-            marginTop: 2
-          }}>
-            {product.price}
-          </div>
+          {priceText && (
+            <div style={{ fontSize: 10, color: "#A87449", fontWeight: 600, fontFamily: "'DM Sans', sans-serif", marginTop: 2 }}>
+              {priceText}
+            </div>
+          )}
         </div>
       </div>
 
@@ -1244,8 +1486,8 @@ function ReportHeader({ t, lang }) {
     // Extract user details for the report header
     const email = typeof window !== "undefined" ? localStorage.getItem("rms_user_email") || "" : "";
     const storedFirstName = typeof window !== "undefined" ? localStorage.getItem("rms_first_name") || "" : "";
-    const age = sessionStorage.getItem("rms_age") || "";
-    const timestamp = sessionStorage.getItem("rms_generation_finished_at");
+    const age = typeof window !== "undefined" ? (sessionStorage.getItem("rms_age") || "") : "";
+    const timestamp = typeof window !== "undefined" ? sessionStorage.getItem("rms_generation_finished_at") : null;
     let dateStr = "";
     if (timestamp) {
       dateStr = new Date(parseInt(timestamp, 10)).toLocaleDateString(lang === 'fr' ? 'fr-FR' : 'en-US');
@@ -1392,7 +1634,7 @@ function TraitTag({ label, value }) {
 }
 
 /* ══════════════════════════════════════════════════════════════════════ */
-export default function BeautyReport({ data: rawData, isPaid, onUnlock }) {
+export default function BeautyReport({ data: rawData, isPaid, onUnlock, analysesCount = 142 }) {
   const { lang, t } = useLang();
   const data = useMemo(() => sanitizeReport(rawData, lang), [rawData, lang]);
   const [unlocking, setUnlocking] = useState(false);
@@ -1401,7 +1643,139 @@ export default function BeautyReport({ data: rawData, isPaid, onUnlock }) {
   const [shareMsg, setShareMsg] = useState("");
   const [showAllFree, setShowAllFree] = useState(false);
   const [pdfLoading, setPdfLoading] = useState(false);
+  const [emailLoading, setEmailLoading] = useState(false);
+  const [emailStatus, setEmailStatus] = useState(null);
   const [timeLeft, setTimeLeft] = useState(null);
+  const [hasClickedCheckout, setHasClickedCheckout] = useState(false);
+
+  const [activeStep, setActiveStep] = useState("all");
+  const [onlyMyMatch, setOnlyMyMatch] = useState(false);
+  const [activeConcern, setActiveConcern] = useState("all");
+
+  const userSkinTypeNorm = useMemo(() => getNormalizedUserSkinType(data?.skinType), [data?.skinType]);
+  const userConcerns = useMemo(() => data ? getUserConcernsList(data) : [], [data]);
+
+  // Derive catalog and routine data here (before any early return) to respect Rules of Hooks
+  const catalogProducts = useMemo(() => {
+    if (!data) return [];
+    const paid = data.paid_version || {};
+    const freeData = data.free_version || {};
+    return data.catalog || paid.productRecommendations || freeData.productRecommendations || [];
+  }, [data]);
+
+  const routineData = useMemo(() => {
+    if (!data) return {};
+    const paid = data.paid_version || {};
+    return paid.routine || {};
+  }, [data]);
+
+  const routineWithProducts = useMemo(() => {
+    if (!routineData || Object.keys(routineData).length === 0) return { morning: [], evening: [], weekly: [] };
+    const alreadySelectedIds = [];
+    
+    const stepsInCatalog = (catalogProducts || []).map(p => (p.routineStep || p.routine_step || '').toLowerCase().trim());
+    const hasMask = stepsInCatalog.includes('mask');
+
+    const mapSteps = (stepsList, timeOfDay, isWeekly = false) => {
+      if (!stepsList || !Array.isArray(stepsList)) return [];
+      
+      const mapped = stepsList.map((stepText, idx) => {
+        const isObj = typeof stepText === 'object' && stepText !== null;
+        const text = isObj ? (stepText.stepText || stepText.text || '') : (stepText || '');
+        const id = isObj ? (stepText.productId || stepText.product_id) : null;
+        
+        let matched = null;
+        if (id) {
+          matched = catalogProducts.find(p => p.id === id);
+        }
+        if (!matched && text) {
+          matched = findMatchingProduct(text, catalogProducts, userSkinTypeNorm, userConcerns, alreadySelectedIds);
+        }
+        if (matched) alreadySelectedIds.push(matched.id);
+
+        let requiredActives = [];
+        if (isWeekly) {
+          requiredActives = ['bha', 'aha', 'salicylic_acid', 'glycolic_acid'];
+        } else if (timeOfDay === 'morning' && idx === 1) {
+          requiredActives = getRelevantActivesForConcerns(userConcerns, 'morning');
+        } else if (timeOfDay === 'evening' && idx === 2) {
+          requiredActives = getRelevantActivesForConcerns(userConcerns, 'evening');
+        }
+
+        return { text, product: matched, requiredActives };
+      });
+
+      if (isWeekly && mapped.length === 0 && userConcerns) {
+        const hasAcneOrPores = userConcerns.includes('acne') || userConcerns.includes('pores');
+        if (hasAcneOrPores && !hasMask) {
+          mapped.push({
+            text: lang === 'fr' 
+              ? "Masque purifiant à l'argile 1x/semaine (à ajouter manuellement à votre routine, pas encore dans notre catalogue)" 
+              : "Purifying clay mask 1x/week (add manually to your routine, not yet in our catalog)",
+            product: null,
+            requiredActives: []
+          });
+        }
+      }
+      
+      return mapped;
+    };
+    
+    return {
+      morning: mapSteps(routineData.morning, 'morning'),
+      evening: mapSteps(routineData.evening, 'evening'),
+      weekly: mapSteps(routineData.weekly, 'weekly', true)
+    };
+  }, [routineData, catalogProducts, userSkinTypeNorm, userConcerns, lang]);
+
+  const sortedAndFilteredProducts = useMemo(() => {
+    // Always prefer the Supabase catalog (data.catalog) over static fallback
+    const rawCatalog = (data?.catalog && Array.isArray(data.catalog) && data.catalog.length > 0)
+      ? data.catalog
+      : STATIC_PRODUCTS;
+
+    return rawCatalog.map(p => {
+      const pSkinTypes = p.skinTypes || p.skin_types || [];
+      const pConcerns = getNormalizedConcerns(p.concerns || (p.skin_problem ? [p.skin_problem] : []));
+      const pRoutineStep = (p.routineStep || p.routine_step || "").toLowerCase().trim();
+
+      const matchesSkinType = pSkinTypes.includes(userSkinTypeNorm);
+      const matchesConcern = pConcerns.some(c => (userConcerns || []).includes(c));
+      const isPerfectMatch = matchesSkinType && matchesConcern;
+      
+      let score = 0;
+      if (isPerfectMatch) score = 3;
+      else if (matchesConcern) score = 2;
+      else if (matchesSkinType) score = 1;
+
+      return {
+        ...p,
+        skinTypes: pSkinTypes,
+        concerns: pConcerns,
+        routineStep: pRoutineStep,
+        matchesSkinType,
+        matchesConcern,
+        isPerfectMatch,
+        relevanceScore: score
+      };
+    })
+    .filter(p => {
+      if (activeStep !== "all" && p.routineStep !== activeStep) return false;
+      if (activeConcern !== "all" && !p.concerns.includes(activeConcern)) return false;
+      if (onlyMyMatch) {
+        return p.matchesSkinType || p.matchesConcern;
+      }
+      return true;
+    })
+    .sort((a, b) => {
+      if (b.relevanceScore !== a.relevanceScore) {
+        return b.relevanceScore - a.relevanceScore;
+      }
+      const ratingB = b.rating || 4.5;
+      const ratingA = a.rating || 4.5;
+      return ratingB - ratingA;
+    });
+  }, [activeStep, activeConcern, onlyMyMatch, userSkinTypeNorm, userConcerns, data?.catalog]);
 
   // Social Proof Counter
   const [socialProofN, setSocialProofN] = useState(() => {
@@ -1458,6 +1832,39 @@ export default function BeautyReport({ data: rawData, isPaid, onUnlock }) {
     return () => clearInterval(interval);
   }, [isPaid]);
 
+  useEffect(() => {
+    if (data && !isPaid) {
+      const sent = sessionStorage.getItem('rms_sent_paywall_viewed');
+      if (!sent) {
+        if (typeof window !== 'undefined' && window.gtag) {
+          window.gtag('event', 'paywall_viewed', {
+            event_category: 'conversion_funnel',
+            event_label: 'free_report_paywall'
+          });
+          sessionStorage.setItem('rms_sent_paywall_viewed', 'true');
+        }
+      }
+    }
+  }, [data, isPaid]);
+
+  useEffect(() => {
+    const handleBeforeUnload = () => {
+      if (hasClickedCheckout && !isPaid) {
+        if (typeof window !== 'undefined' && window.gtag) {
+          window.gtag('event', 'checkout_abandoned', {
+            event_category: 'conversion_funnel',
+            event_label: 'after_checkout_click'
+          });
+        }
+      }
+    };
+
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    return () => {
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+    };
+  }, [hasClickedCheckout, isPaid]);
+
   const formatTime = (seconds) => {
     if (seconds === null) return '15:00';
     const mins = Math.floor(seconds / 60);
@@ -1484,17 +1891,96 @@ export default function BeautyReport({ data: rawData, isPaid, onUnlock }) {
   };
 
   const handleDownloadPDF = async () => {
+    if (pdfLoading) return;
     setPdfLoading(true);
     try {
-      const { generateSkinReportPDF } = await import('../lib/pdfGenerator');
-      await generateSkinReportPDF(data, lang);
+      const reportId = typeof window !== 'undefined' ? sessionStorage.getItem('rms_analysis_id') : null;
+      
+      // Save latest report details to sessionStorage for dev environment test fallback
+      sessionStorage.setItem('rms_latest_report', JSON.stringify(data));
+
+      const response = await fetch('/api/generate-pdf', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ reportId, reportData: data, lang, isPaid }),
+      });
+
+      if (!response.ok) {
+        const errData = await response.json().catch(() => ({}));
+        throw new Error(errData.error || `Server responded with status ${response.status}`);
+      }
+
+      const pdfBlob = await response.blob();
+      const url = URL.createObjectURL(pdfBlob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = lang === 'fr' ? 'analyse-de-peau-rate-my-skin.pdf' : 'rate-my-skin-report.pdf';
+      document.body.appendChild(a);
+      a.click();
+      setTimeout(() => {
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+      }, 1000);
     } catch (error) {
-      console.error('Error generating PDF:', error);
+      console.error('[PDF] Error generating PDF:', error);
+      // Show user-facing error
+      const msg = lang === 'fr'
+        ? 'Une erreur est survenue lors de la génération du PDF. Veuillez réessayer.'
+        : 'An error occurred while generating the PDF. Please try again.';
+      alert(msg);
     } finally {
       setPdfLoading(false);
     }
   };
 
+  const handleSendEmail = async () => {
+    if (emailLoading) return;
+    setEmailLoading(true);
+    setEmailStatus(null);
+    try {
+      const reportId = typeof window !== 'undefined' ? sessionStorage.getItem('rms_analysis_id') : null;
+      
+      if (!reportId) {
+        throw new Error(lang === 'fr' 
+          ? "Identifiant de rapport introuvable."
+          : "Report ID not found.");
+      }
+
+      const response = await fetch('/api/send-email-report', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ reportId, lang }),
+      });
+
+      const resData = await response.json().catch(() => ({}));
+      if (!response.ok) {
+        throw new Error(resData.error || (lang === 'fr' ? "Erreur lors de l'envoi" : "Sending error"));
+      }
+
+      setEmailStatus({
+        type: 'success',
+        text: resData.message || (lang === 'fr' 
+          ? `Rapport envoyé à ${resData.email || 'votre adresse'}`
+          : `Report sent to ${resData.email || 'your address'}`)
+      });
+    } catch (error) {
+      console.error('[Email] Error sending PDF by email:', error);
+      setEmailStatus({
+        type: 'error',
+        text: error.message || (lang === 'fr'
+          ? "Une erreur est survenue lors de l'envoi de l'email."
+          : "An error occurred while sending the email.")
+      });
+    } finally {
+      setEmailLoading(false);
+    }
+  };
+
+  // Early return after ALL hooks — safe here since all useMemo/useState are above
   if (!data) {
     return (
       <div style={{ display: "flex", alignItems: "center", justifyContent: "center", minHeight: "60vh" }}>
@@ -1505,7 +1991,49 @@ export default function BeautyReport({ data: rawData, isPaid, onUnlock }) {
 
   const { overall, summary, faceShape, skinType, skinTone } = data;
 
+  const getDynamicHeadline = () => {
+    const score = overall || 0;
+    if (score < 60) {
+      return lang === 'fr'
+        ? "Votre peau a un potentiel de progression important. Voici votre plan pour atteindre 80+ en 8 semaines."
+        : "Your skin has significant potential for progress. Here is your plan to reach 80+ in 8 weeks.";
+    } else if (score >= 60 && score <= 79) {
+      return lang === 'fr'
+        ? "Votre peau est sur la bonne voie. Voici comment franchir le prochain palier."
+        : "Your skin is on the right track. Here is how to cross the next threshold.";
+    } else {
+      return lang === 'fr'
+        ? "Votre peau est déjà belle. Voici comment la maintenir au sommet."
+        : "Your skin is already beautiful. Here is how to keep it at the top.";
+    }
+  };
+
+  const getDynamicSubheadline = () => {
+    const concerns = mainProblems.map(p => p.title).filter(Boolean);
+    if (concerns.length >= 2) {
+      return lang === 'fr'
+        ? `Causes identifiées pour ${concerns[0].toLowerCase()} et ${concerns[1].toLowerCase()}, routine sur-mesure matin & soir, produits adaptés à votre budget, et plan de progression semaine par semaine.`
+        : `Identified causes for ${concerns[0].toLowerCase()} and ${concerns[1].toLowerCase()}, custom morning & evening routine, budget-matched products, and a week-by-week progress plan.`;
+    } else if (concerns.length === 1) {
+      return lang === 'fr'
+        ? `Causes identifiées pour ${concerns[0].toLowerCase()}, routine sur-mesure matin & soir, produits adaptés à votre budget, et plan de progression semaine par semaine.`
+        : `Identified causes for ${concerns[0].toLowerCase()}, custom morning & evening routine, budget-matched products, and a week-by-week progress plan.`;
+    } else {
+      return lang === 'fr'
+        ? "Rapport complet prêt à débloquer — causes identifiées, routine sur-mesure matin & soir, produits adaptés à votre budget et plan de progression semaine par semaine."
+        : "Your full report is ready to unlock — root causes identified, personalised AM & PM routine, budget-matched products and a week-by-week progression plan.";
+    }
+  };
+
   const handleUnlock = async (planId) => {
+    if (typeof window !== 'undefined' && window.gtag) {
+      window.gtag('event', 'checkout_clicked', {
+        event_category: 'conversion_funnel',
+        event_label: 'paywall_cta',
+        value: 7.99
+      });
+    }
+    setHasClickedCheckout(true);
     setUnlocking(true);
     try { await onUnlock(planId); } finally { setUnlocking(false); }
   };
@@ -1521,7 +2049,7 @@ export default function BeautyReport({ data: rawData, isPaid, onUnlock }) {
   const displayImprovements = paid.improvements || [];
   const displayProducts = paid.productRecommendations || [];
   const allProducts = (freeData.productRecommendations || paid.productRecommendations || []).slice(0, 3);
-  const catalogProducts = data.catalog || paid.productRecommendations || freeData.productRecommendations || [];
+
 
   const TABS_CONFIG = [
     {
@@ -1719,21 +2247,17 @@ export default function BeautyReport({ data: rawData, isPaid, onUnlock }) {
               </span>
               <span>
                 {lang === 'fr' 
-                  ? `${socialProofN} femmes ont noté leur peau cette semaine` 
-                  : `${socialProofN} women rated their skin this week`}
+                  ? `${analysesCount} femmes ont noté leur peau cette semaine` 
+                  : `${analysesCount} women rated their skin this week`}
               </span>
             </div>
 
             {/* 3. COPY HOOK */}
             <h1 className="paywall-title">
-              {lang === 'fr'
-                ? "Votre peau mérite une analyse qui va jusqu'au bout"
-                : "Your skin deserves an analysis that goes all the way"}
+              {getDynamicHeadline()}
             </h1>
             <p className="paywall-subtitle">
-              {lang === 'fr'
-                ? "Rapport complet prêt à débloquer — causes identifiées, routine sur-mesure matin & soir, produits adaptés à votre budget et plan de progression semaine par semaine"
-                : "Your full report is ready to unlock — root causes identified, personalised AM & PM routine, budget-matched products and a week-by-week progression plan"}
+              {getDynamicSubheadline()}
             </p>
 
             {/* 4. UNLOCK GRID */}
@@ -1784,14 +2308,15 @@ export default function BeautyReport({ data: rawData, isPaid, onUnlock }) {
                   <span className="cell-subtext">{lang === 'fr' ? 'Objectifs concrets semaine après semaine pour voir les résultats' : 'Concrete weekly goals to see visible results'}</span>
                 </div>
               </div>
-              <div className="grid-cell">
+              <div className="grid-cell" style={{ position: "relative" }}>
                 <div className="cell-icon-container">
-                  {CUSTOM_PAYWALL_ICONS.chat}
+                  {CUSTOM_PAYWALL_ICONS.pdf}
                 </div>
                 <div className="cell-text-block">
-                  <span className="cell-text">{lang === 'fr' ? 'Assistant IA conversationnel' : 'AI Skincare Assistant'}</span>
-                  <span className="cell-subtext">{lang === 'fr' ? 'Posez toutes vos questions à notre IA experte disponible 24h/7' : 'Ask any questions to our expert AI available 24/7'}</span>
+                  <span className="cell-text">{lang === 'fr' ? 'Rapport PDF premium' : 'Premium PDF Report'}</span>
+                  <span className="cell-subtext">{lang === 'fr' ? 'Document élégant de 5 pages à conserver, imprimer ou consulter à vie' : 'Elegant 5-page document to keep, print or access for life'}</span>
                 </div>
+                <span className="badge-gold">{lang === 'fr' ? 'OFFERT' : 'FREE'}</span>
               </div>
             </div>
 
@@ -1804,24 +2329,95 @@ export default function BeautyReport({ data: rawData, isPaid, onUnlock }) {
             </p>
 
             {/* 1. COUNTDOWN TIMER */}
-            {timeLeft !== null && (
-              <div className="countdown-pill">
-                <svg className="countdown-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#C9A961" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
-                  <circle cx="12" cy="12" r="10" />
-                  <polyline points="12 6 12 12 16 14" />
-                </svg>
-                <span className="countdown-text">
-                  {lang === 'fr' 
-                    ? `Offre disponible encore ${formatTime(timeLeft)}` 
-                    : `Offer available for another ${formatTime(timeLeft)}`}
+            {/* Testimonial Quote Card */}
+            <div style={{
+              margin: "24px auto 0",
+              padding: "16px 20px",
+              borderRadius: "14px",
+              backgroundColor: "#FDF9F4",
+              borderLeft: "3px solid #C9A961",
+              maxWidth: "480px",
+              textAlign: "left",
+              boxShadow: "0 4px 12px rgba(44, 36, 22, 0.03)",
+            }}>
+              <p style={{
+                fontFamily: "'Cormorant Garamond', serif",
+                fontSize: "15px",
+                fontStyle: "italic",
+                lineHeight: 1.5,
+                color: "#2C2416",
+                margin: "0 0 8px"
+              }}>
+                {lang === 'fr'
+                  ? "« J'ai enfin compris ce dont ma peau avait vraiment besoin. La routine est claire et adaptée à mon budget. »"
+                  : "\"I finally understood what my skin actually needed. The routine is clear and fits my budget.\""}
+              </p>
+              <div style={{
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center"
+              }}>
+                <span style={{
+                  fontSize: "11px",
+                  color: "#9B9286",
+                  fontWeight: 500,
+                  fontFamily: "'Inter', sans-serif"
+                }}>
+                  — Sarah M., 34 ans
+                </span>
+                <span style={{
+                  color: "#C9A961",
+                  fontSize: "11px",
+                  letterSpacing: "1px"
+                }}>
+                  ★★★★★
                 </span>
               </div>
-            )}
+            </div>
+
+            {/* Value comparison */}
+            <div style={{
+              margin: "20px auto 16px",
+              padding: "12px 16px",
+              borderRadius: "12px",
+              backgroundColor: "rgba(44, 36, 22, 0.03)",
+              border: "1px dashed rgba(201, 169, 97, 0.2)",
+              maxWidth: "480px",
+              fontFamily: "'DM Sans', sans-serif",
+              fontSize: "12px",
+              lineHeight: 1.6,
+              color: "#6F6156"
+            }}>
+              <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 4 }}>
+                <span>{lang === 'fr' ? "Consultation dermatologique moyenne :" : "Average dermatological consultation:"}</span>
+                <span style={{ textDecoration: "line-through", color: "#A89484", fontWeight: 500 }}>40€ - 60€</span>
+              </div>
+              <div style={{ display: "flex", justifyContent: "space-between", fontWeight: 700 }}>
+                <span style={{ color: "#2C2416" }}>{lang === 'fr' ? "Votre analyse complète personnalisée :" : "Your personalized complete analysis:"}</span>
+                <span style={{ color: "#C9A961" }}>7,99€</span>
+              </div>
+            </div>
 
             {/* 5. CTA BUTTON */}
-            <button onClick={() => handleUnlock("single")} disabled={unlocking} className="cta-button">
+            <button 
+              onClick={() => handleUnlock("single")} 
+              disabled={unlocking} 
+              className="cta-button"
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                justifyContent: "center",
+                padding: "16px 24px",
+                width: "100%",
+                height: "auto",
+                gap: 2,
+                border: "none",
+                cursor: "pointer"
+              }}
+            >
               {unlocking ? (
-                <>
+                <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
                   <span style={{
                     display: "inline-block",
                     width: "16px",
@@ -1831,12 +2427,22 @@ export default function BeautyReport({ data: rawData, isPaid, onUnlock }) {
                     borderRadius: "50%",
                     animation: "spin 0.7s linear infinite"
                   }} />
-                  {t('redirecting')}
-                </>
+                  <span style={{ fontSize: "14px", fontWeight: 700 }}>{t('redirecting')}</span>
+                </div>
               ) : (
-                lang === 'fr' ? "Débloquer mon rapport complet — 7,99 €" : "Unlock My Full Report — €7.99"
+                <>
+                  <span style={{ fontSize: "15px", fontWeight: 800, letterSpacing: "0.03em" }}>
+                    {lang === 'fr' ? "OBTENIR MA ROUTINE PERSONNALISÉE" : "GET MY CUSTOM ROUTINE"}
+                  </span>
+                  <span style={{ fontSize: "11px", fontWeight: 400, opacity: 0.9, marginTop: 1 }}>
+                    {lang === 'fr' 
+                      ? "Paiement unique de 7,99€ • Accès immédiat" 
+                      : "One-time payment of €7.99 • Instant access"}
+                  </span>
+                </>
               )}
             </button>
+
             <div className="trust-signals">
               <span className="trust-item">
                 <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#C9A961" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
@@ -2130,13 +2736,13 @@ export default function BeautyReport({ data: rawData, isPaid, onUnlock }) {
           </div>
         )}
         {previewTab === 3 && (
-          (routine.morning || []).length === 0 && (routine.evening || []).length === 0 && (routine.weekly || []).length === 0 ? (
+          (routineWithProducts.morning || []).length === 0 && (routineWithProducts.evening || []).length === 0 && (routineWithProducts.weekly || []).length === 0 ? (
             <div style={{ ...CARD, padding: "20px", textAlign: "center", color: "#8C7A6B" }}>
               {t('routineUnavailable')}
             </div>
           ) : (
             <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-              {(routine.morning || []).length > 0 && (
+              {(routineWithProducts.morning || []).length > 0 && (
                 <div style={{
                   ...CARD,
                   padding: "20px",
@@ -2153,8 +2759,9 @@ export default function BeautyReport({ data: rawData, isPaid, onUnlock }) {
                     </span>
                   </div>
                   <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-                    {(routine.morning || []).map((step, idx) => {
-                      const matchedProduct = findMatchingProduct(step, catalogProducts);
+                    {(routineWithProducts.morning || []).map((stepItem, idx) => {
+                      const step = stepItem.text;
+                      const matchedProduct = stepItem.product;
                       return (
                         <div key={idx} style={{ display: "flex", flexDirection: "column", gap: 4 }}>
                           <div style={{ display: "flex", gap: 8, alignItems: "flex-start" }}>
@@ -2162,8 +2769,14 @@ export default function BeautyReport({ data: rawData, isPaid, onUnlock }) {
                             <p style={{ margin: 0, fontSize: 12.5, lineHeight: 1.6, color: "#6F6156" }}>{step}</p>
                           </div>
                           {matchedProduct && (
-                            <div style={{ marginLeft: 24, marginTop: 8 }}>
-                              <ProductCard product={matchedProduct} lang={lang} t={t} />
+                            <div style={{ marginLeft: 24, marginTop: 6 }}>
+                              <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 6 }}>
+                                <span style={{ fontSize: 8.5, fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", color: "#C9A961" }}>✦</span>
+                                <span style={{ fontSize: 10, color: "#8C7A6B", fontFamily: "'DM Sans', sans-serif", fontStyle: "italic" }}>
+                                  {lang === 'fr' ? "Produit conseillé pour cette étape" : "Suggested for this step"}
+                                </span>
+                              </div>
+                              <ProductCard product={matchedProduct} lang={lang} t={t} userSkinType={skinType} userConcerns={userConcerns} requiredActives={stepItem.requiredActives} />
                             </div>
                           )}
                         </div>
@@ -2173,7 +2786,7 @@ export default function BeautyReport({ data: rawData, isPaid, onUnlock }) {
                 </div>
               )}
 
-              {(routine.evening || []).length > 0 && (
+              {(routineWithProducts.evening || []).length > 0 && (
                 <div style={{
                   ...CARD,
                   padding: "20px",
@@ -2190,8 +2803,9 @@ export default function BeautyReport({ data: rawData, isPaid, onUnlock }) {
                     </span>
                   </div>
                   <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-                    {(routine.evening || []).map((step, idx) => {
-                      const matchedProduct = findMatchingProduct(step, catalogProducts);
+                    {(routineWithProducts.evening || []).map((stepItem, idx) => {
+                      const step = stepItem.text;
+                      const matchedProduct = stepItem.product;
                       return (
                         <div key={idx} style={{ display: "flex", flexDirection: "column", gap: 4 }}>
                           <div style={{ display: "flex", gap: 8, alignItems: "flex-start" }}>
@@ -2199,8 +2813,14 @@ export default function BeautyReport({ data: rawData, isPaid, onUnlock }) {
                             <p style={{ margin: 0, fontSize: 12.5, lineHeight: 1.6, color: "#6F6156" }}>{step}</p>
                           </div>
                           {matchedProduct && (
-                            <div style={{ marginLeft: 24, marginTop: 8 }}>
-                              <ProductCard product={matchedProduct} lang={lang} t={t} />
+                            <div style={{ marginLeft: 24, marginTop: 6 }}>
+                              <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 6 }}>
+                                <span style={{ fontSize: 8.5, fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", color: "#C9A961" }}>✦</span>
+                                <span style={{ fontSize: 10, color: "#8C7A6B", fontFamily: "'DM Sans', sans-serif", fontStyle: "italic" }}>
+                                  {lang === 'fr' ? "Produit conseillé pour cette étape" : "Suggested for this step"}
+                                </span>
+                              </div>
+                              <ProductCard product={matchedProduct} lang={lang} t={t} userSkinType={skinType} userConcerns={userConcerns} requiredActives={stepItem.requiredActives} />
                             </div>
                           )}
                         </div>
@@ -2210,7 +2830,7 @@ export default function BeautyReport({ data: rawData, isPaid, onUnlock }) {
                 </div>
               )}
 
-              {(routine.weekly || []).length > 0 && (
+              {(routineWithProducts.weekly || []).length > 0 && (
                 <div style={{
                   ...CARD,
                   padding: "20px",
@@ -2227,8 +2847,9 @@ export default function BeautyReport({ data: rawData, isPaid, onUnlock }) {
                     </span>
                   </div>
                   <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-                    {(routine.weekly || []).map((step, idx) => {
-                      const matchedProduct = findMatchingProduct(step, catalogProducts);
+                    {(routineWithProducts.weekly || []).map((stepItem, idx) => {
+                      const step = stepItem.text;
+                      const matchedProduct = stepItem.product;
                       return (
                         <div key={idx} style={{ display: "flex", flexDirection: "column", gap: 4 }}>
                           <div style={{ display: "flex", gap: 8, alignItems: "flex-start" }}>
@@ -2236,8 +2857,14 @@ export default function BeautyReport({ data: rawData, isPaid, onUnlock }) {
                             <p style={{ margin: 0, fontSize: 12.5, lineHeight: 1.6, color: "#6F6156" }}>{step}</p>
                           </div>
                           {matchedProduct && (
-                            <div style={{ marginLeft: 24, marginTop: 8 }}>
-                              <ProductCard product={matchedProduct} lang={lang} t={t} />
+                            <div style={{ marginLeft: 24, marginTop: 6 }}>
+                              <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 6 }}>
+                                <span style={{ fontSize: 8.5, fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", color: "#C9A961" }}>✦</span>
+                                <span style={{ fontSize: 10, color: "#8C7A6B", fontFamily: "'DM Sans', sans-serif", fontStyle: "italic" }}>
+                                  {lang === 'fr' ? "Produit conseillé pour cette étape" : "Suggested for this step"}
+                                </span>
+                              </div>
+                              <ProductCard product={matchedProduct} lang={lang} t={t} userSkinType={skinType} userConcerns={userConcerns} requiredActives={stepItem.requiredActives} />
                             </div>
                           )}
                         </div>
@@ -2250,8 +2877,374 @@ export default function BeautyReport({ data: rawData, isPaid, onUnlock }) {
           )
         )}
         {previewTab === 4 && (
-          <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-            {displayProducts.map((p, i) => <ProductCard key={i} product={p} lang={lang} t={t} />)}
+          <div style={{ display: "flex", flexDirection: "column", gap: 24 }}>
+            {/* Header Banner - Luxury Apothecary Introduction */}
+            <div style={{
+              ...CARD,
+              padding: "24px",
+              background: "linear-gradient(135deg, rgba(255, 255, 255, 0.85) 0%, rgba(253, 246, 237, 0.65) 50%, rgba(201, 169, 97, 0.05) 100%)",
+              border: "1px solid rgba(201, 169, 97, 0.3)",
+              display: "flex",
+              flexDirection: "column",
+              gap: 16
+            }}>
+              <div>
+                <h3 style={{
+                  margin: "0 0 8px",
+                  fontSize: 20,
+                  fontWeight: 300,
+                  fontFamily: "'Cormorant Garamond', serif",
+                  color: "#3A2E26",
+                  letterSpacing: "0.02em"
+                }}>
+                  {lang === 'fr' ? "Votre Boutique Beauté sur Mesure" : "Your Personal Skincare Selection"}
+                </h3>
+                <p style={{
+                  margin: 0,
+                  fontSize: 13,
+                  lineHeight: 1.6,
+                  color: "#6F6156",
+                  fontFamily: "'DM Sans', sans-serif"
+                }}>
+                  {lang === 'fr' 
+                    ? "Chaque produit présenté ici a été sélectionné en tenant compte de votre type de peau et de vos préoccupations spécifiques. Cliquez sur vos matchs idéaux en premier — ce sont vos alliés prioritaires."
+                    : "Every product below was chosen with your unique skin profile in mind. Start with your perfect matches — they're your skin's best allies right now."}
+                </p>
+              </div>
+
+              {/* Profile Summary Badges inside shop */}
+              <div style={{
+                display: "flex",
+                flexWrap: "wrap",
+                gap: 12,
+                padding: "12px 16px",
+                background: "rgba(255, 255, 255, 0.45)",
+                border: "1px solid rgba(168, 116, 73, 0.1)",
+                borderRadius: 12
+              }}>
+                <div style={{ display: "flex", flexDirection: "column", gap: 3 }}>
+                  <span style={{ fontSize: 8.5, fontWeight: 700, color: "#B0885E", textTransform: "uppercase", letterSpacing: "0.05em" }}>
+                    {lang === 'fr' ? "Votre type de peau :" : "Your skin type:"}
+                  </span>
+                  <span style={{ fontSize: 12, fontWeight: 700, color: "#3A2E26", display: "flex", alignItems: "center", gap: 4 }}>
+                    <span style={{ color: "#5CA18B" }}>✓</span> {getSkinTypeLabel(userSkinTypeNorm, lang)}
+                  </span>
+                </div>
+                {userConcerns.length > 0 && (
+                  <div style={{ display: "flex", flexDirection: "column", gap: 3, borderLeft: "1px solid rgba(168, 116, 73, 0.12)", paddingLeft: 12 }}>
+                    <span style={{ fontSize: 8.5, fontWeight: 700, color: "#B0885E", textTransform: "uppercase", letterSpacing: "0.05em" }}>
+                      {lang === 'fr' ? "Vos cibles d'action :" : "Your concerns targeted:"}
+                    </span>
+                    <span style={{ fontSize: 12, fontWeight: 600, color: "#3A2E26", display: "flex", flexWrap: "wrap", gap: 4 }}>
+                      {userConcerns.map((c, idx) => (
+                        <span key={idx} style={{ 
+                          fontSize: 10.5, 
+                          background: "rgba(232,184,212,0.18)", 
+                          color: "#B67C9D", 
+                          padding: "1px 6px", 
+                          borderRadius: 4,
+                          border: "1px solid rgba(232,184,212,0.3)"
+                        }}>
+                          {getConcernLabel(c, lang)}
+                        </span>
+                      ))}
+                    </span>
+                  </div>
+                )}
+              </div>
+
+              {/* Match System Explanation Legend */}
+              <div style={{
+                display: "grid",
+                gridTemplateColumns: "1fr",
+                gap: 8,
+                fontSize: 11,
+                fontFamily: "'DM Sans', sans-serif",
+                color: "#8C7A6B",
+                borderTop: "1px solid rgba(168, 116, 73, 0.08)",
+                paddingTop: 12
+              }}>
+                <span style={{ fontWeight: 700, color: "#3A2E26", textTransform: "uppercase", fontSize: 9, letterSpacing: "0.05em", marginBottom: 2 }}>
+                  {lang === 'fr' ? "Légende de recommandation :" : "Recommendation Legend:"}
+                </span>
+                <div style={{ display: "flex", flexWrap: "wrap", gap: 16 }}>
+                  <span style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                    <span style={{ background: "linear-gradient(135deg, #C9A961 0%, #E5C583 100%)", color: "white", padding: "1px 6px", borderRadius: 4, fontSize: 8.5, fontWeight: 700 }}>Match Parfait</span>
+                    <span>{lang === 'fr' ? "Convient à votre peau ET cible vos préoccupations." : "Fits skin type AND targets active concerns."}</span>
+                  </span>
+                  <span style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                    <span style={{ background: "rgba(168,220,200,0.18)", border: "1px solid rgba(168,220,200,0.45)", color: "#5CA18B", padding: "1px 6px", borderRadius: 4, fontSize: 8.5, fontWeight: 700 }}>✓ Peau {getSkinTypeLabel(userSkinTypeNorm, lang)}</span>
+                    <span>{lang === 'fr' ? "Adapté à votre type de peau." : "Formulated for your skin type."}</span>
+                  </span>
+                  <span style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                    <span style={{ background: "rgba(232,184,212,0.18)", border: "1px solid rgba(232,184,212,0.45)", color: "#B67C9D", padding: "1px 6px", borderRadius: 4, fontSize: 8.5, fontWeight: 700 }}>✦ Ciblé</span>
+                    <span>{lang === 'fr' ? "Cible une de vos préoccupations actives." : "Directly targets one of your skin concerns."}</span>
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            {/* Section: Priority AI Recommendations (Top 3) */}
+            {displayProducts.length > 0 && (
+              <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                  <span style={{ color: GOLD, fontSize: 16 }}>✨</span>
+                  <h4 style={{
+                    margin: 0,
+                    fontSize: 16,
+                    fontWeight: 600,
+                    fontFamily: "'DM Sans', sans-serif",
+                    color: "#3A2E26",
+                    textTransform: "uppercase",
+                    letterSpacing: "0.08em"
+                  }}>
+                    {lang === 'fr' ? "Votre Sélection Sur-Mesure" : "Your Custom Selection"}
+                  </h4>
+                </div>
+                <p style={{ margin: "0 0 4px", fontSize: 12.5, color: "#8C7A6B", lineHeight: 1.5 }}>
+                  {lang === 'fr' 
+                    ? "Ces produits correspondent à la fois à votre type de peau et à vos préoccupations actives. Ils forment la base de votre routine idéale :"
+                    : "These products match both your skin type and your active concerns. They form the core of your ideal daily routine:"}
+                </p>
+                <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+                  {displayProducts.map((p, i) => (
+                    <ProductCard
+                      key={`priority-${i}`}
+                      product={p}
+                      lang={lang}
+                      t={t}
+                      userSkinType={skinType}
+                      userConcerns={userConcerns}
+                      isPriorityRecommendation={true}
+                    />
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Section: Complete Apothecary Catalog (Remaining Products with filters) */}
+            <div style={{ display: "flex", flexDirection: "column", gap: 16, borderTop: "1px solid rgba(168, 116, 73, 0.08)", paddingTop: 20 }}>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", flexWrap: "wrap", gap: 12 }}>
+                <div>
+                  <h4 style={{
+                    margin: 0,
+                    fontSize: 16,
+                    fontWeight: 600,
+                    fontFamily: "'DM Sans', sans-serif",
+                    color: "#3A2E26",
+                    textTransform: "uppercase",
+                    letterSpacing: "0.08em"
+                  }}>
+                    {lang === 'fr' ? "Explorez le catalogue complet" : "Explore the Full Catalog"}
+                  </h4>
+                  <p style={{ margin: "4px 0 0", fontSize: 12, color: "#8C7A6B" }}>
+                    {lang === 'fr' 
+                      ? "Tous nos produits sélectionnés, triés par pertinence pour votre peau."
+                      : "All our curated products, sorted by relevance to your skin."}
+                  </p>
+                </div>
+
+                {/* Profile match quick toggle */}
+                <label style={{
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: 8,
+                  cursor: "pointer",
+                  fontSize: 12,
+                  fontFamily: "'DM Sans', sans-serif",
+                  color: "#3A2E26",
+                  fontWeight: 600,
+                  userSelect: "none",
+                  padding: "6px 12px",
+                  background: onlyMyMatch ? "rgba(201, 169, 97, 0.1)" : "rgba(168,116,73,0.04)",
+                  border: onlyMyMatch ? "1px solid rgba(201, 169, 97, 0.35)" : "1px solid rgba(168, 116, 73, 0.12)",
+                  borderRadius: 10,
+                  transition: "all 0.3s ease"
+                }}>
+                  <input
+                    type="checkbox"
+                    checked={onlyMyMatch}
+                    onChange={(e) => setOnlyMyMatch(e.target.checked)}
+                    style={{
+                      cursor: "pointer",
+                      accentColor: GOLD
+                    }}
+                  />
+                  <span>
+                    {lang === 'fr' ? "Matches Idéaux Uniquement" : "My Matches Only"}
+                  </span>
+                </label>
+              </div>
+
+              {/* Filters Box */}
+              <div style={{
+                display: "flex",
+                flexDirection: "column",
+                gap: 12,
+                padding: 16,
+                background: "rgba(255, 255, 255, 0.4)",
+                border: "1px solid rgba(168, 116, 73, 0.1)",
+                borderRadius: 16
+              }}>
+                {/* 1. Skincare Step Filters (Pills) */}
+                <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+                  <span style={{ fontSize: 9.5, fontWeight: 700, color: "#B0885E", textTransform: "uppercase", letterSpacing: "0.05em" }}>
+                    {lang === 'fr' ? "Filtrer par étape :" : "Filter by Step:"}
+                  </span>
+                  <div className="rpt-tabs" style={{
+                    display: "flex",
+                    gap: 6,
+                    overflowX: "auto",
+                    paddingBottom: 4,
+                    scrollbarWidth: "none",
+                    msOverflowStyle: "none"
+                  }}>
+                    {[
+                      { key: "all", fr: "Tout", en: "All" },
+                      { key: "cleanser", fr: "Nettoyants", en: "Cleansers" },
+                      { key: "toner", fr: "Lotions & Toniques", en: "Toners" },
+                      { key: "serum", fr: "Sérums", en: "Serums" },
+                      { key: "moisturizer", fr: "Crèmes", en: "Moisturizers" },
+                      { key: "sunscreen", fr: "Solaire SPF", en: "Sunscreen" },
+                      { key: "mask", fr: "Masques & Soins", en: "Masks" },
+                      { key: "eye", fr: "Contour des yeux", en: "Eye Care" }
+                    ].map(step => (
+                      <button
+                        key={step.key}
+                        onClick={() => setActiveStep(step.key)}
+                        style={{
+                          flexShrink: 0,
+                          padding: "6px 12px",
+                          borderRadius: 8,
+                          fontSize: 11,
+                          fontWeight: activeStep === step.key ? 700 : 500,
+                          cursor: "pointer",
+                          transition: "all 0.25s ease",
+                          background: activeStep === step.key ? "linear-gradient(135deg, #3D2914 0%, #281B0D 100%)" : "rgba(255, 255, 255, 0.75)",
+                          color: activeStep === step.key ? "#FFFDF9" : "#6F6156",
+                          border: activeStep === step.key ? "1px solid #3D2914" : "1px solid rgba(168,116,73,0.15)",
+                          boxShadow: activeStep === step.key ? "0 2px 6px rgba(61,41,20,0.15)" : "none"
+                        }}
+                      >
+                        {lang === 'fr' ? step.fr : step.en}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* 2. Skin Concern Filters (Pills) */}
+                <div style={{ display: "flex", flexDirection: "column", gap: 6, borderTop: "1px dashed rgba(168, 116, 73, 0.12)", paddingTop: 10 }}>
+                  <span style={{ fontSize: 9.5, fontWeight: 700, color: "#B0885E", textTransform: "uppercase", letterSpacing: "0.05em" }}>
+                    {lang === 'fr' ? "Filtrer par cible dermatologique :" : "Filter by Skin Concern:"}
+                  </span>
+                  <div style={{
+                    display: "flex",
+                    gap: 6,
+                    flexWrap: "wrap"
+                  }}>
+                    {[
+                      { key: "all", fr: "Tous Problèmes", en: "All Concerns" },
+                      { key: "acne", fr: "Acné & Boutons", en: "Acne" },
+                      { key: "pores", fr: "Pores dilatés", en: "Pores" },
+                      { key: "dryness", fr: "Déshydratation / Sècheresse", en: "Dehydration" },
+                      { key: "radiance", fr: "Teint Terne / Éclat", en: "Radiance / Dullness" },
+                      { key: "dark_spots", fr: "Taches / Hyper-pigmentation", en: "Dark Spots" },
+                      { key: "dark_circles", fr: "Cernes & Poches", en: "Dark Circles" },
+                      { key: "redness", fr: "Rougeurs & Réactivité", en: "Redness" },
+                      { key: "aging", fr: "Rides / Signes de l'âge", en: "Aging / Wrinkles" },
+                      { key: "texture", fr: "Texture / Grain de peau", en: "Texture" }
+                    ].map(concern => (
+                      <button
+                        key={concern.key}
+                        onClick={() => setActiveConcern(concern.key)}
+                        style={{
+                          padding: "5px 10px",
+                          borderRadius: 8,
+                          fontSize: 10.5,
+                          fontWeight: activeConcern === concern.key ? 700 : 500,
+                          cursor: "pointer",
+                          transition: "all 0.25s ease",
+                          background: activeConcern === concern.key ? "linear-gradient(135deg, #B0885E 0%, #8C7A6B 100%)" : "rgba(255, 255, 255, 0.75)",
+                          color: activeConcern === concern.key ? "#FFFDF9" : "#8C7A6B",
+                          border: activeConcern === concern.key ? "1px solid #B0885E" : "1px solid rgba(168,116,73,0.12)",
+                          boxShadow: activeConcern === concern.key ? "0 2px 6px rgba(176,136,94,0.12)" : "none"
+                        }}
+                      >
+                        {lang === 'fr' ? concern.fr : concern.en}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+              {/* Grid Catalog */}
+              <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+                {sortedAndFilteredProducts.filter(p => {
+                  // Exclude the priority top 3 products to avoid duplicate display
+                  const isPriority = displayProducts.some(dp => {
+                    const dpName = (dp.productName || dp.product_name || "").toLowerCase();
+                    const pName = (p.productName || p.product_name || "").toLowerCase();
+                    return dpName === pName;
+                  });
+                  return !isPriority;
+                }).length === 0 ? (
+                  <div style={{
+                    ...CARD,
+                    padding: "32px",
+                    textAlign: "center",
+                    color: "#A0938A",
+                    fontFamily: "'DM Sans', sans-serif"
+                  }}>
+                    <p style={{ margin: 0, fontSize: 13 }}>
+                      {lang === 'fr' 
+                        ? "Aucun autre produit ne correspond à vos filtres actuels." 
+                        : "No other products match your current filters."}
+                    </p>
+                    <button 
+                      onClick={() => {
+                        setActiveStep("all");
+                        setActiveConcern("all");
+                        setOnlyMyMatch(false);
+                      }}
+                      style={{
+                        marginTop: 12,
+                        background: "none",
+                        border: "none",
+                        color: GOLD,
+                        fontWeight: 700,
+                        textDecoration: "underline",
+                        cursor: "pointer",
+                        fontSize: 12
+                      }}
+                    >
+                      {lang === 'fr' ? "Réinitialiser les filtres" : "Reset all filters"}
+                    </button>
+                  </div>
+                ) : (
+                  sortedAndFilteredProducts
+                    .filter(p => {
+                      // Exclude priority recommendations from the catalog list
+                      const isPriority = displayProducts.some(dp => {
+                        const dpName = (dp.productName || dp.product_name || "").toLowerCase();
+                        const pName = (p.productName || p.product_name || "").toLowerCase();
+                        return dpName === pName;
+                      });
+                      return !isPriority;
+                    })
+                    .map((p, i) => (
+                      <ProductCard
+                        key={`catalog-${i}`}
+                        product={p}
+                        lang={lang}
+                        t={t}
+                        userSkinType={skinType}
+                        userConcerns={userConcerns}
+                        isPriorityRecommendation={false}
+                      />
+                    ))
+                )}
+              </div>
+            </div>
           </div>
         )}
         {previewTab === 5 && (
@@ -2589,12 +3582,11 @@ export default function BeautyReport({ data: rawData, isPaid, onUnlock }) {
       {isPaid && (
         <div style={{ maxWidth: 680, margin: "32px auto 0", padding: "0 20px" }}>
           <div style={{
-            background: "linear-gradient(150deg, rgba(255,255,255,0.85) 0%, rgba(253,246,237,0.72) 55%, rgba(246,235,222,0.85) 100%)",
-            backdropFilter: "blur(32px) saturate(160%)",
-            WebkitBackdropFilter: "blur(32px) saturate(160%)",
-            border: "1px solid rgba(255,255,255,0.9)",
-            borderRadius: 26, padding: "clamp(28px,5vw,40px)",
-            boxShadow: "0 12px 48px rgba(168,116,73,0.09), 0 2px 0 rgba(255,255,255,0.95), inset 0 1px 0 rgba(255,255,255,0.98)",
+            background: "linear-gradient(to bottom, #F8F4ED 0%, #F0E7D8 100%)",
+            border: "1px solid rgba(201, 169, 97, 0.1)",
+            borderRadius: 24,
+            padding: "44px 40px",
+            boxShadow: "0 16px 40px rgba(44, 36, 22, 0.06), inset 0 1px 0 rgba(255,255,255,0.4)",
             textAlign: "center"
           }}>
             {/* Label pill */}
@@ -2624,65 +3616,140 @@ export default function BeautyReport({ data: rawData, isPaid, onUnlock }) {
             {/* Description */}
             <p style={{
               fontSize: 13.5, color: "#6F6156", lineHeight: 1.7,
-              margin: "0 0 28px", fontFamily: "'DM Sans', sans-serif",
+              margin: "0 0 24px", fontFamily: "'DM Sans', sans-serif",
             }}>
               {t('pdfCardDesc')}
             </p>
 
-            {/* Blurred PDF Preview Mockup */}
+            {/* Benefit Badges */}
             <div style={{
-              position: "relative",
-              width: "160px",
-              height: "220px",
-              margin: "0 auto 24px",
-              borderRadius: "12px",
-              overflow: "hidden",
-              border: "1px solid rgba(168,116,73,0.2)",
-              boxShadow: "0 8px 24px rgba(168, 116, 73, 0.08)",
-              background: "#fff",
               display: "flex",
+              justifyContent: "space-around",
               alignItems: "center",
-              justifyContent: "center"
+              gap: 16,
+              margin: "0 auto 28px",
+              maxWidth: 480,
             }}>
-              <img
-                src="/pdf-preview-mockup.png"
-                alt="PDF Preview"
-                style={{
-                  width: "100%",
-                  height: "100%",
-                  objectFit: "cover",
-                  filter: "blur(3px)",
-                  transform: "scale(1.05)",
-                  display: "block"
-                }}
-              />
-              <div style={{
-                position: "absolute",
-                inset: 0,
-                background: "linear-gradient(to bottom, rgba(58, 46, 38, 0.05), rgba(58, 46, 38, 0.2))",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center"
-              }}>
-                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#FAF6F0" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{
-                  filter: "drop-shadow(0 2px 4px rgba(58, 46, 38, 0.2))"
-                }}>
-                  <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z" />
+              <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 6, flex: 1 }}>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#C9A961" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
                   <polyline points="14 2 14 8 20 8" />
                 </svg>
+                <span style={{ fontSize: 11, fontWeight: 500, color: "#6F6156", textAlign: "center", fontFamily: "'DM Sans', sans-serif" }}>
+                  {lang === 'fr' ? "5 pages premium" : "5 premium pages"}
+                </span>
               </div>
+              <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 6, flex: 1 }}>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#C9A961" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                  <polyline points="7 10 12 15 17 10" />
+                  <line x1="12" y1="15" x2="12" y2="3" />
+                </svg>
+                <span style={{ fontSize: 11, fontWeight: 500, color: "#6F6156", textAlign: "center", fontFamily: "'DM Sans', sans-serif" }}>
+                  {lang === 'fr' ? "Archivage à vie" : "Lifetime archive"}
+                </span>
+              </div>
+              <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 6, flex: 1 }}>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#C9A961" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <polyline points="6 9 6 2 18 2 18 9" />
+                  <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2" />
+                  <rect x="6" y="14" width="12" height="8" />
+                </svg>
+                <span style={{ fontSize: 11, fontWeight: 500, color: "#6F6156", textAlign: "center", fontFamily: "'DM Sans', sans-serif" }}>
+                  {lang === 'fr' ? "Imprimable" : "Printable"}
+                </span>
+              </div>
+            </div>
+
+            {/* Minimalist PDF Icon Visual */}
+            <div style={{
+              display: "flex",
+              justifyContent: "center",
+              margin: "24px auto",
+              width: "100%",
+              maxWidth: "180px",
+            }}>
+              <svg 
+                width="100%" 
+                height="100%" 
+                viewBox="0 0 180 220" 
+                style={{
+                  filter: "drop-shadow(0 10px 20px rgba(44, 36, 22, 0.08))",
+                  maxHeight: "220px"
+                }}
+              >
+                {/* Document outline */}
+                <path 
+                  d="M20 10 H 130 L 160 40 V 210 H 20 Z" 
+                  fill="#FDFBF9" 
+                  stroke="#C9A961" 
+                  strokeWidth="2"
+                  strokeLinejoin="round"
+                />
+                {/* Folded corner */}
+                <path 
+                  d="M130 10 V 40 H 160" 
+                  fill="#F0E7D8" 
+                  stroke="#C9A961" 
+                  strokeWidth="2"
+                  strokeLinejoin="round"
+                />
+                {/* Inner content lines (representing text) */}
+                <line x1="45" y1="65" x2="135" y2="65" stroke="#D4C5A0" strokeWidth="2.5" strokeLinecap="round" />
+                <line x1="45" y1="80" x2="115" y2="80" stroke="#D4C5A0" strokeWidth="2.5" strokeLinecap="round" />
+                <line x1="45" y1="95" x2="125" y2="95" stroke="#D4C5A0" strokeWidth="2.5" strokeLinecap="round" />
+                
+                {/* Score circle in middle */}
+                <circle cx="90" cy="135" r="22" fill="none" stroke="#C9A961" strokeWidth="2.5" />
+                <line x1="82" y1="135" x2="98" y2="135" stroke="#C9A961" strokeWidth="2" strokeLinecap="round" />
+                
+                {/* Bottom content lines */}
+                <line x1="45" y1="175" x2="135" y2="175" stroke="#D4C5A0" strokeWidth="2.5" strokeLinecap="round" />
+                <line x1="45" y1="190" x2="105" y2="190" stroke="#D4C5A0" strokeWidth="2.5" strokeLinecap="round" />
+
+                {/* Premium badge/seal in top-right */}
+                <g>
+                  {/* Subtle outer glow/ring */}
+                  <circle cx="145" cy="45" r="14" fill="#C9A961" />
+                  <circle cx="145" cy="45" r="12" fill="none" stroke="#FDFBF9" strokeWidth="0.75" strokeDasharray="2 1" />
+                  {/* Small star in center */}
+                  <path d="M145 39 L146.5 42.5 L150 43 L147.5 45.5 L148 49 L145 47 L142 49 L142.5 45.5 L140 43 L143.5 42.5 Z" fill="#FDFBF9" />
+                </g>
+              </svg>
             </div>
 
             {/* Button */}
             <button
               onClick={handleDownloadPDF}
               disabled={pdfLoading}
-              className="btn-liquid-glass-dark"
               style={{
-                width: "100%", padding: "16px", borderRadius: 14,
-                fontSize: 14, fontWeight: 700, letterSpacing: "0.02em",
-                display: "flex", alignItems: "center", justifyContent: "center", gap: 8,
-                border: "none", cursor: "pointer"
+                width: "100%",
+                padding: "16px 32px",
+                borderRadius: "14px",
+                backgroundColor: "#2C2416",
+                color: "#FFFFFF",
+                fontSize: "14px",
+                fontWeight: 700,
+                letterSpacing: "0.04em",
+                textTransform: "uppercase",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                gap: 10,
+                border: "none",
+                cursor: "pointer",
+                boxShadow: "0 6px 20px rgba(44, 36, 22, 0.15)",
+                transition: "transform 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease",
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.transform = "scale(1.02)";
+                e.currentTarget.style.boxShadow = "0 8px 24px rgba(44, 36, 22, 0.25)";
+                e.currentTarget.style.backgroundColor = "#3A301E";
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.transform = "scale(1)";
+                e.currentTarget.style.boxShadow = "0 6px 20px rgba(44, 36, 22, 0.15)";
+                e.currentTarget.style.backgroundColor = "#2C2416";
               }}
             >
               {pdfLoading ? (
@@ -2696,7 +3763,7 @@ export default function BeautyReport({ data: rawData, isPaid, onUnlock }) {
                 </>
               ) : (
                 <>
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ marginRight: 4 }}>
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ marginRight: 4 }}>
                     <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
                     <polyline points="7 10 12 15 17 10" />
                     <line x1="12" y1="15" x2="12" y2="3" />
@@ -2705,6 +3772,70 @@ export default function BeautyReport({ data: rawData, isPaid, onUnlock }) {
                 </>
               )}
             </button>
+
+            {/* Email Action */}
+            <div style={{ marginTop: 18 }}>
+              <button
+                onClick={handleSendEmail}
+                disabled={emailLoading}
+                style={{
+                  background: "none",
+                  border: "none",
+                  color: "#C9A961",
+                  fontSize: "12px",
+                  fontWeight: 600,
+                  cursor: "pointer",
+                  textDecoration: "none",
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: 4,
+                  transition: "color 0.2s ease"
+                }}
+                onMouseEnter={(e) => { e.currentTarget.style.textDecoration = "underline"; }}
+                onMouseLeave={(e) => { e.currentTarget.style.textDecoration = "none"; }}
+              >
+                {emailLoading ? (
+                  <>
+                    <span style={{
+                      display: "inline-block", width: 10, height: 10,
+                      border: "1.5px solid rgba(201,169,97,0.4)", borderTopColor: "#C9A961",
+                      borderRadius: "50%", animation: "spin 0.7s linear infinite"
+                    }} />
+                    {lang === 'fr' ? 'Envoi en cours...' : 'Sending...'}
+                  </>
+                ) : (
+                  <>
+                    <span>📧</span>
+                    {lang === 'fr' ? 'Recevoir aussi par email' : 'Also receive by email'}
+                  </>
+                )}
+              </button>
+              {emailStatus && (
+                <p style={{
+                  fontSize: 11,
+                  color: emailStatus.type === 'success' ? '#9CAF88' : '#C97B63',
+                  marginTop: 6,
+                  marginBottom: 0,
+                  fontFamily: "'DM Sans', sans-serif"
+                }}>
+                  {emailStatus.text}
+                </p>
+              )}
+            </div>
+
+            {/* Social Proof */}
+            <p style={{
+              fontSize: 11,
+              color: "#9B9286",
+              marginTop: 18,
+              marginBottom: 0,
+              fontStyle: "italic",
+              fontFamily: "'DM Sans', sans-serif"
+            }}>
+              {lang === 'fr' 
+                ? "Plus de 140 femmes ont déjà téléchargé leur rapport premium ce mois-ci" 
+                : "More than 140 women have already downloaded their premium report this month"}
+            </p>
           </div>
         </div>
       )}
@@ -2816,10 +3947,10 @@ export default function BeautyReport({ data: rawData, isPaid, onUnlock }) {
           box-shadow: 0 12px 28px rgba(168, 116, 73, 0.08), 0 0 10px rgba(201, 169, 97, 0.12);
         }
         .cell-icon-container {
-          width: 40px;
-          height: 40px;
+          width: 48px;
+          height: 48px;
           border-radius: 50%;
-          background: rgba(201, 169, 97, 0.08);
+          background: #F0E7D8;
           border: 1px solid rgba(201, 169, 97, 0.22);
           display: flex;
           align-items: center;
@@ -2830,7 +3961,7 @@ export default function BeautyReport({ data: rawData, isPaid, onUnlock }) {
           transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
         }
         .grid-cell:hover .cell-icon-container {
-          background: rgba(201, 169, 97, 0.18);
+          background: #E8DCC5;
           border-color: rgba(201, 169, 97, 0.5);
           transform: scale(1.05) rotate(5deg);
         }
@@ -3017,6 +4148,77 @@ export default function BeautyReport({ data: rawData, isPaid, onUnlock }) {
           }
           .rpt-inline-product-card-notch {
             display: none !important;
+          }
+        }
+
+        /* Premium Inline Product Card Responsive CSS */
+        .premium-product-card {
+          display: flex;
+          flex-direction: row;
+          gap: 16px;
+          align-items: stretch;
+          width: 100%;
+        }
+        .premium-product-img-wrapper {
+          width: 90px;
+          height: 110px;
+          border-radius: 12px;
+          overflow: hidden;
+          flex-shrink: 0;
+          border: 1px solid rgba(168, 116, 73, 0.1);
+          background: #FAF6F0;
+        }
+        .premium-product-info {
+          flex: 1;
+          min-width: 0;
+          display: flex;
+          flex-direction: column;
+          justify-content: space-between;
+          gap: 4px;
+        }
+        .premium-product-desc {
+          margin: 0;
+          font-size: 12.5px;
+          line-height: 1.55;
+          color: #6F6156;
+          font-family: 'DM Sans', sans-serif;
+        }
+        .rpt-product-buttons-container {
+          display: flex;
+          flex-direction: column;
+          gap: 8px;
+          justify-content: center;
+          width: 110px;
+          flex-shrink: 0;
+        }
+        .premium-product-btn {
+          width: 100%;
+          text-align: center;
+          transition: all 0.3s ease;
+        }
+        .premium-product-btn:hover {
+          transform: translateY(-1px);
+          opacity: 0.95;
+        }
+        @media (max-width: 560px) {
+          .premium-product-card {
+            flex-direction: column;
+            gap: 12px;
+          }
+          .premium-product-img-wrapper {
+            width: 100%;
+            height: 160px;
+          }
+          .rpt-product-buttons-container {
+            flex-direction: row;
+            width: 100%;
+            gap: 10px;
+            margin-top: 6px;
+            padding-top: 10px;
+            border-top: 1px dashed rgba(168, 116, 73, 0.12);
+          }
+          .premium-product-btn {
+            flex: 1;
           }
         }
       `}</style>
