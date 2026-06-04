@@ -500,6 +500,38 @@ export default async function handler(req, res) {
                 productId: finalId,
                 productName: finalName,
                 brand: finalBrand,
+                // Carry the full product object so the frontend uses exactly
+                // what the server chose (respecting dedup + correct image URL)
+                productData: validated ? {
+                  id: validated.id,
+                  brand: validated.brand,
+                  product_name: validated.product_name || validated.productName,
+                  productName: validated.product_name || validated.productName,
+                  description: validated.description,
+                  description_fr: validated.description_fr,
+                  description_en: validated.description_en,
+                  amazon_link: validated.amazon_link || validated.amazonLink,
+                  amazonLink: validated.amazon_link || validated.amazonLink,
+                  sephora_link: validated.sephora_link || validated.sephoraLink,
+                  sephoraLink: validated.sephora_link || validated.sephoraLink,
+                  price: validated.price || validated.price_range,
+                  price_range: validated.price || validated.price_range,
+                  // Image: use all available field names so ProductCard always finds it
+                  product_image_url: validated.imageUrl || validated.image_url || validated.product_image_url || null,
+                  imageUrl: validated.imageUrl || validated.image_url || validated.product_image_url || null,
+                  image_url: validated.imageUrl || validated.image_url || validated.product_image_url || null,
+                  routine_step: validated.routine_step || validated.routineStep,
+                  routineStep: validated.routine_step || validated.routineStep,
+                  skin_types: validated.skin_types || validated.skinTypes,
+                  skinTypes: validated.skin_types || validated.skinTypes,
+                  concerns: validated.concerns,
+                  actives: validated.actives,
+                  actives_en: validated.actives_en || validated.actives,
+                  rating: validated.rating,
+                  count: validated.count,
+                  efficacyLabel_fr: validated.efficacyLabel_fr,
+                  efficacyLabel_en: validated.efficacyLabel_en,
+                } : null,
               });
 
               logs.push({

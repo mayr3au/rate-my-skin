@@ -1687,9 +1687,16 @@ export default function BeautyReport({ data: rawData, isPaid, onUnlock, analyses
         const isObj = typeof stepText === 'object' && stepText !== null;
         const text = isObj ? (stepText.stepText || stepText.text || '') : (stepText || '');
         const id = isObj ? (stepText.productId || stepText.product_id) : null;
-        
+
         let matched = null;
-        if (id) {
+
+        // PRIORITY: use the server-embedded productData if available.
+        // This carries the exact product the server chose (with dedup applied)
+        // AND the correct image URL from Supabase, bypassing all re-lookup ambiguity.
+        if (isObj && stepText.productData) {
+          matched = stepText.productData;
+        } else if (id) {
+          // Fallback: resolve by ID from catalog (old reports without productData)
           matched = catalogProducts.find(p => p.id === id);
         }
         if (!matched && text) {
