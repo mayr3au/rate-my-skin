@@ -572,12 +572,8 @@ const getProxiedImageUrl = (originalUrl) => {
   if (!originalUrl || originalUrl === '' || originalUrl === 'placeholder') {
     return null;
   }
-  // Local/data URLs pass through unchanged
+  // Local/data URLs pass through unchanged (like data:image/jpeg;base64)
   if (originalUrl.startsWith('/') || originalUrl.startsWith('data:')) {
-    return originalUrl;
-  }
-  // Unsplash never hotlink-blocks — serve directly (avoids proxy roundtrip)
-  if (originalUrl.includes('unsplash.com')) {
     return originalUrl;
   }
   return `/api/image-proxy?url=${encodeURIComponent(originalUrl)}`;

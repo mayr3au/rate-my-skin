@@ -86,27 +86,26 @@ export default async function handler(req, res) {
     return res.status(400).json({ error: 'Missing url parameter' });
   }
 
-  // ── Domain allowlist check ────────────────────────────────────────────────
-  let parsedUrl;
+  // Decode the URL parameter cleanly
+  let decodedUrl;
   try {
-    parsedUrl = new URL(url);
-  } catch {
-    return res.status(400).json({ error: 'Invalid URL' });
+    decodedUrl = decodeURIComponent(url);
+  } catch (e) {
+    decodedUrl = url;
   }
 
-  const isAllowed = ALLOWED_DOMAINS.some(domain =>
-    parsedUrl.hostname === domain || parsedUrl.hostname.endsWith('.' + domain)
-  );
-
-  if (!isAllowed) {
-    console.warn(`[image-proxy] BLOCKED domain not in allowlist: ${parsedUrl.hostname} | full url: ${url.substring(0, 120)}`);
-    return res.status(403).json({ error: 'Domain not allowed', domain: parsedUrl.hostname });
+  // Parse the URL to ensure it is valid and extract the origin for headers
+  let parsedUrl;
+  try {
+    parsedUrl = new URL(decodedUrl);
+  } catch {
+    return res.status(400).json({ error: 'Invalid URL' });
   }
 
   console.log(`[image-proxy] Proxying: ${parsedUrl.hostname}${parsedUrl.pathname.substring(0, 60)}`);
   // ── Proxy the image ───────────────────────────────────────────────────────
   try {
-    const response = await fetch(url, {
+    const response = await fetch(decodedUrl, {
       headers: {
         // Mimic a real browser to bypass hotlink protection
         'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
