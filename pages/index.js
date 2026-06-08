@@ -501,6 +501,20 @@ export default function Home({ teaserProducts }) {
   const [userId, setUserId] = useState(null);
   const [paidUnlocks, setPaidUnlocks] = useState(0);
 
+  const [showStickyCta, setShowStickyCta] = useState(false);
+  const heroCtaRef = useRef(null);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      if (!heroCtaRef.current) return;
+      const rect = heroCtaRef.current.getBoundingClientRect();
+      // Show sticky CTA once the bottom of the hero CTA goes above the viewport top
+      setShowStickyCta(rect.bottom < 0);
+    };
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
   const [progress, setProgress] = useState(0);
   const [factIndex, setFactIndex] = useState(0);
   const [fade, setFade] = useState(true);
@@ -1242,6 +1256,7 @@ export default function Home({ teaserProducts }) {
                         
                         <div style={{ display: 'flex', flexDirection: 'column', gap: 12, alignItems: 'center', width: '100%', marginBottom: 16 }}>
                           <button
+                            ref={heroCtaRef}
                             className="premium-cta-primary"
                             onClick={(e) => { e.stopPropagation(); fileInputRef.current?.click(); }}
                           >
@@ -2244,6 +2259,47 @@ export default function Home({ teaserProducts }) {
           </div>
         )}
       </main>
+
+      {/* Sticky Bottom CTA Bar (Mobile Only) */}
+      {currentStep === 'landing' && showStickyCta && (
+        <div className="mobile-sticky-cta-bar" style={{
+          position: 'fixed',
+          bottom: 0,
+          left: 0,
+          right: 0,
+          zIndex: 250,
+          background: 'rgba(251, 246, 240, 0.94)',
+          backdropFilter: 'blur(16px)',
+          WebkitBackdropFilter: 'blur(16px)',
+          borderTop: '1px solid rgba(201, 169, 97, 0.22)',
+          boxShadow: '0 -8px 24px rgba(44, 36, 22, 0.06)',
+          padding: '12px 16px',
+          paddingBottom: 'calc(12px + env(safe-area-inset-bottom))',
+          display: 'none', // Overridden to flex in CSS on mobile
+          justifyContent: 'center',
+          alignItems: 'center',
+          boxSizing: 'border-box',
+        }}>
+          <button
+            className="premium-cta-primary"
+            onClick={(e) => { e.stopPropagation(); fileInputRef.current?.click(); }}
+            style={{
+              width: '100%',
+              maxWidth: 'none',
+              height: '50px',
+              fontSize: '13.5px',
+              fontFamily: "'DM Sans', sans-serif",
+              fontWeight: 700,
+              display: 'inline-flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              borderRadius: '9999px',
+            }}
+          >
+            {lang === 'fr' ? 'Analyser ma peau gratuitement' : 'Analyze my skin for free'}
+          </button>
+        </div>
+      )}
 
       {/* ── Email gate overlay (always in DOM, fades away after submit) ── */}
       {overlayVisible && (

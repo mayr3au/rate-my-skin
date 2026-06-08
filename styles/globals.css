@@ -968,6 +968,51 @@ body::before {
   .trust-label {
     font-size: 9px !important;
   }
+
+  /* 5. MOBILE RENDERING & ALIGNMENTS (MODIFICATION 32) */
+  .mobile-sticky-cta-bar {
+    display: flex !important; /* Force displays flex on mobile */
+  }
+
+  /* Prevent horizontal scrolls globally */
+  html, body {
+    overflow-x: hidden !important;
+    max-width: 100vw !important;
+  }
+
+  /* Add page cushion so content isn't cut off behind the sticky CTA */
+  main {
+    padding-bottom: calc(80px + env(safe-area-inset-bottom)) !important;
+  }
+
+  /* Centering titles, paragraphs, and buttons on mobile */
+  .hero-stagger-1, .hero-stagger-2, .hero-stagger-3, .hero-stagger-4 {
+    text-align: center !important;
+  }
+  
+  .hero-stagger-2 {
+    justify-content: center !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+  }
+
+  /* Make upload zone buttons and normal buttons full width with margins */
+  .premium-cta-primary, .premium-cta-secondary {
+    width: 100% !important;
+    max-width: 100% !important;
+    min-height: 48px !important; /* Comfortable tap target */
+  }
+  
+  .hero-upload-box {
+    margin-left: 8px !important;
+    margin-right: 8px !important;
+  }
+
+  /* Images constraints to avoid CLS and overflow */
+  img {
+    max-width: 100% !important;
+    height: auto !important;
+  }
 }
 
 .premium-cta-primary {
