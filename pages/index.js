@@ -1234,16 +1234,19 @@ export default function Home({ teaserProducts }) {
                           <button
                             onClick={(e) => { e.stopPropagation(); fileInputRef.current?.click(); }}
                             className="premium-cta-primary"
-                            style={{ border: 'none', width: '100%', maxWidth: 280, fontSize: 14, fontWeight: 600, padding: '14px 24px', animation: 'glowPulse 2.5s infinite' }}
+                            style={{
+                              border: 'none',
+                              width: '100%',
+                              maxWidth: 300,
+                              fontSize: 15,
+                              fontWeight: 600,
+                              padding: '16px 28px',
+                              animation: 'glowPulse 1.5s infinite',
+                              background: 'linear-gradient(135deg, #C5A028 0%, #A87449 100%)',
+                              boxShadow: '0 0 20px rgba(197, 160, 40, 0.6)'
+                            }}
                           >
-                            {lang === 'fr' ? 'Obtenir mon score gratuit →' : 'Get my free score →'}
-                          </button>
-                          <button
-                            onClick={(e) => { e.stopPropagation(); startCamera(); }}
-                            className="premium-cta-secondary"
-                            style={{ width: '100%', maxWidth: 280, fontSize: 14, fontWeight: 600, padding: '14px 24px' }}
-                          >
-                            {lang === 'fr' ? 'Prendre une photo' : 'Take a photo'}
+                            {lang === 'fr' ? 'Obtenir mon score gratuit' : 'Get my free score'}
                           </button>
                         </div>
                         
