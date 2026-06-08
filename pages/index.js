@@ -1213,14 +1213,24 @@ export default function Home({ teaserProducts }) {
                       </div>
                     ) : (
                       <>
-                        {/* Elegant camera icon */}
+                        {/* Simplified Elegant Face Scan Icon */}
                         <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 16 }}>
-                          <svg width="44" height="44" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ display: 'block' }}>
-                            <path d="M14 14L16.3 10.5C16.8 9.8 17.5 9.4 18.3 9.4H29.7C30.5 9.4 31.2 9.8 31.7 10.5L34 14M10 14H38C40.2 14 42 15.8 42 18V37C42 39.2 40.2 41 38 41H10C7.8 41 6 39.2 6 37V18C6 15.8 7.8 14 10 14Z" stroke="#C9A961" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-                            <circle cx="24" cy="27" r="7.5" stroke="#C9A961" strokeWidth="1.5" />
-                            <circle cx="24" cy="27" r="1.8" fill="#C9A961" />
-                            <path d="M24 23.5v7M20.5 27h7" stroke="#C9A961" strokeWidth="1.2" strokeLinecap="round" />
-                            <circle cx="35" cy="19.5" r="1" fill="#C9A961" />
+                          <svg width="44" height="44" viewBox="0 0 44 44" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ display: 'block' }}>
+                            {/* Simple elegant scan oval */}
+                            <rect x="3" y="3" width="38" height="38" rx="19" stroke="#C9A961" strokeWidth="1.25" />
+                            
+                            {/* Minimalist face outline within the oval */}
+                            {/* Hair/Head Top Arch */}
+                            <path d="M15 17 C 15 15, 29 15, 29 17" stroke="#C9A961" strokeWidth="1.25" strokeLinecap="round" />
+                            {/* Face/Jaw Contour */}
+                            <path d="M15 20 C14 22, 14.5 27, 22 31.5 C29.5 27, 30 22, 29 20" stroke="#C9A961" strokeWidth="1.25" strokeLinecap="round" strokeLinejoin="round" />
+                            {/* Stylized Nose line */}
+                            <path d="M22 21.5 V 25.5 H 23.5" stroke="#C9A961" strokeWidth="1.25" strokeLinecap="round" strokeLinejoin="round" />
+                            {/* Minimal Eyes (Horizontal dashes) */}
+                            <line x1="17.5" y1="20.5" x2="19.5" y2="20.5" stroke="#C9A961" strokeWidth="1.25" strokeLinecap="round" />
+                            <line x1="24.5" y1="20.5" x2="26.5" y2="20.5" stroke="#C9A961" strokeWidth="1.25" strokeLinecap="round" />
+                            {/* Minimal Smile */}
+                            <path d="M20 28 C 21 28.5, 23 28.5, 24 28" stroke="#C9A961" strokeWidth="1.25" strokeLinecap="round" />
                           </svg>
                         </div>
                         <h3 className="hero-upload-title" style={{ margin: '0 0 8px', fontSize: 20, color: '#2C2416', fontWeight: 700, fontFamily: "'Cormorant Garamond', serif" }}>
