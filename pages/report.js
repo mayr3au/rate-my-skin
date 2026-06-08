@@ -110,8 +110,8 @@ export default function Report() {
   const [email, setEmail] = useState('');
   const [firstName, setFirstName] = useState('');
   const [emailLoading, setEmailLoading] = useState(false);
-  const [newsletterConsent, setNewsletterConsent] = useState(true);
-  const [showEmailGate, setShowEmailGate] = useState(false);
+  const [newsletterConsent, setNewsletterConsent] = useState(false);
+  const [emailSkipped, setEmailSkipped] = useState(false);
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
@@ -125,9 +125,8 @@ export default function Report() {
 
     const captured = localStorage.getItem('rms_email_captured') === '1';
     setEmailCaptured(captured);
-    if (!captured) {
-      setShowEmailGate(true);
-    }
+    const skipped = sessionStorage.getItem('rms_email_skipped') === '1';
+    setEmailSkipped(skipped);
 
     const storedAnalysisId = sessionStorage.getItem('rms_analysis_id');
     if (storedAnalysisId) setAnalysisId(storedAnalysisId);
@@ -511,8 +510,24 @@ export default function Report() {
       localStorage.setItem('rms_first_name', firstName.trim());
     }
     setEmailCaptured(true);
-    setShowEmailGate(false);
+    if (typeof window !== 'undefined' && window.gtag) {
+      window.gtag('event', 'email_save_submitted', {
+        event_category: 'conversion_funnel',
+        event_label: 'soft_email_gate'
+      });
+    }
     setEmailLoading(false);
+  };
+
+  const handleEmailSkip = () => {
+    setEmailSkipped(true);
+    sessionStorage.setItem('rms_email_skipped', '1');
+    if (typeof window !== 'undefined' && window.gtag) {
+      window.gtag('event', 'email_save_skipped', {
+        event_category: 'conversion_funnel',
+        event_label: 'soft_email_gate'
+      });
+    }
   };
 
   // 4. handleUnlock: calls checkout, redirects to Stripe
@@ -851,143 +866,28 @@ export default function Report() {
         </div>
       </div>
 
-      <div style={{
-        filter: showEmailGate ? 'blur(12px)' : 'none',
-        pointerEvents: showEmailGate ? 'none' : 'auto',
-        userSelect: showEmailGate ? 'none' : 'auto',
-        transition: 'filter 0.6s cubic-bezier(0.16, 1, 0.3, 1)'
-      }}>
-        <BeautyReport data={data} isPaid={isPaid} onUnlock={handleUnlock} analysesCount={analysesCount} />
+      <div>
+        <BeautyReport
+          data={data}
+          isPaid={isPaid}
+          onUnlock={handleUnlock}
+          analysesCount={analysesCount}
+          emailCaptured={emailCaptured}
+          setEmailCaptured={setEmailCaptured}
+          emailSkipped={emailSkipped}
+          setEmailSkipped={setEmailSkipped}
+          email={email}
+          setEmail={setEmail}
+          firstName={firstName}
+          setFirstName={setFirstName}
+          emailLoading={emailLoading}
+          setEmailLoading={setEmailLoading}
+          newsletterConsent={newsletterConsent}
+          setNewsletterConsent={setNewsletterConsent}
+          handleEmailSubmit={handleEmailSubmit}
+          handleEmailSkip={handleEmailSkip}
+        />
       </div>
-
-      {/* ── Email gate overlay ── */}
-      {showEmailGate && (
-        <div style={{
-          position: 'fixed', inset: 0, zIndex: 300,
-          background: 'rgba(255, 253, 248, 0.45)',
-          backdropFilter: 'blur(8px)', WebkitBackdropFilter: 'blur(8px)',
-          display: 'flex', alignItems: 'center', justifyContent: 'center',
-          padding: '24px',
-        }}>
-          <div className="card-blur" style={{
-            borderRadius: 32,
-            padding: 'clamp(32px, 6vw, 48px)',
-            maxWidth: 420, width: '100%',
-            boxShadow: '0 32px 80px rgba(130, 100, 80, 0.08), inset 0 1px 1px rgba(255, 255, 255, 0.85)',
-            textAlign: 'center',
-          }}>
-            <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 22 }}>
-              <LuxuryFlower width={72} height={72} />
-            </div>
-
-            <p style={{
-              fontFamily: "'DM Sans', sans-serif",
-              fontSize: 11, letterSpacing: '0.16em', textTransform: 'uppercase',
-              color: '#C5A028', fontWeight: 500, margin: '0 0 10px',
-            }}>
-              {t('reward')}
-            </p>
-
-            <h2 style={{
-              fontFamily: "'Cormorant Garamond', serif",
-              fontSize: 'clamp(22px, 5vw, 30px)', fontWeight: 400,
-              color: '#2C241D', margin: '0 0 10px', lineHeight: 1.2,
-            }}>
-              {t('unlock2ndFree')}
-            </h2>
-
-            <p style={{
-              fontFamily: "'DM Sans', sans-serif",
-              fontSize: 13, color: '#8C7A6B', lineHeight: 1.6,
-              margin: '0 0 24px',
-            }}>
-              {t('emailGateDesc')}
-            </p>
-
-            <form onSubmit={handleEmailSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-              <input
-                type="text"
-                value={firstName}
-                onChange={(e) => setFirstName(e.target.value)}
-                placeholder={lang === 'fr' ? 'Votre prénom (optionnel)' : 'Your first name (optional)'}
-                className="input-nacré"
-                style={{
-                  borderRadius: 16,
-                  padding: '14px 18px', fontSize: 14,
-                  fontFamily: "'DM Sans', sans-serif",
-                  outline: 'none', width: '100%', boxSizing: 'border-box',
-                  color: '#3A2E26',
-                }}
-              />
-              <input
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder={lang === 'fr' ? 'Votre email' : 'Your email'}
-                required
-                className="input-nacré"
-                style={{
-                  borderRadius: 16,
-                  padding: '14px 18px', fontSize: 14,
-                  fontFamily: "'DM Sans', sans-serif",
-                  outline: 'none', width: '100%', boxSizing: 'border-box',
-                  color: '#3A2E26',
-                }}
-              />
-
-              <label style={{ display: 'flex', alignItems: 'flex-start', gap: 8, cursor: 'pointer', marginTop: 6, textAlign: 'left' }}>
-                <input
-                  type="checkbox"
-                  checked={newsletterConsent}
-                  onChange={(e) => setNewsletterConsent(e.target.checked)}
-                  style={{ marginTop: 3 }}
-                />
-                <span style={{ fontSize: 11, color: '#8C7A6B', lineHeight: 1.45, fontFamily: "'DM Sans', sans-serif" }}>
-                  {t('newsletterConsent')}
-                </span>
-              </label>
-
-              <button
-                type="submit"
-                disabled={emailLoading}
-                className="btn-liquid-glass-dark"
-                style={{
-                  width: '100%',
-                  marginTop: 10,
-                  padding: '14px 20px',
-                  borderRadius: 16,
-                  border: 'none',
-                  fontSize: 14,
-                  fontWeight: 700,
-                  cursor: 'pointer',
-                  fontFamily: "'DM Sans', sans-serif",
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  gap: 10,
-                }}
-              >
-                {emailLoading ? (
-                  <>
-                    <span style={{
-                      display: 'inline-block',
-                      width: 14,
-                      height: 14,
-                      border: '2px solid rgba(255,255,255,0.4)',
-                      borderTopColor: '#fff',
-                      borderRadius: '50%',
-                      animation: 'spin 0.7s linear infinite',
-                    }} />
-                    {t('saving')}
-                  </>
-                ) : (
-                  t('claimFreeAnalysis')
-                )}
-              </button>
-            </form>
-          </div>
-        </div>
-      )}
 
       <style dangerouslySetInnerHTML={{ __html: `
         @keyframes spin { to { transform: rotate(360deg); } }

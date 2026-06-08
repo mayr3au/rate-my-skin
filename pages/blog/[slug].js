@@ -125,23 +125,23 @@ function ContentBlock({ block }) {
           <p style={{
             fontSize: 11, letterSpacing: '0.14em', textTransform: 'uppercase',
             color: WARM, fontWeight: 600, fontFamily: "'DM Sans', sans-serif", marginBottom: 10,
-          }}>Analyse gratuite</p>
+          }}>{block.kicker || 'Analyse gratuite'}</p>
           <p style={{
             fontFamily: "'Cormorant Garamond', serif",
             fontSize: 'clamp(20px, 3vw, 26px)', fontWeight: 400,
             color: '#2C241D', margin: '0 0 10px', lineHeight: 1.3,
-          }}>Testez votre peau gratuitement</p>
+          }}>{block.title || 'Testez votre peau gratuitement'}</p>
           <p style={{
             fontFamily: "'DM Sans', sans-serif",
             fontSize: 13, color: '#8C7A6B', margin: '0 0 20px', lineHeight: 1.65,
-          }}>Importez une photo et obtenez votre score de peau + 3 problèmes prioritaires en 30 secondes. 100% gratuit.</p>
+          }}>{block.desc || 'Importez une photo et obtenez votre score de peau + 3 problèmes prioritaires en 30 secondes. 100% gratuit.'}</p>
           <Link href="/" style={{ textDecoration: 'none' }}>
             <button style={{
               background: 'linear-gradient(135deg, #3A2E26, #5A4035)',
               color: '#fff', border: 'none', borderRadius: 16,
               padding: '14px 28px', fontSize: 14, fontWeight: 600,
               cursor: 'pointer', fontFamily: "'DM Sans', sans-serif",
-            }}>Analyser ma peau → ratemyskin.co</button>
+            }}>{block.buttonText || 'Analyser ma peau → ratemyskin.co'}</button>
           </Link>
         </div>
       );

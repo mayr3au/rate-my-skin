@@ -14,6 +14,12 @@ const nextConfig = {
       'media.sephora.fr',
       'media.sephora.eu'
     ],
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: '*.supabase.co',
+      },
+    ],
   },
 };
 

@@ -6,15 +6,17 @@ import MedicalDisclaimer from "./MedicalDisclaimer";
 import { STATIC_PRODUCTS } from "../lib/catalog";
 import { ScanFace, Sparkles, ShoppingBag, Heart, TrendingUp, FileText } from 'lucide-react';
 import { getRelevantActivesForConcerns } from "../lib/productFilter";
+import { LuxuryFlower } from "./Logo";
+import ProductImage from "./ProductImage";
 
 const GOLD = "#C5A028";
 const CARD = {
-  background: "rgba(255, 255, 255, 0.55)",
-  backdropFilter: "blur(20px) saturate(150%)",
-  WebkitBackdropFilter: "blur(20px) saturate(150%)",
-  border: "1px solid rgba(255, 255, 255, 0.65)",
-  borderRadius: 20,
-  boxShadow: "0 8px 32px rgba(168, 116, 73, 0.03), inset 0 1px 0 rgba(255, 255, 255, 0.9)",
+  background: "rgba(255, 255, 255, 0.68)",
+  backdropFilter: "blur(24px) saturate(150%)",
+  WebkitBackdropFilter: "blur(24px) saturate(150%)",
+  border: "1px solid rgba(201, 169, 97, 0.22)",
+  borderRadius: 24,
+  boxShadow: "0 10px 36px rgba(168, 116, 73, 0.04), inset 0 1px 0 rgba(255, 255, 255, 0.95)",
   transition: "all 0.5s cubic-bezier(0.16, 1, 0.3, 1)"
 };
 const LABEL_STYLE = { margin: "0 0 4px", fontSize: 9.5, letterSpacing: "0.22em", textTransform: "uppercase", color: "#B0885E", fontWeight: 600, fontFamily: "'DM Sans', sans-serif" };
@@ -292,8 +294,9 @@ function ScoreHeroCard({ score, summary, faceShape, skinType, skinTone, badge, m
 
       {/* Summary */}
       <p style={{
-        margin: "0 0 16px", fontSize: 13, lineHeight: 1.72, textAlign: "center", position: "relative",
-        color: "#8C7A6B", fontFamily: "'DM Sans', sans-serif",
+        margin: "0 0 16px", fontSize: 16, lineHeight: 1.5, textAlign: "center", position: "relative",
+        color: "#2C2416", fontFamily: "'DM Sans', sans-serif",
+        fontWeight: 400,
         wordBreak: "break-word"
       }}>
         {summary}
@@ -477,6 +480,161 @@ function ScoreHeroCard({ score, summary, faceShape, skinType, skinTone, badge, m
   );
 }
 
+function EmailSaveCard({
+  lang,
+  t,
+  email,
+  setEmail,
+  firstName,
+  setFirstName,
+  emailLoading,
+  newsletterConsent,
+  setNewsletterConsent,
+  handleEmailSubmit,
+  handleEmailSkip
+}) {
+  return (
+    <div style={{
+      ...CARD,
+      marginTop: 40,
+      padding: "clamp(24px, 5vw, 36px)",
+      textAlign: "center",
+      border: "1px solid rgba(201, 169, 97, 0.35)",
+      boxShadow: "0 12px 32px rgba(168, 116, 73, 0.05), inset 0 1px 0 rgba(255, 255, 255, 0.9)",
+    }}>
+      <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 16 }}>
+        <LuxuryFlower width={56} height={56} />
+      </div>
+
+      <p style={{
+        fontFamily: "'DM Sans', sans-serif",
+        fontSize: 10, letterSpacing: '0.16em', textTransform: 'uppercase',
+        color: '#C5A028', fontWeight: 600, margin: '0 0 8px',
+      }}>
+        {lang === 'fr' ? 'Sauvegarder mon rapport' : 'Save my report'}
+      </p>
+
+      <h2 style={{
+        fontFamily: "'Cormorant Garamond', serif",
+        fontSize: 'clamp(20px, 4vw, 24px)', fontWeight: 400,
+        color: '#2C241D', margin: '0 0 10px', lineHeight: 1.25,
+      }}>
+        {lang === 'fr' ? 'Retrouvez votre analyse à tout moment' : 'Access your analysis anytime'}
+      </h2>
+
+      <p style={{
+        fontFamily: "'DM Sans', sans-serif",
+        fontSize: 12.5, color: '#8C7A6B', lineHeight: 1.6,
+        margin: '0 0 20px',
+      }}>
+        {lang === 'fr'
+          ? "Entrez votre e-mail pour enregistrer ce rapport dans 'Mes rapports' et recevoir chaque semaine nos conseils skincare basés sur la science."
+          : "Enter your email to save this report to 'My Reports' and receive weekly science-based skincare tips."}
+      </p>
+
+      <form onSubmit={handleEmailSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 10, maxWidth: 360, margin: '0 auto' }}>
+        <input
+          type="text"
+          value={firstName}
+          onChange={(e) => setFirstName(e.target.value)}
+          placeholder={lang === 'fr' ? 'Votre prénom (optionnel)' : 'Your first name (optional)'}
+          className="input-nacré"
+          style={{
+            borderRadius: 16,
+            padding: '12px 16px', fontSize: 13,
+            fontFamily: "'DM Sans', sans-serif",
+            outline: 'none', width: '100%', boxSizing: 'border-box',
+            color: '#3A2E26',
+          }}
+        />
+        <input
+          type="email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          placeholder={lang === 'fr' ? 'Votre email' : 'Your email'}
+          required
+          className="input-nacré"
+          style={{
+            borderRadius: 16,
+            padding: '12px 16px', fontSize: 13,
+            fontFamily: "'DM Sans', sans-serif",
+            outline: 'none', width: '100%', boxSizing: 'border-box',
+            color: '#3A2E26',
+          }}
+        />
+
+        <label style={{ display: 'flex', alignItems: 'flex-start', gap: 8, cursor: 'pointer', marginTop: 4, textAlign: 'left' }}>
+          <input
+            type="checkbox"
+            checked={newsletterConsent}
+            onChange={(e) => setNewsletterConsent(e.target.checked)}
+            style={{ marginTop: 3 }}
+          />
+          <span style={{ fontSize: 10.5, color: '#8C7A6B', lineHeight: 1.4, fontFamily: "'DM Sans', sans-serif" }}>
+            {t('newsletterConsent')}
+          </span>
+        </label>
+
+        <button
+          type="submit"
+          disabled={emailLoading}
+          className="btn-liquid-glass-dark"
+          style={{
+            width: '100%',
+            marginTop: 8,
+            padding: '12px 18px',
+            borderRadius: 16,
+            border: 'none',
+            fontSize: 13,
+            fontWeight: 700,
+            cursor: 'pointer',
+            fontFamily: "'DM Sans', sans-serif",
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: 10,
+          }}
+        >
+          {emailLoading ? (
+            <>
+              <span style={{
+                display: 'inline-block',
+                width: 14,
+                height: 14,
+                border: '2px solid rgba(255,255,255,0.4)',
+                borderTopColor: '#fff',
+                borderRadius: '50%',
+                animation: 'spin 0.7s linear infinite',
+              }} />
+              {t('saving')}
+            </>
+          ) : (
+            lang === 'fr' ? 'Sauvegarder mon rapport →' : 'Save my report →'
+          )}
+        </button>
+      </form>
+
+      <div style={{ marginTop: 16 }}>
+        <button
+          onClick={handleEmailSkip}
+          style={{
+            background: 'none',
+            border: 'none',
+            fontFamily: "'DM Sans', sans-serif",
+            fontSize: 12.5,
+            fontWeight: 600,
+            color: '#8C7A6B',
+            textDecoration: 'underline',
+            cursor: 'pointer',
+          }}
+        >
+          {lang === 'fr' ? 'Continuer sans sauvegarder' : 'Continue without saving'}
+        </button>
+      </div>
+    </div>
+  );
+}
+
 /* ── Animated score ring (metric cards) ── */
 function ScoreRing({ score, size = 64 }) {
   const [animated, setAnimated] = useState(0);
@@ -502,23 +660,29 @@ function ScoreRing({ score, size = 64 }) {
 /* ── Metric card ── */
 function MetricCard({ m, index, t }) {
   const [vis, setVis] = useState(false);
+  const { lang } = useLang();
+
   useEffect(() => {
     const timer = setTimeout(() => setVis(true), index * 80 + 100);
     return () => clearTimeout(timer);
   }, [index]);
 
-  const getGradeStyle = (grade) => {
-    const g = (grade || '').toUpperCase().trim();
-    if (g.startsWith('A')) {
-      return { color: "#7DBFA8", bg: "rgba(168,220,200,0.18)", border: "1px solid rgba(168,220,200,0.45)" };
-    }
-    if (g.startsWith('B')) {
-      return { color: "#82B8D8", bg: "rgba(168,200,232,0.18)", border: "1px solid rgba(168,200,232,0.45)" };
-    }
-    return { color: "#D4A0BC", bg: "rgba(232,184,212,0.18)", border: "1px solid rgba(232,184,212,0.45)" };
+  const getStatus = (score) => {
+    const s = Number(score) || 0;
+    if (s >= 80) return { label: lang === 'fr' ? 'BON' : 'GOOD', color: 'green' };
+    if (s >= 60) return { label: lang === 'fr' ? 'À SURVEILLER' : 'MONITOR', color: 'amber' };
+    return { label: lang === 'fr' ? 'À TRAVAILLER' : 'NEEDS WORK', color: 'pink' };
   };
 
-  const gradeStyle = getGradeStyle(m.grade);
+  const status = getStatus(m.score);
+  
+  const statusColors = {
+    green: { bg: 'rgba(125,191,168,0.1)', color: '#4D8C76' },
+    amber: { bg: 'rgba(212, 165, 116, 0.15)', color: '#B0885E' },
+    pink: { bg: 'rgba(216, 134, 157, 0.1)', color: '#B85C75' },
+  };
+
+  const currentStatusStyle = statusColors[status.color];
 
   return (
     <div style={{
@@ -537,25 +701,29 @@ function MetricCard({ m, index, t }) {
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 6, gap: 8, flexWrap: "wrap" }}>
           <span style={{ fontSize: 11, fontWeight: 600, letterSpacing: "0.1em", textTransform: "uppercase", color: "#3A2E26" }}>{m.label}</span>
           <div style={{ display: "flex", gap: 6, alignItems: "center", flexShrink: 0 }}>
-            <span style={{
-              fontSize: 10,
-              fontWeight: 700,
-              borderRadius: 6,
-              padding: "3px 9px",
-              background: gradeStyle.bg,
-              color: gradeStyle.color,
-              border: gradeStyle.border,
-              letterSpacing: "0.06em"
-            }}>
-              {m.grade}
-            </span>
             {m.severity && t && <SeverityBadge severity={m.severity} t={t} />}
           </div>
         </div>
         <div style={{ height: 2, background: "rgba(168,116,73,0.1)", borderRadius: 10, marginBottom: 8, overflow: "hidden" }}>
           <div style={{ height: "100%", width: `${m.score}%`, background: "linear-gradient(90deg, #A87449, #D4A574)", borderRadius: 10, transition: "width 1.6s cubic-bezier(0.4,0,0.2,1)" }} />
         </div>
-        <p className="rpt-metric-detail" style={{ margin: 0, fontSize: 12, lineHeight: 1.65, color: "#8C7A6B", wordBreak: "break-word", overflowWrap: "break-word" }}>{m.detail}</p>
+        <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
+           <span style={{
+             background: currentStatusStyle.bg,
+             color: currentStatusStyle.color,
+             fontSize: 8.5, fontWeight: 700, padding: "3px 6px",
+             borderRadius: 6, letterSpacing: "0.05em", lineHeight: 1,
+             whiteSpace: "nowrap"
+           }}>
+             {status.label}
+           </span>
+           <span style={{ 
+             fontSize: 12, color: "#5C4A3A", fontWeight: 500, 
+             whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", flex: 1
+           }}>
+             {m.detail}
+           </span>
+        </div>
       </div>
     </div>
   );
@@ -753,7 +921,7 @@ const getUserConcernsList = (reportData) => {
 };
 
 /* ── Product card ── */
-function ProductCard({ product, lang, t, userSkinType, userConcerns, isPriorityRecommendation = false, compact = false, requiredActives = [] }) {
+export function ProductCard({ product, lang, t, userSkinType, userConcerns, isPriorityRecommendation = false, compact = false, requiredActives = [] }) {
   const [hov, setHov] = useState(false);
   const [vis, setVis] = useState(false);
   const [imgFailed, setImgFailed] = useState(false);
@@ -863,36 +1031,13 @@ function ProductCard({ product, lang, t, userSkinType, userConcerns, isPriorityR
         {/* Product image container */}
         <div className="premium-product-img-wrapper">
           <a href={amazonUrl} target="_blank" rel="noopener noreferrer" style={{ display: "block", width: "100%", height: "100%" }}>
-            {/* Always render the <img>; fall back to placeholder SVG on error or missing URL */}
-            {(() => {
-              console.log('[CARD]', product.productName || product.product_name || product.name);
-              console.log('[CARD]   product.product_image_url:', product.product_image_url);
-              console.log('[CARD]   product.imageUrl:', product.imageUrl);
-              console.log('[CARD]   rawImgUrl computed:', rawImgUrl);
-              console.log('[CARD]   finalUrl after proxy:', imgUrl);
-              return null;
-            })()}
-            <img
-              src={imgFailed || !imgUrl ? PLACEHOLDER_IMAGE : imgUrl}
-              alt={product.productName || product.product_name}
-              loading="lazy"
-              onError={(e) => {
-                if (!imgFailed) {
-                  setImgFailed(true);
-                  e.target.src = PLACEHOLDER_IMAGE;
-                }
-              }}
-              style={{
-                width: "100%",
-                height: "100%",
-                objectFit: imgFailed || !imgUrl ? "contain" : "cover",
-                display: "block",
-                transition: "transform 0.5s cubic-bezier(0.16, 1, 0.3, 1)",
-                transform: hov ? "scale(1.06)" : "scale(1)",
-                background: "linear-gradient(135deg, #FBF6F0 0%, #EEDCD0 100%)",
-                padding: imgFailed || !imgUrl ? "16px" : 0,
-              }}
-            />
+            <div style={{ 
+              width: "100%", height: "100%", 
+              transition: "transform 0.5s cubic-bezier(0.16, 1, 0.3, 1)",
+              transform: hov ? "scale(1.06)" : "scale(1)"
+            }}>
+              <ProductImage src={imgUrl} alt={product.productName || product.product_name} sizes="(max-width: 768px) 50vw, 300px" />
+            </div>
           </a>
         </div>
 
@@ -1370,34 +1515,9 @@ function InlineProductCard({ product, lang, t }) {
     >
       <div className="rpt-inline-product-card-header">
         {/* Image */}
-        {/* Always render img; fallback to branded SVG placeholder on missing or broken URL */}
-        {(() => {
-          console.log('[CARD:INLINE]', product.productName || product.product_name || product.name);
-          console.log('[CARD:INLINE]   product.product_image_url:', product.product_image_url);
-          console.log('[CARD:INLINE]   product.imageUrl:', product.imageUrl);
-          console.log('[CARD:INLINE]   rawImgUrl computed:', rawImgUrl);
-          console.log('[CARD:INLINE]   finalUrl after proxy:', imgUrl);
-          return null;
-        })()}
-        <img
-          src={imgFailed || !imgUrl ? PLACEHOLDER_IMAGE : imgUrl}
-          alt={productName}
-          loading="lazy"
-          onError={(e) => {
-            if (!imgFailed) {
-              setImgFailed(true);
-              e.target.src = PLACEHOLDER_IMAGE;
-            }
-          }}
-          style={{
-            width: 38, height: 38,
-            objectFit: imgFailed || !imgUrl ? "contain" : "cover",
-            borderRadius: 8, flexShrink: 0,
-            background: "linear-gradient(135deg, #FBF6F0 0%, #EEDCD0 100%)",
-            border: "1px solid rgba(168, 116, 73, 0.08)",
-            padding: imgFailed || !imgUrl ? "4px" : 0,
-          }}
-        />
+        <div style={{ width: 38, height: 38, flexShrink: 0, borderRadius: 8, overflow: 'hidden', border: "1px solid rgba(168, 116, 73, 0.08)" }}>
+          <ProductImage src={imgUrl} alt={productName} sizes="38px" />
+        </div>
 
         {/* Text block: name + description + price */}
         <div style={{ flex: 1, minWidth: 0 }}>
@@ -1662,7 +1782,26 @@ function TraitTag({ label, value }) {
 }
 
 /* ══════════════════════════════════════════════════════════════════════ */
-export default function BeautyReport({ data: rawData, isPaid, onUnlock, analysesCount = 142 }) {
+export default function BeautyReport({
+  data: rawData,
+  isPaid,
+  onUnlock,
+  analysesCount = 142,
+  emailCaptured,
+  setEmailCaptured,
+  emailSkipped,
+  setEmailSkipped,
+  email,
+  setEmail,
+  firstName,
+  setFirstName,
+  emailLoading,
+  setEmailLoading,
+  newsletterConsent,
+  setNewsletterConsent,
+  handleEmailSubmit,
+  handleEmailSkip
+}) {
   const { lang, t } = useLang();
   const data = useMemo(() => sanitizeReport(rawData, lang), [rawData, lang]);
   const [unlocking, setUnlocking] = useState(false);
@@ -1671,7 +1810,7 @@ export default function BeautyReport({ data: rawData, isPaid, onUnlock, analyses
   const [shareMsg, setShareMsg] = useState("");
   const [showAllFree, setShowAllFree] = useState(false);
   const [pdfLoading, setPdfLoading] = useState(false);
-  const [emailLoading, setEmailLoading] = useState(false);
+  const [sendEmailLoading, setSendEmailLoading] = useState(false);
   const [emailStatus, setEmailStatus] = useState(null);
   const [timeLeft, setTimeLeft] = useState(null);
   const [hasClickedCheckout, setHasClickedCheckout] = useState(false);
@@ -1915,7 +2054,37 @@ const mapUiConcernToDb = (uiConcern) => {
   }, [isPaid]);
 
   useEffect(() => {
-    if (data && !isPaid) {
+    if (data) {
+      const sent = sessionStorage.getItem('rms_sent_score_viewed');
+      if (!sent) {
+        if (typeof window !== 'undefined' && window.gtag) {
+          window.gtag('event', 'score_viewed', {
+            event_category: 'conversion_funnel',
+            event_label: 'free_score_displayed'
+          });
+          sessionStorage.setItem('rms_sent_score_viewed', 'true');
+        }
+      }
+    }
+  }, [data]);
+
+  useEffect(() => {
+    if (data && !isPaid && !emailCaptured && !emailSkipped) {
+      const sent = sessionStorage.getItem('rms_sent_email_save_shown');
+      if (!sent) {
+        if (typeof window !== 'undefined' && window.gtag) {
+          window.gtag('event', 'email_save_shown', {
+            event_category: 'conversion_funnel',
+            event_label: 'soft_email_gate'
+          });
+          sessionStorage.setItem('rms_sent_email_save_shown', 'true');
+        }
+      }
+    }
+  }, [data, isPaid, emailCaptured, emailSkipped]);
+
+  useEffect(() => {
+    if (data && !isPaid && (emailCaptured || emailSkipped)) {
       const sent = sessionStorage.getItem('rms_sent_paywall_viewed');
       if (!sent) {
         if (typeof window !== 'undefined' && window.gtag) {
@@ -1927,7 +2096,7 @@ const mapUiConcernToDb = (uiConcern) => {
         }
       }
     }
-  }, [data, isPaid]);
+  }, [data, isPaid, emailCaptured, emailSkipped]);
 
   useEffect(() => {
     const handleBeforeUnload = () => {
@@ -2018,8 +2187,8 @@ const mapUiConcernToDb = (uiConcern) => {
   };
 
   const handleSendEmail = async () => {
-    if (emailLoading) return;
-    setEmailLoading(true);
+    if (sendEmailLoading) return;
+    setSendEmailLoading(true);
     setEmailStatus(null);
     try {
       const reportId = typeof window !== 'undefined' ? sessionStorage.getItem('rms_analysis_id') : null;
@@ -2058,7 +2227,7 @@ const mapUiConcernToDb = (uiConcern) => {
           : "An error occurred while sending the email.")
       });
     } finally {
-      setEmailLoading(false);
+      setSendEmailLoading(false);
     }
   };
 
@@ -2228,79 +2397,99 @@ const mapUiConcernToDb = (uiConcern) => {
         />
 
         <MedicalDisclaimer style={{ marginTop: 16 }} />
+      </div>
 
-        {/* ── Main problems ── */}
-        {!isPaid && mainProblems.length > 0 && (
-          <div style={{ marginTop: 28 }}>
-            <SectionHeading label={t('mainProblemsHeading')} title={t('areasToAddress')} />
-            <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-              {mainProblems.map((problem, i) => {
-                if (i > 0 && !showAllFree) return null;
-                return (
-                  <div key={i} style={{ ...CARD, padding: "0", display: "flex", overflow: "hidden" }}>
-                    <div style={{ width: 4, background: SEVERITY_ACCENT[problem.severity] || "#D1D5DB", flexShrink: 0 }} />
-                    <div style={{ padding: "18px 20px", flex: 1 }}>
-                      <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 8 }}>
-                        <SeverityBadge severity={problem.severity} t={t} />
+      {!isPaid && !emailCaptured && !emailSkipped ? (
+        <div style={{ maxWidth: 680, margin: "0 auto", padding: "0 20px" }}>
+          <EmailSaveCard
+            lang={lang}
+            t={t}
+            email={email}
+            setEmail={setEmail}
+            firstName={firstName}
+            setFirstName={setFirstName}
+            emailLoading={emailLoading}
+            newsletterConsent={newsletterConsent}
+            setNewsletterConsent={setNewsletterConsent}
+            handleEmailSubmit={handleEmailSubmit}
+            handleEmailSkip={handleEmailSkip}
+          />
+        </div>
+      ) : (
+        <>
+          <div style={{ maxWidth: 680, margin: "0 auto", padding: "0 20px" }}>
+            {/* ── Main problems ── */}
+            {!isPaid && mainProblems.length > 0 && (
+              <div style={{ marginTop: 40 }}>
+                <SectionHeading label={t('mainProblemsHeading')} title={t('areasToAddress')} />
+                <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+                  {mainProblems.map((problem, i) => {
+                    if (i > 0 && !showAllFree) return null;
+                    return (
+                      <div key={i} style={{ ...CARD, padding: "0", display: "flex", overflow: "hidden" }}>
+                        <div style={{ width: 4, background: SEVERITY_ACCENT[problem.severity] || "#D1D5DB", flexShrink: 0 }} />
+                        <div style={{ padding: "18px 20px", flex: 1 }}>
+                          <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 8 }}>
+                            <SeverityBadge severity={problem.severity} t={t} />
+                          </div>
+                          <div style={{ fontSize: 16, fontWeight: 400, color: "#3A2E26", marginBottom: 6, fontFamily: "'Cormorant Garamond', serif", lineHeight: 1.3 }}>{problem.title}</div>
+                          <p style={{ margin: 0, fontSize: 16, lineHeight: 1.5, color: "#2C2416", fontWeight: 400 }}>{problem.description}</p>
+                        </div>
                       </div>
-                      <div style={{ fontSize: 16, fontWeight: 400, color: "#3A2E26", marginBottom: 6, fontFamily: "'Cormorant Garamond', serif", lineHeight: 1.3 }}>{problem.title}</div>
-                      <p style={{ margin: 0, fontSize: 12.5, lineHeight: 1.7, color: "#8C7A6B" }}>{problem.description}</p>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
+                    );
+                  })}
+                </div>
 
-            {/* Voir plus / Voir moins toggle button */}
-            {mainProblems.length > 1 && (
-              <div style={{ display: "flex", justifyContent: "center", marginTop: 16 }}>
-                <button
-                  onClick={() => setShowAllFree(!showAllFree)}
-                  className="btn-liquid-glass-pearl"
-                  style={{
-                    padding: "10px 24px",
-                    fontSize: 12,
-                    fontWeight: 600,
-                    borderRadius: 20,
-                    border: "none",
-                    cursor: "pointer",
-                    display: "flex",
-                    alignItems: "center",
-                    gap: 6,
-                    color: "#A87449",
-                    boxShadow: "0 4px 12px rgba(168, 116, 73, 0.05)"
-                  }}
-                >
-                  {showAllFree ? t('seeLess') : t('seeMore')}
-                  <span style={{ fontSize: 9 }}>{showAllFree ? '▲' : '▼'}</span>
-                </button>
+                {/* Voir plus / Voir moins toggle button */}
+                {mainProblems.length > 1 && (
+                  <div style={{ display: "flex", justifyContent: "center", marginTop: 16 }}>
+                    <button
+                      onClick={() => setShowAllFree(!showAllFree)}
+                      className="btn-liquid-glass-pearl"
+                      style={{
+                        padding: "10px 24px",
+                        fontSize: 12,
+                        fontWeight: 600,
+                        borderRadius: 20,
+                        border: "none",
+                        cursor: "pointer",
+                        display: "flex",
+                        alignItems: "center",
+                        gap: 6,
+                        color: "#A87449",
+                        boxShadow: "0 4px 12px rgba(168, 116, 73, 0.05)"
+                      }}
+                    >
+                      {showAllFree ? t('seeLess') : t('seeMore')}
+                      <span style={{ fontSize: 9 }}>{showAllFree ? '▲' : '▼'}</span>
+                    </button>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* ── Products (free) ── */}
+            {!isPaid && allProducts.length > 0 && (
+              <div style={{ marginTop: 48 }}>
+                <div style={{ display: "flex", alignItems: "flex-end", justifyContent: "space-between", marginBottom: 14, gap: 8 }}>
+                  <SectionHeading label={t('shopSubtitle')} title={t('shopTitle')} />
+                  <span style={{ fontSize: 9, fontWeight: 700, letterSpacing: "0.16em", textTransform: "uppercase", color: "#8B6914", background: "rgba(197,160,40,0.1)", border: "1px solid rgba(197,160,40,0.28)", borderRadius: 20, padding: "4px 12px", whiteSpace: "nowrap", flexShrink: 0, fontFamily: "'DM Sans', sans-serif", marginBottom: 16 }}>
+                    {t('freeIncluded')}
+                  </span>
+                </div>
+                <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+                  {allProducts.map((p, i) => <ProductCard key={i} product={p} lang={lang} t={t} />)}
+                </div>
+                <p style={{ fontSize: 10, color: "#B9AC9E", textAlign: "center", padding: "12px 4px 0", lineHeight: 1.7, fontFamily: "'DM Sans', sans-serif" }}>
+                  {t('affiliateNotice')}
+                </p>
               </div>
             )}
           </div>
-        )}
-
-        {/* ── Products (free) ── */}
-        {!isPaid && allProducts.length > 0 && (
-          <div style={{ marginTop: 32 }}>
-            <div style={{ display: "flex", alignItems: "flex-end", justifyContent: "space-between", marginBottom: 14, gap: 8 }}>
-              <SectionHeading label={t('shopSubtitle')} title={t('shopTitle')} />
-              <span style={{ fontSize: 9, fontWeight: 700, letterSpacing: "0.16em", textTransform: "uppercase", color: "#8B6914", background: "rgba(197,160,40,0.1)", border: "1px solid rgba(197,160,40,0.28)", borderRadius: 20, padding: "4px 12px", whiteSpace: "nowrap", flexShrink: 0, fontFamily: "'DM Sans', sans-serif", marginBottom: 16 }}>
-                {t('freeIncluded')}
-              </span>
-            </div>
-            <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-              {allProducts.map((p, i) => <ProductCard key={i} product={p} lang={lang} t={t} />)}
-            </div>
-            <p style={{ fontSize: 10, color: "#B9AC9E", textAlign: "center", padding: "12px 4px 0", lineHeight: 1.7, fontFamily: "'DM Sans', sans-serif" }}>
-              {t('affiliateNotice')}
-            </p>
-          </div>
-        )}
-      </div>
 
       {/* ── Paywall card (unpaid only) ── */}
       {!isPaid && (
-        <div style={{ maxWidth: 680, margin: "32px auto 0", padding: "0 20px" }}>
+        <div style={{ maxWidth: 680, margin: "48px auto 0", padding: "0 20px" }}>
           <div style={{
             background: "linear-gradient(150deg, rgba(255,255,255,0.92) 0%, rgba(253,246,237,0.85) 55%, rgba(246,235,222,0.92) 100%)",
             backdropFilter: "blur(32px) saturate(160%)",
@@ -2516,7 +2705,7 @@ const mapUiConcernToDb = (uiConcern) => {
                   <span style={{ fontSize: "15px", fontWeight: 800, letterSpacing: "0.03em" }}>
                     {lang === 'fr' ? "OBTENIR MA ROUTINE PERSONNALISÉE" : "GET MY CUSTOM ROUTINE"}
                   </span>
-                  <span style={{ fontSize: "11px", fontWeight: 400, opacity: 0.9, marginTop: 1 }}>
+                  <span style={{ fontSize: 11, fontWeight: 400, opacity: 0.9, marginTop: 1 }}>
                     {lang === 'fr' 
                       ? "Paiement unique de 7,99€ • Accès immédiat" 
                       : "One-time payment of €7.99 • Instant access"}
@@ -2802,7 +2991,7 @@ const mapUiConcernToDb = (uiConcern) => {
             {displayStrengths.map((s, i) => (
               <div key={i} style={{ ...CARD, padding: "20px 22px", display: "flex", gap: 14, alignItems: "flex-start" }}>
                 <div style={{ width: 34, height: 34, borderRadius: 10, background: "rgba(168,116,73,0.12)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, color: GOLD, fontSize: 14 }}>{ICONS[i] || "✦"}</div>
-                <div><div style={{ fontSize: 12, fontWeight: 600, color: "#2C241D", marginBottom: 6 }}>{s.title}</div><p style={{ margin: 0, fontSize: 13, lineHeight: 1.7, color: "#8C7A6B" }}>{s.desc}</p></div>
+                <div><div style={{ fontSize: 16, fontWeight: 600, color: "#2C2416", marginBottom: 6 }}>{s.title}</div><p style={{ margin: 0, fontSize: 16, lineHeight: 1.5, color: "#2C2416", fontWeight: 400 }}>{s.desc}</p></div>
               </div>
             ))}
           </div>
@@ -2812,7 +3001,7 @@ const mapUiConcernToDb = (uiConcern) => {
             {displayImprovements.map((item, i) => (
               <div key={i} style={{ ...CARD, padding: "20px 22px", display: "flex", gap: 14, alignItems: "flex-start" }}>
                 <div style={{ width: 28, height: 28, borderRadius: "50%", background: "rgba(212,165,116,0.12)", border: "1px solid rgba(212,165,116,0.25)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, fontSize: 13, fontWeight: 600, color: GOLD, fontFamily: "'Cormorant Garamond', serif" }}>{i + 1}</div>
-                <div><div style={{ fontSize: 12, fontWeight: 600, color: "#2C241D", marginBottom: 6 }}>{item.title}</div><p style={{ margin: 0, fontSize: 13, lineHeight: 1.7, color: "#8C7A6B" }}>{item.desc}</p></div>
+                <div><div style={{ fontSize: 16, fontWeight: 600, color: "#2C2416", marginBottom: 6 }}>{item.title}</div><p style={{ margin: 0, fontSize: 16, lineHeight: 1.5, color: "#2C2416", fontWeight: 400 }}>{item.desc}</p></div>
               </div>
             ))}
           </div>
@@ -3083,7 +3272,7 @@ const mapUiConcernToDb = (uiConcern) => {
                     {lang === 'fr' ? "Votre Sélection Sur-Mesure" : "Your Custom Selection"}
                   </h4>
                 </div>
-                <p style={{ margin: "0 0 4px", fontSize: 12.5, color: "#8C7A6B", lineHeight: 1.5 }}>
+                <p style={{ margin: "0 0 4px", fontSize: 16, color: "#2C2416", lineHeight: 1.5, fontWeight: 400 }}>
                   {lang === 'fr' 
                     ? "Ces produits correspondent à la fois à votre type de peau et à vos préoccupations actives. Ils forment la base de votre routine idéale :"
                     : "These products match both your skin type and your active concerns. They form the core of your ideal daily routine:"}
@@ -3119,7 +3308,7 @@ const mapUiConcernToDb = (uiConcern) => {
                   }}>
                     {lang === 'fr' ? "Explorez le catalogue complet" : "Explore the Full Catalog"}
                   </h4>
-                  <p style={{ margin: "4px 0 0", fontSize: 12, color: "#8C7A6B" }}>
+                  <p style={{ margin: "4px 0 0", fontSize: 16, color: "#2C2416", lineHeight: 1.5, fontWeight: 400 }}>
                     {lang === 'fr' 
                       ? "Tous nos produits sélectionnés, triés par pertinence pour votre peau."
                       : "All our curated products, sorted by relevance to your skin."}
@@ -3590,17 +3779,17 @@ const mapUiConcernToDb = (uiConcern) => {
                         {step.week}
                       </div>
                       <div>
-                        <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", color: "#8C7A6B", marginBottom: 2 }}>
+                        <div style={{ fontSize: 16, fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", color: "#2C2416", marginBottom: 2 }}>
                           {lang === 'fr' ? `Semaine ${step.week}` : `Week ${step.week}`}
                         </div>
-                        <div style={{ fontSize: 16, fontWeight: 600, color: "#2C241D", marginBottom: 4, fontFamily: "'Cormorant Garamond', serif" }}>{step.title}</div>
-                        <p style={{ margin: 0, fontSize: 12.5, lineHeight: 1.5, color: "#6F6156" }}>{step.desc}</p>
+                        <div style={{ fontSize: 16, fontWeight: 600, color: "#2C2416", marginBottom: 4, fontFamily: "'Cormorant Garamond', serif" }}>{step.title}</div>
+                        <p style={{ margin: 0, fontSize: 16, lineHeight: 1.5, color: "#2C2416", fontWeight: 400 }}>{step.desc}</p>
                       </div>
                     </div>
                   ))}
                 </>
               ) : (
-                <div style={{ ...CARD, padding: "20px", textAlign: "center", color: "#8C7A6B" }}>
+                <div style={{ ...CARD, padding: "20px", textAlign: "center", color: "#2C2416", fontSize: 16, lineHeight: 1.5, fontWeight: 400 }}>
                   {lang === 'fr' ? 'Plan de progression non disponible pour ce rapport.' : 'Progression plan not available for this report.'}
                 </div>
               )}
@@ -3859,7 +4048,7 @@ const mapUiConcernToDb = (uiConcern) => {
             <div style={{ marginTop: 18 }}>
               <button
                 onClick={handleSendEmail}
-                disabled={emailLoading}
+                disabled={sendEmailLoading}
                 style={{
                   background: "none",
                   border: "none",
@@ -3876,7 +4065,7 @@ const mapUiConcernToDb = (uiConcern) => {
                 onMouseEnter={(e) => { e.currentTarget.style.textDecoration = "underline"; }}
                 onMouseLeave={(e) => { e.currentTarget.style.textDecoration = "none"; }}
               >
-                {emailLoading ? (
+                {sendEmailLoading ? (
                   <>
                     <span style={{
                       display: "inline-block", width: 10, height: 10,
@@ -3921,6 +4110,9 @@ const mapUiConcernToDb = (uiConcern) => {
           </div>
         </div>
       )}
+
+          </>
+        )}
 
       {/* Footer disclaimer and links */}
       <div style={{ maxWidth: 680, margin: "20px auto 0", padding: "0 20px 8px", textAlign: "center" }}>

@@ -72,6 +72,8 @@ const ALLOWED_DOMAINS = [
   // Unsplash (fallback, no hotlink protection needed but listed for completeness)
   'images.unsplash.com',
   'plus.unsplash.com',
+  // Supabase
+  'supabase.co',
 ];
 
 export default async function handler(req, res) {

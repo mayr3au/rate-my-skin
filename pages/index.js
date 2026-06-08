@@ -5,6 +5,62 @@ import Logo, { CreamDrop, LuxuryFlower } from '../components/Logo';
 import { useLang } from '../lib/LangContext';
 import MedicalDisclaimer from '../components/MedicalDisclaimer';
 import MultiAngleCamera from '../components/MultiAngleCamera';
+import ProductImage from '../components/ProductImage';
+import { ProductCard } from '../components/BeautyReport';
+import { createAdminClient } from '../lib/supabase';
+
+export async function getStaticProps() {
+  let teaserProducts = {
+    morningCleanser: null,
+    morningSerum: null,
+    eveningCleanser: null,
+    eveningTreatment: null
+  };
+
+  try {
+    const supabase = createAdminClient();
+    const { data: products } = await supabase.from('products').select('*');
+
+    if (products && products.length > 0) {
+      teaserProducts.morningCleanser = products.find(p => p.routine_step === 'cleanser' && p.product_name.includes('Effaclar')) || products.find(p => p.routine_step === 'cleanser') || products[0];
+      teaserProducts.morningSerum = products.find(p => p.routine_step === 'serum' && p.product_name.includes('C15')) || products.find(p => p.routine_step === 'serum') || products[1] || products[0];
+      teaserProducts.eveningCleanser = products.find(p => p.routine_step === 'cleanser' && p.product_name.includes('Clinique')) || products.find(p => p.routine_step === 'cleanser' && p.id !== teaserProducts.morningCleanser?.id) || products[2] || products[0];
+      teaserProducts.eveningTreatment = products.find(p => p.routine_step === 'treatment' && p.product_name.includes('Retinol')) || products.find(p => p.routine_step === 'treatment') || products[3] || products[0];
+    } else {
+      throw new Error("Aucun produit trouvé dans la base");
+    }
+  } catch (err) {
+    console.error('Error fetching teaser products:', err);
+    // Fallback de secours si la base n'est pas accessible localement
+    teaserProducts.morningCleanser = {
+      product_name: "Gel Moussant Purifiant Effaclar", brand: "La Roche-Posay", routine_step: "cleanser",
+      skin_types: ["oily", "combination"], concerns: ["acne"], rating: 4.8, count: "2k+", actives: ["Zinc PCA", "Eau Thermale"],
+      product_image_url: "https://votre-projet.supabase.co/storage/v1/object/public/products/la-roche-posay-effaclar.jpg"
+    };
+    teaserProducts.morningSerum = {
+      product_name: "C15 Super Booster Vitamine C", brand: "Paula's Choice", routine_step: "serum",
+      skin_types: ["all"], concerns: ["hyperpigmentation", "dark_spots"], rating: 4.6, count: "1k+", actives: ["15% Vitamine C pure", "Acide férulique"],
+      product_image_url: "https://votre-projet.supabase.co/storage/v1/object/public/products/paulas-choice-c15.jpg"
+    };
+    teaserProducts.eveningCleanser = {
+      product_name: "Take The Day Off Baume", brand: "Clinique", routine_step: "cleanser",
+      skin_types: ["all"], concerns: ["acne"], rating: 4.7, count: "5k+", actives: ["Huile de Carthame", "Vitamine E"],
+      product_image_url: "https://votre-projet.supabase.co/storage/v1/object/public/products/clinique-take-the-day-off.jpg"
+    };
+    teaserProducts.eveningTreatment = {
+      product_name: "Retinol 0.2% in Squalane", brand: "The Ordinary", routine_step: "treatment",
+      skin_types: ["all"], concerns: ["aging", "acne"], rating: 4.5, count: "3k+", actives: ["Rétinol pur (0.2%)", "Squalane"],
+      product_image_url: "https://votre-projet.supabase.co/storage/v1/object/public/products/the-ordinary-retinol.jpg"
+    };
+  }
+
+  return {
+    props: {
+      teaserProducts
+    },
+    revalidate: 3600
+  };
+}
 
 const SKIN_CONCERN_MAX = 200;
 const GOLD = '#C5A028';
@@ -81,44 +137,14 @@ const ANALYSIS_STEPS = [
 function Testimonials({ lang }) {
   const data = [
     {
-      name: "Sarah",
-      age: 24,
-      concern: lang === 'fr' ? "Peau à tendance acnéique" : "Acne-prone skin",
-      scoreBefore: 64,
-      scoreAfter: 88,
+      name: "Christel",
+      age: 38,
+      concern: lang === 'fr' ? "Taches pigmentaires & Teint terne" : "Pigmentation & Dullness",
       quote: lang === 'fr'
-        ? "L'analyse a immédiatement ciblé mes microkystes sur le front. La routine recommandée a changé ma peau en quelques semaines."
-        : "The analysis instantly targeted my forehead bumps. The recommended routine transformed my skin in just a few weeks."
-    },
-    {
-      name: "Léa",
-      age: 31,
-      concern: lang === 'fr' ? "Peau mixte & sensible" : "Combo & sensitive skin",
-      scoreBefore: 72,
-      scoreAfter: 91,
-      quote: lang === 'fr'
-        ? "Je pensais avoir la peau sèche, mais l'IA a détecté une déshydratation profonde. Ma barrière cutanée est enfin réparée !"
-        : "I thought I had dry skin, but the AI detected deep dehydration. My skin barrier is finally restored!"
-    },
-    {
-      name: "Camille",
-      age: 42,
-      concern: lang === 'fr' ? "Ridules & Teint terne" : "Fine lines & Dullness",
-      scoreBefore: 68,
-      scoreAfter: 85,
-      quote: lang === 'fr'
-        ? "Rapport ultra détaillé et précieux. Les conseils d'application des sérums m'ont permis de retrouver de l'éclat et lisser mes ridules."
-        : "Extremely detailed and valuable report. The serum application tips helped me regain radiance and smooth fine lines."
-    },
-    {
-      name: "Inès",
-      age: 28,
-      concern: lang === 'fr' ? "Pores dilatés & Rougeurs" : "Large pores & Redness",
-      scoreBefore: 70,
-      scoreAfter: 89,
-      quote: lang === 'fr'
-        ? "Impressionnée par la précision. L'IA a repéré mes rougeurs diffuses et m'a évité d'acheter des produits irritants inutiles."
-        : "Impressed by the accuracy. The AI spotted my diffuse redness and saved me from buying irritating products."
+        ? "J'ai complètement repensé ma routine grâce au scan. Fini les produits trop agressifs, ma peau respire et mes taches s'estompent enfin !"
+        : "I completely revamped my routine thanks to the scan. No more harsh products, my skin breathes and my dark spots are finally fading!",
+      rating: 5,
+      isVerified: true
     }
   ];
 
@@ -136,14 +162,14 @@ function Testimonials({ lang }) {
           fontWeight: 700,
           letterSpacing: "0.22em",
           textTransform: "uppercase",
-          color: "#B0885E",
-          background: "rgba(168, 116, 73, 0.05)",
-          border: "1px solid rgba(168, 116, 73, 0.15)",
+          color: "#D4A574",
+          background: "rgba(212, 165, 116, 0.05)",
+          border: "1px solid rgba(212, 165, 116, 0.15)",
           borderRadius: 20,
           padding: "4px 12px",
           fontFamily: "'DM Sans', sans-serif"
         }}>
-          {lang === 'fr' ? "ÉVOLUTION & TÉMOIGNAGES" : "COMMUNITY EVOLUTION"}
+          {lang === 'fr' ? "TÉMOIGNAGES" : "COMMUNITY FEEDBACK"}
         </span>
       </div>
 
@@ -156,7 +182,7 @@ function Testimonials({ lang }) {
         margin: '0 0 10px',
         letterSpacing: '-0.01em',
       }}>
-        {lang === 'fr' ? "Leur peau a changé de score" : "Real results, measured by AI"}
+        {lang === 'fr' ? "L'avis de la communauté" : "Real results"}
       </h3>
       <p style={{
         fontSize: 13,
@@ -168,22 +194,24 @@ function Testimonials({ lang }) {
         letterSpacing: '0.01em',
       }}>
         {lang === 'fr'
-          ? "Voici l'évolution moyenne et les impressions de la communauté après l'ajustement de leur routine."
-          : "Read the journeys and routine adjustments of members after unlocking their AI diagnostic."}
+          ? "Découvrez comment Rate My Skin aide à faire les bons choix pour sa peau."
+          : "Discover how Rate My Skin helps you make the right choices for your skin."}
       </p>
 
       <div style={{
-        display: 'grid',
-        gridTemplateColumns: 'repeat(auto-fit, minmax(270px, 1fr))',
+        display: 'flex',
+        flexWrap: 'wrap',
+        justifyContent: 'center',
         gap: 24,
       }}>
         {data.map((t, idx) => {
-          const pointsGained = t.scoreAfter - t.scoreBefore;
           return (
             <div
               key={idx}
               className="bubble-nacré"
               style={{
+                width: '100%',
+                maxWidth: 360,
                 borderRadius: 28,
                 padding: '28px 24px 24px',
                 display: 'flex',
@@ -211,46 +239,19 @@ function Testimonials({ lang }) {
               }}
             >
               <div>
-                {/* Header: stars + score progress */}
+                {/* Header: stars */}
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
-                  <div style={{ color: '#C5A028', fontSize: 11, letterSpacing: 1 }}>
-                    ★★★★★
-                  </div>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                    <div style={{
-                      fontSize: 10,
-                      fontWeight: 700,
-                      color: '#8C6A3A',
-                      background: 'rgba(255, 255, 255, 0.6)',
-                      border: '1px solid rgba(168, 116, 73, 0.18)',
-                      borderRadius: 20,
-                      padding: '3px 9px',
-                      fontFamily: "'DM Sans', sans-serif",
-                      boxShadow: '0 2px 6px rgba(168, 116, 73, 0.02)'
-                    }}>
-                      Score: {t.scoreBefore} ➔ {t.scoreAfter}
-                    </div>
-                    <div style={{
-                      fontSize: 9.5,
-                      fontWeight: 800,
-                      color: '#FFFFFF',
-                      background: 'linear-gradient(135deg, #C5A028 0%, #A87449 100%)',
-                      borderRadius: 20,
-                      padding: '3px 8px',
-                      fontFamily: "'DM Sans', sans-serif",
-                      boxShadow: '0 2px 8px rgba(197, 160, 40, 0.2)'
-                    }}>
-                      +{pointsGained}
-                    </div>
+                  <div style={{ color: '#C5A028', fontSize: 14, letterSpacing: 1 }}>
+                    {"★".repeat(t.rating)}
                   </div>
                 </div>
 
                 {/* Quote */}
                 <p style={{
                   fontFamily: "'DM Sans', sans-serif",
-                  fontSize: 13,
-                  color: '#A2968B',
-                  lineHeight: 1.6,
+                  fontSize: 16,
+                  color: '#2C2416',
+                  lineHeight: 1.5,
                   letterSpacing: '0.01em',
                   margin: '0 0 20px',
                 }}>
@@ -289,27 +290,29 @@ function Testimonials({ lang }) {
                     <div style={{ fontSize: 13, fontWeight: 600, color: '#3A2E26' }}>
                       {t.name}, {t.age} {lang === 'fr' ? 'ans' : 'y/o'}
                     </div>
-                    <div style={{ fontSize: 11, color: '#8C7A6B', marginTop: 1 }}>
+                    <div style={{ fontSize: 11, color: '#8C6A3A', marginTop: 1, letterSpacing: '0.02em' }}>
                       {t.concern}
                     </div>
                   </div>
                 </div>
 
                 {/* Verified badge */}
-                <span style={{
-                  fontSize: 9,
-                  fontWeight: 600,
-                  color: '#7DBFA8',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 3,
-                  fontFamily: "'DM Sans', sans-serif"
-                }}>
-                  <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
-                    <polyline points="20 6 9 17 4 12" />
-                  </svg>
-                  {lang === 'fr' ? 'IA vérifié' : 'AI verified'}
-                </span>
+                {t.isVerified && (
+                  <span style={{
+                    fontSize: 9,
+                    fontWeight: 600,
+                    color: '#7DBFA8',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 3,
+                    fontFamily: "'DM Sans', sans-serif"
+                  }}>
+                    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                      <polyline points="20 6 9 17 4 12" />
+                    </svg>
+                    {lang === 'fr' ? 'Avis vérifié' : 'Verified review'}
+                  </span>
+                )}
               </div>
             </div>
           );
@@ -342,9 +345,9 @@ function FAQ({ lang, t }) {
           fontWeight: 700,
           letterSpacing: "0.22em",
           textTransform: "uppercase",
-          color: "#B0885E",
-          background: "rgba(168, 116, 73, 0.05)",
-          border: "1px solid rgba(168, 116, 73, 0.15)",
+          color: "#D4A574",
+          background: "rgba(212, 165, 116, 0.05)",
+          border: "1px solid rgba(212, 165, 116, 0.15)",
           borderRadius: 20,
           padding: "4px 12px",
           fontFamily: "'DM Sans', sans-serif"
@@ -389,9 +392,9 @@ function FAQ({ lang, t }) {
               }}>
                 <span style={{
                   fontFamily: "'DM Sans', sans-serif",
-                  fontSize: 13,
-                  fontWeight: 500,
-                  color: '#3A2E26',
+                  fontSize: 16,
+                  fontWeight: 600,
+                  color: '#2C2416',
                   textAlign: 'left',
                 }}>
                   {item.q}
@@ -413,9 +416,9 @@ function FAQ({ lang, t }) {
               }}>
                 <p style={{
                   fontFamily: "'DM Sans', sans-serif",
-                  fontSize: 12,
-                  color: '#8C7A6B',
-                  lineHeight: 1.55,
+                  fontSize: 16,
+                  color: '#2C2416',
+                  lineHeight: 1.5,
                   margin: '8px 0 0',
                   textAlign: 'left',
                 }}>
@@ -430,9 +433,29 @@ function FAQ({ lang, t }) {
   );
 }
 
-export default function Home() {
+export default function Home({ teaserProducts }) {
   const router = useRouter();
   const { lang, t } = useLang();
+
+
+
+  const renderFloatingAccent = (label, pct, color, style, className, animClass) => (
+    <div className={`floating-accent ${className}`} style={{ ...style, animation: `${animClass} 4s ease-in-out infinite` }}>
+      <div style={{ position: 'relative', width: 28, height: 28 }}>
+        <svg width="28" height="28" viewBox="0 0 36 36" style={{ transform: 'rotate(-90deg)' }}>
+          <circle cx="18" cy="18" r="14" fill="none" stroke="rgba(201,169,97,0.15)" strokeWidth="3" />
+          <circle cx="18" cy="18" r="14" fill="none" stroke={color} strokeWidth="3"
+            strokeDasharray={`${2 * Math.PI * 14 * (pct / 100)} ${2 * Math.PI * 14}`}
+            strokeLinecap="round" />
+        </svg>
+        <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 9, fontWeight: 700, color: '#2C2416' }}>
+          {pct}
+        </div>
+      </div>
+      <span style={{ fontSize: 11, fontWeight: 600, color: '#2C2416', fontFamily: "'DM Sans', sans-serif" }}>{label}</span>
+    </div>
+  );
+
   const fileInputRef = useRef(null);
   const cameraInputRef = useRef(null);
   const videoRef = useRef(null);
@@ -468,7 +491,10 @@ export default function Home() {
   const [climate, setClimate] = useState('');
   const [allergies, setAllergies] = useState('');
   const [activeChips, setActiveChips] = useState([]);
+  const [showOptionalFields, setShowOptionalFields] = useState(false);
   const [dragOver, setDragOver] = useState(false);
+  const [currentStep, setCurrentStep] = useState('landing');
+  const [hasSentQuestionsViewed, setHasSentQuestionsViewed] = useState(false);
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -480,6 +506,7 @@ export default function Home() {
   const [fade, setFade] = useState(true);
   const [analysisStep, setAnalysisStep] = useState(0);
   const [stepFade, setStepFade] = useState(true);
+  const [routineTeaserTab, setRoutineTeaserTab] = useState('morning');
 
   useEffect(() => {
     // Migrate old localStorage key so returning users are recognised
@@ -651,6 +678,7 @@ export default function Home() {
     setError('');
     setImage(file);
     setImageUrl(URL.createObjectURL(file));
+    setCurrentStep('questions');
   };
 
   const handleDrop = (e) => {
@@ -733,6 +761,28 @@ export default function Home() {
       stopCamera();
     }, 200);
   };
+
+  const handleSkipQuestions = () => {
+    if (typeof window !== 'undefined' && window.gtag) {
+      window.gtag('event', 'questions_skipped', {
+        event_category: 'conversion_funnel',
+        event_label: 'optional_questions_step'
+      });
+    }
+    handleAnalyse();
+  };
+
+  useEffect(() => {
+    if (currentStep === 'questions' && !hasSentQuestionsViewed) {
+      if (typeof window !== 'undefined' && window.gtag) {
+        window.gtag('event', 'questions_step_viewed', {
+          event_category: 'conversion_funnel',
+          event_label: 'optional_questions_step'
+        });
+      }
+      setHasSentQuestionsViewed(true);
+    }
+  }, [currentStep, hasSentQuestionsViewed]);
 
   const handleAnalyse = async () => {
     if (!image) return;
@@ -895,13 +945,15 @@ export default function Home() {
       <div className="nav-blur" style={{
         position: 'sticky', top: 0, zIndex: 200,
         boxShadow: '0 4px 20px rgba(180, 160, 140, 0.04)',
-        padding: '13px 26px',
+        padding: '13px 24px',
         display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+        width: '100%',
       }}>
-        <Logo />
-        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+        {/* Left Section */}
+        <div style={{ flex: 1, display: 'flex', alignItems: 'center', gap: 10, minWidth: 0 }}>
+          <LangToggle />
           {paidUnlocks > 0 && (
-            <div style={{
+            <div className="mobile-hide" style={{
               display: 'flex', alignItems: 'center', gap: 5,
               background: 'linear-gradient(135deg, rgba(197,160,40,0.08), rgba(212,165,116,0.06))',
               border: '1px solid rgba(197,160,40,0.28)',
@@ -913,14 +965,22 @@ export default function Home() {
               </span>
             </div>
           )}
-          <LangToggle />
+        </div>
+
+        {/* Center Section */}
+        <div style={{ flex: '0 0 auto', display: 'flex', justifyContent: 'center' }}>
+          <Logo />
+        </div>
+
+        {/* Right Section */}
+        <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: 'clamp(8px, 2vw, 16px)', minWidth: 0 }}>
           <button
             onClick={() => router.push('/blog')}
             style={{
               background: 'none', border: 'none',
-              padding: '2px 4px', fontSize: 12, color: '#8C7A6B', cursor: 'pointer',
+              padding: '2px 0', fontSize: 'clamp(11px, 2vw, 12px)', color: '#8C7A6B', cursor: 'pointer',
               fontFamily: "'DM Sans', sans-serif", fontWeight: 500,
-              letterSpacing: '0.02em',
+              letterSpacing: '0.02em', whiteSpace: 'nowrap'
             }}
           >
             {t('blogNav')}
@@ -929,9 +989,9 @@ export default function Home() {
             onClick={() => router.push('/mes-rapports')}
             style={{
               background: 'none', border: 'none',
-              padding: '2px 4px', fontSize: 12, color: '#8C7A6B', cursor: 'pointer',
+              padding: '2px 0', fontSize: 'clamp(11px, 2vw, 12px)', color: '#8C7A6B', cursor: 'pointer',
               fontFamily: "'DM Sans', sans-serif", fontWeight: 500,
-              letterSpacing: '0.02em',
+              letterSpacing: '0.02em', whiteSpace: 'nowrap'
             }}
           >
             {t('myReportsNav')}
@@ -939,7 +999,6 @@ export default function Home() {
         </div>
       </div>
 
-      {/* ── Main content (always rendered; blurred behind overlay) ── */}
       <main
         onDrop={handleDrop}
         onDragOver={(e) => { e.preventDefault(); setDragOver(true); }}
@@ -954,148 +1013,893 @@ export default function Home() {
           userSelect: (overlayVisible && !emailCaptured) ? 'none' : 'auto',
         }}
       >
-        {/* Hero */}
-        <div style={{ textAlign: 'center', padding: '52px 24px 8px' }}>
-          <p style={{
-            fontSize: 11, letterSpacing: '0.22em', textTransform: 'uppercase',
-            fontWeight: 600, marginBottom: 14,
-            fontFamily: "'DM Sans', sans-serif",
-            background: 'linear-gradient(180deg, #2C241D 0%, #6B4828 12%, #A87449 50%, #6B4828 88%, #2C241D 100%)',
-            backgroundSize: '100% 150%',
-            WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent',
-            backgroundClip: 'text',
-            animation: 'logoShimmer 20s ease-in-out infinite',
-          }}>
-            {t('facialAestheticsAnalysis')}
-          </p>
-          <h1 style={{
-            fontFamily: "'Cormorant Garamond', serif",
-            fontSize: 'clamp(32px, 6vw, 52px)', fontWeight: 400,
-            color: '#3A2E26', lineHeight: 1.18, margin: '0 0 6px',
-          }}>
-            {t('heroLine1')}
-          </h1>
-          <h2 style={{
-            fontFamily: "'Cormorant Garamond', serif",
-            fontSize: 'clamp(20px, 3.5vw, 30px)', fontWeight: 300,
-            color: '#6B5040', lineHeight: 1.25, margin: 0,
-          }}>
-            <em>{t('heroLine2')}</em>
-          </h2>
-          <div style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', margin: '18px auto 0' }}>
-            <span style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: 8,
-              background: 'rgba(255, 255, 255, 0.48)',
-              border: '1px solid rgba(255, 255, 255, 0.65)',
-              borderRadius: 30,
-              padding: '6px 16px',
-              fontSize: 12,
-              fontWeight: 500,
-              color: '#6F6156',
-              backdropFilter: 'blur(12px)',
-              WebkitBackdropFilter: 'blur(12px)',
-              boxShadow: '0 6px 20px rgba(168, 116, 73, 0.02), inset 0 1px 0 rgba(255, 255, 255, 0.6)',
-              fontFamily: "'DM Sans', sans-serif",
-              letterSpacing: '0.01em',
-            }}>
-              <span style={{ fontSize: 7, color: '#C5A028' }}>✦</span>
-              {t('heroLine3')}
-            </span>
-          </div>
-          <p style={{
-            fontSize: 13, color: '#A2968B', margin: '6px auto 0',
-            maxWidth: 420, lineHeight: 1.6, fontFamily: "'DM Sans', sans-serif",
-          }}>
-            {t('heroDesc')}
-          </p>
-        </div>
-
-        {/* Trust row (Three separate bubbles) */}
-        <div style={{
-          display: 'flex',
-          justifyContent: 'center',
-          alignItems: 'stretch',
-          gap: 12,
-          flexWrap: 'wrap',
-          maxWidth: 600,
-          margin: '24px auto 0'
-        }}>
-          {[
-            { num: t('trust1Num'), label: t('trust1Label') },
-            { num: t('trust2Num'), label: t('trust2Label') },
-            { num: t('trust3Num'), label: t('trust3Label') },
-          ].map(({ num, label }) => (
-            <div key={label} className="bubble-nacré" style={{
-              flex: '1 1 110px',
-              textAlign: 'center',
-              padding: '12px 14px',
-              borderRadius: 24,
+        {currentStep === 'landing' ? (
+          <>
+            <style>{`
+              @keyframes float1 { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
+              @keyframes float2 { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-12px); } }
+              @keyframes float3 { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-6px); } }
+              .floating-accent {
+                position: absolute;
+                background: rgba(255, 255, 255, 0.9);
+                backdrop-filter: blur(8px);
+                -webkit-backdrop-filter: blur(8px);
+                border: 1px solid rgba(201, 169, 97, 0.2);
+                border-radius: 40px;
+                padding: 6px 12px 6px 6px;
+                display: flex;
+                align-items: center;
+                gap: 8px;
+                box-shadow: 0 8px 24px rgba(44, 36, 22, 0.08);
+                z-index: 10;
+              }
+              @media (max-width: 768px) {
+                .floating-accent.hide-mobile { display: none; }
+                .mobile-hide { display: none !important; }
+                .hero-mockup-col { margin-top: 24px; }
+              }
+              .metric-card {
+                transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+                cursor: pointer;
+              }
+              .metric-card:hover {
+                transform: translateY(-4px) scale(1.02);
+                border-color: rgba(201, 169, 97, 0.4) !important;
+                box-shadow: 0 12px 24px rgba(168, 116, 73, 0.08) !important;
+                background: rgba(255, 255, 255, 0.8) !important;
+              }
+              @keyframes dash { from { stroke-dasharray: 0 100; } }
+              @keyframes fadeInUp {
+                from { opacity: 0; transform: translateY(16px); }
+                to { opacity: 1; transform: translateY(0); }
+              }
+              @keyframes phoneFloat {
+                0%, 100% { transform: translateY(-10px); }
+                50% { transform: translateY(-20px); }
+              }
+              @keyframes glowPulse {
+                0% { box-shadow: 0 0 0 0 rgba(212, 165, 116, 0.4); }
+                70% { box-shadow: 0 0 0 12px rgba(212, 165, 116, 0); }
+                100% { box-shadow: 0 0 0 0 rgba(212, 165, 116, 0); }
+              }
+              .hero-stagger-1 { animation: fadeInUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards; opacity: 0; animation-delay: 0.1s; }
+              .hero-stagger-2 { animation: fadeInUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards; opacity: 0; animation-delay: 0.2s; }
+              .hero-stagger-3 { animation: fadeInUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards; opacity: 0; animation-delay: 0.3s; }
+              .hero-stagger-4 { animation: fadeInUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards; opacity: 0; animation-delay: 0.4s; }
+              .premium-cta-primary {
+                background: linear-gradient(135deg, #2C2416 0%, #1A150C 100%) !important;
+                color: #FFFFFF !important;
+                border-radius: 100px !important;
+                box-shadow: 0 8px 24px rgba(44, 36, 22, 0.2) !important;
+                transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
+                cursor: pointer;
+              }
+              .premium-cta-primary:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 12px 32px rgba(44, 36, 22, 0.3) !important;
+              }
+              .premium-cta-secondary {
+                background: rgba(255, 255, 255, 0.7) !important;
+                color: #2C2416 !important;
+                border: 1px solid rgba(212, 165, 116, 0.3) !important;
+                border-radius: 100px !important;
+                transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
+                cursor: pointer;
+                backdrop-filter: blur(8px);
+                -webkit-backdrop-filter: blur(8px);
+              }
+              .premium-cta-secondary:hover {
+                transform: translateY(-2px);
+                background: rgba(255, 255, 255, 0.95) !important;
+                border-color: rgba(212, 165, 116, 0.6) !important;
+                box-shadow: 0 8px 24px rgba(212, 165, 116, 0.12) !important;
+              }
+            `}</style>
+            {/* ═══ HERO: Two-column layout on desktop ═══ */}
+            <div style={{
+              maxWidth: 1080,
+              margin: '0 auto',
+              padding: '48px 24px 0',
               display: 'flex',
-              flexDirection: 'column',
+              flexWrap: 'wrap',
+              alignItems: 'center',
+              gap: 'clamp(32px, 4vw, 56px)',
               justifyContent: 'center',
-              alignItems: 'center'
             }}>
+              {/* LEFT COLUMN: Hook + Upload */}
               <div style={{
-                fontSize: 22,
-                fontWeight: 500,
-                fontFamily: "'Cormorant Garamond', serif",
-                background: 'linear-gradient(90deg, #A87449 0%, #D4A574 100%)',
-                WebkitBackgroundClip: 'text',
-                WebkitTextFillColor: 'transparent',
-                backgroundClip: 'text',
+                flex: '1 1 340px',
+                maxWidth: 520,
+                textAlign: 'left',
               }}>
-                {num}
+                <p className="hero-stagger-1" style={{
+                  fontSize: 11, letterSpacing: '0.22em', textTransform: 'uppercase',
+                  fontWeight: 700, marginBottom: 14,
+                  fontFamily: "'DM Sans', sans-serif",
+                  color: '#D4A574',
+                }}>
+                  {t('facialAestheticsAnalysis')}
+                </p>
+                <h1 className="hero-stagger-1 hero-h1" style={{
+                  fontFamily: "'Cormorant Garamond', serif",
+                  fontSize: 'clamp(32px, 6vw, 52px)', fontWeight: 400,
+                  color: '#2C2416', lineHeight: 1.18, margin: '0 0 10px',
+                }}>
+                  {t('landingHook')}
+                </h1>
+                <h2 className="hero-stagger-2 hero-h2" style={{
+                  fontFamily: "'Cormorant Garamond', serif",
+                  fontSize: 'clamp(20px, 3.5vw, 24px)',
+                  fontStyle: 'italic',
+                  color: '#D4A574',
+                  margin: '0 0 16px',
+                  fontWeight: 400
+                }}>
+                  {lang === 'fr' ? 'Diagnostic facial IA · Score & conseils personnalisés' : 'AI facial diagnosis · Score & personalized advice'}
+                </h2>
+                <div className="hero-stagger-2" style={{ display: 'inline-flex', alignItems: 'center', gap: 6, marginBottom: 20, padding: '6px 12px', background: 'rgba(212, 165, 116, 0.08)', borderRadius: 20, border: '1px solid rgba(212, 165, 116, 0.2)' }}>
+                  <span style={{ color: '#D4A574', fontSize: 14 }}>✦</span>
+                  <span style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 11, fontWeight: 700, letterSpacing: '0.05em', color: '#D4A574', textTransform: 'uppercase' }}>
+                    {lang === 'fr' ? 'Analyse gratuite · Rapport complet dès 7,99€' : 'Free analysis · Full report from €7.99'}
+                  </span>
+                </div>
+                <p className="hero-stagger-3 hero-p" style={{
+                  fontFamily: "'DM Sans', sans-serif",
+                  fontSize: 'clamp(16px, 2.5vw, 17px)',
+                  fontWeight: 400,
+                  color: '#2C2416',
+                  lineHeight: 1.5,
+                  margin: '0 0 32px',
+                  letterSpacing: '0.01em',
+                }}>
+                  {lang === 'fr' ? (
+                    <>Le vrai problème de ta peau n'est peut-être pas <strong style={{ fontWeight: 700 }}>celui que tu crois.</strong></>
+                  ) : (
+                    <>Your real skin issue might not be <strong style={{ fontWeight: 700 }}>what you think.</strong></>
+                  )}
+                </p>
+
+                {/* Upload Zone */}
+                <div className="hero-stagger-4" style={{
+                  padding: '24px 20px 28px',
+                  borderRadius: 28,
+                  border: '1px solid rgba(201, 169, 97, 0.15)',
+                  background: 'linear-gradient(180deg, rgba(255, 255, 255, 0.42) 0%, rgba(248, 244, 237, 0.18) 100%)',
+                  boxShadow: '0 16px 40px rgba(168, 116, 73, 0.02)',
+                  position: 'relative',
+                  overflow: 'hidden'
+                }}>
+                  {/* Filigree brand flower decoration */}
+                  <div style={{ position: 'absolute', top: -40, right: -40, opacity: 0.03, pointerEvents: 'none' }}>
+                    <LuxuryFlower width={200} height={200} />
+                  </div>
+
+                  <div
+                    onClick={(e) => !imageUrl && fileInputRef.current?.click()}
+                    className="card-nacré hero-upload-box"
+                    style={{
+                      border: dragOver ? `1.5px solid ${GOLD}` : '1px solid rgba(201, 169, 97, 0.22)',
+                      boxShadow: dragOver
+                        ? 'inset 0 0 0 2px #C5A028, inset 0 4px 12px rgba(0,0,0,0.02)'
+                        : '0 12px 32px rgba(168, 116, 73, 0.04), inset 0 1px 0 rgba(255, 255, 255, 0.95)',
+                      borderRadius: 22,
+                      padding: imageUrl ? 0 : '40px 24px',
+                      textAlign: 'center',
+                      cursor: imageUrl ? 'default' : 'pointer',
+                      background: dragOver ? 'rgba(255, 255, 255, 0.75)' : 'rgba(255, 255, 255, 0.85)',
+                      transition: 'all 0.35s cubic-bezier(0.4,0,0.2,1)',
+                      overflow: 'hidden',
+                      position: 'relative',
+                      zIndex: 1,
+                    }}
+                  >
+                    {imageUrl ? (
+                      <div style={{ position: 'relative' }}>
+                        <img
+                          src={imageUrl} alt="Preview"
+                          style={{ width: '100%', maxHeight: 340, objectFit: 'cover', display: 'block', borderRadius: 16 }}
+                        />
+                        <button
+                          onClick={(e) => { e.stopPropagation(); fileInputRef.current?.click(); }}
+                          style={{
+                            position: 'absolute', bottom: 12, right: 12,
+                            background: 'rgba(13,13,13,0.82)', color: '#fff',
+                            border: 'none', borderRadius: 8, padding: '7px 14px',
+                            fontSize: 12, cursor: 'pointer', fontFamily: "'DM Sans', sans-serif",
+                          }}
+                        >
+                          {t('changePhoto')}
+                        </button>
+                      </div>
+                    ) : (
+                      <>
+                        {/* Elegant camera icon */}
+                        <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 16 }}>
+                          <svg width="44" height="44" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ display: 'block' }}>
+                            <path d="M14 14L16.3 10.5C16.8 9.8 17.5 9.4 18.3 9.4H29.7C30.5 9.4 31.2 9.8 31.7 10.5L34 14M10 14H38C40.2 14 42 15.8 42 18V37C42 39.2 40.2 41 38 41H10C7.8 41 6 39.2 6 37V18C6 15.8 7.8 14 10 14Z" stroke="#C9A961" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                            <circle cx="24" cy="27" r="7.5" stroke="#C9A961" strokeWidth="1.5" />
+                            <circle cx="24" cy="27" r="1.8" fill="#C9A961" />
+                            <path d="M24 23.5v7M20.5 27h7" stroke="#C9A961" strokeWidth="1.2" strokeLinecap="round" />
+                            <circle cx="35" cy="19.5" r="1" fill="#C9A961" />
+                          </svg>
+                        </div>
+                        <h3 className="hero-upload-title" style={{ margin: '0 0 8px', fontSize: 20, color: '#2C2416', fontWeight: 700, fontFamily: "'Cormorant Garamond', serif" }}>
+                          {lang === 'fr' ? 'Découvre ton score de peau en 30 secondes' : 'Discover your skin score in 30 seconds'}
+                        </h3>
+                        <p style={{ margin: '0 0 20px', fontSize: 13, color: '#5C4A3A', fontWeight: 500, fontFamily: "'DM Sans', sans-serif" }}>
+                          {lang === 'fr' ? 'Glisse ta photo ici, ou' : 'Drop your photo here, or'}
+                        </p>
+                        
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: 12, alignItems: 'center', width: '100%', marginBottom: 16 }}>
+                          <button
+                            onClick={(e) => { e.stopPropagation(); fileInputRef.current?.click(); }}
+                            className="premium-cta-primary"
+                            style={{ border: 'none', width: '100%', maxWidth: 280, fontSize: 14, fontWeight: 600, padding: '14px 24px', animation: 'glowPulse 2.5s infinite' }}
+                          >
+                            {lang === 'fr' ? 'Obtenir mon score gratuit →' : 'Get my free score →'}
+                          </button>
+                          <button
+                            onClick={(e) => { e.stopPropagation(); startCamera(); }}
+                            className="premium-cta-secondary"
+                            style={{ width: '100%', maxWidth: 280, fontSize: 14, fontWeight: 600, padding: '14px 24px' }}
+                          >
+                            {lang === 'fr' ? 'Prendre une photo' : 'Take a photo'}
+                          </button>
+                        </div>
+                        
+                        <div style={{ fontSize: 10.5, color: '#8A7A6B', fontWeight: 500, fontFamily: "'DM Sans', sans-serif", display: 'flex', flexDirection: 'column', gap: 8 }}>
+                          <p style={{ margin: 0, letterSpacing: '0.02em' }}>
+                            {lang === 'fr' ? 'Gratuit · résultat en ~30s · sans inscription · photos jamais stockées' : 'Free · ~30s result · no sign-up · photos never stored'}
+                          </p>
+                          <div style={{ width: 30, height: 1, background: 'rgba(212, 165, 116, 0.3)', margin: '0 auto' }}></div>
+                          <p style={{ margin: 0, textTransform: 'uppercase', letterSpacing: '0.05em', fontSize: 9.5 }}>
+                            {lang === 'fr' ? 'Portrait · bien éclairé · sans lunettes' : 'Portrait · well lit · no glasses'}
+                          </p>
+                        </div>
+                      </>
+                    )}
+                  </div>
+
+                  <input ref={fileInputRef} type="file" accept="image/*" style={{ display: 'none' }}
+                    onChange={(e) => processFile(e.target.files[0])} />
+                  <input ref={cameraInputRef} type="file" accept="image/*" capture="user" style={{ display: 'none' }}
+                    onChange={(e) => processFile(e.target.files[0])} />
+                </div>
               </div>
-              <div style={{
-                fontSize: 9,
-                color: '#8C7A6B',
-                letterSpacing: '0.06em',
-                textTransform: 'uppercase',
-                marginTop: 2,
-                fontFamily: "'DM Sans', sans-serif",
-                fontWeight: 600,
-                lineHeight: 1.3
+
+              {/* RIGHT COLUMN: Phone mockup showing the report */}
+              <div className="hero-mockup-col" style={{
+                flex: '0 1 380px',
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
+                position: 'relative',
               }}>
-                {label}
+                {renderFloatingAccent(lang === 'fr' ? 'Hydratation' : 'Hydration', 78, '#7DBFA8', { top: '15%', left: '-5%' }, 'mobile-float-bubble mobile-float-bubble-1', 'float1')}
+                {renderFloatingAccent(lang === 'fr' ? 'Éclat' : 'Radiance', 65, '#C9A961', { top: '45%', right: '-10%' }, 'mobile-float-bubble mobile-float-bubble-2', 'float2')}
+                {renderFloatingAccent(lang === 'fr' ? 'Pores' : 'Pores', 82, '#D4A574', { bottom: '20%', left: '-2%' }, 'mobile-float-bubble mobile-float-bubble-3', 'float3')}
+                {/* Extra bubbles for mobile */}
+                {renderFloatingAccent(lang === 'fr' ? 'Fermeté' : 'Firmness', 71, '#A87449', { bottom: '5%', right: '-5%' }, 'hide-desktop mobile-float-bubble mobile-float-bubble-4', 'float1')}
+                {renderFloatingAccent(lang === 'fr' ? 'Rougeurs' : 'Redness', 89, '#D4A574', { top: '-2%', right: '15%' }, 'hide-desktop mobile-float-bubble mobile-float-bubble-5', 'float2')}
+
+                <img 
+                  src="/hero-mockup.png" 
+                  alt="Rate My Skin Report Preview" 
+                  style={{
+                    width: '100%',
+                    maxWidth: 380,
+                    height: 'auto',
+                    objectFit: 'contain',
+                    animation: 'phoneFloat 6s ease-in-out infinite',
+                  }}
+                />
               </div>
             </div>
-          ))}
-        </div>
 
-        {/* Upload + skin concern */}
-        <div style={{ maxWidth: 480, margin: '32px auto 0', padding: '0 20px 60px' }}>
+            {/* ═══ Trust row ═══ */}
+            <div className="trust-row" style={{
+              display: 'flex',
+              justifyContent: 'center',
+              alignItems: 'center',
+              gap: 16,
+              flexWrap: 'wrap',
+              maxWidth: 700,
+              margin: '40px auto 0',
+              padding: '0 24px',
+            }}>
+              {[
+                { num: t('trust1Num'), label: t('trust1Label') },
+                { num: t('trust2Num'), label: t('trust2Label') },
+                { num: t('trust3Num'), label: t('trust3Label') },
+              ].map(({ num, label }) => (
+                <div key={label} className="trust-badge" style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 8,
+                  background: 'rgba(255, 255, 255, 0.45)',
+                  border: '1px solid rgba(212, 165, 116, 0.25)',
+                  borderRadius: 100,
+                  padding: '6px 16px',
+                  boxShadow: '0 4px 12px rgba(168, 116, 73, 0.03)',
+                  backdropFilter: 'blur(10px)',
+                  WebkitBackdropFilter: 'blur(10px)',
+                }}>
+                  <span style={{ color: '#D4A574', fontSize: 12 }}>✦</span>
+                  <div style={{ display: 'flex', alignItems: 'baseline', gap: 6 }}>
+                    <span className="trust-num" style={{
+                      fontSize: 16,
+                      fontWeight: 600,
+                      fontFamily: "'Cormorant Garamond', serif",
+                      color: '#D4A574',
+                    }}>
+                      {num}
+                    </span>
+                    <span className="trust-label" style={{
+                      fontSize: 10.5,
+                      fontWeight: 700,
+                      letterSpacing: '0.04em',
+                      textTransform: 'uppercase',
+                      color: '#2C2416',
+                      fontFamily: "'DM Sans', sans-serif"
+                    }}>
+                      {label}
+                    </span>
+                  </div>
+                </div>
+              ))}
+            </div>
 
-          {/* Photo tip */}
-          <p style={{
-            margin: '0 0 12px', fontSize: 12, color: '#A87449',
-            fontFamily: "'DM Sans', sans-serif", textAlign: 'center',
-            lineHeight: 1.5, letterSpacing: '0.01em',
-          }}>
-            {t('photoTip')}
-          </p>
+            {/* ═══ Une analyse complète ═══ */}
+            <div style={{
+              maxWidth: 1080,
+              margin: '80px auto 0',
+              padding: '0 24px',
+              fontFamily: "'DM Sans', sans-serif",
+              display: 'flex',
+              flexWrap: 'wrap',
+              gap: 40,
+              alignItems: 'center',
+            }}>
+              {/* Left Column: Title and Explanation Box */}
+              <div style={{ flex: '1 1 300px', maxWidth: 500 }}>
+                <h2 style={{
+                  fontFamily: "'Cormorant Garamond', serif",
+                  fontSize: 'clamp(26px, 4vw, 36px)',
+                  fontWeight: 400,
+                  color: '#3A2E26',
+                  margin: '0 0 24px',
+                  lineHeight: 1.15
+                }}>
+                  {lang === 'fr' ? 'Une analyse complète de ta peau' : 'A complete skin analysis'}
+                </h2>
+                
+                <div style={{
+                  background: 'rgba(255,255,255,0.7)',
+                  borderLeft: '3px solid #D4A574',
+                  padding: '20px 24px',
+                  borderRadius: '0 16px 16px 0',
+                  boxShadow: '0 8px 24px rgba(168,116,73,0.03)',
+                  backdropFilter: 'blur(10px)',
+                  WebkitBackdropFilter: 'blur(10px)',
+                }}>
+                  <h4 style={{ margin: '0 0 8px', color: '#2C2416', fontSize: 15, fontWeight: 700 }}>
+                    {lang === 'fr' ? 'Pourquoi 8 métriques ?' : 'Why 8 metrics?'}
+                  </h4>
+                  <p style={{ margin: 0, fontSize: 14, color: '#5C4A3A', lineHeight: 1.5 }}>
+                    {lang === 'fr' 
+                      ? "Un bouton ou une rougeur ne sont que des symptômes. En croisant l'hydratation, les pores, le relief ou encore les taches sous-jacentes, l'IA dresse un bilan ultra-précis de l'écosystème de ta peau. C'est la clé pour arrêter de deviner et utiliser enfin les actifs qui te correspondent." 
+                      : "A blemish or redness are just symptoms. By cross-referencing hydration, pores, texture, or underlying spots, the AI creates an ultra-precise assessment of your skin's ecosystem. It's the key to stop guessing and finally use the active ingredients that work for you."}
+                  </p>
+                </div>
+              </div>
 
-          {/* Upload zone */}
-          <div
-            onClick={(e) => !imageUrl && fileInputRef.current?.click()}
-            className="card-nacré"
-            style={{
-              border: dragOver ? `1.5px solid ${GOLD}` : undefined,
-              boxShadow: dragOver
-                ? 'inset 0 0 0 2px #C5A028, inset 0 4px 12px rgba(0,0,0,0.02)'
-                : undefined,
-              borderRadius: 24,
-              padding: imageUrl ? 0 : '40px 24px',
-              textAlign: 'center',
-              cursor: imageUrl ? 'default' : 'pointer',
-              background: dragOver ? 'rgba(255, 255, 255, 0.65)' : undefined,
-              transition: 'all 0.35s cubic-bezier(0.4,0,0.2,1)',
-              overflow: 'hidden',
-            }}
-          >
-            {imageUrl ? (
-              <div style={{ position: 'relative' }}>
+              {/* Right Column: The Densely Packed Metrics */}
+              <div style={{
+                flex: '2 1 400px',
+                display: 'grid',
+                gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))',
+                gap: '20px 12px',
+              }}>
+                {[
+                  { id: 'hydratation', label: lang === 'fr' ? 'Hydratation' : 'Hydration', color: '#7DBFA8', val: 78, status: lang === 'fr' ? 'À SURVEILLER' : 'MONITOR', statusColor: 'amber', shortLine: lang === 'fr' ? 'Manque de lipides' : 'Lacking lipids' },
+                  { id: 'pores', label: lang === 'fr' ? 'Pores' : 'Pores', color: '#D4A574', val: 58, status: lang === 'fr' ? 'À TRAVAILLER' : 'NEEDS WORK', statusColor: 'pink', shortLine: lang === 'fr' ? 'Légèrement dilatés' : 'Slightly enlarged' },
+                  { id: 'eclat', label: lang === 'fr' ? 'Éclat' : 'Radiance', color: '#C9A961', val: 65, status: lang === 'fr' ? 'À SURVEILLER' : 'MONITOR', statusColor: 'amber', shortLine: lang === 'fr' ? 'Teint un peu terne' : 'Slightly dull' },
+                  { id: 'acne', label: lang === 'fr' ? 'Acné' : 'Acne', color: '#7DBFA8', val: 82, status: lang === 'fr' ? 'BON' : 'GOOD', statusColor: 'green', shortLine: lang === 'fr' ? 'Peau nette' : 'Clear skin' },
+                  { id: 'taches', label: lang === 'fr' ? 'Taches' : 'Dark spots', color: '#B0885E', val: 70, status: lang === 'fr' ? 'À SURVEILLER' : 'MONITOR', statusColor: 'amber', shortLine: lang === 'fr' ? 'Début de taches' : 'Early spots' },
+                  { id: 'cernes', label: lang === 'fr' ? 'Cernes' : 'Dark circles', color: '#8C7A6B', val: 62, status: lang === 'fr' ? 'À SURVEILLER' : 'MONITOR', statusColor: 'amber', shortLine: lang === 'fr' ? 'Ombres visibles' : 'Visible shadows' },
+                  { id: 'symetrie', label: lang === 'fr' ? 'Symétrie' : 'Symmetry', color: '#A87449', val: 85, status: lang === 'fr' ? 'BON' : 'GOOD', statusColor: 'green', shortLine: lang === 'fr' ? 'Très harmonieux' : 'Very harmonious' },
+                  { id: 'age', label: lang === 'fr' ? 'Âge estimé' : 'Estimated age', color: '#C5A028', val: 26, isValue: true, status: lang === 'fr' ? 'BON' : 'GOOD', statusColor: 'green', shortLine: lang === 'fr' ? 'Signes très discrets' : 'Very faint signs' },
+                ].map((m) => (
+                  <div key={m.id} className="metric-card" style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 12,
+                    padding: '8px 12px',
+                    borderRadius: 12,
+                    border: '1px solid transparent',
+                    transition: 'all 0.3s ease',
+                    cursor: 'default'
+                  }}>
+                    <div style={{ position: 'relative', width: 40, height: 40, flexShrink: 0 }}>
+                      {m.isValue ? (
+                        <div style={{
+                          width: '100%', height: '100%', borderRadius: '50%',
+                          border: `2px solid ${m.color}`,
+                          display: 'flex', alignItems: 'center', justifyContent: 'center',
+                          fontSize: 16, fontWeight: 600, color: '#2C2416', fontFamily: "'Cormorant Garamond', serif"
+                        }}>
+                          {m.val}
+                        </div>
+                      ) : (
+                        <>
+                          <svg width="40" height="40" viewBox="0 0 40 40" style={{ transform: 'rotate(-90deg)' }}>
+                            <circle cx="20" cy="20" r="17" fill="none" stroke="rgba(201,169,97,0.15)" strokeWidth="2.5" />
+                            <circle cx="20" cy="20" r="17" fill="none" stroke={m.color} strokeWidth="2.5"
+                              strokeDasharray={`${2 * Math.PI * 17 * (m.val / 100)} ${2 * Math.PI * 17}`}
+                              strokeLinecap="round"
+                              style={{ animation: 'dash 1.5s ease-out forwards' }} />
+                          </svg>
+                          <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 13, fontWeight: 700, color: '#2C2416' }}>
+                            {m.val}
+                          </div>
+                        </>
+                      )}
+                    </div>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 2, minWidth: 0 }}>
+                      <h4 style={{ margin: '0 0 2px', fontSize: 14, fontWeight: 600, color: '#2C2416' }}>{m.label}</h4>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap' }}>
+                        {m.status && (
+                           <span style={{
+                             background: m.statusColor === 'green' ? 'rgba(125,191,168,0.1)' : 
+                                         m.statusColor === 'amber' ? 'rgba(212, 165, 116, 0.15)' : 
+                                         'rgba(216, 134, 157, 0.1)',
+                             color: m.statusColor === 'green' ? '#4D8C76' : 
+                                    m.statusColor === 'amber' ? '#B0885E' : 
+                                    '#B85C75',
+                             fontSize: 8.5, fontWeight: 700, padding: '3px 6px',
+                             borderRadius: 6, letterSpacing: '0.05em', lineHeight: 1,
+                             whiteSpace: 'nowrap'
+                           }}>
+                             {m.status}
+                           </span>
+                        )}
+                        {m.shortLine && (
+                           <span style={{ fontSize: 11, color: '#5C4A3A', fontWeight: 500, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                             {m.shortLine}
+                           </span>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              {/* Product preview */}
+              <div style={{
+                width: '100%',
+                marginTop: 40,
+                padding: 'clamp(24px, 5vw, 40px) clamp(16px, 4vw, 32px)',
+                borderRadius: 24,
+                background: 'linear-gradient(135deg, rgba(255,255,255,0.7) 0%, rgba(248,244,237,0.5) 100%)',
+                border: '1px solid rgba(201,169,97,0.2)',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: 'clamp(24px, 4vw, 32px)',
+                boxSizing: 'border-box'
+              }}>
+                <div style={{ textAlign: 'center', maxWidth: 680, margin: '0 auto' }}>
+                  <span style={{ fontSize: 9, fontWeight: 700, letterSpacing: '0.22em', textTransform: 'uppercase', color: '#D4A574', marginBottom: 12, display: 'inline-block' }}>
+                    {lang === 'fr' ? 'TA ROUTINE SUR-MESURE' : 'YOUR BESPOKE ROUTINE'}
+                  </span>
+                  <h4 style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: 'clamp(24px, 4vw, 32px)', fontWeight: 600, color: '#2C2416', margin: '0 0 16px', lineHeight: 1.2 }}>
+                    {lang === 'fr' ? 'Une routine construite sur ta peau réelle' : 'A routine built on your real skin'}
+                  </h4>
+                  <p style={{ fontSize: 15, color: '#5C4A3A', margin: 0, lineHeight: 1.6 }}>
+                    {lang === 'fr' 
+                      ? "Pas un quiz. Pas les conseils génériques d'un influenceur. L'IA lit 8 métriques directement sur ton visage — hydratation, pores, taches, éclat — et compose la routine et les produits faits pour TES besoins, zone par zone. Ce que tu vois ici n'est qu'un exemple : la tienne sera unique." 
+                      : "Not a quiz. Not generic influencer advice. The AI reads 8 metrics directly on your face — hydration, pores, dark spots, radiance — and curates the routine and products made for YOUR needs, zone by zone. What you see here is just an example: yours will be unique."}
+                  </p>
+                </div>
+
+                {/* The Teaser Routine Container */}
+                <div style={{ position: 'relative', width: '100%', maxWidth: 640, margin: '0 auto', background: '#fff', borderRadius: 24, boxShadow: '0 12px 40px rgba(44,36,22,0.06)', border: '1px solid rgba(201,169,97,0.15)', overflow: 'hidden' }}>
+                  
+                  {/* TABS */}
+                  <div style={{ display: 'flex', borderBottom: '1px solid rgba(201,169,97,0.1)', background: 'linear-gradient(180deg, rgba(255,255,255,1) 0%, rgba(248,244,237,0.3) 100%)' }}>
+                    <button 
+                      onClick={() => setRoutineTeaserTab('morning')}
+                      style={{ flex: 1, padding: '20px 16px', background: 'none', border: 'none', borderBottom: routineTeaserTab === 'morning' ? '2px solid #D4A574' : '2px solid transparent', cursor: 'pointer', transition: 'all 0.2s', display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 8 }}
+                    >
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={routineTeaserTab === 'morning' ? '#D4A574' : '#8C7A6B'} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+                      <span style={{ fontSize: 13, fontWeight: 700, letterSpacing: '0.15em', color: routineTeaserTab === 'morning' ? '#D4A574' : '#8C7A6B' }}>
+                        {lang === 'fr' ? 'MATIN' : 'MORNING'}
+                      </span>
+                    </button>
+                    <button 
+                      onClick={() => setRoutineTeaserTab('evening')}
+                      style={{ flex: 1, padding: '20px 16px', background: 'none', border: 'none', borderBottom: routineTeaserTab === 'evening' ? '2px solid #D4A574' : '2px solid transparent', cursor: 'pointer', transition: 'all 0.2s', display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 8 }}
+                    >
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={routineTeaserTab === 'evening' ? '#D4A574' : '#8C7A6B'} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+                      <span style={{ fontSize: 13, fontWeight: 700, letterSpacing: '0.15em', color: routineTeaserTab === 'evening' ? '#D4A574' : '#8C7A6B' }}>
+                        {lang === 'fr' ? 'SOIR' : 'EVENING'}
+                      </span>
+                    </button>
+                  </div>
+
+                  {/* Steps Wrapper */}
+                  <div style={{ padding: 'clamp(20px, 4vw, 32px)', position: 'relative', maxHeight: 520, overflow: 'hidden' }}>
+                    
+                    {routineTeaserTab === 'morning' ? (
+                      <>
+                        {/* MORNING CONTENT */}
+                        <div style={{ marginBottom: 32 }}>
+                          <div style={{ display: 'flex', alignItems: 'baseline', gap: 12, marginBottom: 16 }}>
+                            <span style={{ fontSize: 18, fontFamily: "'Cormorant Garamond', serif", color: '#C9A961', fontWeight: 600 }}>01</span>
+                            <h6 style={{ margin: 0, fontSize: 18, color: '#2C2416', fontWeight: 600 }}>{lang === 'fr' ? 'Nettoyer en douceur' : 'Gentle Cleanse'}</h6>
+                          </div>
+                          
+                          {teaserProducts?.morningCleanser && (
+                            <ProductCard 
+                              product={teaserProducts.morningCleanser} 
+                              lang={lang} 
+                              t={t} 
+                              userSkinType={teaserProducts.morningCleanser.skin_types?.[0] || teaserProducts.morningCleanser.skinTypes?.[0] || 'oily'} 
+                              userConcerns={teaserProducts.morningCleanser.skin_problem ? [teaserProducts.morningCleanser.skin_problem] : (teaserProducts.morningCleanser.concerns ? [teaserProducts.morningCleanser.concerns[0]] : ['acne'])} 
+                            />
+                          )}
+
+                          <div style={{ marginTop: 12, background: '#FAF6F0', border: '1px solid rgba(212,165,116,0.3)', borderRadius: 12, padding: '12px 16px', display: 'flex', gap: 12, alignItems: 'flex-start' }}>
+                            <div style={{ fontSize: 16 }}>💡</div>
+                            <div style={{ fontSize: 13, color: '#5C4A3A', lineHeight: 1.5 }}>
+                              <strong style={{ color: '#2C2416', display: 'block', marginBottom: 2 }}>{lang === 'fr' ? "Conseil de l'IA" : "AI Coaching"}</strong>
+                              {lang === 'fr' 
+                                ? "Masse 60 secondes sur peau humide pour dissoudre l'excès de sébum détecté sur la zone T, puis rince à l'eau tiède."
+                                : "Massage for 60 seconds on damp skin to dissolve the excess sebum detected on your T-zone, then rinse with lukewarm water."}
+                            </div>
+                          </div>
+                        </div>
+
+                        <div style={{ marginBottom: 40 }}>
+                          <div style={{ display: 'flex', alignItems: 'baseline', gap: 12, marginBottom: 16 }}>
+                            <span style={{ fontSize: 18, fontFamily: "'Cormorant Garamond', serif", color: '#C9A961', fontWeight: 600 }}>02</span>
+                            <h6 style={{ margin: 0, fontSize: 18, color: '#2C2416', fontWeight: 600 }}>{lang === 'fr' ? 'Cibler l\'éclat' : 'Target Radiance'}</h6>
+                          </div>
+                          
+                          {teaserProducts?.morningSerum && (
+                            <ProductCard 
+                              product={teaserProducts.morningSerum} 
+                              lang={lang} 
+                              t={t} 
+                              userSkinType={teaserProducts.morningSerum.skin_types?.[0] || teaserProducts.morningSerum.skinTypes?.[0] || 'oily'} 
+                              userConcerns={teaserProducts.morningSerum.skin_problem ? [teaserProducts.morningSerum.skin_problem] : (teaserProducts.morningSerum.concerns ? [teaserProducts.morningSerum.concerns[0]] : ['hyperpigmentation'])} 
+                            />
+                          )}
+
+                          <div style={{ marginTop: 12, background: '#FAF6F0', border: '1px solid rgba(212,165,116,0.3)', borderRadius: 12, padding: '12px 16px', display: 'flex', gap: 12, alignItems: 'flex-start' }}>
+                            <div style={{ fontSize: 16 }}>⏱️</div>
+                            <div style={{ fontSize: 13, color: '#5C4A3A', lineHeight: 1.5 }}>
+                              <strong style={{ color: '#2C2416', display: 'block', marginBottom: 2 }}>{lang === 'fr' ? "Application" : "Application"}</strong>
+                              {lang === 'fr' 
+                                ? "Applique 3 à 4 gouttes. Laisse absorber 2 minutes avant de passer à l'hydratation pour maximiser son effet antioxydant."
+                                : "Apply 3 to 4 drops. Let it absorb for 2 minutes before moisturizing to maximize its antioxidant effect."}
+                            </div>
+                          </div>
+                        </div>
+                      </>
+                    ) : (
+                      <>
+                        {/* EVENING CONTENT */}
+                        <div style={{ marginBottom: 32 }}>
+                          <div style={{ display: 'flex', alignItems: 'baseline', gap: 12, marginBottom: 16 }}>
+                            <span style={{ fontSize: 18, fontFamily: "'Cormorant Garamond', serif", color: '#C9A961', fontWeight: 600 }}>01</span>
+                            <h6 style={{ margin: 0, fontSize: 18, color: '#2C2416', fontWeight: 600 }}>{lang === 'fr' ? 'Double nettoyage' : 'Double Cleanse'}</h6>
+                          </div>
+                          
+                          {teaserProducts?.eveningCleanser && (
+                            <ProductCard 
+                              product={teaserProducts.eveningCleanser} 
+                              lang={lang} 
+                              t={t} 
+                              userSkinType={teaserProducts.eveningCleanser.skin_types?.[0] || teaserProducts.eveningCleanser.skinTypes?.[0] || 'oily'} 
+                              userConcerns={teaserProducts.eveningCleanser.skin_problem ? [teaserProducts.eveningCleanser.skin_problem] : (teaserProducts.eveningCleanser.concerns ? [teaserProducts.eveningCleanser.concerns[0]] : ['acne'])} 
+                            />
+                          )}
+
+                          <div style={{ marginTop: 12, background: '#FAF6F0', border: '1px solid rgba(212,165,116,0.3)', borderRadius: 12, padding: '12px 16px', display: 'flex', gap: 12, alignItems: 'flex-start' }}>
+                            <div style={{ fontSize: 16 }}>💡</div>
+                            <div style={{ fontSize: 13, color: '#5C4A3A', lineHeight: 1.5 }}>
+                              <strong style={{ color: '#2C2416', display: 'block', marginBottom: 2 }}>{lang === 'fr' ? "Conseil de l'IA" : "AI Coaching"}</strong>
+                              {lang === 'fr' 
+                                ? "Masse sur peau sèche pendant 60 secondes. Les huiles du baume vont dissoudre tes bouchons de sébum incrustés dans les pores, puis rince."
+                                : "Massage on dry skin for 60 seconds. The balm's oils will dissolve the sebum plugs in your pores, then rinse."}
+                            </div>
+                          </div>
+                        </div>
+
+                        <div style={{ marginBottom: 40 }}>
+                          <div style={{ display: 'flex', alignItems: 'baseline', gap: 12, marginBottom: 16 }}>
+                            <span style={{ fontSize: 18, fontFamily: "'Cormorant Garamond', serif", color: '#C9A961', fontWeight: 600 }}>02</span>
+                            <h6 style={{ margin: 0, fontSize: 18, color: '#2C2416', fontWeight: 600 }}>{lang === 'fr' ? 'Traiter & Réparer' : 'Treat & Repair'}</h6>
+                          </div>
+                          
+                          {teaserProducts?.eveningTreatment && (
+                            <ProductCard 
+                              product={teaserProducts.eveningTreatment} 
+                              lang={lang} 
+                              t={t} 
+                              userSkinType={teaserProducts.eveningTreatment.skin_types?.[0] || teaserProducts.eveningTreatment.skinTypes?.[0] || 'oily'} 
+                              userConcerns={teaserProducts.eveningTreatment.skin_problem ? [teaserProducts.eveningTreatment.skin_problem] : (teaserProducts.eveningTreatment.concerns ? [teaserProducts.eveningTreatment.concerns[0]] : ['acne'])} 
+                            />
+                          )}
+
+                          <div style={{ marginTop: 12, background: '#FAF6F0', border: '1px solid rgba(212,165,116,0.3)', borderRadius: 12, padding: '12px 16px', display: 'flex', gap: 12, alignItems: 'flex-start' }}>
+                            <div style={{ fontSize: 16 }}>⚠️</div>
+                            <div style={{ fontSize: 13, color: '#5C4A3A', lineHeight: 1.5 }}>
+                              <strong style={{ color: '#2C2416', display: 'block', marginBottom: 2 }}>{lang === 'fr' ? "Application progressive" : "Progressive Application"}</strong>
+                              {lang === 'fr' 
+                                ? "Ne commence qu'avec 2 soirs par semaine ! Ton scan montre de légers signes de fragilité cutanée, on y va doucement."
+                                : "Start with only 2 nights a week! Your scan shows slight signs of skin fragility, we need to build tolerance slowly."}
+                            </div>
+                          </div>
+                        </div>
+                      </>
+                    )}
+                    
+                    {/* Overlay Lock UI */}
+                    <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: 280, background: 'linear-gradient(to bottom, rgba(255,255,255,0) 0%, rgba(255,255,255,0.9) 35%, rgba(255,255,255,1) 100%)', zIndex: 10, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'flex-end', paddingBottom: 24 }}>
+                       <div style={{ background: '#fff', border: '1px solid rgba(201,169,97,0.3)', borderRadius: 16, padding: '24px 20px', textAlign: 'center', boxShadow: '0 12px 30px rgba(44,36,22,0.08)', width: 'calc(100% - 48px)', maxWidth: 360 }}>
+                         <div style={{ background: '#F8F4ED', width: 48, height: 48, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 16px' }}>
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#D4A574" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+                         </div>
+                         <h4 style={{ margin: '0 0 8px', color: '#2C2416', fontSize: 18, fontWeight: 700 }}>{lang === 'fr' ? 'Débloque ta routine' : 'Unlock your routine'}</h4>
+                         <p style={{ margin: '0 0 20px', color: '#5C4A3A', fontSize: 13, lineHeight: 1.4 }}>
+                           {lang === 'fr' ? 'Matin & soir, étapes complètes et conseils.' : 'AM & PM, full steps and tips.'}
+                         </p>
+                         <button
+                           onClick={() => setShowMultiAngle(true)}
+                           style={{
+                             background: '#2C2416', color: '#fff', border: 'none', padding: '14px 24px', borderRadius: 100, fontFamily: "'DM Sans', sans-serif", fontSize: 14, fontWeight: 700, cursor: 'pointer', transition: 'all 0.3s ease', boxShadow: '0 8px 24px rgba(44,36,22,0.15)', width: '100%',
+                           }}
+                         >
+                           {lang === 'fr' ? 'Créer ma routine →' : 'Create my routine →'}
+                         </button>
+                       </div>
+                    </div>
+                  </div>
+                </div>
+                <div style={{ textAlign: 'center', fontSize: 12, color: '#8C7A6B' }}>
+                  {lang === 'fr' ? 'Exemple illustratif — ta vraie routine sera construite à partir de ton scan.' : 'Illustrative example — your real routine will be built from your scan.'}
+                </div>
+              </div>
+            </div>
+
+            {/* ═══ Comment ça marche — 3 steps ═══ */}
+            <div style={{
+              maxWidth: 960,
+              margin: '72px auto 0',
+              padding: '0 24px',
+              fontFamily: "'DM Sans', sans-serif",
+            }}>
+              {/* Section badge */}
+              <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 8 }}>
+                <span style={{
+                  fontSize: 8.5,
+                  fontWeight: 700,
+                  letterSpacing: '0.22em',
+                  textTransform: 'uppercase',
+                  color: '#D4A574',
+                  background: 'rgba(212, 165, 116, 0.05)',
+                  border: '1px solid rgba(212, 165, 116, 0.15)',
+                  borderRadius: 20,
+                  padding: '4px 12px',
+                  fontFamily: "'DM Sans', sans-serif"
+                }}>
+                  {lang === 'fr' ? 'COMMENT ÇA MARCHE' : 'HOW IT WORKS'}
+                </span>
+              </div>
+
+              <h2 style={{
+                fontFamily: "'Cormorant Garamond', serif",
+                fontSize: 'clamp(26px, 4.5vw, 36px)',
+                fontWeight: 400,
+                color: '#3A2E26',
+                textAlign: 'center',
+                margin: '0 0 40px',
+                letterSpacing: '-0.01em',
+              }}>
+                {lang === 'fr' ? 'De ta photo à ta routine parfaite' : 'From your photo to your perfect routine'}
+              </h2>
+
+              <div style={{
+                display: 'grid',
+                gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
+                gap: 24,
+              }}>
+                {[
+                  {
+                    num: '01',
+                    icon: (
+                      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#C9A961" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z" />
+                        <circle cx="12" cy="13" r="4" />
+                      </svg>
+                    ),
+                    title: lang === 'fr' ? 'Scanne ta peau' : 'Scan your skin',
+                    desc: lang === 'fr'
+                      ? 'Une photo suffit. L\'IA analyse 8 métriques cliniques que ton miroir ne te montre pas — fini de deviner ce qui ne va pas.'
+                      : 'One photo is enough. The AI analyzes 8 clinical metrics your mirror doesn\'t show — stop guessing what\'s wrong.',
+                  },
+                  {
+                    num: '02',
+                    icon: (
+                      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#C9A961" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M12 2l3.09 6.26 6.91 1.01-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+                      </svg>
+                    ),
+                    title: lang === 'fr' ? 'Comprends ta peau' : 'Understand your skin',
+                    desc: lang === 'fr'
+                      ? 'Un score précis et le détail zone par zone : enfin une réponse claire à \'pourquoi ma peau fait ça ?\''
+                      : 'A precise score and zone-by-zone breakdown: finally a clear answer to \'why is my skin doing this?\'',
+                  },
+                  {
+                    num: '03',
+                    icon: (
+                      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#C9A961" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M9 3H15M10 3V9L5.3 18.4A2 2 0 0 0 7.1 21H16.9A2 2 0 0 0 18.7 18.4L14 9V3" />
+                        <path d="M14 9H10" />
+                      </svg>
+                    ),
+                    title: lang === 'fr' ? 'Transforme ta peau' : 'Transform your skin',
+                    desc: lang === 'fr'
+                      ? 'Une routine matin/soir sur-mesure, les bons produits, et un plan pour viser de vrais résultats en quelques semaines. Tu sais exactement quoi faire.'
+                      : 'A bespoke AM/PM routine, the right products, and a plan targeting real results in weeks. You know exactly what to do.',
+                  },
+                ].map((step) => (
+                  <div
+                    key={step.num}
+                    className="bubble-nacré"
+                    style={{
+                      borderRadius: 28,
+                      padding: '28px 24px 24px',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      gap: 12,
+                      transition: 'all 0.4s cubic-bezier(0.16, 1, 0.3, 1)',
+                      cursor: 'default',
+                      background: 'linear-gradient(135deg, rgba(255,255,255,0.72) 0%, rgba(253,246,237,0.45) 50%, rgba(246,235,222,0.65) 100%)',
+                      backdropFilter: 'blur(20px)',
+                      WebkitBackdropFilter: 'blur(20px)',
+                      border: '1px solid rgba(168,116,73,0.12)',
+                      boxShadow: '0 8px 32px rgba(168,116,73,0.02), inset 0 1px 0 rgba(255,255,255,0.9)',
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.transform = 'translateY(-6px)';
+                      e.currentTarget.style.borderColor = 'rgba(168,116,73,0.35)';
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.transform = 'none';
+                      e.currentTarget.style.borderColor = 'rgba(168,116,73,0.12)';
+                    }}
+                  >
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                      <span style={{
+                        fontFamily: "'Cormorant Garamond', serif",
+                        fontSize: 28, fontWeight: 600,
+                        color: '#2C2416',
+                        lineHeight: 1,
+                      }}>{step.num}</span>
+                      {step.icon}
+                    </div>
+                    <h3 style={{
+                      fontFamily: "'Cormorant Garamond', serif",
+                      fontSize: 20, fontWeight: 600,
+                      color: '#2C2416', margin: 0,
+                    }}>{step.title}</h3>
+                    <p style={{
+                      fontSize: 13, color: '#5C4A3A',
+                      lineHeight: 1.6, margin: 0,
+                    }}>{step.desc}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* ═══ Social Proof Band ═══ */}
+            <div style={{
+              maxWidth: 560,
+              margin: '56px auto 0',
+              padding: '0 24px',
+            }}>
+              <div style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: 14,
+                padding: '16px 24px',
+                borderRadius: 60,
+                background: 'linear-gradient(135deg, rgba(255,255,255,0.55) 0%, rgba(248,244,237,0.35) 100%)',
+                backdropFilter: 'blur(16px)',
+                WebkitBackdropFilter: 'blur(16px)',
+                border: '1px solid rgba(201,169,97,0.14)',
+                boxShadow: '0 4px 20px rgba(168,116,73,0.03)',
+              }}>
+                {/* Overlapping avatar circles */}
+                <div style={{ display: 'flex', flexShrink: 0 }}>
+                  {['#D4A574', '#C9A961', '#A87449', '#7DBFA8'].map((c, i) => (
+                    <div key={i} style={{
+                      width: 28, height: 28,
+                      borderRadius: '50%',
+                      background: `linear-gradient(135deg, ${c} 0%, #FAF6F0 100%)`,
+                      border: '2px solid #FDFAF7',
+                      marginLeft: i === 0 ? 0 : -8,
+                      display: 'flex', alignItems: 'center', justifyContent: 'center',
+                      fontSize: 10, fontWeight: 700, color: '#3A2E26',
+                      fontFamily: "'Cormorant Garamond', serif",
+                      position: 'relative', zIndex: 4 - i,
+                    }}>
+                      {['S', 'L', 'C', 'I'][i]}
+                    </div>
+                  ))}
+                </div>
+                <span style={{
+                  fontFamily: "'DM Sans', sans-serif",
+                  fontSize: 13, fontWeight: 500,
+                  color: '#5C4A3A',
+                  lineHeight: 1.4,
+                }}>
+                  {lang === 'fr'
+                    ? <><strong style={{ color: '#2C2416' }}>206 femmes</strong> ont noté leur peau cette semaine</>
+                    : <><strong style={{ color: '#2C2416' }}>206 women</strong> rated their skin this week</>}
+                </span>
+              </div>
+            </div>
+
+            {/* ═══ Testimonials ═══ */}
+            <div style={{ marginTop: 64 }}>
+              <Testimonials lang={lang} />
+            </div>
+            <FAQ lang={lang} t={t} />
+          </>
+        ) : (
+          /* Step: 'questions' */
+          <div style={{ maxWidth: 480, margin: '0 auto', padding: '0 20px 60px' }}>
+            {/* Top skip button */}
+            <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 20 }}>
+              <button
+                onClick={handleSkipQuestions}
+                style={{
+                  background: 'none',
+                  border: 'none',
+                  fontFamily: "'DM Sans', sans-serif",
+                  fontSize: 'clamp(16px, 4vw, 17px)',
+                  fontWeight: 600,
+                  color: '#C5A028',
+                  cursor: 'pointer',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: 6,
+                  padding: '8px 16px',
+                  textDecoration: 'underline',
+                }}
+              >
+                {t('skipQuestions')}
+              </button>
+            </div>
+
+            {/* Questions Step Title */}
+            <div style={{ textAlign: 'center', marginBottom: 20 }}>
+              <h1 style={{
+                fontFamily: "'Cormorant Garamond', serif",
+                fontSize: 'clamp(28px, 5vw, 36px)', fontWeight: 400,
+                color: '#2C2416', lineHeight: 1.2, margin: '0 0 10px',
+              }}>
+                {t('questionsTitle')}
+              </h1>
+            </div>
+
+            {/* Photo preview */}
+            {imageUrl && (
+              <div style={{ position: 'relative', marginBottom: 24, borderRadius: 16, overflow: 'hidden' }}>
                 <img
                   src={imageUrl} alt="Preview"
                   style={{ width: '100%', maxHeight: 340, objectFit: 'cover', display: 'block', borderRadius: 16 }}
@@ -1112,338 +1916,331 @@ export default function Home() {
                   {t('changePhoto')}
                 </button>
               </div>
-            ) : (
-              <>
-                <CreamDrop width={110} height={55} />
-                <p style={{ margin: '14px 0 4px', fontSize: 14, color: '#6F6156', fontWeight: 500, fontFamily: "'DM Sans', sans-serif" }}>
-                  {lang === 'fr' ? 'Glissez ou d\u00e9posez votre photo ici' : 'Drag and drop your photo here'}
-                </p>
-                <p style={{ margin: 0, fontSize: 11, color: '#B9AC9E', fontFamily: "'DM Sans', sans-serif" }}>
-                  {lang === 'fr' ? 'JPG, PNG, WebP \u00b7 jusqu\u2019\u00e0 20 Mo' : 'JPG, PNG, WebP \u00b7 up to 20MB'}
-                </p>
-                <p style={{ margin: '16px 0 0', fontSize: 11, color: '#CBAA8D', letterSpacing: '0.08em', textTransform: 'uppercase', fontFamily: "'DM Sans', sans-serif" }}>
-                  {lang === 'fr' ? 'OU' : 'OR'}
-                </p>
-                <div style={{ display: 'flex', gap: 8, justifyContent: 'center', marginTop: 14, flexWrap: 'wrap' }}>
-                  <button
-                    onClick={(e) => { e.stopPropagation(); fileInputRef.current?.click(); }}
-                    className="btn-liquid-glass-dark home-upload-btn"
-                    style={{ border: 'none' }}
-                  >
-                    {lang === 'fr' ? 'Importer' : 'Import'}
-                  </button>
-                  <button
-                    onClick={(e) => { e.stopPropagation(); startCamera(); }}
-                    className="btn-liquid-glass home-upload-btn"
-                    style={{ border: 'none' }}
-                  >
-                    {lang === 'fr' ? 'Scanner' : 'Scan'}
-                  </button>
-                </div>
-              </>
             )}
-          </div>
 
-          <input ref={fileInputRef} type="file" accept="image/*" style={{ display: 'none' }}
-            onChange={(e) => processFile(e.target.files[0])} />
-          <input ref={cameraInputRef} type="file" accept="image/*" capture="user" style={{ display: 'none' }}
-            onChange={(e) => processFile(e.target.files[0])} />
+            <input ref={fileInputRef} type="file" accept="image/*" style={{ display: 'none' }}
+              onChange={(e) => processFile(e.target.files[0])} />
+            <input ref={cameraInputRef} type="file" accept="image/*" capture="user" style={{ display: 'none' }}
+              onChange={(e) => processFile(e.target.files[0])} />
 
-          {/* Skin concern */}
-          <div style={{ marginTop: 24 }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 8, flexWrap: 'wrap', gap: 4 }}>
-              <label style={{
-                fontFamily: "'Cormorant Garamond', serif",
-                fontSize: 17, color: '#3A2E26', fontWeight: 500,
-              }}>
-                {t('skinConcernLabel')}
-              </label>
-              <span style={{ fontSize: 11, color: '#B9AC9E', fontFamily: "'DM Sans', sans-serif", marginLeft: 'auto', textAlign: 'right' }}>{t('skinConcernOptional')}</span>
-            </div>
+            {/* Skin concern */}
+            <div style={{ marginTop: 24 }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 8, flexWrap: 'wrap', gap: 4 }}>
+                <label style={{
+                  fontFamily: "'Cormorant Garamond', serif",
+                  fontSize: 18, color: '#2C2416', fontWeight: 600,
+                }}>
+                  {t('skinConcernLabel')}
+                </label>
+                <span style={{ fontSize: 16, color: '#2C2416', fontFamily: "'DM Sans', sans-serif", marginLeft: 'auto', textAlign: 'right' }}>{t('skinConcernOptional')}</span>
+              </div>
 
-            {/* Quick-select chips */}
-            <div style={{ display: 'flex', gap: 7, flexWrap: 'wrap', marginBottom: 10 }}>
-              {quickConcerns.map(({ key, label }) => (
-                <button
-                  key={key}
-                  onClick={() => handleChip(key, label)}
-                  style={{
-                    border: activeChips.includes(key) ? '1.5px solid rgba(197, 160, 40, 0.65)' : '1px solid rgba(168, 116, 73, 0.22)',
-                    background: activeChips.includes(key) ? 'rgba(197,160,40,0.12)' : 'rgba(255, 255, 255, 0.45)',
-                    color: activeChips.includes(key) ? '#8B6914' : '#887E75',
-                    borderRadius: 30, padding: '6px 16px',
-                    fontSize: 12, cursor: 'pointer',
-                    fontFamily: "'DM Sans', sans-serif",
-                    fontWeight: activeChips.includes(key) ? 600 : 400,
-                    boxShadow: activeChips.includes(key) ? '0 4px 12px rgba(197,160,40,0.15)' : 'inset 0 1px 1px rgba(255,255,255,0.7)',
-                    transition: 'all 0.25s ease',
-                    backdropFilter: 'blur(10px)',
-                    WebkitBackdropFilter: 'blur(10px)',
+              {/* Quick-select chips */}
+              <div style={{ display: 'flex', gap: 7, flexWrap: 'wrap', marginBottom: 10 }}>
+                {quickConcerns.map(({ key, label }) => (
+                  <button
+                    key={key}
+                    onClick={() => handleChip(key, label)}
+                    style={{
+                      border: activeChips.includes(key) ? '1.5px solid rgba(197, 160, 40, 0.65)' : '1px solid rgba(168, 116, 73, 0.22)',
+                      background: activeChips.includes(key) ? 'rgba(197,160,40,0.12)' : 'rgba(255, 255, 255, 0.45)',
+                      color: activeChips.includes(key) ? '#8B6914' : '#2C2416',
+                      borderRadius: 30, padding: '6px 16px',
+                      fontSize: 16, cursor: 'pointer',
+                      fontFamily: "'DM Sans', sans-serif",
+                      fontWeight: activeChips.includes(key) ? 600 : 400,
+                      boxShadow: activeChips.includes(key) ? '0 4px 12px rgba(197,160,40,0.15)' : 'inset 0 1px 1px rgba(255,255,255,0.7)',
+                      transition: 'all 0.25s ease',
+                      backdropFilter: 'blur(10px)',
+                      WebkitBackdropFilter: 'blur(10px)',
+                    }}
+                  >
+                    {label}
+                  </button>
+                ))}
+              </div>
+
+              <div style={{ position: 'relative' }}>
+                <textarea
+                  value={skinConcern}
+                  onChange={(e) => {
+                    if (e.target.value.length <= SKIN_CONCERN_MAX) {
+                      setSkinConcern(e.target.value);
+                      setActiveChips([]);
+                    }
                   }}
-                >
-                  {label}
-                </button>
-              ))}
-            </div>
-
-            <div style={{ position: 'relative' }}>
-              <textarea
-                value={skinConcern}
-                onChange={(e) => {
-                  if (e.target.value.length <= SKIN_CONCERN_MAX) {
-                    setSkinConcern(e.target.value);
-                    setActiveChips([]);
-                  }
-                }}
-                placeholder={t('skinConcernPlaceholder')}
-                rows={3}
-                className="input-nacré"
-                style={{
-                  width: '100%', boxSizing: 'border-box',
-                  borderRadius: 18,
-                  padding: '16px 18px 32px', fontSize: 13, color: '#3A2E26',
-                  fontFamily: "'DM Sans', sans-serif",
-                  resize: 'vertical', outline: 'none',
-                  lineHeight: 1.6,
-                }}
-              />
-              <span style={{
-                position: 'absolute', bottom: 9, right: 12,
-                fontSize: 11, color: skinConcern.length >= SKIN_CONCERN_MAX ? '#c0392b' : '#B9AC9E',
-                fontFamily: "'DM Sans', sans-serif",
-              }}>
-                {t('skinConcernCounter', skinConcern.length, SKIN_CONCERN_MAX)}
-              </span>
-            </div>
-
-            {/* Additional context fields */}
-            <div style={{ marginTop: 24, display: 'flex', flexDirection: 'column', gap: 20 }}>
-              {/* Age */}
-              <div>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 8, flexWrap: 'wrap', gap: 4 }}>
-                  <label style={{
-                    fontFamily: "'Cormorant Garamond', serif",
-                    fontSize: 17, color: '#3A2E26', fontWeight: 500,
-                  }}>
-                    {t('ageLabel')}
-                  </label>
-                  <span style={{ fontSize: 11, color: '#B9AC9E', fontFamily: "'DM Sans', sans-serif" }}>{t('skinConcernOptional')}</span>
-                </div>
-                <input
-                  type="text"
-                  value={age}
-                  onChange={(e) => setAge(e.target.value)}
-                  placeholder={t('agePlaceholder')}
+                  placeholder={t('skinConcernPlaceholder')}
+                  rows={3}
                   className="input-nacré"
                   style={{
                     width: '100%', boxSizing: 'border-box',
                     borderRadius: 18,
-                    padding: '14px 18px', fontSize: 13, color: '#3A2E26',
-                    fontFamily: "'DM Sans', sans-serif", outline: 'none',
+                    padding: '16px 18px 32px', fontSize: 16, color: '#2C2416',
+                    fontFamily: "'DM Sans', sans-serif",
+                    resize: 'vertical', outline: 'none',
+                    lineHeight: 1.5,
                   }}
                 />
+                <span style={{
+                  position: 'absolute', bottom: 9, right: 12,
+                  fontSize: 16, color: skinConcern.length >= SKIN_CONCERN_MAX ? '#c0392b' : '#2C2416',
+                  fontFamily: "'DM Sans', sans-serif",
+                }}>
+                  {t('skinConcernCounter', skinConcern.length, SKIN_CONCERN_MAX)}
+                </span>
               </div>
 
-              {/* Climate */}
-              <div>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 8, flexWrap: 'wrap', gap: 4 }}>
-                  <label style={{
-                    fontFamily: "'Cormorant Garamond', serif",
-                    fontSize: 17, color: '#3A2E26', fontWeight: 500,
-                  }}>
-                    {t('climateLabel')}
-                  </label>
-                  <span style={{ fontSize: 11, color: '#B9AC9E', fontFamily: "'DM Sans', sans-serif" }}>{t('skinConcernOptional')}</span>
-                </div>
-                <div style={{ position: 'relative' }}>
-                  <select
-                    value={climate}
-                    onChange={(e) => setClimate(e.target.value)}
+              {/* Additional context fields */}
+              <div style={{ marginTop: 24, display: 'flex', flexDirection: 'column', gap: 20 }}>
+                {/* Age */}
+                <div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 8, flexWrap: 'wrap', gap: 4 }}>
+                    <label style={{
+                      fontFamily: "'Cormorant Garamond', serif",
+                      fontSize: 18, color: '#2C2416', fontWeight: 600,
+                    }}>
+                      {t('ageLabel')}
+                    </label>
+                    <span style={{ fontSize: 16, color: '#2C2416', fontFamily: "'DM Sans', sans-serif" }}>{t('skinConcernOptional')}</span>
+                  </div>
+                  <input
+                    type="text"
+                    value={age}
+                    onChange={(e) => setAge(e.target.value)}
+                    placeholder={t('agePlaceholder')}
                     className="input-nacré"
                     style={{
                       width: '100%', boxSizing: 'border-box',
                       borderRadius: 18,
-                      padding: '14px 18px', fontSize: 13, color: climate ? '#3A2E26' : '#887E75',
+                      padding: '14px 18px', fontSize: 16, color: '#2C2416',
                       fontFamily: "'DM Sans', sans-serif", outline: 'none',
-                      appearance: 'none', cursor: 'pointer',
+                    }}
+                  />
+                </div>
+
+                {/* Collapsible toggle for Climate & Allergies */}
+                <div style={{ textAlign: 'center', marginTop: 10 }}>
+                  <button
+                    type="button"
+                    onClick={() => setShowOptionalFields(!showOptionalFields)}
+                    style={{
+                      background: 'none',
+                      border: 'none',
+                      fontFamily: "'DM Sans', sans-serif",
+                      fontSize: 16,
+                      fontWeight: 600,
+                      color: '#C5A028',
+                      cursor: 'pointer',
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: 6,
+                      padding: '8px 16px',
                     }}
                   >
-                    <option value="" disabled>{t('climateOptionSelect')}</option>
-                    <option value="Humid & Tropical">{t('climateOptionHumid')}</option>
-                    <option value="Dry & Arid">{t('climateOptionDry')}</option>
-                    <option value="Cold & Harsh">{t('climateOptionCold')}</option>
-                    <option value="Urban (Pollution)">{t('climateOptionUrban')}</option>
-                    <option value="High Sun Exposure">{t('climateOptionSun')}</option>
-                    <option value="Temperate / Moderate">{t('climateOptionTemperate')}</option>
-                  </select>
-                  <div style={{ position: 'absolute', right: 18, top: '50%', transform: 'translateY(-50%)', pointerEvents: 'none', color: '#B9AC9E', fontSize: 10 }}>
-                    ▼
-                  </div>
+                    {t('refineAnalysis')}
+                    <span style={{ fontSize: 10, display: 'inline-block', transition: 'transform 0.3s', transform: showOptionalFields ? 'rotate(180deg)' : 'rotate(0deg)' }}>▼</span>
+                  </button>
                 </div>
-              </div>
 
-              {/* Allergies */}
-              <div>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 8, flexWrap: 'wrap', gap: 4 }}>
-                  <label style={{
-                    fontFamily: "'Cormorant Garamond', serif",
-                    fontSize: 17, color: '#3A2E26', fontWeight: 500,
-                  }}>
-                    {t('allergiesLabel')}
-                  </label>
-                  <span style={{ fontSize: 11, color: '#B9AC9E', fontFamily: "'DM Sans', sans-serif" }}>{t('skinConcernOptional')}</span>
-                </div>
-                <input
-                  type="text"
-                  value={allergies}
-                  onChange={(e) => setAllergies(e.target.value)}
-                  placeholder={t('allergiesPlaceholder')}
-                  className="input-nacré"
-                  style={{
-                    width: '100%', boxSizing: 'border-box',
-                    borderRadius: 18,
-                    padding: '14px 18px', fontSize: 13, color: '#3A2E26',
-                    fontFamily: "'DM Sans', sans-serif", outline: 'none',
-                  }}
-                />
+                {showOptionalFields && (
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 20, animation: 'fadeIn 0.3s ease-out' }}>
+                    {/* Climate */}
+                    <div>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 8, flexWrap: 'wrap', gap: 4 }}>
+                        <label style={{
+                          fontFamily: "'Cormorant Garamond', serif",
+                          fontSize: 18, color: '#2C2416', fontWeight: 600,
+                        }}>
+                          {t('climateLabel')}
+                        </label>
+                        <span style={{ fontSize: 16, color: '#2C2416', fontFamily: "'DM Sans', sans-serif" }}>{t('skinConcernOptional')}</span>
+                      </div>
+                      <div style={{ position: 'relative' }}>
+                        <select
+                          value={climate}
+                          onChange={(e) => setClimate(e.target.value)}
+                          className="input-nacré"
+                          style={{
+                            width: '100%', boxSizing: 'border-box',
+                            borderRadius: 18,
+                            padding: '14px 18px', fontSize: 16, color: climate ? '#2C2416' : '#2C2416',
+                            fontFamily: "'DM Sans', sans-serif", outline: 'none',
+                            appearance: 'none', cursor: 'pointer',
+                          }}
+                        >
+                          <option value="" disabled>{t('climateOptionSelect')}</option>
+                          <option value="Humid & Tropical">{t('climateOptionHumid')}</option>
+                          <option value="Dry & Arid">{t('climateOptionDry')}</option>
+                          <option value="Cold & Harsh">{t('climateOptionCold')}</option>
+                          <option value="Urban (Pollution)">{t('climateOptionUrban')}</option>
+                          <option value="High Sun Exposure">{t('climateOptionSun')}</option>
+                          <option value="Temperate / Moderate">{t('climateOptionTemperate')}</option>
+                        </select>
+                        <div style={{ position: 'absolute', right: 18, top: '50%', transform: 'translateY(-50%)', pointerEvents: 'none', color: '#C5A028', fontSize: 10 }}>
+                          ▼
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Allergies */}
+                    <div>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 8, flexWrap: 'wrap', gap: 4 }}>
+                        <label style={{
+                          fontFamily: "'Cormorant Garamond', serif",
+                          fontSize: 18, color: '#2C2416', fontWeight: 600,
+                        }}>
+                          {t('allergiesLabel')}
+                        </label>
+                        <span style={{ fontSize: 16, color: '#2C2416', fontFamily: "'DM Sans', sans-serif" }}>{t('skinConcernOptional')}</span>
+                      </div>
+                      <input
+                        type="text"
+                        value={allergies}
+                        onChange={(e) => setAllergies(e.target.value)}
+                        placeholder={t('allergiesPlaceholder')}
+                        className="input-nacré"
+                        style={{
+                          width: '100%', boxSizing: 'border-box',
+                          borderRadius: 18,
+                          padding: '14px 18px', fontSize: 16, color: '#2C2416',
+                          fontFamily: "'DM Sans', sans-serif", outline: 'none',
+                        }}
+                      />
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
-          </div>
 
-          {/* Error */}
-          {error && (
-            <p style={{ margin: '12px 0 0', fontSize: 13, color: '#c0392b', textAlign: 'center', fontFamily: "'DM Sans', sans-serif" }}>{error}</p>
-          )}
-
-          {/* CTA */}
-          <button
-            onClick={handleAnalyse}
-            disabled={!image || loading}
-            style={{
-              width: '100%',
-              marginTop: 20,
-              padding: '16px 28px',
-              fontSize: 16,
-              fontWeight: 700,
-              letterSpacing: '0.05em',
-              textTransform: 'uppercase',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              gap: 12,
-              fontFamily: "'DM Sans', sans-serif",
-              borderRadius: 32,
-              border: 'none',
-              cursor: image && !loading ? 'pointer' : 'not-allowed',
-              transition: 'all 0.4s cubic-bezier(0.16, 1, 0.3, 1)',
-              position: 'relative',
-              overflow: 'hidden',
-              ...(image && !loading ? {
-                background: 'rgba(255, 255, 255, 0.85)',
-                backdropFilter: 'blur(20px) saturate(150%)',
-                WebkitBackdropFilter: 'blur(20px) saturate(150%)',
-                border: '1px solid rgba(255, 255, 255, 0.95)',
-                boxShadow: [
-                  '0 2px 0 0 rgba(255,255,255,0.95) inset',
-                  '0 -2px 0 0 rgba(168,116,73,0.15) inset',
-                  'inset 0 1px 0 rgba(255,255,255,0.98)',
-                  '0 12px 32px rgba(168, 116, 73, 0.08)',
-                  '0 4px 12px rgba(168, 116, 73, 0.04)',
-                ].join(','),
-                color: '#3A2E26',
-                transform: 'translateY(-2px)',
-              } : {
-                background: 'linear-gradient(135deg, rgba(255,255,255,0.15) 0%, rgba(255,255,255,0.08) 100%)',
-                boxShadow: 'inset 0 0 0 1px rgba(255,255,255,0.15), 0 4px 12px rgba(0,0,0,0.1)',
-                color: '#B9AC9E',
-                backdropFilter: 'blur(12px)',
-                WebkitBackdropFilter: 'blur(12px)',
-              }),
-            }}
-            onMouseEnter={(e) => {
-              if (image && !loading) {
-                e.target.style.transform = 'translateY(-4px) scale(1.02)';
-                e.target.style.boxShadow = [
-                  '0 2px 0 0 rgba(255,255,255,0.98) inset',
-                  '0 -2px 0 0 rgba(168,116,73,0.2) inset',
-                  'inset 0 1px 0 rgba(255,255,255,0.99)',
-                  '0 16px 40px rgba(168, 116, 73, 0.12)',
-                  '0 8px 20px rgba(168, 116, 73, 0.08)',
-                ].join(',');
-              }
-            }}
-            onMouseLeave={(e) => {
-              if (image && !loading) {
-                e.target.style.transform = 'translateY(-2px)';
-                e.target.style.boxShadow = [
-                  '0 2px 0 0 rgba(255,255,255,0.95) inset',
-                  '0 -2px 0 0 rgba(168,116,73,0.15) inset',
-                  'inset 0 1px 0 rgba(255,255,255,0.98)',
-                  '0 12px 32px rgba(168, 116, 73, 0.08)',
-                  '0 4px 12px rgba(168, 116, 73, 0.04)',
-                ].join(',');
-              }
-            }}
-          >
-            {loading ? (
-              <span style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-                <LuxuryFlower width={22} height={22} />
-                {t('analysingFeatures')}
-              </span>
-            ) : (
-              t('analyseNow')
+            {/* Error */}
+            {error && (
+              <p style={{ margin: '12px 0 0', fontSize: 16, color: '#c0392b', textAlign: 'center', fontFamily: "'DM Sans', sans-serif" }}>{error}</p>
             )}
-          </button>
 
+            {/* CTA */}
+            <button
+              onClick={handleAnalyse}
+              disabled={!image || loading}
+              style={{
+                width: '100%',
+                marginTop: 20,
+                padding: '16px 28px',
+                fontSize: 16,
+                fontWeight: 700,
+                letterSpacing: '0.05em',
+                textTransform: 'uppercase',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: 12,
+                fontFamily: "'DM Sans', sans-serif",
+                borderRadius: 32,
+                border: 'none',
+                cursor: image && !loading ? 'pointer' : 'not-allowed',
+                transition: 'all 0.4s cubic-bezier(0.16, 1, 0.3, 1)',
+                position: 'relative',
+                overflow: 'hidden',
+                ...(image && !loading ? {
+                  background: 'rgba(255, 255, 255, 0.85)',
+                  backdropFilter: 'blur(20px) saturate(150%)',
+                  WebkitBackdropFilter: 'blur(20px) saturate(150%)',
+                  border: '1px solid rgba(255, 255, 255, 0.95)',
+                  boxShadow: [
+                    '0 2px 0 0 rgba(255,255,255,0.95) inset',
+                    '0 -2px 0 0 rgba(168,116,73,0.15) inset',
+                    'inset 0 1px 0 rgba(255,255,255,0.98)',
+                    '0 12px 32px rgba(168, 116, 73, 0.08)',
+                    '0 4px 12px rgba(168, 116, 73, 0.04)',
+                  ].join(','),
+                  color: '#2C2416',
+                  transform: 'translateY(-2px)',
+                } : {
+                  background: 'linear-gradient(135deg, rgba(255,255,255,0.15) 0%, rgba(255,255,255,0.08) 100%)',
+                  boxShadow: 'inset 0 0 0 1px rgba(255,255,255,0.15), 0 4px 12px rgba(0,0,0,0.1)',
+                  color: '#2C2416',
+                  backdropFilter: 'blur(12px)',
+                  WebkitBackdropFilter: 'blur(12px)',
+                }),
+              }}
+              onMouseEnter={(e) => {
+                if (image && !loading) {
+                  e.target.style.transform = 'translateY(-4px) scale(1.02)';
+                  e.target.style.boxShadow = [
+                    '0 2px 0 0 rgba(255,255,255,0.98) inset',
+                    '0 -2px 0 0 rgba(168,116,73,0.2) inset',
+                    'inset 0 1px 0 rgba(255,255,255,0.99)',
+                    '0 16px 40px rgba(168, 116, 73, 0.12)',
+                    '0 8px 20px rgba(168, 116, 73, 0.08)',
+                  ].join(',');
+                }
+              }}
+              onMouseLeave={(e) => {
+                if (image && !loading) {
+                  e.target.style.transform = 'translateY(-2px)';
+                  e.target.style.boxShadow = [
+                    '0 2px 0 0 rgba(255,255,255,0.95) inset',
+                    '0 -2px 0 0 rgba(168,116,73,0.15) inset',
+                    'inset 0 1px 0 rgba(255,255,255,0.98)',
+                    '0 12px 32px rgba(168, 116, 73, 0.08)',
+                    '0 4px 12px rgba(168, 116, 73, 0.04)',
+                  ].join(',');
+                }
+              }}
+            >
+              {loading ? (
+                <span style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                  <LuxuryFlower width={22} height={22} />
+                  {t('analysingFeatures')}
+                </span>
+              ) : (
+                t('analyseNow')
+              )}
+            </button>
 
+            {loading && (
+              <p style={{ textAlign: 'center', fontSize: 16, color: '#2C2416', marginTop: 10, fontFamily: "'DM Sans', sans-serif" }}>
+                {t('analysisTime')}
+              </p>
+            )}
 
-          {loading && (
-            <p style={{ textAlign: 'center', fontSize: 12, color: '#8C7A6B', marginTop: 10, fontFamily: "'DM Sans', sans-serif" }}>
-              {t('analysisTime')}
-            </p>
-          )}
+            {/* Footer trust */}
+            <div style={{ display: 'flex', justifyContent: 'center', gap: 20, marginTop: 20, flexWrap: 'wrap' }}>
+              {[t('noAccountNeeded'), t('resultsIn20s')].map((txt) => (
+                <span key={txt} style={{ fontSize: 16, color: '#2C2416', display: 'flex', alignItems: 'center', gap: 5, fontFamily: "'DM Sans', sans-serif" }}>
+                  <span style={{ color: GOLD }}>✓</span> {txt}
+                </span>
+              ))}
+            </div>
 
-          {/* Footer trust */}
-          <div style={{ display: 'flex', justifyContent: 'center', gap: 20, marginTop: 20, flexWrap: 'wrap' }}>
-            {[t('noAccountNeeded'), t('resultsIn20s')].map((txt) => (
-              <span key={txt} style={{ fontSize: 11, color: '#CBAA8D', display: 'flex', alignItems: 'center', gap: 5, fontFamily: "'DM Sans', sans-serif" }}>
-                <span style={{ color: GOLD }}>✓</span> {txt}
-              </span>
-            ))}
+            <div style={{ display: 'flex', justifyContent: 'center', gap: 20, marginTop: 24, flexWrap: 'wrap' }}>
+              {[
+                { label: t('privacyPolicy'), path: '/privacy' },
+                { label: lang === 'fr' ? 'Avertissement médical' : 'Medical Disclaimer', path: '/mentions-legales' },
+              ].map(({ label, path }) => (
+                <span
+                  key={path}
+                  onClick={() => router.push(path)}
+                  style={{
+                    fontSize: 16,
+                    color: '#2C2416',
+                    cursor: 'pointer',
+                    fontFamily: "'DM Sans', sans-serif",
+                    letterSpacing: '0.04em',
+                    opacity: 0.75,
+                    transition: 'opacity 0.2s',
+                    textDecoration: 'underline',
+                  }}
+                  onMouseEnter={(e) => e.target.style.opacity = 1}
+                  onMouseLeave={(e) => e.target.style.opacity = 0.75}
+                >
+                  {label}
+                </span>
+              ))}
+            </div>
+
+            <MedicalDisclaimer style={{ marginTop: 16 }} />
           </div>
-
-          <div style={{ display: 'flex', justifyContent: 'center', gap: 20, marginTop: 24, flexWrap: 'wrap' }}>
-            {[
-              { label: t('privacyPolicy'), path: '/privacy' },
-              { label: lang === 'fr' ? 'Avertissement médical' : 'Medical Disclaimer', path: '/mentions-legales' },
-            ].map(({ label, path }) => (
-              <span
-                key={path}
-                onClick={() => router.push(path)}
-                style={{
-                  fontSize: 11,
-                  color: '#A87449',
-                  cursor: 'pointer',
-                  fontFamily: "'DM Sans', sans-serif",
-                  letterSpacing: '0.04em',
-                  opacity: 0.75,
-                  transition: 'opacity 0.2s',
-                  textDecoration: 'underline',
-                }}
-                onMouseEnter={(e) => e.target.style.opacity = 1}
-                onMouseLeave={(e) => e.target.style.opacity = 0.75}
-              >
-                {label}
-              </span>
-            ))}
-          </div>
-
-          <MedicalDisclaimer style={{ marginTop: 16 }} />
-        </div>
-
-        <Testimonials lang={lang} />
-
-        <FAQ lang={lang} t={t} />
+        )}
       </main>
 
       {/* ── Email gate overlay (always in DOM, fades away after submit) ── */}
