@@ -1161,11 +1161,11 @@ export default function Home({ teaserProducts }) {
 
                 {/* Upload Zone */}
                 <div className="hero-stagger-4" style={{
-                  padding: '16px 12px 20px',
-                  borderRadius: 16,
+                  padding: '12px 8px 16px',
+                  borderRadius: 12,
                   border: '1px solid rgba(201, 169, 97, 0.45)',
                   background: 'linear-gradient(180deg, rgba(255, 255, 255, 0.42) 0%, rgba(248, 244, 237, 0.18) 100%)',
-                  boxShadow: '0 12px 30px rgba(168, 116, 73, 0.02)',
+                  boxShadow: '0 10px 24px rgba(168, 116, 73, 0.02)',
                   position: 'relative',
                   overflow: 'hidden'
                 }}>
