@@ -1232,20 +1232,10 @@ export default function Home({ teaserProducts }) {
                         
                         <div style={{ display: 'flex', flexDirection: 'column', gap: 12, alignItems: 'center', width: '100%', marginBottom: 16 }}>
                           <button
+                            className="premium-cta-primary"
                             onClick={(e) => { e.stopPropagation(); fileInputRef.current?.click(); }}
-                            style={{
-                              border: 'none',
-                              width: '100%',
-                              maxWidth: 300,
-                              fontSize: 15,
-                              fontWeight: 600,
-                              padding: '16px 28px',
-                              animation: 'glowPulse 1.5s infinite',
-                              background: 'linear-gradient(135deg, #C5A028 0%, #A87449 100%)',
-                              boxShadow: '0 0 20px rgba(197, 160, 40, 0.6)'
-                            }}
                           >
-                            {lang === 'fr' ? 'Obtenir mon score gratuit' : 'Get my free score'}
+                            {lang === 'fr' ? 'Analyser ma peau gratuitement' : 'Analyze my skin for free'}
                           </button>
                         </div>
                         
