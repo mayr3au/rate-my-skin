@@ -1233,7 +1233,6 @@ export default function Home({ teaserProducts }) {
                         <div style={{ display: 'flex', flexDirection: 'column', gap: 12, alignItems: 'center', width: '100%', marginBottom: 16 }}>
                           <button
                             onClick={(e) => { e.stopPropagation(); fileInputRef.current?.click(); }}
-                            className="premium-cta-primary"
                             style={{
                               border: 'none',
                               width: '100%',
