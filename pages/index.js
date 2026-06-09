@@ -922,7 +922,7 @@ export default function Home({ teaserProducts }) {
       </Head>
 
       {/* ── Welcoming Banner ── */}
-      <div style={{
+      <div className="welcome-banner" style={{
         background: 'linear-gradient(90deg, #FDFCF9 0%, #FAF2EA 50%, #FDFCF9 100%)',
         borderBottom: '1px solid rgba(197, 160, 40, 0.12)',
         padding: 'calc(6px + env(safe-area-inset-top, 0px)) 12px 6px',
@@ -1173,114 +1173,116 @@ export default function Home({ teaserProducts }) {
                   )}
                 </p>
 
-                {/* Upload Zone */}
-                <div className="hero-stagger-4" style={{
-                  padding: '12px 8px 16px',
-                  borderRadius: 12,
-                  border: '1px solid rgba(201, 169, 97, 0.45)',
-                  background: 'linear-gradient(180deg, rgba(255, 255, 255, 0.42) 0%, rgba(248, 244, 237, 0.18) 100%)',
-                  boxShadow: '0 10px 24px rgba(168, 116, 73, 0.02)',
-                  position: 'relative',
-                  overflow: 'hidden'
-                }}>
-                  {/* Filigree brand flower decoration */}
-                  <div style={{ position: 'absolute', top: -40, right: -40, opacity: 0.03, pointerEvents: 'none' }}>
-                    <LuxuryFlower width={200} height={200} />
-                  </div>
+                {/* Upload Zone — desktop: full drag-drop; mobile: CTA button only */}
+                <div className="hero-stagger-4">
+                  {/* Desktop drag-drop card — hidden on mobile via CSS */}
+                  <div className="hero-upload-zone-desktop" style={{
+                    padding: '12px 8px 16px',
+                    borderRadius: 12,
+                    border: '1px solid rgba(201, 169, 97, 0.45)',
+                    background: 'linear-gradient(180deg, rgba(255, 255, 255, 0.42) 0%, rgba(248, 244, 237, 0.18) 100%)',
+                    boxShadow: '0 10px 24px rgba(168, 116, 73, 0.02)',
+                    position: 'relative',
+                    overflow: 'hidden'
+                  }}>
+                    {/* Filigree brand flower decoration */}
+                    <div style={{ position: 'absolute', top: -40, right: -40, opacity: 0.03, pointerEvents: 'none' }}>
+                      <LuxuryFlower width={200} height={200} />
+                    </div>
 
-                  <div
-                    onClick={(e) => !imageUrl && fileInputRef.current?.click()}
-                    className="card-nacré hero-upload-box"
-                    style={{
-                      border: dragOver ? `1.5px solid ${GOLD}` : '1px solid rgba(201, 169, 97, 0.22)',
-                      boxShadow: dragOver
-                        ? 'inset 0 0 0 2px #C5A028, inset 0 4px 12px rgba(0,0,0,0.02)'
-                        : '0 12px 32px rgba(168, 116, 73, 0.04), inset 0 1px 0 rgba(255, 255, 255, 0.95)',
-                      borderRadius: 22,
-                      padding: imageUrl ? 0 : '40px 24px',
-                      textAlign: 'center',
-                      cursor: imageUrl ? 'default' : 'pointer',
-                      background: dragOver ? 'rgba(255, 255, 255, 0.75)' : 'rgba(255, 255, 255, 0.85)',
-                      transition: 'all 0.35s cubic-bezier(0.4,0,0.2,1)',
-                      overflow: 'hidden',
-                      position: 'relative',
-                      zIndex: 1,
-                    }}
-                  >
-                    {imageUrl ? (
-                      <div style={{ position: 'relative' }}>
-                        <img
-                          src={imageUrl} alt="Preview"
-                          style={{ width: '100%', maxHeight: 340, objectFit: 'cover', display: 'block', borderRadius: 16 }}
-                        />
-                        <button
-                          onClick={(e) => { e.stopPropagation(); fileInputRef.current?.click(); }}
-                          style={{
-                            position: 'absolute', bottom: 12, right: 12,
-                            background: 'rgba(13,13,13,0.82)', color: '#fff',
-                            border: 'none', borderRadius: 8, padding: '7px 14px',
-                            fontSize: 12, cursor: 'pointer', fontFamily: "'DM Sans', sans-serif",
-                          }}
-                        >
-                          {t('changePhoto')}
-                        </button>
-                      </div>
-                    ) : (
-                      <>
-                        {/* Simplified Elegant Face Scan Icon */}
-                        <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 16 }}>
-                          <svg width="44" height="44" viewBox="0 0 44 44" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ display: 'block' }}>
-                            {/* Simple elegant scan oval */}
-                            <rect x="3" y="3" width="38" height="38" rx="19" stroke="#C9A961" strokeWidth="1.25" />
-                            
-                            {/* Minimalist face outline within the oval */}
-                            {/* Hair/Head Top Arch */}
-                            <path d="M15 17 C 15 15, 29 15, 29 17" stroke="#C9A961" strokeWidth="1.25" strokeLinecap="round" />
-                            {/* Face/Jaw Contour */}
-                            <path d="M15 20 C14 22, 14.5 27, 22 31.5 C29.5 27, 30 22, 29 20" stroke="#C9A961" strokeWidth="1.25" strokeLinecap="round" strokeLinejoin="round" />
-                            {/* Stylized Nose line */}
-                            <path d="M22 21.5 V 25.5 H 23.5" stroke="#C9A961" strokeWidth="1.25" strokeLinecap="round" strokeLinejoin="round" />
-                            {/* Minimal Eyes (Horizontal dashes) */}
-                            <line x1="17.5" y1="20.5" x2="19.5" y2="20.5" stroke="#C9A961" strokeWidth="1.25" strokeLinecap="round" />
-                            <line x1="24.5" y1="20.5" x2="26.5" y2="20.5" stroke="#C9A961" strokeWidth="1.25" strokeLinecap="round" />
-                            {/* Minimal Smile */}
-                            <path d="M20 28 C 21 28.5, 23 28.5, 24 28" stroke="#C9A961" strokeWidth="1.25" strokeLinecap="round" />
-                          </svg>
-                        </div>
-                        <h3 className="hero-upload-title" style={{ margin: '0 0 8px', fontSize: 20, color: '#2C2416', fontWeight: 700, fontFamily: "'Cormorant Garamond', serif" }}>
-                          {lang === 'fr' ? 'Découvre ton score de peau en 30 secondes' : 'Discover your skin score in 30 seconds'}
-                        </h3>
-                        <p style={{ margin: '0 0 20px', fontSize: 13, color: '#5C4A3A', fontWeight: 500, fontFamily: "'DM Sans', sans-serif" }}>
-                          {lang === 'fr' ? 'Glisse ta photo ici, ou' : 'Drop your photo here, or'}
-                        </p>
-                        
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: 12, alignItems: 'center', width: '100%', marginBottom: 16 }}>
+                    <div
+                      onClick={(e) => !imageUrl && fileInputRef.current?.click()}
+                      className="card-nacré hero-upload-box"
+                      style={{
+                        border: dragOver ? `1.5px solid ${GOLD}` : '1px solid rgba(201, 169, 97, 0.22)',
+                        boxShadow: dragOver
+                          ? 'inset 0 0 0 2px #C5A028, inset 0 4px 12px rgba(0,0,0,0.02)'
+                          : '0 12px 32px rgba(168, 116, 73, 0.04), inset 0 1px 0 rgba(255, 255, 255, 0.95)',
+                        borderRadius: 22,
+                        padding: imageUrl ? 0 : '40px 24px',
+                        textAlign: 'center',
+                        cursor: imageUrl ? 'default' : 'pointer',
+                        background: dragOver ? 'rgba(255, 255, 255, 0.75)' : 'rgba(255, 255, 255, 0.85)',
+                        transition: 'all 0.35s cubic-bezier(0.4,0,0.2,1)',
+                        overflow: 'hidden',
+                        position: 'relative',
+                        zIndex: 1,
+                      }}
+                    >
+                      {imageUrl ? (
+                        <div style={{ position: 'relative' }}>
+                          <img
+                            src={imageUrl} alt="Preview"
+                            style={{ width: '100%', maxHeight: 340, objectFit: 'cover', display: 'block', borderRadius: 16 }}
+                          />
                           <button
-                            ref={heroCtaRef}
-                            className="premium-cta-primary"
-                            onClick={() => setShowMultiAngle(true)}
+                            onClick={(e) => { e.stopPropagation(); fileInputRef.current?.click(); }}
+                            style={{
+                              position: 'absolute', bottom: 12, right: 12,
+                              background: 'rgba(13,13,13,0.82)', color: '#fff',
+                              border: 'none', borderRadius: 8, padding: '7px 14px',
+                              fontSize: 12, cursor: 'pointer', fontFamily: "'DM Sans', sans-serif",
+                            }}
                           >
-                            {lang === 'fr' ? 'Analyser ma peau gratuitement' : 'Analyze my skin for free'}
+                            {t('changePhoto')}
                           </button>
                         </div>
-                        
-                        <div style={{ fontSize: 10.5, color: '#8A7A6B', fontWeight: 500, fontFamily: "'DM Sans', sans-serif", display: 'flex', flexDirection: 'column', gap: 8 }}>
-                          <p style={{ margin: 0, letterSpacing: '0.02em' }}>
-                            {lang === 'fr' ? 'Gratuit · résultat en ~30s · sans inscription · photos jamais stockées' : 'Free · ~30s result · no sign-up · photos never stored'}
+                      ) : (
+                        <>
+                          {/* Simplified Elegant Face Scan Icon */}
+                          <div className="hero-upload-desktop-hint" style={{ display: 'flex', justifyContent: 'center', marginBottom: 16 }}>
+                            <svg width="44" height="44" viewBox="0 0 44 44" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ display: 'block' }}>
+                              {/* Simple elegant scan oval */}
+                              <rect x="3" y="3" width="38" height="38" rx="19" stroke="#C9A961" strokeWidth="1.25" />
+                              {/* Minimalist face outline within the oval */}
+                              {/* Hair/Head Top Arch */}
+                              <path d="M15 17 C 15 15, 29 15, 29 17" stroke="#C9A961" strokeWidth="1.25" strokeLinecap="round" />
+                              {/* Face/Jaw Contour */}
+                              <path d="M15 20 C14 22, 14.5 27, 22 31.5 C29.5 27, 30 22, 29 20" stroke="#C9A961" strokeWidth="1.25" strokeLinecap="round" strokeLinejoin="round" />
+                              {/* Stylized Nose line */}
+                              <path d="M22 21.5 V 25.5 H 23.5" stroke="#C9A961" strokeWidth="1.25" strokeLinecap="round" strokeLinejoin="round" />
+                              {/* Minimal Eyes (Horizontal dashes) */}
+                              <line x1="17.5" y1="20.5" x2="19.5" y2="20.5" stroke="#C9A961" strokeWidth="1.25" strokeLinecap="round" />
+                              <line x1="24.5" y1="20.5" x2="26.5" y2="20.5" stroke="#C9A961" strokeWidth="1.25" strokeLinecap="round" />
+                              {/* Minimal Smile */}
+                              <path d="M20 28 C 21 28.5, 23 28.5, 24 28" stroke="#C9A961" strokeWidth="1.25" strokeLinecap="round" />
+                            </svg>
+                          </div>
+                          <h3 className="hero-upload-title hero-upload-desktop-hint" style={{ margin: '0 0 8px', fontSize: 20, color: '#2C2416', fontWeight: 700, fontFamily: "'Cormorant Garamond', serif" }}>
+                            {lang === 'fr' ? 'Découvre ton score de peau en 30 secondes' : 'Discover your skin score in 30 seconds'}
+                          </h3>
+                          <p className="hero-upload-desktop-hint" style={{ margin: '0 0 20px', fontSize: 13, color: '#5C4A3A', fontWeight: 500, fontFamily: "'DM Sans', sans-serif" }}>
+                            {lang === 'fr' ? 'Glisse ta photo ici, ou' : 'Drop your photo here, or'}
                           </p>
-                          <div style={{ width: 30, height: 1, background: 'rgba(212, 165, 116, 0.3)', margin: '0 auto' }}></div>
-                          <p style={{ margin: 0, textTransform: 'uppercase', letterSpacing: '0.05em', fontSize: 9.5 }}>
-                            {lang === 'fr' ? 'Portrait · bien éclairé · sans lunettes' : 'Portrait · well lit · no glasses'}
-                          </p>
-                        </div>
-                      </>
-                    )}
-                  </div>
 
-                  <input ref={fileInputRef} type="file" accept="image/*" style={{ display: 'none' }}
-                    onChange={(e) => processFile(e.target.files[0])} />
-                  <input ref={cameraInputRef} type="file" accept="image/*" capture="user" style={{ display: 'none' }}
-                    onChange={(e) => processFile(e.target.files[0])} />
+                          <div style={{ display: 'flex', flexDirection: 'column', gap: 12, alignItems: 'center', width: '100%', marginBottom: 16 }}>
+                            <button
+                              ref={heroCtaRef}
+                              className="premium-cta-primary"
+                              onClick={() => setShowMultiAngle(true)}
+                            >
+                              {lang === 'fr' ? 'Analyser ma peau gratuitement' : 'Analyze my skin for free'}
+                            </button>
+                          </div>
+
+                          <div className="hero-upload-desktop-hint" style={{ fontSize: 10.5, color: '#8A7A6B', fontWeight: 500, fontFamily: "'DM Sans', sans-serif", display: 'flex', flexDirection: 'column', gap: 8 }}>
+                            <p style={{ margin: 0, letterSpacing: '0.02em' }}>
+                              {lang === 'fr' ? 'Gratuit · résultat en ~30s · sans inscription · photos jamais stockées' : 'Free · ~30s result · no sign-up · photos never stored'}
+                            </p>
+                            <div style={{ width: 30, height: 1, background: 'rgba(212, 165, 116, 0.3)', margin: '0 auto' }}></div>
+                            <p style={{ margin: 0, textTransform: 'uppercase', letterSpacing: '0.05em', fontSize: 9.5 }}>
+                              {lang === 'fr' ? 'Portrait · bien éclairé · sans lunettes' : 'Portrait · well lit · no glasses'}
+                            </p>
+                          </div>
+                        </>
+                      )}
+                    </div>
+
+                    <input ref={fileInputRef} type="file" accept="image/*" style={{ display: 'none' }}
+                      onChange={(e) => processFile(e.target.files[0])} />
+                    <input ref={cameraInputRef} type="file" accept="image/*" capture="user" style={{ display: 'none' }}
+                      onChange={(e) => processFile(e.target.files[0])} />
+                  </div>
                 </div>
               </div>
 

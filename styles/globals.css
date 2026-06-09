@@ -1091,4 +1091,25 @@ body::before {
 }
 .premium-cta-primary {
   animation: buttonGlow 4s ease-in-out infinite;
-}
+}
+
+/* ── Camera active: hide all page chrome on mobile ── */
+@media (max-width: 768px) {
+  /* Masquer nav + welcome banner quand caméra ouverte */
+  .camera-active .nav-blur,
+  .camera-active .welcome-banner,
+  .camera-active .mobile-sticky-cta-bar {
+    display: none !important;
+  }
+
+  /* Masquer la hero-upload-box (drag-drop desktop) sur mobile */
+  .hero-upload-zone-desktop {
+    display: none !important;
+  }
+
+  /* Masquer les textes upload (icône + "Glisse ta photo") sur mobile */
+  .hero-upload-desktop-hint {
+    display: none !important;
+  }
+}
+

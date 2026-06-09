@@ -10,6 +10,19 @@ export default function MultiAngleCamera({ onCapturesComplete, onClose }) {
   const [screenFlash, setScreenFlash] = useState(false);
   const [isCapturing, setIsCapturing] = useState(false);
 
+  // Lock body scroll + hide page chrome while camera is open
+  useEffect(() => {
+    document.body.classList.add('camera-active');
+    document.documentElement.classList.add('camera-active');
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    return () => {
+      document.body.classList.remove('camera-active');
+      document.documentElement.classList.remove('camera-active');
+      document.body.style.overflow = prev;
+    };
+  }, []);
+
   // Start camera
   useEffect(() => {
     const startCamera = async () => {
