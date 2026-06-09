@@ -1101,15 +1101,5 @@ body::before {
   .camera-active .mobile-sticky-cta-bar {
     display: none !important;
   }
-
-  /* Masquer la hero-upload-box (drag-drop desktop) sur mobile */
-  .hero-upload-zone-desktop {
-    display: none !important;
-  }
-
-  /* Masquer les textes upload (icône + "Glisse ta photo") sur mobile */
-  .hero-upload-desktop-hint {
-    display: none !important;
-  }
 }
 
