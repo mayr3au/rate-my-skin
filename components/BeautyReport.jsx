@@ -2435,8 +2435,8 @@ const mapUiConcernToDb = (uiConcern) => {
                           <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 8 }}>
                             <SeverityBadge severity={problem.severity} t={t} />
                           </div>
-                          <div style={{ fontSize: "20px", fontWeight: "700", color: "#2C2416", marginBottom: 6, fontFamily: "'Playfair Display', serif", lineHeight: 1.3 }}>{problem.title}</div>
-                          <p style={{ margin: 0, fontSize: "16px", lineHeight: "1.55", color: "#2C2416", fontWeight: 400, fontFamily: "'Inter', sans-serif" }}>{problem.description}</p>
+                          <div style={{ fontSize: "16px", fontWeight: "700", color: "#2C2416", marginBottom: 6, fontFamily: "'Playfair Display', serif", lineHeight: 1.3 }}>{problem.title}</div>
+                          <p style={{ margin: 0, fontSize: "13px", lineHeight: "1.55", color: "#2C2416", fontWeight: 400, fontFamily: "'Inter', sans-serif" }}>{problem.description}</p>
                         </div>
                       </div>
                     );
