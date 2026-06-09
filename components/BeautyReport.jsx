@@ -294,7 +294,7 @@ function ScoreHeroCard({ score, summary, faceShape, skinType, skinTone, badge, m
 
       {/* Summary */}
       <p style={{
-        margin: "0 0 16px", fontSize: "17px", lineHeight: "1.6", textAlign: "center", position: "relative",
+        margin: "0 0 16px", fontSize: "14px", lineHeight: "1.6", textAlign: "center", position: "relative",
         color: "#2C2416", fontFamily: "'Inter', sans-serif",
         fontWeight: 400,
         wordBreak: "break-word"
@@ -718,7 +718,7 @@ function MetricCard({ m, index, t }) {
              {status.label}
            </span>
            <span style={{ 
-              fontSize: "16px", color: "#2C2416", fontWeight: 400, 
+              fontSize: "13px", color: "#2C2416", fontWeight: 400, 
               fontFamily: "'Inter', sans-serif",
               lineHeight: "1.55",
               whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", flex: 1
@@ -2994,7 +2994,7 @@ const mapUiConcernToDb = (uiConcern) => {
             {displayStrengths.map((s, i) => (
               <div key={i} style={{ ...CARD, padding: "20px 22px", display: "flex", gap: 14, alignItems: "flex-start" }}>
                 <div style={{ width: 34, height: 34, borderRadius: 10, background: "rgba(168,116,73,0.12)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, color: GOLD, fontSize: 14 }}>{ICONS[i] || "✦"}</div>
-                <div><div style={{ fontSize: "20px", fontWeight: "700", color: "#2C2416", marginBottom: 6, fontFamily: "'Playfair Display', serif" }}>{s.title}</div><p style={{ margin: 0, fontSize: "16px", lineHeight: "1.55", color: "#2C2416", fontWeight: 400, fontFamily: "'Inter', sans-serif" }}>{s.desc}</p></div>
+                <div><div style={{ fontSize: "16px", fontWeight: "700", color: "#2C2416", marginBottom: 6, fontFamily: "'Playfair Display', serif" }}>{s.title}</div><p style={{ margin: 0, fontSize: "13px", lineHeight: "1.55", color: "#2C2416", fontWeight: 400, fontFamily: "'Inter', sans-serif" }}>{s.desc}</p></div>
               </div>
             ))}
           </div>
@@ -3004,7 +3004,7 @@ const mapUiConcernToDb = (uiConcern) => {
             {displayImprovements.map((item, i) => (
               <div key={i} style={{ ...CARD, padding: "20px 22px", display: "flex", gap: 14, alignItems: "flex-start" }}>
                 <div style={{ width: 28, height: 28, borderRadius: "50%", background: "rgba(212,165,116,0.12)", border: "1px solid rgba(212,165,116,0.25)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, fontSize: 13, fontWeight: 600, color: GOLD, fontFamily: "'Cormorant Garamond', serif" }}>{i + 1}</div>
-                <div><div style={{ fontSize: "20px", fontWeight: "700", color: "#2C2416", marginBottom: 6, fontFamily: "'Playfair Display', serif" }}>{item.title}</div><p style={{ margin: 0, fontSize: "16px", lineHeight: "1.55", color: "#2C2416", fontWeight: 400, fontFamily: "'Inter', sans-serif" }}>{item.desc}</p></div>
+                <div><div style={{ fontSize: "16px", fontWeight: "700", color: "#2C2416", marginBottom: 6, fontFamily: "'Playfair Display', serif" }}>{item.title}</div><p style={{ margin: 0, fontSize: "13px", lineHeight: "1.55", color: "#2C2416", fontWeight: 400, fontFamily: "'Inter', sans-serif" }}>{item.desc}</p></div>
               </div>
             ))}
           </div>
@@ -3617,8 +3617,8 @@ const mapUiConcernToDb = (uiConcern) => {
                           {priorities[key]}
                         </span>
                       </div>
-                      <div style={{ fontSize: "20px", fontWeight: "700", color: "#2C2416", marginBottom: 6, fontFamily: "'Playfair Display', serif" }}>{item.title}</div>
-                      <p style={{ margin: 0, fontSize: "16px", lineHeight: "1.55", color: "#2C2416", fontWeight: 400, fontFamily: "'Inter', sans-serif" }}>{item.desc}</p>
+                      <div style={{ fontSize: "16px", fontWeight: "700", color: "#2C2416", marginBottom: 6, fontFamily: "'Playfair Display', serif" }}>{item.title}</div>
+                      <p style={{ margin: 0, fontSize: "13px", lineHeight: "1.55", color: "#2C2416", fontWeight: 400, fontFamily: "'Inter', sans-serif" }}>{item.desc}</p>
                   </div>
                 </div>
               );
@@ -3778,15 +3778,15 @@ const mapUiConcernToDb = (uiConcern) => {
                   <div style={{ position: "absolute", left: 36, top: 20, bottom: 20, width: 2, background: "linear-gradient(180deg, rgba(201,169,97,0.4), rgba(201,169,97,0.05))", zIndex: 0 }} />
                   {paid.progression.map((step, i) => (
                     <div key={i} style={{ ...CARD, padding: "18px 20px", display: "flex", gap: 16, alignItems: "center", position: "relative", zIndex: 1 }}>
-                      <div style={{ width: 34, height: 34, borderRadius: "50%", background: "#FFF", border: "2px solid #C9A961", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, fontWeight: 700, color: "#A87449", flexShrink: 0, boxShadow: "0 4px 12px rgba(201,169,97,0.15)" }}>
+                      <div style={{ width: 34, height: 34, borderRadius: "50%", background: "#FFF", border: "2px solid #C9A961", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12, fontWeight: 700, color: "#A87449", flexShrink: 0, boxShadow: "0 4px 12px rgba(201,169,97,0.15)" }}>
                         {step.week}
                       </div>
                       <div>
-                        <div style={{ fontSize: 16, fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", color: "#2C2416", marginBottom: 2 }}>
+                        <div style={{ fontSize: 13, fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", color: "#2C2416", marginBottom: 2 }}>
                           {lang === 'fr' ? `Semaine ${step.week}` : `Week ${step.week}`}
                         </div>
-                        <div style={{ fontSize: "20px", fontWeight: "700", color: "#2C2416", marginBottom: 4, fontFamily: "'Playfair Display', serif" }}>{step.title}</div>
-                        <p style={{ margin: 0, fontSize: "16px", lineHeight: "1.55", color: "#2C2416", fontWeight: 400, fontFamily: "'Inter', sans-serif" }}>{step.desc}</p>
+                        <div style={{ fontSize: "16px", fontWeight: "700", color: "#2C2416", marginBottom: 4, fontFamily: "'Playfair Display', serif" }}>{step.title}</div>
+                        <p style={{ margin: 0, fontSize: "13px", lineHeight: "1.55", color: "#2C2416", fontWeight: 400, fontFamily: "'Inter', sans-serif" }}>{step.desc}</p>
                       </div>
                     </div>
                   ))}
