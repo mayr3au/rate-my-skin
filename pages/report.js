@@ -148,7 +148,7 @@ export default function Report() {
           : "Mild dehydration and periorbital hyperpigmentation are the dominant findings in this analysis.",
         faceShape: isFr ? "Ovale" : "Oval",
         skinType: isFr ? "Mixte" : "Combination",
-        skinTone: isFr ? "Teint Beige Moyen — Type III" : "Type III — Medium Beige",
+        skinTone: isFr ? "Teint Beige Moyen, Type III" : "Type III, Medium Beige",
         free_version: {
           mainProblems: isFr ? [
             { title: "Déshydratation", description: "Des signes de manque d’hydratation sont visibles dans les couches superficielles de la peau. Cela arrive souvent avec la fatigue ou un manque d’eau.", severity: "mild" },
@@ -160,8 +160,8 @@ export default function Report() {
             { title: "Sebum Production", description: "Slight shininess in the T-zone area, indicating slightly elevated sebum production.", severity: "mild" }
           ],
           basicSummary: isFr
-            ? "Votre peau présente une belle résistance générale, avec de légers signes de déshydratation à corriger. Dans l’ensemble, votre peau est en bonne santé — le rapport complet vous donnera des scores détaillés, une routine sur mesure et des produits adaptés."
-            : "Your skin shows high overall resilience, with mild indicators of moisture loss. Overall, your skin is in good health — the full report will give you detailed scores, a personalised routine and tailored product recommendations.",
+            ? "Votre peau présente une belle résistance générale, avec de légers signes de déshydratation à corriger. Dans l’ensemble, votre peau est en bonne santé, le rapport complet vous donnera des scores détaillés, une routine sur mesure et des produits adaptés."
+            : "Your skin shows high overall resilience, with mild indicators of moisture loss. Overall, your skin is in good health, the full report will give you detailed scores, a personalised routine and tailored product recommendations.",
         },
         paid_version: {
           metrics: isFr ? [
@@ -171,8 +171,8 @@ export default function Report() {
             { label: "Acné", score: 92, grade: "A", detail: "Aucun coumédon actif ni lésion inflammatoire détecté." },
             { label: "Taches", score: 74, grade: "C", detail: "Légères taches solaires sur les joues et hyperpigmentation." },
             { label: "Cernes", score: 68, grade: "D", detail: "Léger creux sous l’œil avec cernes visibles, probablement liés à la fatigue." },
-            { label: "Symétrie", score: 85, grade: "B", detail: "Alignement facial très harmonieux, légère variance structurelle mineure." },
-            { label: "Harmonie", score: 90, grade: "A", detail: "Excellente relation spatiale entre les proportions du visage." }
+            { label: "Texture", score: 85, grade: "B", detail: "Texture légèrement irrégulière avec quelques rugosités sur les joues." },
+            { label: "Rougeurs", score: 90, grade: "A", detail: "Rougeurs diffuses localisées autour du nez et des joues." }
           ] : [
             { label: "Hydration", score: 85, grade: "B", detail: "Optimal barrier function, minor dry lines on the forehead." },
             { label: "Pores", score: 79, grade: "B", detail: "Sebaceous activity is within normal limits; minor visible pores." },
@@ -180,8 +180,8 @@ export default function Report() {
             { label: "Acne", score: 92, grade: "A", detail: "No active comedones or inflammatory lesions detected." },
             { label: "Dark Spots", score: 74, grade: "C", detail: "Slight sun spots on cheeks and hyperpigmentation." },
             { label: "Under-Eye", score: 68, grade: "D", detail: "Mild structural pooling under orbit, visible periorbital hyperpigmentation." },
-            { label: "Symmetry", score: 85, grade: "B", detail: "Highly harmonious facial alignment; minor structural variance." },
-            { label: "Harmony", score: 90, grade: "A", detail: "Perfect spatial relationship between golden ratios." }
+            { label: "Texture", score: 85, grade: "B", detail: "Slightly uneven texture with minor roughness on the cheeks." },
+            { label: "Redness", score: 90, grade: "A", detail: "Diffuse redness around the nose and cheeks." }
           ],
           strengths: isFr ? [
             { title: "Éclat cellulaire", desc: "Texture de peau lumineuse montrant un renouvellement cellulaire très efficace." },
@@ -239,7 +239,7 @@ export default function Report() {
                 : "Caffeine + peptides to visibly reduce puffiness and dark circles overnight.",
               amazonLink: "https://www.amazon.fr/dp/B08JH2JH7Y?tag=ratemyskin-21",
               sephoraLink: "https://www.sephora.com/product/the-inkey-list-caffeine-eye-cream",
-              price: "€10–14",
+              price: "€10-14",
               imageUrl: "https://images.unsplash.com/photo-1629732047847-50b7ecf0cbf1?q=80&w=200&auto=format&fit=crop"
             },
             {

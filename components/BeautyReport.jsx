@@ -294,8 +294,8 @@ function ScoreHeroCard({ score, summary, faceShape, skinType, skinTone, badge, m
 
       {/* Summary */}
       <p style={{
-        margin: "0 0 16px", fontSize: 16, lineHeight: 1.5, textAlign: "center", position: "relative",
-        color: "#2C2416", fontFamily: "'DM Sans', sans-serif",
+        margin: "0 0 16px", fontSize: "17px", lineHeight: "1.6", textAlign: "center", position: "relative",
+        color: "#2C2416", fontFamily: "'Inter', sans-serif",
         fontWeight: 400,
         wordBreak: "break-word"
       }}>
@@ -718,11 +718,13 @@ function MetricCard({ m, index, t }) {
              {status.label}
            </span>
            <span style={{ 
-             fontSize: 12, color: "#5C4A3A", fontWeight: 500, 
-             whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", flex: 1
-           }}>
-             {m.detail}
-           </span>
+              fontSize: "16px", color: "#2C2416", fontWeight: 400, 
+              fontFamily: "'Inter', sans-serif",
+              lineHeight: "1.55",
+              whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", flex: 1
+            }}>
+              {m.detail}
+            </span>
         </div>
       </div>
     </div>
@@ -995,9 +997,6 @@ export function ProductCard({ product, lang, t, userSkinType, userConcerns, isPr
   const matchedConcernsList = userConcerns ? pConcerns.filter(c => userConcerns.includes(c)) : [];
 
   const hasActiveOverlap = requiredActives && requiredActives.length > 0
-    ? (product.actives || []).some(a => requiredActives.some(ra => a.toLowerCase().includes(ra.toLowerCase())))
-    : true;
-
   const hasConcernOverlap = userConcerns && userConcerns.length > 0
     ? (matchedConcernsList.length / userConcerns.length >= 0.5 || matchedConcernsList.length / Math.max(1, pConcerns.length) >= 0.5)
     : matchesConcern;
@@ -1025,6 +1024,10 @@ export function ProductCard({ product, lang, t, userSkinType, userConcerns, isPr
           : "linear-gradient(135deg, rgba(255, 255, 255, 0.78) 0%, rgba(253, 246, 237, 0.52) 50%, rgba(246, 235, 222, 0.78) 100%)",
         backdropFilter: "blur(20px) saturate(140%)",
         WebkitBackdropFilter: "blur(20px) saturate(140%)",
+        display: "flex",
+        flexDirection: "row",
+        alignItems: "center",
+        gap: "12px"
       }}
     >
       <div className="premium-product-card">
@@ -1042,7 +1045,7 @@ export function ProductCard({ product, lang, t, userSkinType, userConcerns, isPr
         </div>
 
         {/* Content wrapper */}
-        <div className="premium-product-info">
+        <div className="premium-product-info" style={{ flex: 1 }}>
           {/* Header row with Matching Badges / Category and Price */}
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 2, flexWrap: "wrap", gap: 6 }}>
             <div style={{ display: "flex", flexWrap: "wrap", gap: 4 }}>
@@ -2432,8 +2435,8 @@ const mapUiConcernToDb = (uiConcern) => {
                           <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 8 }}>
                             <SeverityBadge severity={problem.severity} t={t} />
                           </div>
-                          <div style={{ fontSize: 16, fontWeight: 400, color: "#3A2E26", marginBottom: 6, fontFamily: "'Cormorant Garamond', serif", lineHeight: 1.3 }}>{problem.title}</div>
-                          <p style={{ margin: 0, fontSize: 16, lineHeight: 1.5, color: "#2C2416", fontWeight: 400 }}>{problem.description}</p>
+                          <div style={{ fontSize: "20px", fontWeight: "700", color: "#2C2416", marginBottom: 6, fontFamily: "'Playfair Display', serif", lineHeight: 1.3 }}>{problem.title}</div>
+                          <p style={{ margin: 0, fontSize: "16px", lineHeight: "1.55", color: "#2C2416", fontWeight: 400, fontFamily: "'Inter', sans-serif" }}>{problem.description}</p>
                         </div>
                       </div>
                     );
@@ -2991,7 +2994,7 @@ const mapUiConcernToDb = (uiConcern) => {
             {displayStrengths.map((s, i) => (
               <div key={i} style={{ ...CARD, padding: "20px 22px", display: "flex", gap: 14, alignItems: "flex-start" }}>
                 <div style={{ width: 34, height: 34, borderRadius: 10, background: "rgba(168,116,73,0.12)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, color: GOLD, fontSize: 14 }}>{ICONS[i] || "✦"}</div>
-                <div><div style={{ fontSize: 16, fontWeight: 600, color: "#2C2416", marginBottom: 6 }}>{s.title}</div><p style={{ margin: 0, fontSize: 16, lineHeight: 1.5, color: "#2C2416", fontWeight: 400 }}>{s.desc}</p></div>
+                <div><div style={{ fontSize: "20px", fontWeight: "700", color: "#2C2416", marginBottom: 6, fontFamily: "'Playfair Display', serif" }}>{s.title}</div><p style={{ margin: 0, fontSize: "16px", lineHeight: "1.55", color: "#2C2416", fontWeight: 400, fontFamily: "'Inter', sans-serif" }}>{s.desc}</p></div>
               </div>
             ))}
           </div>
@@ -3001,7 +3004,7 @@ const mapUiConcernToDb = (uiConcern) => {
             {displayImprovements.map((item, i) => (
               <div key={i} style={{ ...CARD, padding: "20px 22px", display: "flex", gap: 14, alignItems: "flex-start" }}>
                 <div style={{ width: 28, height: 28, borderRadius: "50%", background: "rgba(212,165,116,0.12)", border: "1px solid rgba(212,165,116,0.25)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, fontSize: 13, fontWeight: 600, color: GOLD, fontFamily: "'Cormorant Garamond', serif" }}>{i + 1}</div>
-                <div><div style={{ fontSize: 16, fontWeight: 600, color: "#2C2416", marginBottom: 6 }}>{item.title}</div><p style={{ margin: 0, fontSize: 16, lineHeight: 1.5, color: "#2C2416", fontWeight: 400 }}>{item.desc}</p></div>
+                <div><div style={{ fontSize: "20px", fontWeight: "700", color: "#2C2416", marginBottom: 6, fontFamily: "'Playfair Display', serif" }}>{item.title}</div><p style={{ margin: 0, fontSize: "16px", lineHeight: "1.55", color: "#2C2416", fontWeight: 400, fontFamily: "'Inter', sans-serif" }}>{item.desc}</p></div>
               </div>
             ))}
           </div>
@@ -3272,7 +3275,7 @@ const mapUiConcernToDb = (uiConcern) => {
                     {lang === 'fr' ? "Votre Sélection Sur-Mesure" : "Your Custom Selection"}
                   </h4>
                 </div>
-                <p style={{ margin: "0 0 4px", fontSize: 16, color: "#2C2416", lineHeight: 1.5, fontWeight: 400 }}>
+                <p style={{ margin: "0 0 4px", fontSize: 18, color: "#2C2416", lineHeight: 1.5, fontWeight: 400, fontFamily: "'Cormorant Garamond', serif" }}>
                   {lang === 'fr' 
                     ? "Ces produits correspondent à la fois à votre type de peau et à vos préoccupations actives. Ils forment la base de votre routine idéale :"
                     : "These products match both your skin type and your active concerns. They form the core of your ideal daily routine:"}
@@ -3308,7 +3311,7 @@ const mapUiConcernToDb = (uiConcern) => {
                   }}>
                     {lang === 'fr' ? "Explorez le catalogue complet" : "Explore the Full Catalog"}
                   </h4>
-                  <p style={{ margin: "4px 0 0", fontSize: 16, color: "#2C2416", lineHeight: 1.5, fontWeight: 400 }}>
+                  <p style={{ margin: "4px 0 0", fontSize: 18, color: "#2C2416", lineHeight: 1.5, fontWeight: 400, fontFamily: "'Cormorant Garamond', serif" }}>
                     {lang === 'fr' 
                       ? "Tous nos produits sélectionnés, triés par pertinence pour votre peau."
                       : "All our curated products, sorted by relevance to your skin."}
@@ -3614,8 +3617,8 @@ const mapUiConcernToDb = (uiConcern) => {
                           {priorities[key]}
                         </span>
                       </div>
-                      <div style={{ fontSize: 16, fontWeight: 600, color: "#2C241D", marginBottom: 6, fontFamily: "'Cormorant Garamond', serif" }}>{item.title}</div>
-                      <p style={{ margin: 0, fontSize: 13, lineHeight: 1.6, color: "#6F6156" }}>{item.desc}</p>
+                      <div style={{ fontSize: "20px", fontWeight: "700", color: "#2C2416", marginBottom: 6, fontFamily: "'Playfair Display', serif" }}>{item.title}</div>
+                      <p style={{ margin: 0, fontSize: "16px", lineHeight: "1.55", color: "#2C2416", fontWeight: 400, fontFamily: "'Inter', sans-serif" }}>{item.desc}</p>
                   </div>
                 </div>
               );
@@ -3782,8 +3785,8 @@ const mapUiConcernToDb = (uiConcern) => {
                         <div style={{ fontSize: 16, fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", color: "#2C2416", marginBottom: 2 }}>
                           {lang === 'fr' ? `Semaine ${step.week}` : `Week ${step.week}`}
                         </div>
-                        <div style={{ fontSize: 16, fontWeight: 600, color: "#2C2416", marginBottom: 4, fontFamily: "'Cormorant Garamond', serif" }}>{step.title}</div>
-                        <p style={{ margin: 0, fontSize: 16, lineHeight: 1.5, color: "#2C2416", fontWeight: 400 }}>{step.desc}</p>
+                        <div style={{ fontSize: "20px", fontWeight: "700", color: "#2C2416", marginBottom: 4, fontFamily: "'Playfair Display', serif" }}>{step.title}</div>
+                        <p style={{ margin: 0, fontSize: "16px", lineHeight: "1.55", color: "#2C2416", fontWeight: 400, fontFamily: "'Inter', sans-serif" }}>{step.desc}</p>
                       </div>
                     </div>
                   ))}
@@ -4452,10 +4455,10 @@ const mapUiConcernToDb = (uiConcern) => {
         }
         .premium-product-desc {
           margin: 0;
-          font-size: 12.5px;
+          font-size: 16px;
           line-height: 1.55;
-          color: #6F6156;
-          font-family: 'DM Sans', sans-serif;
+          color: #2C2416;
+          font-family: 'Inter', sans-serif;
         }
         .rpt-product-buttons-container {
           display: flex;
@@ -4476,23 +4479,47 @@ const mapUiConcernToDb = (uiConcern) => {
         }
         @media (max-width: 560px) {
           .premium-product-card {
-            flex-direction: column;
-            gap: 12px;
+            display: grid !important;
+            grid-template-columns: 96px 1fr !important;
+            grid-template-rows: auto auto !important;
+            gap: 12px 16px !important;
+            align-items: center !important;
+            width: 100% !important;
           }
           .premium-product-img-wrapper {
-            width: 100%;
-            height: 160px;
+            grid-column: 1 !important;
+            grid-row: 1 !important;
+            width: 96px !important;
+            height: 96px !important;
+            border-radius: 12px !important;
+            background: #F8F4ED !important;
+            padding: 8px !important;
+            box-sizing: border-box !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+          }
+          .premium-product-info {
+            grid-column: 2 !important;
+            grid-row: 1 !important;
+            display: flex !important;
+            flex-direction: column !important;
+            justify-content: center !important;
+            min-width: 0 !important;
           }
           .rpt-product-buttons-container {
-            flex-direction: row;
-            width: 100%;
-            gap: 10px;
-            margin-top: 6px;
-            padding-top: 10px;
-            border-top: 1px dashed rgba(168, 116, 73, 0.12);
+            grid-column: 1 / span 2 !important;
+            grid-row: 2 !important;
+            display: flex !important;
+            flex-direction: row !important;
+            width: 100% !important;
+            gap: 10px !important;
+            margin-top: 4px !important;
+            padding-top: 0 !important;
+            border-top: none !important;
           }
           .premium-product-btn {
-            flex: 1;
+            flex: 1 !important;
           }
         }
       `}</style>

@@ -10,12 +10,12 @@ const steps = [
   {
     num: '01',
     title: 'Upload ta photo',
-    desc: "Importe une photo de ton visage — bonne lumière, visage centré, gros plan. JPG, PNG ou WebP jusqu'à 20 Mo.",
+    desc: "Importe une photo de ton visage, bonne lumière, visage centré, gros plan. JPG, PNG ou WebP jusqu'à 20 Mo.",
   },
   {
     num: '02',
     title: "L'IA analyse en 30 secondes",
-    desc: "Notre intelligence artificielle examine 8 métriques cliniques : hydratation, éclat, acné, pores, taches brunes, cernes, symétrie et harmonie du visage.",
+    desc: "Notre intelligence artificielle examine 8 métriques cliniques : hydratation, éclat, acné, pores, taches brunes, cernes, texture et rougeurs de la peau.",
   },
   {
     num: '03',
@@ -27,7 +27,7 @@ const steps = [
 const faqs = [
   {
     q: "Comment l'IA note ma peau ?",
-    a: "Notre IA analyse une photo de ton visage et évalue 8 critères dermatologiques : hydratation, éclat, présence d'acné, taille des pores, taches brunes, cernes, symétrie du visage et harmonie des traits. Chaque critère est noté individuellement, puis combiné pour générer un score global sur 100. L'analyse est réalisée en temps réel et ta photo n'est jamais stockée.",
+    a: "Notre IA analyse une photo de ton visage et évalue 8 critères dermatologiques : hydratation, éclat, présence d'acné, taille des pores, taches brunes, cernes, texture de la peau et rougeurs. Chaque critère est noté individuellement, puis combiné pour générer un score global sur 100. L'analyse est réalisée en temps réel et ta photo n'est jamais stockée.",
   },
   {
     q: 'Est-ce vraiment gratuit ?',
@@ -153,7 +153,7 @@ export default function NoteMaPeau() {
         }}>
           {[
             { num: '8', label: 'métriques analysées' },
-            { num: '100%', label: 'privé — photo non stockée' },
+            { num: '100%', label: 'privé, photo non stockée' },
             { num: '~20s', label: 'pour ton rapport complet' },
           ].map(({ num, label }) => (
             <div key={label} className="bubble-nacré" style={{
@@ -182,7 +182,7 @@ export default function NoteMaPeau() {
             boxShadow: '0 8px 32px rgba(168,116,73,0.06), inset 0 1px 0 rgba(255,255,255,0.9)',
           }}>
             <p style={{ fontSize: 14.5, lineHeight: 1.8, color: '#6F6156', margin: '0 0 22px', fontFamily: "'DM Sans', sans-serif" }}>
-              <strong style={{ color: '#3A2E26' }}>Noter sa peau</strong>, c'est obtenir une évaluation objective de l'état de ta peau à un instant donné. Contrairement à une simple observation dans le miroir, le diagnostic peau IA de Rate My Skin analyse plusieurs paramètres cliniques — hydratation, éclat, acné, pores, taches, cernes — pour te donner un <strong style={{ color: '#3A2E26' }}>score peau sur 100</strong>, précis et reproductible.
+              <strong style={{ color: '#3A2E26' }}>Noter sa peau</strong>, c'est obtenir une évaluation objective de l'état de ta peau à un instant donné. Contrairement à une simple observation dans le miroir, le diagnostic peau IA de Rate My Skin analyse plusieurs paramètres cliniques, hydratation, éclat, acné, pores, taches, cernes, texture et rougeurs, pour te donner un <strong style={{ color: '#3A2E26' }}>score peau sur 100</strong>, précis et reproductible.
             </p>
             <div style={{ height: 1, background: 'linear-gradient(90deg, transparent, rgba(168,116,73,0.15), transparent)', margin: '0 0 22px' }} />
             <p style={{ fontSize: 14.5, lineHeight: 1.8, color: '#6F6156', margin: '0 0 22px', fontFamily: "'DM Sans', sans-serif" }}>

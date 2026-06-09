@@ -82,18 +82,18 @@ export default function BlogIndex() {
   return (
     <>
       <Head>
-        <title>Blog Skincare — Conseils Peau & Routine | Rate My Skin</title>
+        <title>Blog Skincare, Conseils Peau & Routine | Rate My Skin</title>
         <meta name="description" content="Conseils skincare d'experts, routines, ingrédients actifs et guides peau rédigés par des passionnés de dermatologie. Gratuit et sans jargon." />
         <meta name="keywords" content="blog skincare, conseils peau, routine skincare, ingrédients actifs, type de peau" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="canonical" href="https://ratemyskin.co/blog" />
         <meta property="og:type" content="website" />
         <meta property="og:url" content="https://ratemyskin.co/blog" />
-        <meta property="og:title" content="Blog Skincare — Conseils Peau & Routine | Rate My Skin" />
+        <meta property="og:title" content="Blog Skincare, Conseils Peau & Routine | Rate My Skin" />
         <meta property="og:description" content="Conseils skincare d'experts, routines, ingrédients actifs et guides peau rédigés par des passionnés de dermatologie." />
         <meta property="og:image" content="https://ratemyskin.co/og-image.png" />
         <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content="Blog Skincare — Conseils Peau & Routine | Rate My Skin" />
+        <meta name="twitter:title" content="Blog Skincare, Conseils Peau & Routine | Rate My Skin" />
         <meta name="twitter:description" content="Conseils skincare d'experts, routines, ingrédients actifs et guides peau." />
         <meta name="twitter:image" content="https://ratemyskin.co/og-image.png" />
       </Head>

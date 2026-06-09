@@ -110,18 +110,18 @@ export default function Privacy() {
   return (
     <>
       <Head>
-        <title>{activeContent.title} — Rate My Skin</title>
-        <meta name="description" content={lang === 'fr' ? "Politique de confidentialité de Rate My Skin — analyse de peau par IA." : "Privacy policy for Rate My Skin — AI skin analysis."} />
+        <title>{activeContent.title}, Rate My Skin</title>
+        <meta name="description" content={lang === 'fr' ? "Politique de confidentialité de Rate My Skin, analyse de peau par IA." : "Privacy policy for Rate My Skin, AI skin analysis."} />
         <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
         <link rel="canonical" href="https://ratemyskin.co/privacy" />
         <meta property="og:type" content="website" />
         <meta property="og:url" content="https://ratemyskin.co/privacy" />
-        <meta property="og:title" content={`${activeContent.title} — Rate My Skin`} />
-        <meta property="og:description" content={lang === 'fr' ? "Politique de confidentialité de Rate My Skin — analyse de peau par IA." : "Privacy policy for Rate My Skin — AI skin analysis."} />
+        <meta property="og:title" content={`${activeContent.title}, Rate My Skin`} />
+        <meta property="og:description" content={lang === 'fr' ? "Politique de confidentialité de Rate My Skin, analyse de peau par IA." : "Privacy policy for Rate My Skin, AI skin analysis."} />
         <meta property="og:image" content="https://ratemyskin.co/og-image.png" />
         <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content={`${activeContent.title} — Rate My Skin`} />
-        <meta name="twitter:description" content={lang === 'fr' ? "Politique de confidentialité de Rate My Skin — analyse de peau par IA." : "Privacy policy for Rate My Skin — AI skin analysis."} />
+        <meta name="twitter:title" content={`${activeContent.title}, Rate My Skin`} />
+        <meta name="twitter:description" content={lang === 'fr' ? "Politique de confidentialité de Rate My Skin, analyse de peau par IA." : "Privacy policy for Rate My Skin, AI skin analysis."} />
         <meta name="twitter:image" content="https://ratemyskin.co/og-image.png" />
       </Head>
 

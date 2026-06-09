@@ -46,7 +46,7 @@ const content = {
       },
       {
         title: "3. Consultez un professionnel de santé",
-        body: "Pour des conditions de peau sérieuses — mélanome, eczéma sévère, acné kystique, psoriasis, rosacée ou toute lésion suspecte — consultez IMPÉRATIVEMENT un dermatologue ou un médecin. Aucune décision médicale ne doit être prise sur la seule base de cette analyse.\n\nEn cas d'urgence médicale, appelez le 15 (SAMU, France) ou votre service d'urgence local.",
+        body: "Pour des conditions de peau sérieuses, mélanome, eczéma sévère, acné kystique, psoriasis, rosacée ou toute lésion suspecte, consultez IMPÉRATIVEMENT un dermatologue ou un médecin. Aucune décision médicale ne doit être prise sur la seule base de cette analyse.\n\nEn cas d'urgence médicale, appelez le 15 (SAMU, France) ou votre service d'urgence local.",
       },
       {
         title: "4. Recommandations produits",
@@ -74,11 +74,11 @@ const content = {
       },
       {
         title: "2. Limitations of AI",
-        body: "Artificial intelligence can make errors, misinterpret visual elements, or fail to detect serious dermatological conditions — including melanoma, carcinoma, or other skin pathologies that require in-person clinical evaluation.",
+        body: "Artificial intelligence can make errors, misinterpret visual elements, or fail to detect serious dermatological conditions, including melanoma, carcinoma, or other skin pathologies that require in-person clinical evaluation.",
       },
       {
         title: "3. Consult a Healthcare Professional",
-        body: "For serious skin conditions — melanoma, severe eczema, cystic acne, psoriasis, rosacea, or any suspicious lesion — you MUST consult a dermatologist or physician. No medical decision should be made based solely on this analysis.\n\nIn case of a medical emergency, call your local emergency services (911 in the US, 15 in France, 999 in the UK).",
+        body: "For serious skin conditions, melanoma, severe eczema, cystic acne, psoriasis, rosacea, or any suspicious lesion, you MUST consult a dermatologist or physician. No medical decision should be made based solely on this analysis.\n\nIn case of a medical emergency, call your local emergency services (911 in the US, 15 in France, 999 in the UK).",
       },
       {
         title: "4. Product Recommendations",
@@ -105,7 +105,7 @@ export default function MentionsLegales() {
   return (
     <>
       <Head>
-        <title>{active.title} — Rate My Skin</title>
+        <title>{active.title}, Rate My Skin</title>
         <meta name="description" content={lang === 'fr'
           ? "Avertissement médical de Rate My Skin. Cette analyse IA n'est pas un diagnostic médical."
           : "Medical disclaimer for Rate My Skin. This AI analysis is not a medical diagnosis."

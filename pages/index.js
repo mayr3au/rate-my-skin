@@ -137,7 +137,7 @@ const ANALYSIS_STEPS = [
 function Testimonials({ lang }) {
   const data = [
     {
-      name: "Christel",
+      name: "Christelle",
       age: 38,
       concern: lang === 'fr' ? "Taches pigmentaires & Teint terne" : "Pigmentation & Dullness",
       quote: lang === 'fr'
@@ -1296,7 +1296,7 @@ export default function Home({ teaserProducts }) {
                 {renderFloatingAccent(lang === 'fr' ? 'Éclat' : 'Radiance', 65, '#C9A961', { top: '45%', right: '-10%' }, 'mobile-float-bubble mobile-float-bubble-2', 'float2')}
                 {renderFloatingAccent(lang === 'fr' ? 'Pores' : 'Pores', 82, '#D4A574', { bottom: '20%', left: '-2%' }, 'mobile-float-bubble mobile-float-bubble-3', 'float3')}
                 {/* Extra bubbles for mobile */}
-                {renderFloatingAccent(lang === 'fr' ? 'Fermeté' : 'Firmness', 71, '#A87449', { bottom: '5%', right: '-5%' }, 'hide-desktop mobile-float-bubble mobile-float-bubble-4', 'float1')}
+                {renderFloatingAccent(lang === 'fr' ? 'Texture' : 'Texture', 74, '#A87449', { bottom: '5%', right: '-5%' }, 'hide-desktop mobile-float-bubble mobile-float-bubble-4', 'float1')}
                 {renderFloatingAccent(lang === 'fr' ? 'Rougeurs' : 'Redness', 89, '#D4A574', { top: '-2%', right: '15%' }, 'hide-desktop mobile-float-bubble mobile-float-bubble-5', 'float2')}
 
                 <img 
@@ -1424,8 +1424,8 @@ export default function Home({ teaserProducts }) {
                   { id: 'acne', label: lang === 'fr' ? 'Acné' : 'Acne', color: '#7DBFA8', val: 82, status: lang === 'fr' ? 'BON' : 'GOOD', statusColor: 'green', shortLine: lang === 'fr' ? 'Peau nette' : 'Clear skin' },
                   { id: 'taches', label: lang === 'fr' ? 'Taches' : 'Dark spots', color: '#B0885E', val: 70, status: lang === 'fr' ? 'À SURVEILLER' : 'MONITOR', statusColor: 'amber', shortLine: lang === 'fr' ? 'Début de taches' : 'Early spots' },
                   { id: 'cernes', label: lang === 'fr' ? 'Cernes' : 'Dark circles', color: '#8C7A6B', val: 62, status: lang === 'fr' ? 'À SURVEILLER' : 'MONITOR', statusColor: 'amber', shortLine: lang === 'fr' ? 'Ombres visibles' : 'Visible shadows' },
-                  { id: 'symetrie', label: lang === 'fr' ? 'Symétrie' : 'Symmetry', color: '#A87449', val: 85, status: lang === 'fr' ? 'BON' : 'GOOD', statusColor: 'green', shortLine: lang === 'fr' ? 'Très harmonieux' : 'Very harmonious' },
-                  { id: 'age', label: lang === 'fr' ? 'Âge estimé' : 'Estimated age', color: '#C5A028', val: 26, isValue: true, status: lang === 'fr' ? 'BON' : 'GOOD', statusColor: 'green', shortLine: lang === 'fr' ? 'Signes très discrets' : 'Very faint signs' },
+                  { id: 'texture', label: lang === 'fr' ? 'Texture' : 'Texture', color: '#A87449', val: 74, status: lang === 'fr' ? 'À SURVEILLER' : 'MONITOR', statusColor: 'amber', shortLine: lang === 'fr' ? 'Grain irrégulier' : 'Uneven texture' },
+                  { id: 'rougeurs', label: lang === 'fr' ? 'Rougeurs' : 'Redness', color: '#D4A574', val: 89, status: lang === 'fr' ? 'BON' : 'GOOD', statusColor: 'green', shortLine: lang === 'fr' ? 'Rougeurs diffuses' : 'Diffuse redness' },
                 ].map((m) => (
                   <div key={m.id} className="metric-card" style={{
                     display: 'flex',
@@ -1513,8 +1513,8 @@ export default function Home({ teaserProducts }) {
                   </h4>
                   <p style={{ fontSize: 15, color: '#5C4A3A', margin: 0, lineHeight: 1.6 }}>
                     {lang === 'fr' 
-                      ? "Pas un quiz. Pas les conseils génériques d'un influenceur. L'IA lit 8 métriques directement sur ton visage — hydratation, pores, taches, éclat — et compose la routine et les produits faits pour TES besoins, zone par zone. Ce que tu vois ici n'est qu'un exemple : la tienne sera unique." 
-                      : "Not a quiz. Not generic influencer advice. The AI reads 8 metrics directly on your face — hydration, pores, dark spots, radiance — and curates the routine and products made for YOUR needs, zone by zone. What you see here is just an example: yours will be unique."}
+                      ? "Pas un quiz. Pas les conseils génériques d'un influenceur. L'IA lit 8 métriques directement sur ton visage, hydratation, pores, taches, éclat, et compose la routine et les produits faits pour TES besoins, zone par zone. Ce que tu vois ici n'est qu'un exemple : la tienne sera unique." 
+                      : "Not a quiz. Not generic influencer advice. The AI reads 8 metrics directly on your face, hydration, pores, dark spots, radiance, and curates the routine and products made for YOUR needs, zone by zone. What you see here is just an example: yours will be unique."}
                   </p>
                 </div>
 
@@ -1685,7 +1685,7 @@ export default function Home({ teaserProducts }) {
                   </div>
                 </div>
                 <div style={{ textAlign: 'center', fontSize: 12, color: '#8C7A6B' }}>
-                  {lang === 'fr' ? 'Exemple illustratif — ta vraie routine sera construite à partir de ton scan.' : 'Illustrative example — your real routine will be built from your scan.'}
+                  {lang === 'fr' ? 'Exemple illustratif, ta vraie routine sera construite à partir de ton scan.' : 'Illustrative example, your real routine will be built from your scan.'}
                 </div>
               </div>
             </div>
@@ -1743,8 +1743,8 @@ export default function Home({ teaserProducts }) {
                     ),
                     title: lang === 'fr' ? 'Scanne ta peau' : 'Scan your skin',
                     desc: lang === 'fr'
-                      ? 'Une photo suffit. L\'IA analyse 8 métriques cliniques que ton miroir ne te montre pas — fini de deviner ce qui ne va pas.'
-                      : 'One photo is enough. The AI analyzes 8 clinical metrics your mirror doesn\'t show — stop guessing what\'s wrong.',
+                      ? 'Une photo suffit. L\'IA analyse 8 métriques cliniques que ton miroir ne te montre pas, fini de deviner ce qui ne va pas.'
+                      : 'One photo is enough. The AI analyzes 8 clinical metrics your mirror doesn\'t show, stop guessing what\'s wrong.',
                   },
                   {
                     num: '02',

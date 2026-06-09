@@ -106,14 +106,19 @@ const fetchProducts = async (supabase) => {
   });
 
   return { formattedProducts, imageByName };
-};const buildPremiumSystemPrompt = (lang, routineSlotsCandidatesPrompt, freeSummary) => {
+};
+
+const buildPremiumSystemPrompt = (lang, routineSlotsCandidatesPrompt, freeSummary, preCalculatedScoresContext) => {
   const isFr = lang === 'fr';
 
   if (isFr) {
     return `Tu es un spécialiste de la peau chaleureux et expert. Tu as déjà rédigé le bilan d'analyse de base suivant : "${freeSummary}".
-Maintenant, génère la version premium complète de ce rapport en analysant la photo de peau fournie pour les détails cliniques (scores, routine, recommandations de produits).
+Maintenant, génère la version premium complète de ce rapport en analysant la photo de peau fournie pour les détails cliniques (routine, recommandations de produits).
 
 RÉPONDS ENTIÈREMENT EN FRANÇAIS. TOUS les textes générés, routines et recommandations de produits doivent être rédigés en français fluide, chaleureux et simple. Sois extrêmement direct, concis et va droit au but. Évite toute phrase de remplissage ou généralité inutile.
+
+SCORES ÉVALUÉS À L'ÉTAPE PRÉCÉDENTE (tu dois concevoir tes explications detail en accord avec ces notes) :
+${preCalculatedScoresContext}
 
 SLOTS DE ROUTINE ET PRODUITS CANDIDATS DISPONIBLES :
 ${routineSlotsCandidatesPrompt}
@@ -122,14 +127,14 @@ Réponds UNIQUEMENT avec du JSON BRUT respectant EXACTEMENT cette structure :
 {
   "paid_version": {
     "metrics": [
-      { "label": "Hydratation", "score": <0-100>, "grade": "<A|B|C|D>", "severity": "<mild|moderate|significant. Utilise 'mild' si le score est >= 78, 'moderate' si 65-77, 'significant' si < 65>", "detail": "<1 courte phrase concise (12 mots max) décrivant uniquement ce qui est visible à l'image (ex: 'Légères ridules de déshydratation sur le front.')>" },
-      { "label": "Pores", "score": <0-100>, "grade": "<A|B|C|D>", "severity": "<mild|moderate|significant>", "detail": "<1 courte phrase concise (12 mots max) localisant précisément l'état des pores visible sur la photo (ex: 'Pores légèrement dilatés sur la zone T.')>" },
-      { "label": "Éclat", "score": <0-100>, "grade": "<A|B|C|D>", "severity": "<mild|moderate|significant>", "detail": "<1 courte phrase concise (12 mots max) décrivant l'éclat observé (ex: 'Teint terne nécessitant un boost de luminosité.')>" },
-      { "label": "Acné", "score": <0-100>, "grade": "<A|B|C|D>", "severity": "<mild|moderate|significant>", "detail": "<1 courte phrase concise (12 mots max) décrivant l'acné/imperfections (ex: 'Quelques imperfections localisées sur le menton.')>" },
-      { "label": "Taches", "score": <0-100>, "grade": "<A|B|C|D>", "severity": "<mild|moderate|significant>", "detail": "<1 courte phrase concise (12 mots max) décrivant la pigmentation (ex: 'Pigmentation homogène, aucune tache pigmentaire majeure visible.')>" },
-      { "label": "Cernes", "score": <0-100>, "grade": "<A|B|C|D>", "severity": "<mild|moderate|significant>", "detail": "<1 courte phrase concise (12 mots max) décrivant le dessous de l'œil (ex: 'Cernes légèrement marqués avec présence de ridules.')>" },
-      { "label": "Symétrie", "score": <0-100>, "grade": "<A|B|C|D>", "severity": "<mild|moderate|significant>", "detail": "<1 courte phrase (10 mots max) bienveillante (ex: 'Excellente symétrie et équilibre des traits du visage.')>" },
-      { "label": "Harmonie", "score": <0-100>, "grade": "<A|B|C|D>", "severity": "<mild|moderate|significant>", "detail": "<1 courte phrase (10 mots max) bienveillante (ex: 'Harmonie faciale naturelle très équilibrée.')>" }
+      { "label": "Hydratation", "detail": "<1 courte phrase concise (12 mots max) décrivant uniquement ce qui est visible à l'image (ex: 'Légères ridules de déshydratation sur le front.')>" },
+      { "label": "Pores", "detail": "<1 courte phrase concise (12 mots max) localisant précisément l'état des pores visible sur la photo (ex: 'Pores légèrement dilatés sur la zone T.')>" },
+      { "label": "Éclat", "detail": "<1 courte phrase concise (12 mots max) décrivant l'éclat observé (ex: 'Teint terne nécessitant un boost de luminosité.')>" },
+      { "label": "Acné", "detail": "<1 courte phrase concise (12 mots max) décrivant l'acné/imperfections (ex: 'Quelques imperfections localisées sur le menton.')>" },
+      { "label": "Taches", "detail": "<1 courte phrase concise (12 mots max) décrivant la pigmentation (ex: 'Pigmentation homogène, aucune tache pigmentaire majeure visible.')>" },
+      { "label": "Cernes", "detail": "<1 courte phrase concise (12 mots max) décrivant le dessous de l'œil (ex: 'Cernes légèrement marqués avec présence de ridules.')>" },
+      { "label": "Texture", "detail": "<1 courte phrase (12 mots max) décrivant le grain de peau / les irrégularités visibles (ex: 'Texture légèrement irrégulière avec quelques rugosités sur les joues.')>" },
+      { "label": "Rougeurs", "detail": "<1 courte phrase (12 mots max) décrivant les rougeurs / la sensibilité visibles (ex: 'Rougeurs diffuses localisées autour du nez et des joues.')>" }
     ],
     "strengths": [
       { "title": "<point fort court en français, ex : 'Élasticité de la peau'>", "desc": "<1 phrase courte expliquant pourquoi (12 mots max)>" },
@@ -142,14 +147,14 @@ Réponds UNIQUEMENT avec du JSON BRUT respectant EXACTEMENT cette structure :
     "routine": {
       "morning": [
         { "stepText": "Nettoyer en douceur", "productId": "<ID du produit choisi parmi les candidats du slot morning.cleanser>" },
-        { "stepText": "Appliquer un sérum...", "productId": "<ID du produit choisi parmi les candidats du slot morning.serum>" },
+        { "stepText": "Appliquer un sérum ciblé", "productId": "<ID du produit choisi parmi les candidats du slot morning.serum>" },
         { "stepText": "Hydrater avec une crème adaptée", "productId": "<ID du produit choisi parmi les candidats du slot morning.moisturizer>" },
         { "stepText": "Protéger avec un SPF50+", "productId": "<ID du produit choisi parmi les candidats du slot morning.spf>" }
       ],
       "evening": [
         { "stepText": "Première étape : démaquillant huileux", "productId": "<ID du produit choisi parmi les candidats du slot evening.oil_cleanser ou null>" },
         { "stepText": "Deuxième étape : nettoyant doux", "productId": "<ID du produit choisi parmi les candidats du slot evening.cleanser>" },
-        { "stepText": "Appliquer un traitement...", "productId": "<ID du produit choisi parmi les candidats du slot evening.treatment>" },
+        { "stepText": "Appliquer un traitement ciblé", "productId": "<ID du produit choisi parmi les candidats du slot evening.treatment>" },
         { "stepText": "Crème hydratante nuit", "productId": "<ID du produit choisi parmi les candidats du slot evening.moisturizer>" }
       ],
       "weekly": [
@@ -182,16 +187,22 @@ Réponds UNIQUEMENT avec du JSON BRUT respectant EXACTEMENT cette structure :
 }
 
 RÈGLES CRUCIALES :
-- metrics doit avoir EXACTEMENT 8 éléments avec les libellés exacts indiqués ci-dessus.
+- metrics doit avoir EXACTEMENT 8 éléments avec les libellés exacts dans cet ordre : Hydratation, Pores, Éclat, Acné, Taches, Cernes, Texture, Rougeurs.
+- Pour severity : 'mild' si le score pré-calculé correspondant est >= 78, 'moderate' si 65-77, 'significant' si < 65.
+- N'utilise JAMAIS de tiret cadratin (—) ni de tiret long (–). Remplace-les par des virgules, des points ou des parenthèses. Les traits d'union des mots composés restent autorisés.
 - SÉLECTION UNIQUE ET STRICTE DES PRODUITS : Pour chaque étape de la routine, tu DOIS choisir EXACTEMENT UN produit de la liste de candidats fournie pour ce slot précis, et mettre son ID dans le champ "productId". Ne modifie pas la valeur "stepText". Si la liste de candidats est vide (ou pour le slot optionnel si aucun ne convient), renvoie null pour "productId". Tu ne dois INVENTER aucun nom ou ID de produit.
 - productRecommendations doit comporter EXACTEMENT 3-4 éléments correspondant à des produits sélectionnés dans la routine ci-dessus, avec leur description.
 - CONCISION ABSOLUE : Rédige des phrases extrêmement courtes. Supprime tout bavardage inutile, introduction ou explication longue.
+- Conseils cosmétiques uniquement. Aucune allégation médicale ni promesse de traitement. Pour une affection persistante ou sévère, recommander de consulter un professionnel de santé.
 - Ne pas envelopper la réponse dans des blocs de code markdown.`;
   } else {
     return `You are a friendly yet expert skin specialist. You have already written the following basic skin summary: "${freeSummary}".
-Now, generate the complete premium version of this report by analysing the provided skin photo for detailed metrics, custom skincare routines, and specific product recommendations.
+Now, generate the complete premium version of this report by analysing the provided skin photo for detailed custom skincare routines, and specific product recommendations.
 
 RESPOND ENTIRELY IN ENGLISH. ALL text, routines, and recommendations must be in fluent, simple English. Be extremely direct, concise, and straight to the point.
+
+SCORES EVALUATED IN THE PREVIOUS STEP (align your detail explanations with these scores):
+${preCalculatedScoresContext}
 
 ROUTINE SLOTS AND AVAILABLE CANDIDATE PRODUCTS:
 ${routineSlotsCandidatesPrompt}
@@ -200,14 +211,14 @@ Respond ONLY with RAW JSON matching EXACTLY this structure:
 {
   "paid_version": {
     "metrics": [
-      { "label": "Hydration", "score": <0-100>, "grade": "<A|B|C|D>", "severity": "<mild|moderate|significant. Use 'mild' if score >= 78, 'moderate' if 65-77, 'significant' if < 65>", "detail": "<1 short concise sentence (max 12 words) describing only what is visible on the image (e.g. 'Fine dehydration lines visible on the forehead.')>" },
-      { "label": "Pores", "score": <0-100>, "grade": "<A|B|C|D>", "severity": "<mild|moderate|significant>", "detail": "<1 short concise sentence (max 12 words) locating precisely the pore status on the photo (e.g. 'Slightly visible pores in the T-zone.')>" },
-      { "label": "Radiance", "score": <0-100>, "grade": "<A|B|C|D>", "severity": "<mild|moderate|significant>", "detail": "<1 short concise sentence (max 12 words) describing radiance (e.g. 'Dull complexion needing a brightness boost.')>" },
-      { "label": "Acne", "score": <0-100>, "grade": "<A|B|C|D>", "severity": "<mild|moderate|significant>", "detail": "<1 short concise sentence (max 12 words) describing acne (e.g. 'Minor breakouts visible on the chin area.')>" },
-      { "label": "Dark Spots", "score": <0-100>, "grade": "<A|B|C|D>", "severity": "<mild|moderate|significant>", "detail": "<1 short concise sentence (max 12 words) describing pigmentation (e.g. 'Even pigmentation with no major dark spots.')>" },
-      { "label": "Under-Eye", "score": <0-100>, "grade": "<A|B|C|D>", "severity": "<mild|moderate|significant>", "detail": "<1 short concise sentence (max 12 words) describing under-eyes (e.g. 'Mild dark circles with slight fine lines.')>" },
-      { "label": "Symmetry", "score": <0-100>, "grade": "<A|B|C|D>", "severity": "<mild|moderate|significant>", "detail": "<1 short sentence (max 10 words) reassuring (e.g. 'Excellent facial symmetry and balanced traits.')>" },
-      { "label": "Harmony", "score": <0-100>, "grade": "<A|B|C|D>", "severity": "<mild|moderate|significant>", "detail": "<1 short sentence (max 10 words) reassuring (e.g. 'Naturally well-proportioned and balanced features.')>" }
+      { "label": "Hydration", "detail": "<1 short concise sentence (max 12 words) describing only what is visible on the image (e.g. 'Fine dehydration lines visible on the forehead.')>" },
+      { "label": "Pores", "detail": "<1 short concise sentence (max 12 words) locating precisely the pore status on the photo (e.g. 'Slightly visible pores in the T-zone.')>" },
+      { "label": "Radiance", "detail": "<1 short concise sentence (max 12 words) describing radiance (e.g. 'Dull complexion needing a brightness boost.')>" },
+      { "label": "Acne", "detail": "<1 short concise sentence (max 12 words) describing acne (e.g. 'Minor breakouts visible on the chin area.')>" },
+      { "label": "Dark Spots", "detail": "<1 short concise sentence (max 12 words) describing pigmentation (e.g. 'Even pigmentation with no major dark spots.')>" },
+      { "label": "Under-Eye", "detail": "<1 short concise sentence (max 12 words) describing under-eyes (e.g. 'Mild dark circles with slight fine lines.')>" },
+      { "label": "Texture", "detail": "<1 short concise sentence (max 12 words) describing visible skin texture / unevenness (e.g. 'Slightly uneven texture with minor roughness on the cheeks.')>" },
+      { "label": "Redness", "detail": "<1 short concise sentence (max 12 words) describing visible redness / sensitivity (e.g. 'Diffuse redness around the nose and cheeks.')>" }
     ],
     "strengths": [
       { "title": "<short strength, e.g. 'Skin elasticity'>", "desc": "<1 short sentence explaining why (max 12 words)>" },
@@ -219,19 +230,19 @@ Respond ONLY with RAW JSON matching EXACTLY this structure:
     ],
     "routine": {
       "morning": [
-        { "stepText": "Nettoyer en douceur", "productId": "<product ID chosen from morning.cleanser candidates>" },
-        { "stepText": "Appliquer un sérum...", "productId": "<product ID chosen from morning.serum candidates>" },
-        { "stepText": "Hydrater avec une crème adaptée", "productId": "<product ID chosen from morning.moisturizer candidates>" },
-        { "stepText": "Protéger avec un SPF50+", "productId": "<product ID chosen from morning.spf candidates>" }
+        { "stepText": "Cleanse gently", "productId": "<product ID chosen from morning.cleanser candidates>" },
+        { "stepText": "Apply a targeted serum", "productId": "<product ID chosen from morning.serum candidates>" },
+        { "stepText": "Hydrate with a suitable cream", "productId": "<product ID chosen from morning.moisturizer candidates>" },
+        { "stepText": "Protect with SPF50+", "productId": "<product ID chosen from morning.spf candidates>" }
       ],
       "evening": [
-        { "stepText": "Première étape : démaquillant huileux", "productId": "<product ID chosen from evening.oil_cleanser candidates or null>" },
-        { "stepText": "Deuxième étape : nettoyant doux", "productId": "<product ID chosen from evening.cleanser candidates>" },
-        { "stepText": "Appliquer un traitement...", "productId": "<product ID chosen from evening.treatment candidates>" },
-        { "stepText": "Crème hydratante nuit", "productId": "<product ID chosen from evening.moisturizer candidates>" }
+        { "stepText": "Step one: oil-based makeup remover", "productId": "<product ID chosen from evening.oil_cleanser candidates or null>" },
+        { "stepText": "Step two: gentle cleanser", "productId": "<product ID chosen from evening.cleanser candidates>" },
+        { "stepText": "Apply a targeted treatment", "productId": "<product ID chosen from evening.treatment candidates>" },
+        { "stepText": "Overnight hydrating cream", "productId": "<product ID chosen from evening.moisturizer candidates>" }
       ],
       "weekly": [
-        { "stepText": "Exfolier 1-2x par semaine", "productId": "<product ID chosen from weekly.exfoliant candidates>" }
+        { "stepText": "Exfoliate 1-2x per week", "productId": "<product ID chosen from weekly.exfoliant candidates>" }
       ]
     },
     "productRecommendations": [
@@ -260,12 +271,16 @@ Respond ONLY with RAW JSON matching EXACTLY this structure:
 }
 
 CRITICAL RULES:
-- metrics MUST have EXACTLY 8 items in the exact label order listed above.
+- metrics MUST have EXACTELY 8 items in the exact label order: Hydration, Pores, Radiance, Acne, Dark Spots, Under-Eye, Texture, Redness.
+- NEVER use em-dashes (—) or en-dashes (–). Replace them with commas, periods, or parentheses. Hyphens in compound words remain allowed.
 - STRICT AND EXCLUSIVE PRODUCT MATCHING: For each routine step, you MUST choose EXACTLY ONE product from the candidates list provided for that slot and set its "productId". Do not modify "stepText". If the candidate list is empty (or for the optional slot if none is suitable), return null for "productId". Do NOT invent any product name or ID.
-- productRecommendations must contain EXACTEMENT 3-4 items matching products selected in the routine above, with their description.
-- ABSOLUTE BREVITY: Write extremely short sentences. Remove any unnecessary explanations or fluff.`;
+- productRecommendations must contain EXACTLY 3-4 items matching products selected in the routine above, with their description.
+- ABSOLUTE BREVITY: Write extremely short sentences. Remove any unnecessary explanations or fluff.
+- Cosmetic advice only. No medical claims or treatment promises. For persistent or severe conditions, recommend consulting a healthcare professional.
+- Do NOT wrap output in markdown code blocks.`;
   }
 };
+
 
 export default async function handler(req, res) {
   if (req.method !== 'GET') return res.status(405).end();
@@ -391,11 +406,24 @@ export default async function handler(req, res) {
         
         const routineSlotsCandidatesPrompt = formatCandidatesForPrompt(resolvedSlots);
 
+        // Fetch stored scores or use fallbacks for backward compatibility
+        const storedScores = report?.scores || {
+          Hydration: 80,
+          Pores: 80,
+          Radiance: 80,
+          Acne: 80,
+          'Dark Spots': 80,
+          'Under-Eye': 80,
+          Texture: 80,
+          Redness: 80
+        };
+        const preCalculatedScoresContext = JSON.stringify(storedScores, null, 2);
+
         const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
         const message = await anthropic.messages.create({
           model: 'claude-sonnet-4-6',
           max_tokens: 3500,
-          system: [{ type: 'text', text: buildPremiumSystemPrompt(activeLang, routineSlotsCandidatesPrompt, report.summary || '') }],
+          system: [{ type: 'text', text: buildPremiumSystemPrompt(activeLang, routineSlotsCandidatesPrompt, report.summary || '', preCalculatedScoresContext) }],
           messages: [{
             role: 'user',
             content: [
@@ -416,6 +444,42 @@ export default async function handler(req, res) {
         const end = raw.lastIndexOf('}');
         if (start !== -1 && end !== -1) {
           let premiumData = JSON.parse(raw.substring(start, end + 1));
+
+          // Post-generation: merge scores/grades programmatically
+          const getGrade = (score) => {
+            if (score >= 88) return 'A';
+            if (score >= 78) return 'B';
+            if (score >= 65) return 'C';
+            return 'D';
+          };
+
+          if (premiumData.paid_version && premiumData.paid_version.metrics) {
+            premiumData.paid_version.metrics = premiumData.paid_version.metrics.map(m => {
+              const labelLower = m.label.toLowerCase();
+              let key = 'Hydration';
+              if (labelLower.includes('hydratation') || labelLower.includes('hydration')) key = 'Hydration';
+              else if (labelLower.includes('pore')) key = 'Pores';
+              else if (labelLower.includes('éclat') || labelLower.includes('radiance')) key = 'Radiance';
+              else if (labelLower.includes('acné') || labelLower.includes('acne')) key = 'Acne';
+              else if (labelLower.includes('tache') || labelLower.includes('dark spot') || labelLower.includes('spot')) key = 'Dark Spots';
+              else if (labelLower.includes('cerne') || labelLower.includes('under-eye') || labelLower.includes('eye')) key = 'Under-Eye';
+              else if (labelLower.includes('texture')) key = 'Texture';
+              else if (labelLower.includes('rougeur') || labelLower.includes('redness')) key = 'Redness';
+
+              const score = storedScores[key] ?? 80;
+              const grade = getGrade(score);
+              const severity = score >= 78 ? 'mild' : score >= 65 ? 'moderate' : 'significant';
+
+              return {
+                label: m.label,
+                score,
+                grade,
+                severity,
+                detail: m.detail || ''
+              };
+            });
+          }
+
           premiumData = sanitizeReport(premiumData, activeLang);
 
           // ── Post-generation: hard slot validation, dedup & logging ────────
