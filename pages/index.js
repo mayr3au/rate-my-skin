@@ -1258,7 +1258,7 @@ export default function Home({ teaserProducts }) {
                           <button
                             ref={heroCtaRef}
                             className="premium-cta-primary"
-                            onClick={(e) => requireEmail('camera', e)}
+                            onClick={() => setShowMultiAngle(true)}
                           >
                             {lang === 'fr' ? 'Analyser ma peau gratuitement' : 'Analyze my skin for free'}
                           </button>
@@ -2282,7 +2282,7 @@ export default function Home({ teaserProducts }) {
         }}>
           <button
             className="premium-cta-primary"
-            onClick={(e) => requireEmail('camera', e)}
+            onClick={() => setShowMultiAngle(true)}
             style={{
               width: '100%',
               maxWidth: 'none',
