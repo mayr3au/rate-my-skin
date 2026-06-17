@@ -149,18 +149,64 @@ export default function MultiAngleCamera({ onCapturesComplete, onClose }) {
         {/* Faded background outside the face guide */}
         <rect width="100" height="100" fill="rgba(28,21,17,0.68)" mask="url(#faceMaskOverlay)" />
         {/* Glowing/elegant gold dashed oval */}
-        <ellipse cx="50" cy="46" rx="30" ry="38" fill="none" stroke="#C9A961" strokeWidth="0.8" strokeDasharray="3 2" />
-        {/* Subtle face & neck silhouette */}
+        <ellipse cx="50" cy="46" rx="30" ry="38" fill="none" stroke="#C9A961" strokeWidth="1" strokeDasharray="3 2" />
+        
+        {/* Stylized premium head silhouette guide (perfectly scaled to fit the gold dashed oval) */}
         <path
-          d="M 50,18 C 36,18 32,28 32,46 C 32,60 38,72 50,72 C 62,72 68,60 68,46 C 68,28 64,18 50,18 Z"
+          d="M 50,9 C 35.5,9 23,24 23,46 C 23,65 32,83 50,83 C 68,83 77,65 77,46 C 77,24 64.5,9 50,9 Z"
           fill="none"
-          stroke="rgba(255,255,255,0.22)"
-          strokeWidth="0.4"
+          stroke="rgba(255,255,255,0.35)"
+          strokeWidth="0.5"
         />
-        {/* Vertical center alignment guide */}
-        <line x1="50" y1="20" x2="50" y2="70" stroke="rgba(255,255,255,0.12)" strokeWidth="0.3" strokeDasharray="1 1" />
-        {/* Horizontal eye alignment guide */}
-        <line x1="36" y1="42" x2="64" y2="42" stroke="rgba(255,255,255,0.12)" strokeWidth="0.3" strokeDasharray="1 1" />
+        {/* Neck guides */}
+        <path
+          d="M 36,78 C 35,82 34,86 34,90"
+          fill="none"
+          stroke="rgba(255,255,255,0.2)"
+          strokeWidth="0.5"
+        />
+        <path
+          d="M 64,78 C 65,82 66,86 66,90"
+          fill="none"
+          stroke="rgba(255,255,255,0.2)"
+          strokeWidth="0.5"
+        />
+        {/* Shoulder guides */}
+        <path
+          d="M 34,90 C 28,92 21,94 15,96"
+          fill="none"
+          stroke="rgba(255,255,255,0.15)"
+          strokeWidth="0.5"
+        />
+        <path
+          d="M 66,90 C 72,92 79,94 85,96"
+          fill="none"
+          stroke="rgba(255,255,255,0.15)"
+          strokeWidth="0.5"
+        />
+
+        {/* High-tech auto-focus corner brackets around the face oval */}
+        {/* Top-Left Bracket */}
+        <path d="M 23,32 L 20,32 L 20,28" fill="none" stroke="#C9A961" strokeWidth="0.75" />
+        {/* Top-Right Bracket */}
+        <path d="M 77,32 L 80,32 L 80,28" fill="none" stroke="#C9A961" strokeWidth="0.75" />
+        {/* Bottom-Left Bracket */}
+        <path d="M 23,60 L 20,60 L 20,64" fill="none" stroke="#C9A961" strokeWidth="0.75" />
+        {/* Bottom-Right Bracket */}
+        <path d="M 77,60 L 80,60 L 80,64" fill="none" stroke="#C9A961" strokeWidth="0.75" />
+
+        {/* Subtle crosshair & horizontal guides for eyes, nose, mouth */}
+        {/* Vertical center axis line */}
+        <line x1="50" y1="12" x2="50" y2="80" stroke="rgba(255,255,255,0.12)" strokeWidth="0.3" strokeDasharray="1.5 1.5" />
+        {/* Eye axis line */}
+        <line x1="25" y1="42" x2="75" y2="42" stroke="rgba(255,255,255,0.12)" strokeWidth="0.3" strokeDasharray="1.5 1.5" />
+        {/* Eyebrow helper ticks */}
+        <line x1="32" y1="33" x2="44" y2="33" stroke="rgba(201,169,97,0.2)" strokeWidth="0.4" />
+        <line x1="56" y1="33" x2="68" y2="33" stroke="rgba(201,169,97,0.2)" strokeWidth="0.4" />
+        {/* Nose base helper tick */}
+        <line x1="47" y1="56" x2="53" y2="56" stroke="rgba(201,169,97,0.2)" strokeWidth="0.4" />
+        {/* Mouth alignment helper tick */}
+        <line x1="44" y1="68" x2="56" y2="68" stroke="rgba(201,169,97,0.2)" strokeWidth="0.4" />
       </svg>
 
       {/* UI Overlay Controls & Instructions */}

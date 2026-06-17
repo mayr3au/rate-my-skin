@@ -474,6 +474,7 @@ export default function Home({ teaserProducts }) {
 
   const [showCamera, setShowCamera] = useState(false);
   const [showMultiAngle, setShowMultiAngle] = useState(false);
+  const [showUploadSelector, setShowUploadSelector] = useState(false);
   const [screenFlash, setScreenFlash] = useState(false);
 
   const [emailCaptured, setEmailCaptured] = useState(false);
@@ -1340,7 +1341,7 @@ export default function Home({ teaserProducts }) {
                             <button
                               ref={heroCtaRef}
                               className="premium-cta-primary"
-                              onClick={() => setShowMultiAngle(true)}
+                              onClick={(e) => { e.stopPropagation(); setShowUploadSelector(true); }}
                             >
                               {lang === 'fr' ? 'Analyser ma peau gratuitement' : 'Analyze my skin for free'}
                             </button>
@@ -2345,7 +2346,7 @@ export default function Home({ teaserProducts }) {
         }}>
           <button
             className="premium-cta-primary"
-            onClick={() => setShowMultiAngle(true)}
+            onClick={(e) => { e.stopPropagation(); setShowUploadSelector(true); }}
             style={{
               width: '100%',
               maxWidth: 'none',
@@ -2789,6 +2790,213 @@ export default function Home({ teaserProducts }) {
         />
       )}
 
+      {/* ── Upload options selector overlay ── */}
+      {showUploadSelector && (
+        <div 
+          className="upload-selector-overlay"
+          onClick={() => setShowUploadSelector(false)}
+          style={{
+            position: 'fixed',
+            inset: 0,
+            zIndex: 650,
+            background: 'rgba(44, 36, 22, 0.55)',
+            backdropFilter: 'blur(12px)',
+            WebkitBackdropFilter: 'blur(12px)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            padding: 20,
+            animation: 'fadeIn 0.25s ease-out forwards',
+          }}
+        >
+          <div 
+            className="upload-selector-card"
+            onClick={(e) => e.stopPropagation()}
+            style={{
+              background: 'linear-gradient(150deg, rgba(255,255,255,0.95) 0%, rgba(253,246,237,0.9) 55%, rgba(246,235,222,0.95) 100%)',
+              border: '1px solid rgba(201, 169, 97, 0.35)',
+              borderRadius: 24,
+              padding: '24px 28px',
+              width: '100%',
+              maxWidth: 420,
+              boxShadow: '0 24px 64px rgba(61,41,20,0.12), inset 0 1px 0 rgba(255,255,255,0.95)',
+              animation: 'slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards',
+              textAlign: 'center',
+            }}
+          >
+            <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 12 }}>
+              <LuxuryFlower width={48} height={48} />
+            </div>
+            <h3 style={{
+              fontFamily: "'Playfair Display', serif",
+              fontSize: 22,
+              fontWeight: 600,
+              color: '#2C2416',
+              margin: '0 0 6px',
+            }}>
+              {lang === 'fr' ? 'Analyser ma peau' : 'Analyze my skin'}
+            </h3>
+            <p style={{
+              fontFamily: "'DM Sans', sans-serif",
+              fontSize: 13,
+              color: '#6F6156',
+              lineHeight: 1.5,
+              margin: '0 0 24px',
+            }}>
+              {lang === 'fr' ? 'Choisissez comment ajouter votre photo :' : 'Choose how to add your photo:'}
+            </p>
+
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+              {/* Option 1: Live Camera */}
+              <button
+                onClick={() => {
+                  setShowUploadSelector(false);
+                  setShowMultiAngle(true);
+                }}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 16,
+                  background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.8) 0%, rgba(253, 246, 237, 0.5) 100%)',
+                  border: '1px solid rgba(201, 169, 97, 0.28)',
+                  borderRadius: 16,
+                  padding: '14px 18px',
+                  cursor: 'pointer',
+                  textAlign: 'left',
+                  width: '100%',
+                  transition: 'all 0.25s ease',
+                  boxShadow: '0 4px 12px rgba(168,116,73,0.03)',
+                }}
+                className="selector-option-btn"
+              >
+                <div style={{
+                  width: 42, height: 42, borderRadius: '50%',
+                  background: '#F0E7D8', display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  color: '#C9A961', flexShrink: 0
+                }}>
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
+                    <circle cx="12" cy="13" r="4"/>
+                  </svg>
+                </div>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ fontSize: 14, fontWeight: 700, color: '#2C2416', fontFamily: "'DM Sans', sans-serif" }}>
+                    {lang === 'fr' ? 'Appareil photo (En direct)' : 'Live Camera'}
+                  </div>
+                  <div style={{ fontSize: 11, color: '#8C7A6B', marginTop: 2, fontFamily: "'DM Sans', sans-serif", lineHeight: 1.3 }}>
+                    {lang === 'fr' ? 'Scanner votre visage avec notre guide doré' : 'Scan your face with our smart gold guide'}
+                  </div>
+                </div>
+              </button>
+
+              {/* Option 2: Photo Library */}
+              <button
+                onClick={() => {
+                  setShowUploadSelector(false);
+                  fileInputRef.current?.click();
+                }}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 16,
+                  background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.8) 0%, rgba(253, 246, 237, 0.5) 100%)',
+                  border: '1px solid rgba(201, 169, 97, 0.28)',
+                  borderRadius: 16,
+                  padding: '14px 18px',
+                  cursor: 'pointer',
+                  textAlign: 'left',
+                  width: '100%',
+                  transition: 'all 0.25s ease',
+                  boxShadow: '0 4px 12px rgba(168,116,73,0.03)',
+                }}
+                className="selector-option-btn"
+              >
+                <div style={{
+                  width: 42, height: 42, borderRadius: '50%',
+                  background: '#F0E7D8', display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  color: '#C9A961', flexShrink: 0
+                }}>
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
+                    <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+                    <circle cx="8.5" cy="8.5" r="1.5"/>
+                    <polyline points="21 15 16 10 5 21"/>
+                  </svg>
+                </div>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ fontSize: 14, fontWeight: 700, color: '#2C2416', fontFamily: "'DM Sans', sans-serif" }}>
+                    {lang === 'fr' ? 'Photothèque' : 'Photo Library'}
+                  </div>
+                  <div style={{ fontSize: 11, color: '#8C7A6B', marginTop: 2, fontFamily: "'DM Sans', sans-serif", lineHeight: 1.3 }}>
+                    {lang === 'fr' ? 'Choisir un portrait existant dans votre galerie' : 'Choose an existing portrait from your library'}
+                  </div>
+                </div>
+              </button>
+
+              {/* Option 3: Files */}
+              <button
+                onClick={() => {
+                  setShowUploadSelector(false);
+                  fileInputRef.current?.click();
+                }}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 16,
+                  background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.8) 0%, rgba(253, 246, 237, 0.5) 100%)',
+                  border: '1px solid rgba(201, 169, 97, 0.28)',
+                  borderRadius: 16,
+                  padding: '14px 18px',
+                  cursor: 'pointer',
+                  textAlign: 'left',
+                  width: '100%',
+                  transition: 'all 0.25s ease',
+                  boxShadow: '0 4px 12px rgba(168,116,73,0.03)',
+                }}
+                className="selector-option-btn"
+              >
+                <div style={{
+                  width: 42, height: 42, borderRadius: '50%',
+                  background: '#F0E7D8', display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  color: '#C9A961', flexShrink: 0
+                }}>
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                    <polyline points="14 2 14 8 20 8"/>
+                    <line x1="16" y1="13" x2="8" y2="13"/>
+                    <line x1="16" y1="17" x2="8" y2="17"/>
+                  </svg>
+                </div>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ fontSize: 14, fontWeight: 700, color: '#2C2416', fontFamily: "'DM Sans', sans-serif" }}>
+                    {lang === 'fr' ? 'Choisir un fichier' : 'Choose a file'}
+                  </div>
+                  <div style={{ fontSize: 11, color: '#8C7A6B', marginTop: 2, fontFamily: "'DM Sans', sans-serif", lineHeight: 1.3 }}>
+                    {lang === 'fr' ? 'Parcourir les documents locaux de votre appareil' : 'Browse local documents on your device'}
+                  </div>
+                </div>
+              </button>
+            </div>
+
+            <button
+              onClick={() => setShowUploadSelector(false)}
+              style={{
+                background: 'none',
+                border: 'none',
+                fontFamily: "'DM Sans', sans-serif",
+                fontSize: 13,
+                fontWeight: 600,
+                color: '#8C7A6B',
+                textDecoration: 'underline',
+                cursor: 'pointer',
+                marginTop: 20,
+              }}
+            >
+              {lang === 'fr' ? 'Annuler' : 'Cancel'}
+            </button>
+          </div>
+        </div>
+      )}
+
       <style dangerouslySetInnerHTML={{
         __html: `
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
@@ -2816,6 +3024,12 @@ export default function Home({ teaserProducts }) {
           100% { transform: translateX(200%); }
         }
         * { box-sizing: border-box; }
+        .selector-option-btn:hover {
+          transform: translateY(-2px);
+          border-color: rgba(201, 169, 97, 0.6) !important;
+          background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(253, 246, 237, 0.7) 100%) !important;
+          box-shadow: 0 6px 18px rgba(168,116,73,0.08) !important;
+        }
       ` }} />
     </>
   );
