@@ -496,7 +496,7 @@ function EmailSaveCard({
   return (
     <div style={{
       ...CARD,
-      marginTop: 40,
+      marginTop: 0,
       padding: "clamp(24px, 5vw, 36px)",
       textAlign: "center",
       border: "1px solid rgba(201, 169, 97, 0.35)",
@@ -1817,6 +1817,8 @@ export default function BeautyReport({
   const [emailStatus, setEmailStatus] = useState(null);
   const [timeLeft, setTimeLeft] = useState(null);
   const [hasClickedCheckout, setHasClickedCheckout] = useState(false);
+  const [showEmailOverlay, setShowEmailOverlay] = useState(false);
+  const [isMounted, setIsMounted] = useState(false);
 
   const [activeStep, setActiveStep] = useState("all");
   const [onlyMyMatch, setOnlyMyMatch] = useState(false);
@@ -2072,7 +2074,41 @@ export default function BeautyReport({
   }, [data]);
 
   useEffect(() => {
-    if (data && !isPaid && !emailCaptured && !emailSkipped) {
+    setIsMounted(true);
+  }, []);
+
+  useEffect(() => {
+    if (!isMounted) return;
+    if (isPaid || emailCaptured || emailSkipped) {
+      setShowEmailOverlay(false);
+      return;
+    }
+
+    const handleScroll = () => {
+      if (window.scrollY > 150) {
+        setShowEmailOverlay(true);
+      }
+    };
+
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    handleScroll();
+
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, [isMounted, isPaid, emailCaptured, emailSkipped]);
+
+  useEffect(() => {
+    if (showEmailOverlay) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [showEmailOverlay]);
+
+  useEffect(() => {
+    if (data && !isPaid && !emailCaptured && !emailSkipped && showEmailOverlay) {
       const sent = sessionStorage.getItem('rms_sent_email_save_shown');
       if (!sent) {
         if (typeof window !== 'undefined' && window.gtag) {
@@ -2084,7 +2120,7 @@ export default function BeautyReport({
         }
       }
     }
-  }, [data, isPaid, emailCaptured, emailSkipped]);
+  }, [data, isPaid, emailCaptured, emailSkipped, showEmailOverlay]);
 
   useEffect(() => {
     if (data && !isPaid && (emailCaptured || emailSkipped)) {
@@ -2402,24 +2438,7 @@ export default function BeautyReport({
         <MedicalDisclaimer style={{ marginTop: 16 }} />
       </div>
 
-      {!isPaid && !emailCaptured && !emailSkipped ? (
-        <div style={{ maxWidth: 680, margin: "0 auto", padding: "0 20px" }}>
-          <EmailSaveCard
-            lang={lang}
-            t={t}
-            email={email}
-            setEmail={setEmail}
-            firstName={firstName}
-            setFirstName={setFirstName}
-            emailLoading={emailLoading}
-            newsletterConsent={newsletterConsent}
-            setNewsletterConsent={setNewsletterConsent}
-            handleEmailSubmit={handleEmailSubmit}
-            handleEmailSkip={handleEmailSkip}
-          />
-        </div>
-      ) : (
-        <>
+      <>
           <div style={{ maxWidth: 680, margin: "0 auto", padding: "0 20px" }}>
             {/* ── Main problems ── */}
             {!isPaid && mainProblems.length > 0 && (
@@ -4163,8 +4182,7 @@ export default function BeautyReport({
             </div>
           )}
 
-        </>
-      )}
+      </>
 
       {/* Footer disclaimer and links */}
       <div style={{ maxWidth: 680, margin: "20px auto 0", padding: "0 20px 8px", textAlign: "center" }}>
@@ -4178,6 +4196,14 @@ export default function BeautyReport({
 
       <style>{`
         @keyframes spin { to { transform: rotate(360deg); } }
+        @keyframes fadeIn {
+          from { opacity: 0; }
+          to { opacity: 1; }
+        }
+        @keyframes slideUp {
+          from { transform: translateY(40px); opacity: 0; }
+          to { transform: translateY(0); opacity: 1; }
+        }
         
         .pulsing-dot-wrapper {
           position: relative;
@@ -4677,6 +4703,49 @@ export default function BeautyReport({
           }
         }
       `}</style>
+
+      {/* ── Email gate overlay (shown on scroll if unpaid/not captured/not skipped) ── */}
+      {isMounted && !isPaid && !emailCaptured && !emailSkipped && showEmailOverlay && (
+        <div 
+          className="email-gate-overlay" 
+          style={{ 
+            position: "fixed", 
+            inset: 0, 
+            zIndex: 10000, 
+            background: "rgba(44, 36, 22, 0.55)", 
+            backdropFilter: "blur(12px)", 
+            WebkitBackdropFilter: "blur(12px)", 
+            display: "flex", 
+            alignItems: "center", 
+            justifyContent: "center", 
+            padding: "20px",
+            animation: "fadeIn 0.35s ease-out forwards"
+          }}
+        >
+          <div 
+            style={{ 
+              position: "relative", 
+              width: "100%", 
+              maxWidth: "520px",
+              animation: "slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards"
+            }}
+          >
+            <EmailSaveCard
+              lang={lang}
+              t={t}
+              email={email}
+              setEmail={setEmail}
+              firstName={firstName}
+              setFirstName={setFirstName}
+              emailLoading={emailLoading}
+              newsletterConsent={newsletterConsent}
+              setNewsletterConsent={setNewsletterConsent}
+              handleEmailSubmit={handleEmailSubmit}
+              handleEmailSkip={handleEmailSkip}
+            />
+          </div>
+        </div>
+      )}
     </div>
   );
 }
