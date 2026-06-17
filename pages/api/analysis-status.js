@@ -149,7 +149,7 @@ Réponds UNIQUEMENT avec du JSON BRUT respectant EXACTEMENT cette structure :
         { "stepText": "Nettoyer en douceur", "productId": "<ID du produit choisi parmi les candidats du slot morning.cleanser>" },
         { "stepText": "Appliquer un sérum ciblé", "productId": "<ID du produit choisi parmi les candidats du slot morning.serum>" },
         { "stepText": "Hydrater avec une crème adaptée", "productId": "<ID du produit choisi parmi les candidats du slot morning.moisturizer>" },
-        { "stepText": "Protéger avec un SPF50+", "productId": "<ID du produit choisi parmi les candidats du slot morning.spf>" }
+        { "stepText": "Protéger avec un SPF50+", "productId": "<ID du produit choisi parmi les candidats du slot morning.sunscreen>" }
       ],
       "evening": [
         { "stepText": "Première étape : démaquillant huileux", "productId": "<ID du produit choisi parmi les candidats du slot evening.oil_cleanser ou null>" },
@@ -233,7 +233,7 @@ Respond ONLY with RAW JSON matching EXACTLY this structure:
         { "stepText": "Cleanse gently", "productId": "<product ID chosen from morning.cleanser candidates>" },
         { "stepText": "Apply a targeted serum", "productId": "<product ID chosen from morning.serum candidates>" },
         { "stepText": "Hydrate with a suitable cream", "productId": "<product ID chosen from morning.moisturizer candidates>" },
-        { "stepText": "Protect with SPF50+", "productId": "<product ID chosen from morning.spf candidates>" }
+        { "stepText": "Protect with SPF50+", "productId": "<product ID chosen from morning.sunscreen candidates>" }
       ],
       "evening": [
         { "stepText": "Step one: oil-based makeup remover", "productId": "<product ID chosen from evening.oil_cleanser candidates or null>" },
@@ -323,16 +323,30 @@ export default async function handler(req, res) {
   }
 
   // Fetch the current state of the analysis
-  const { data, error } = await supabase
+  let { data, error } = await supabase
     .from('analyses')
-    .select('is_paid, report_json')
+    .select('is_paid, report_json, ga_purchase_fired')
     .eq('id', id)
     .single();
+
+  if (error) {
+    console.warn('[analysis-status] Error fetching analysis with ga_purchase_fired. Retrying with basic columns...', error.message);
+    const retry = await supabase
+      .from('analyses')
+      .select('is_paid, report_json')
+      .eq('id', id)
+      .single();
+    if (!retry.error && retry.data) {
+      data = { ...retry.data, ga_purchase_fired: false };
+      error = null;
+    }
+  }
 
   if (error || !data) return res.status(404).json({ isPaid: false });
 
   let report = data.report_json;
   const isPaid = data.is_paid;
+  const gaPurchaseFired = data.ga_purchase_fired || false;
 
   if (report && !report.catalog) {
     try {
@@ -732,5 +746,19 @@ export default async function handler(req, res) {
     }
   }
 
-  return res.status(200).json({ isPaid, report, analysesCount });
+  let should_fire_purchase = false;
+  if (isPaid && !gaPurchaseFired) {
+    should_fire_purchase = true;
+    try {
+      await supabase
+        .from('analyses')
+        .update({ ga_purchase_fired: true })
+        .eq('id', id);
+      console.log(`[analysis-status] Marked ga_purchase_fired=true for analysis ${id}`);
+    } catch (dbErr) {
+      console.error('[analysis-status] Failed to update ga_purchase_fired:', dbErr.message);
+    }
+  }
+
+  return res.status(200).json({ isPaid, report, analysesCount, should_fire_purchase });
 }

@@ -132,7 +132,9 @@ export default function Privacy() {
         display: 'flex', alignItems: 'center', justifyContent: 'space-between',
         animation: 'slideDown 0.55s ease',
       }}>
-        <Logo />
+        <div onClick={() => router.push('/')} style={{ cursor: 'pointer', display: 'flex', alignItems: 'center' }}>
+          <Logo />
+        </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
           <LangToggle />
           <button

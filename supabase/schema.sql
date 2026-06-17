@@ -77,3 +77,7 @@ ALTER TABLE public.users ADD COLUMN IF NOT EXISTS email text;
 --   ALTER TABLE public.analyses DROP CONSTRAINT IF EXISTS analyses_user_id_fkey;
 --
 -- After dropping the FK, inserts with user_id = NULL or any text value will work.
+
+-- ── GA4 Conversion: ga_purchase_fired column ────────────────────────────────
+-- Track whether the purchase conversion event has been fired to ensure server-side idempotency.
+ALTER TABLE public.analyses ADD COLUMN IF NOT EXISTS ga_purchase_fired boolean NOT NULL DEFAULT false;

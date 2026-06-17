@@ -112,8 +112,74 @@ const fetchProducts = async (supabase) => {
   });
 
   return { formattedProducts, imageByName };
-};const buildAnalysisSystemPrompt = (lang) => {
+};
+
+// Fetch the last N analyses for a user (by email or userId) to give Claude longitudinal context
+const fetchPreviousAnalyses = async (supabase, normalizedEmail, userId, limit = 3) => {
+  const histories = [];
+
+  // Path 1: by email
+  if (normalizedEmail) {
+    const { data } = await supabase
+      .from('analyses')
+      .select('id, created_at, report_json, skin_concern')
+      .eq('email', normalizedEmail)
+      .order('created_at', { ascending: false })
+      .limit(limit);
+    if (data) histories.push(...data);
+  }
+
+  // Path 2: by userId (may add entries not already found by email)
+  if (userId) {
+    const { data } = await supabase
+      .from('analyses')
+      .select('id, created_at, report_json, skin_concern')
+      .eq('user_id', userId)
+      .order('created_at', { ascending: false })
+      .limit(limit);
+    if (data) histories.push(...data);
+  }
+
+  // Deduplicate by id, keep only last `limit` entries — return compact summary to save tokens
+  const byId = new Map();
+  histories.forEach(r => byId.set(r.id, r));
+  return [...byId.values()]
+    .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
+    .slice(0, limit)
+    .map(r => {
+      const rj = r.report_json || {};
+      const s = rj.scores || {};
+      // Build a compact one-line scores string to avoid large token footprint
+      const scoresLine = Object.entries(s)
+        .map(([k, v]) => `${k}:${v}`)
+        .join(', ');
+      return {
+        date: (r.created_at || '').slice(0, 10),
+        overallScore: rj.overall ?? null,
+        scores: scoresLine || null,
+        skinType: rj.skinType ?? null,
+        mainProblems: (rj.free_version?.mainProblems || []).map(p => p.title).join(', ') || null,
+      };
+    });
+};
+
+const buildAnalysisSystemPrompt = (lang, previousAnalyses = []) => {
   const isFr = lang === 'fr';
+  const hasPrevious = previousAnalyses.length > 0;
+
+  // Build a compact plain-text history block (tokens-efficient)
+  const historyBlock = hasPrevious
+    ? (isFr
+        ? `\n\n━━━ HISTORIQUE UTILISATEUR (à intégrer dans ton analyse) ━━━
+Cet utilisateur a déjà effectué ${previousAnalyses.length} analyse(s). Utilise ces données pour être cohérent, noter les progrès et personnaliser ta conclusion.
+${previousAnalyses.map((a, i) => `Session #${i + 1} (${a.date}) : score global ${a.overallScore ?? '?'}/100 | scores: ${a.scores ?? 'N/A'} | type de peau: ${a.skinType ?? 'N/A'} | problèmes: ${a.mainProblems ?? 'N/A'}`).join('\n')}
+Règles : compare les scores entre les sessions, mentionne les améliorations (+5) ou régressions (-5) dans le summary. Ne réinvente pas skinType/skinTone sauf changement visuel évident.`
+        : `\n\n━━━ USER HISTORY (integrate in your analysis) ━━━
+This user has ${previousAnalyses.length} previous session(s). Use this to be consistent, track progress, and personalise your conclusion.
+${previousAnalyses.map((a, i) => `Session #${i + 1} (${a.date}): overall ${a.overallScore ?? '?'}/100 | scores: ${a.scores ?? 'N/A'} | skin type: ${a.skinType ?? 'N/A'} | issues: ${a.mainProblems ?? 'N/A'}`).join('\n')}
+Rules: compare scores across sessions, mention improvements (+5) or regressions (-5) in the summary. Do not reinvent skinType/skinTone unless visually evident.`
+      )
+    : '';
 
   if (isFr) {
     return `Tu es un spécialiste de la peau chaleureux et expert — imagine un dermatologue compétent qui sait s'adresser à de vraies personnes de manière simple et accessible. Tu analyses les photographies de peau avec précision et bienveillance, puis tu expliques tes observations dans un ton chaleureux, clair, encourageant et TRÈS SIMPLE que tout le monde peut comprendre sans bagage médical.
@@ -168,7 +234,7 @@ RÈGLES CRUCIALES :
 - L'évaluation des 8 sous-scores peaux dans "scores" doit être réaliste et cohérente avec les observations de l'image.
 - N'utilise JAMAIS de tiret cadratin (—) ni de tiret long (–). Remplace-les par des virgules, des points ou des parenthèses. Les traits d'union des mots composés restent autorisés.
 - Conseils cosmétiques uniquement. Aucune allégation médicale ni promesse de traitement. Pour une affection persistante ou sévère, recommander de consulter un professionnel de santé.
-- Ne pas envelopper la réponse dans des blocs de code markdown.`;
+- Ne pas envelopper la réponse dans des blocs de code markdown.${historyBlock}`;
   } else {
     return `You are a friendly yet expert skin specialist — think of a knowledgeable dermatologist who also knows how to talk to real people. You analyse skin photographs with accuracy and care, then explain your findings in a warm, clear, reassuring, and VERY SIMPLE tone that anyone can understand.
 
@@ -222,7 +288,7 @@ CRITICAL RULES:
 - The evaluation of the 8 sub-scores in "scores" must be realistic and reflect visual skin proof.
 - NEVER use em-dashes (—) or en-dashes (–). Replace them with commas, periods, or parentheses. Hyphens in compound words remain allowed.
 - Cosmetic advice only. No medical claims or treatment promises. For persistent or severe conditions, recommend consulting a healthcare professional.
-- Do NOT wrap output in markdown code blocks.`;
+- Do NOT wrap output in markdown code blocks.${historyBlock}`;
   }
 };
 
@@ -311,14 +377,17 @@ export default async function handler(req, res) {
 
   let analysisData;
   try {
-    const { formattedProducts, imageByName } = await fetchProducts(supabase);
+    const [{ formattedProducts, imageByName }, previousAnalyses] = await Promise.all([
+      fetchProducts(supabase),
+      fetchPreviousAnalyses(supabase, normalizedEmail, userId),
+    ]);
 
     // 1. Call Claude for Free report snapshot (Vision Call to analyze skin)
     const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
     const message = await anthropic.messages.create({
       model: 'claude-sonnet-4-6',
-      max_tokens: 2500,
-      system: [{ type: 'text', text: buildAnalysisSystemPrompt(lang) }],
+      max_tokens: 4096,
+      system: [{ type: 'text', text: buildAnalysisSystemPrompt(lang, previousAnalyses) }],
       messages: [{
         role: 'user',
         content: [
@@ -359,7 +428,7 @@ export default async function handler(req, res) {
 
     // Step 3: Recommendation Call (Text Call to Claude)
     const recMessage = await anthropic.messages.create({
-      model: 'claude-sonnet-4-6',
+      model: 'claude-haiku-4-5',
       max_tokens: 2500,
       system: [{ type: 'text', text: buildRecommendationSystemPrompt(lang, filteredProducts, baseAnalysis) }],
       messages: [{

@@ -439,6 +439,12 @@ export default function Report() {
 
   useEffect(() => {
     if (!router.isReady) return;
+
+    if (router.query.demo === 'true') {
+      setCheckingPayment(true);
+      return;
+    }
+
     if (router.query.payment !== 'success') return;
 
     const storedAnalysisId = sessionStorage.getItem('rms_analysis_id');
@@ -455,7 +461,8 @@ export default function Report() {
     const poll = async () => {
       try {
         const res = await fetch(`/api/analysis-status?id=${storedAnalysisId}&session_id=${encodeURIComponent(sessionId)}`);
-        const { isPaid: paid, report } = await res.json();
+        const data = await res.json();
+        const { isPaid: paid, report, should_fire_purchase } = data;
         if (paid) {
           sessionStorage.setItem('rms_is_paid', 'true');
           if (report) {
@@ -464,6 +471,32 @@ export default function Report() {
           }
           setIsPaid(true);
           setProgress(100);
+
+          // Trigger GA4 purchase event on server-confirmed transaction
+          const purchaseSentKey = `rms_purchase_sent_${sessionId}`;
+          const isPurchaseAlreadySent = sessionStorage.getItem(purchaseSentKey) === 'true';
+          
+          if (should_fire_purchase && !isPurchaseAlreadySent && typeof window !== 'undefined' && window.gtag) {
+            const pendingPlanId = sessionStorage.getItem('rms_pending_plan_id') || 'single';
+            const value = pendingPlanId === 'pack' ? 4.99 : 7.99;
+            const itemId = pendingPlanId === 'pack' ? 'five_analyses' : 'single_analysis';
+            const itemName = pendingPlanId === 'pack' ? 'Pack 5 Analyses' : 'Analyse Individuelle';
+
+            window.gtag('event', 'purchase', {
+              transaction_id: sessionId,
+              value: value,
+              currency: 'EUR',
+              items: [{
+                item_id: itemId,
+                item_name: itemName,
+                price: value,
+                quantity: 1
+              }]
+            });
+            sessionStorage.setItem(purchaseSentKey, 'true');
+            sessionStorage.removeItem('rms_pending_plan_id');
+          }
+
           setTimeout(() => {
             setCheckingPayment(false);
           }, 350);
@@ -537,6 +570,10 @@ export default function Report() {
       ? (localStorage.getItem('rms_user_email') || localStorage.getItem('rms_email') || '')
       : '';
     try {
+      if (typeof window !== 'undefined') {
+        window.rms_is_redirecting_to_stripe = true;
+        sessionStorage.setItem('rms_pending_plan_id', planId);
+      }
       const res = await fetch('/api/checkout', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -558,6 +595,10 @@ export default function Report() {
       if (err) throw new Error(err);
       window.location.href = url;
     } catch (err) {
+      if (typeof window !== 'undefined') {
+        window.rms_is_redirecting_to_stripe = false;
+        sessionStorage.removeItem('rms_pending_plan_id');
+      }
       console.error('Checkout error:', err.message);
     }
   };
@@ -801,8 +842,10 @@ export default function Report() {
         </div>
       )}
 
-      {/* Sticky frosted-glass nav */}
-      <div className="rpt-nav" style={{
+      {!checkingPayment && (
+        <>
+          {/* Sticky frosted-glass nav */}
+          <div className="rpt-nav" style={{
         position: 'sticky', top: 0, zIndex: 100,
         background: 'rgba(255, 255, 255, 0.45)',
         backdropFilter: 'blur(18px)',
@@ -812,7 +855,9 @@ export default function Report() {
         display: 'flex', alignItems: 'center', justifyContent: 'space-between',
         animation: 'slideDown 0.55s ease',
       }}>
-        <Logo />
+        <div onClick={() => router.push('/')} style={{ cursor: 'pointer', display: 'flex', alignItems: 'center' }}>
+          <Logo />
+        </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
           {paidUnlocks > 0 && (
             <div className="mobile-hide" style={{
@@ -827,10 +872,23 @@ export default function Report() {
               </span>
             </div>
           )}
+        </div>
+        
+        <div className="desktop-nav-links" style={{ display: 'flex', alignItems: 'center', gap: 'clamp(10px, 2.5vw, 16px)' }}>
           <LangToggle />
           <button
+            onClick={() => router.push('/technologie')}
+            style={{
+              background: 'none', border: 'none',
+              padding: '9px 4px', fontSize: 12, color: '#888', cursor: 'pointer',
+              fontFamily: "'DM Sans', sans-serif", fontWeight: 500,
+              letterSpacing: '0.02em',
+            }}
+          >
+            {t('techNav')}
+          </button>
+          <button
             onClick={() => router.push('/blog')}
-            className="mobile-hide"
             style={{
               background: 'none', border: 'none',
               padding: '9px 4px', fontSize: 12, color: '#888', cursor: 'pointer',
@@ -842,7 +900,6 @@ export default function Report() {
           </button>
           <button
             onClick={() => router.push('/mes-rapports')}
-            className="mobile-hide"
             style={{
               background: 'none', border: 'none',
               padding: '9px 4px', fontSize: 12, color: '#888', cursor: 'pointer',
@@ -863,6 +920,73 @@ export default function Report() {
           >
             {t('newAnalysis')}
           </button>
+        </div>
+
+        {/* Mobile Hamburger Button */}
+        <input type="checkbox" id="mobile-nav-toggle-checkbox" className="mobile-nav-toggle" />
+        <div className="nav-mobile-controls" style={{ display: 'none', alignItems: 'center', gap: 14 }}>
+          <LangToggle />
+          <label htmlFor="mobile-nav-toggle-checkbox" className="mobile-nav-toggle-btn">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#2C241D" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <line x1="3" y1="12" x2="21" y2="12"></line>
+              <line x1="3" y1="6" x2="21" y2="6"></line>
+              <line x1="3" y1="18" x2="21" y2="18"></line>
+            </svg>
+          </label>
+        </div>
+
+        {/* Mobile Navigation Drawer Backdrop Overlay */}
+        <label htmlFor="mobile-nav-toggle-checkbox" className="mobile-nav-overlay" />
+
+        {/* Mobile Drawer Content */}
+        <div className="mobile-nav-drawer">
+          <div className="mobile-nav-drawer-header">
+            <div 
+              onClick={() => { document.getElementById('mobile-nav-toggle-checkbox').checked = false; router.push('/'); }} 
+              style={{ cursor: 'pointer', display: 'flex', alignItems: 'center' }}
+            >
+              <Logo height={28} />
+            </div>
+            <label htmlFor="mobile-nav-toggle-checkbox" className="mobile-nav-drawer-close">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#2C241D" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                <line x1="18" y1="6" x2="6" y2="18"></line>
+                <line x1="6" y1="6" x2="18" y2="18"></line>
+              </svg>
+            </label>
+          </div>
+          <div className="mobile-nav-drawer-links">
+            <button className="mobile-nav-drawer-link" onClick={() => { document.getElementById('mobile-nav-toggle-checkbox').checked = false; router.push('/technologie'); }}>
+              {t('techNav')}
+            </button>
+            <button className="mobile-nav-drawer-link" onClick={() => { document.getElementById('mobile-nav-toggle-checkbox').checked = false; router.push('/blog'); }}>
+              {t('blogNav')}
+            </button>
+            <button className="mobile-nav-drawer-link" onClick={() => { document.getElementById('mobile-nav-toggle-checkbox').checked = false; router.push('/mes-rapports'); }}>
+              {t('myReportsNav')}
+            </button>
+          </div>
+          <div className="mobile-nav-drawer-cta">
+            <button
+              onClick={() => { document.getElementById('mobile-nav-toggle-checkbox').checked = false; router.push('/'); }}
+              style={{
+                width: '100%',
+                background: 'linear-gradient(135deg, #3D2914 0%, #281B0D 100%)',
+                color: '#FFFFFF',
+                border: 'none',
+                borderRadius: '12px',
+                padding: '13px 20px',
+                fontSize: '13px',
+                fontWeight: '700',
+                cursor: 'pointer',
+                fontFamily: "'Inter', sans-serif",
+                textTransform: 'uppercase',
+                letterSpacing: '0.04em',
+                boxShadow: '0 4px 14px rgba(61, 41, 20, 0.15)'
+              }}
+            >
+              {t('newAnalysis')}
+            </button>
+          </div>
         </div>
       </div>
 
@@ -888,6 +1012,8 @@ export default function Report() {
           handleEmailSkip={handleEmailSkip}
         />
       </div>
+      </>
+      )}
 
       <style dangerouslySetInnerHTML={{ __html: `
         @keyframes spin { to { transform: rotate(360deg); } }

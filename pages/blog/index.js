@@ -79,6 +79,8 @@ function ArticleCard({ article }) {
 }
 
 export default function BlogIndex() {
+  const { lang, t } = useLang();
+
   return (
     <>
       <Head>
@@ -97,14 +99,96 @@ export default function BlogIndex() {
         <meta name="twitter:description" content="Conseils skincare d'experts, routines, ingrédients actifs et guides peau." />
         <meta name="twitter:image" content="https://ratemyskin.co/og-image.png" />
       </Head>
-
+ 
       <div style={{ maxWidth: 900, margin: '0 auto', padding: '0 20px 80px' }}>
         {/* Header */}
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '20px 0 8px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '20px 0 8px', gap: 12, flexWrap: 'wrap' }}>
           <Link href="/" style={{ textDecoration: 'none' }}>
             <Logo height={32} />
           </Link>
-          <LangToggle />
+          <div className="desktop-nav-links" style={{ display: 'flex', alignItems: 'center', gap: 'clamp(10px, 2.5vw, 16px)' }}>
+            <LangToggle />
+            <Link href="/technologie" style={{
+              fontSize: 12, color: '#8C7A6B', textDecoration: 'none',
+              fontFamily: "'DM Sans', sans-serif", fontWeight: 500,
+              letterSpacing: '0.02em', whiteSpace: 'nowrap'
+            }}>
+              {lang === 'fr' ? 'Technologie' : 'Our Tech'}
+            </Link>
+            <Link href="/" style={{
+              fontSize: 12, color: WARM, textDecoration: 'none',
+              fontFamily: "'DM Sans', sans-serif", fontWeight: 600,
+              letterSpacing: '0.02em', whiteSpace: 'nowrap'
+            }}>
+              {lang === 'fr' ? 'Analyser ma peau' : 'Analyze my skin'}
+            </Link>
+          </div>
+
+          {/* Mobile Hamburger Button */}
+          <input type="checkbox" id="mobile-nav-toggle-checkbox" className="mobile-nav-toggle" />
+          <div className="nav-mobile-controls" style={{ display: 'none', alignItems: 'center', gap: 14 }}>
+            <LangToggle />
+            <label htmlFor="mobile-nav-toggle-checkbox" className="mobile-nav-toggle-btn">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#2C241D" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <line x1="3" y1="12" x2="21" y2="12"></line>
+                <line x1="3" y1="6" x2="21" y2="6"></line>
+                <line x1="3" y1="18" x2="21" y2="18"></line>
+              </svg>
+            </label>
+          </div>
+
+          {/* Mobile Navigation Drawer Backdrop Overlay */}
+          <label htmlFor="mobile-nav-toggle-checkbox" className="mobile-nav-overlay" />
+
+          {/* Mobile Drawer Content */}
+          <div className="mobile-nav-drawer" style={{ textAlign: 'left' }}>
+            <div className="mobile-nav-drawer-header">
+              <Link href="/" style={{ textDecoration: 'none', display: 'flex', alignItems: 'center' }} onClick={() => { document.getElementById('mobile-nav-toggle-checkbox').checked = false; }}>
+                <Logo height={28} />
+              </Link>
+              <label htmlFor="mobile-nav-toggle-checkbox" className="mobile-nav-drawer-close">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#2C241D" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                  <line x1="18" y1="6" x2="6" y2="18"></line>
+                  <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+              </label>
+            </div>
+            <div className="mobile-nav-drawer-links">
+              <Link href="/technologie" className="mobile-nav-drawer-link" style={{ display: 'block', textDecoration: 'none' }} onClick={() => { document.getElementById('mobile-nav-toggle-checkbox').checked = false; }}>
+                {t('techNav')}
+              </Link>
+              <Link href="/blog" className="mobile-nav-drawer-link" style={{ display: 'block', textDecoration: 'none' }} onClick={() => { document.getElementById('mobile-nav-toggle-checkbox').checked = false; }}>
+                {t('blogNav')}
+              </Link>
+              <Link href="/mes-rapports" className="mobile-nav-drawer-link" style={{ display: 'block', textDecoration: 'none' }} onClick={() => { document.getElementById('mobile-nav-toggle-checkbox').checked = false; }}>
+                {t('myReportsNav')}
+              </Link>
+            </div>
+            <div className="mobile-nav-drawer-cta">
+              <Link href="/" style={{ textDecoration: 'none' }}>
+                <button
+                  onClick={() => { document.getElementById('mobile-nav-toggle-checkbox').checked = false; }}
+                  style={{
+                    width: '100%',
+                    background: 'linear-gradient(135deg, #3D2914 0%, #281B0D 100%)',
+                    color: '#FFFFFF',
+                    border: 'none',
+                    borderRadius: '12px',
+                    padding: '13px 20px',
+                    fontSize: '13px',
+                    fontWeight: '700',
+                    cursor: 'pointer',
+                    fontFamily: "'Inter', sans-serif",
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.04em',
+                    boxShadow: '0 4px 14px rgba(61, 41, 20, 0.15)'
+                  }}
+                >
+                  {lang === 'fr' ? 'Analyser ma peau' : 'Analyze my skin'}
+                </button>
+              </Link>
+            </div>
+          </div>
         </div>
 
         {/* Hero */}

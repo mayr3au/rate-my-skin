@@ -982,34 +982,115 @@ export default function Home({ teaserProducts }) {
         </div>
 
         {/* Center Section */}
-        <div style={{ flex: '0 0 auto', display: 'flex', justifyContent: 'center' }}>
+        <div 
+          onClick={() => router.push('/')} 
+          style={{ flex: '0 0 auto', display: 'flex', justifyContent: 'center', cursor: 'pointer' }}
+        >
           <Logo />
         </div>
 
         {/* Right Section */}
-        <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: 'clamp(8px, 2vw, 16px)', minWidth: 0 }}>
-          <button
-            onClick={() => router.push('/blog')}
-            style={{
-              background: 'none', border: 'none',
-              padding: '2px 0', fontSize: 'clamp(11px, 2vw, 12px)', color: '#8C7A6B', cursor: 'pointer',
-              fontFamily: "'DM Sans', sans-serif", fontWeight: 500,
-              letterSpacing: '0.02em', whiteSpace: 'nowrap'
-            }}
-          >
-            {t('blogNav')}
-          </button>
-          <button
-            onClick={() => router.push('/mes-rapports')}
-            style={{
-              background: 'none', border: 'none',
-              padding: '2px 0', fontSize: 'clamp(11px, 2vw, 12px)', color: '#8C7A6B', cursor: 'pointer',
-              fontFamily: "'DM Sans', sans-serif", fontWeight: 500,
-              letterSpacing: '0.02em', whiteSpace: 'nowrap'
-            }}
-          >
-            {t('myReportsNav')}
-          </button>
+        <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'flex-end', minWidth: 0 }}>
+          <div className="desktop-nav-links" style={{ display: 'flex', alignItems: 'center', gap: 'clamp(8px, 2vw, 16px)', minWidth: 0 }}>
+            <button
+              onClick={() => router.push('/technologie')}
+              style={{
+                background: 'none', border: 'none',
+                padding: '2px 0', fontSize: 'clamp(11px, 2vw, 12px)', color: '#8C7A6B', cursor: 'pointer',
+                fontFamily: "'DM Sans', sans-serif", fontWeight: 500,
+                letterSpacing: '0.02em', whiteSpace: 'nowrap'
+              }}
+            >
+              {t('techNav')}
+            </button>
+            <button
+              onClick={() => router.push('/blog')}
+              style={{
+                background: 'none', border: 'none',
+                padding: '2px 0', fontSize: 'clamp(11px, 2vw, 12px)', color: '#8C7A6B', cursor: 'pointer',
+                fontFamily: "'DM Sans', sans-serif", fontWeight: 500,
+                letterSpacing: '0.02em', whiteSpace: 'nowrap'
+              }}
+            >
+              {t('blogNav')}
+            </button>
+            <button
+              onClick={() => router.push('/mes-rapports')}
+              style={{
+                background: 'none', border: 'none',
+                padding: '2px 0', fontSize: 'clamp(11px, 2vw, 12px)', color: '#8C7A6B', cursor: 'pointer',
+                fontFamily: "'DM Sans', sans-serif", fontWeight: 500,
+                letterSpacing: '0.02em', whiteSpace: 'nowrap'
+              }}
+            >
+              {t('myReportsNav')}
+            </button>
+          </div>
+
+          <label htmlFor="mobile-nav-toggle-checkbox" className="mobile-nav-toggle-btn">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#2C241D" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <line x1="3" y1="12" x2="21" y2="12"></line>
+              <line x1="3" y1="6" x2="21" y2="6"></line>
+              <line x1="3" y1="18" x2="21" y2="18"></line>
+            </svg>
+          </label>
+        </div>
+
+        {/* Mobile Hamburger Button Input Control */}
+        <input type="checkbox" id="mobile-nav-toggle-checkbox" className="mobile-nav-toggle" />
+
+        {/* Mobile Navigation Drawer Backdrop Overlay */}
+        <label htmlFor="mobile-nav-toggle-checkbox" className="mobile-nav-overlay" />
+
+        {/* Mobile Drawer Content */}
+        <div className="mobile-nav-drawer">
+          <div className="mobile-nav-drawer-header">
+            <div 
+              onClick={() => { document.getElementById('mobile-nav-toggle-checkbox').checked = false; router.push('/'); }} 
+              style={{ cursor: 'pointer', display: 'flex', alignItems: 'center' }}
+            >
+              <Logo height={28} />
+            </div>
+            <label htmlFor="mobile-nav-toggle-checkbox" className="mobile-nav-drawer-close">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#2C241D" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                <line x1="18" y1="6" x2="6" y2="18"></line>
+                <line x1="6" y1="6" x2="18" y2="18"></line>
+              </svg>
+            </label>
+          </div>
+          <div className="mobile-nav-drawer-links">
+            <button className="mobile-nav-drawer-link" onClick={() => { document.getElementById('mobile-nav-toggle-checkbox').checked = false; router.push('/technologie'); }}>
+              {t('techNav')}
+            </button>
+            <button className="mobile-nav-drawer-link" onClick={() => { document.getElementById('mobile-nav-toggle-checkbox').checked = false; router.push('/blog'); }}>
+              {t('blogNav')}
+            </button>
+            <button className="mobile-nav-drawer-link" onClick={() => { document.getElementById('mobile-nav-toggle-checkbox').checked = false; router.push('/mes-rapports'); }}>
+              {t('myReportsNav')}
+            </button>
+          </div>
+          <div className="mobile-nav-drawer-cta">
+            <button
+              onClick={() => { document.getElementById('mobile-nav-toggle-checkbox').checked = false; router.push('/'); }}
+              style={{
+                width: '100%',
+                background: 'linear-gradient(135deg, #3D2914 0%, #281B0D 100%)',
+                color: '#FFFFFF',
+                border: 'none',
+                borderRadius: '12px',
+                padding: '13px 20px',
+                fontSize: '13px',
+                fontWeight: '700',
+                cursor: 'pointer',
+                fontFamily: "'Inter', sans-serif",
+                textTransform: 'uppercase',
+                letterSpacing: '0.04em',
+                boxShadow: '0 4px 14px rgba(61, 41, 20, 0.15)'
+              }}
+            >
+              {lang === 'fr' ? 'Analyser ma peau' : 'Analyze my skin'}
+            </button>
+          </div>
         </div>
       </div>
 
@@ -1249,7 +1330,7 @@ export default function Home({ teaserProducts }) {
                             </svg>
                           </div>
                           <h3 className="hero-upload-title hero-upload-desktop-hint" style={{ margin: '0 0 8px', fontSize: 20, color: '#2C2416', fontWeight: 700, fontFamily: "'Cormorant Garamond', serif" }}>
-                            {lang === 'fr' ? 'Découvre ton score de peau en 30 secondes' : 'Discover your skin score in 30 seconds'}
+                            {lang === 'fr' ? 'Découvre ton score de peau' : 'Discover your skin score'}
                           </h3>
                           <p className="hero-upload-desktop-hint" style={{ margin: '0 0 20px', fontSize: 13, color: '#5C4A3A', fontWeight: 500, fontFamily: "'DM Sans', sans-serif" }}>
                             {lang === 'fr' ? 'Glisse ta photo ici, ou' : 'Drop your photo here, or'}
@@ -1301,9 +1382,9 @@ export default function Home({ teaserProducts }) {
                 {renderFloatingAccent(lang === 'fr' ? 'Texture' : 'Texture', 74, '#A87449', { bottom: '5%', right: '-5%' }, 'hide-desktop mobile-float-bubble mobile-float-bubble-4', 'float1')}
                 {renderFloatingAccent(lang === 'fr' ? 'Rougeurs' : 'Redness', 89, '#D4A574', { top: '-2%', right: '15%' }, 'hide-desktop mobile-float-bubble mobile-float-bubble-5', 'float2')}
 
-                <img 
-                  src="/hero-mockup.png" 
-                  alt="Rate My Skin Report Preview" 
+                <img
+                  src="/hero-mockup.png"
+                  alt="Rate My Skin Report Preview"
                   style={{
                     width: '100%',
                     maxWidth: 380,
@@ -1391,7 +1472,7 @@ export default function Home({ teaserProducts }) {
                 }}>
                   {lang === 'fr' ? 'Une analyse complète de ta peau' : 'A complete skin analysis'}
                 </h2>
-                
+
                 <div style={{
                   background: 'rgba(255,255,255,0.7)',
                   borderLeft: '3px solid #D4A574',
@@ -1405,8 +1486,8 @@ export default function Home({ teaserProducts }) {
                     {lang === 'fr' ? 'Pourquoi 8 métriques ?' : 'Why 8 metrics?'}
                   </h4>
                   <p style={{ margin: 0, fontSize: 14, color: '#5C4A3A', lineHeight: 1.5 }}>
-                    {lang === 'fr' 
-                      ? "Un bouton ou une rougeur ne sont que des symptômes. En croisant l'hydratation, les pores, le relief ou encore les taches sous-jacentes, l'IA dresse un bilan ultra-précis de l'écosystème de ta peau. C'est la clé pour arrêter de deviner et utiliser enfin les actifs qui te correspondent." 
+                    {lang === 'fr'
+                      ? "Un bouton ou une rougeur ne sont que des symptômes. En croisant l'hydratation, les pores, le relief ou encore les taches sous-jacentes, l'IA dresse un bilan ultra-précis de l'écosystème de ta peau. C'est la clé pour arrêter de deviner et utiliser enfin les actifs qui te correspondent."
                       : "A blemish or redness are just symptoms. By cross-referencing hydration, pores, texture, or underlying spots, the AI creates an ultra-precise assessment of your skin's ecosystem. It's the key to stop guessing and finally use the active ingredients that work for you."}
                   </p>
                 </div>
@@ -1468,24 +1549,24 @@ export default function Home({ teaserProducts }) {
                       <h4 style={{ margin: '0 0 2px', fontSize: 14, fontWeight: 600, color: '#2C2416' }}>{m.label}</h4>
                       <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap' }}>
                         {m.status && (
-                           <span style={{
-                             background: m.statusColor === 'green' ? 'rgba(125,191,168,0.1)' : 
-                                         m.statusColor === 'amber' ? 'rgba(212, 165, 116, 0.15)' : 
-                                         'rgba(216, 134, 157, 0.1)',
-                             color: m.statusColor === 'green' ? '#4D8C76' : 
-                                    m.statusColor === 'amber' ? '#B0885E' : 
-                                    '#B85C75',
-                             fontSize: 8.5, fontWeight: 700, padding: '3px 6px',
-                             borderRadius: 6, letterSpacing: '0.05em', lineHeight: 1,
-                             whiteSpace: 'nowrap'
-                           }}>
-                             {m.status}
-                           </span>
+                          <span style={{
+                            background: m.statusColor === 'green' ? 'rgba(125,191,168,0.1)' :
+                              m.statusColor === 'amber' ? 'rgba(212, 165, 116, 0.15)' :
+                                'rgba(216, 134, 157, 0.1)',
+                            color: m.statusColor === 'green' ? '#4D8C76' :
+                              m.statusColor === 'amber' ? '#B0885E' :
+                                '#B85C75',
+                            fontSize: 8.5, fontWeight: 700, padding: '3px 6px',
+                            borderRadius: 6, letterSpacing: '0.05em', lineHeight: 1,
+                            whiteSpace: 'nowrap'
+                          }}>
+                            {m.status}
+                          </span>
                         )}
                         {m.shortLine && (
-                           <span style={{ fontSize: 11, color: '#5C4A3A', fontWeight: 500, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                             {m.shortLine}
-                           </span>
+                          <span style={{ fontSize: 11, color: '#5C4A3A', fontWeight: 500, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                            {m.shortLine}
+                          </span>
                         )}
                       </div>
                     </div>
@@ -1514,31 +1595,31 @@ export default function Home({ teaserProducts }) {
                     {lang === 'fr' ? 'Une routine construite sur ta peau réelle' : 'A routine built on your real skin'}
                   </h4>
                   <p style={{ fontSize: 15, color: '#5C4A3A', margin: 0, lineHeight: 1.6 }}>
-                    {lang === 'fr' 
-                      ? "Pas un quiz. Pas les conseils génériques d'un influenceur. L'IA lit 8 métriques directement sur ton visage, hydratation, pores, taches, éclat, et compose la routine et les produits faits pour TES besoins, zone par zone. Ce que tu vois ici n'est qu'un exemple : la tienne sera unique." 
+                    {lang === 'fr'
+                      ? "Pas un quiz. Pas les conseils génériques d'un influenceur. L'IA lit 8 métriques directement sur ton visage, hydratation, pores, taches, éclat, et compose la routine et les produits faits pour TES besoins, zone par zone. Ce que tu vois ici n'est qu'un exemple : la tienne sera unique."
                       : "Not a quiz. Not generic influencer advice. The AI reads 8 metrics directly on your face, hydration, pores, dark spots, radiance, and curates the routine and products made for YOUR needs, zone by zone. What you see here is just an example: yours will be unique."}
                   </p>
                 </div>
 
                 {/* The Teaser Routine Container */}
                 <div style={{ position: 'relative', width: '100%', maxWidth: 640, margin: '0 auto', background: '#fff', borderRadius: 24, boxShadow: '0 12px 40px rgba(44,36,22,0.06)', border: '1px solid rgba(201,169,97,0.15)', overflow: 'hidden' }}>
-                  
+
                   {/* TABS */}
                   <div style={{ display: 'flex', borderBottom: '1px solid rgba(201,169,97,0.1)', background: 'linear-gradient(180deg, rgba(255,255,255,1) 0%, rgba(248,244,237,0.3) 100%)' }}>
-                    <button 
+                    <button
                       onClick={() => setRoutineTeaserTab('morning')}
                       style={{ flex: 1, padding: '20px 16px', background: 'none', border: 'none', borderBottom: routineTeaserTab === 'morning' ? '2px solid #D4A574' : '2px solid transparent', cursor: 'pointer', transition: 'all 0.2s', display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 8 }}
                     >
-                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={routineTeaserTab === 'morning' ? '#D4A574' : '#8C7A6B'} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={routineTeaserTab === 'morning' ? '#D4A574' : '#8C7A6B'} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="5" /><line x1="12" y1="1" x2="12" y2="3" /><line x1="12" y1="21" x2="12" y2="23" /><line x1="4.22" y1="4.22" x2="5.64" y2="5.64" /><line x1="18.36" y1="18.36" x2="19.78" y2="19.78" /><line x1="1" y1="12" x2="3" y2="12" /><line x1="21" y1="12" x2="23" y2="12" /><line x1="4.22" y1="19.78" x2="5.64" y2="18.36" /><line x1="18.36" y1="5.64" x2="19.78" y2="4.22" /></svg>
                       <span style={{ fontSize: 13, fontWeight: 700, letterSpacing: '0.15em', color: routineTeaserTab === 'morning' ? '#D4A574' : '#8C7A6B' }}>
                         {lang === 'fr' ? 'MATIN' : 'MORNING'}
                       </span>
                     </button>
-                    <button 
+                    <button
                       onClick={() => setRoutineTeaserTab('evening')}
                       style={{ flex: 1, padding: '20px 16px', background: 'none', border: 'none', borderBottom: routineTeaserTab === 'evening' ? '2px solid #D4A574' : '2px solid transparent', cursor: 'pointer', transition: 'all 0.2s', display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 8 }}
                     >
-                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={routineTeaserTab === 'evening' ? '#D4A574' : '#8C7A6B'} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={routineTeaserTab === 'evening' ? '#D4A574' : '#8C7A6B'} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" /></svg>
                       <span style={{ fontSize: 13, fontWeight: 700, letterSpacing: '0.15em', color: routineTeaserTab === 'evening' ? '#D4A574' : '#8C7A6B' }}>
                         {lang === 'fr' ? 'SOIR' : 'EVENING'}
                       </span>
@@ -1547,7 +1628,7 @@ export default function Home({ teaserProducts }) {
 
                   {/* Steps Wrapper */}
                   <div style={{ padding: 'clamp(20px, 4vw, 32px)', position: 'relative', maxHeight: 520, overflow: 'hidden' }}>
-                    
+
                     {routineTeaserTab === 'morning' ? (
                       <>
                         {/* MORNING CONTENT */}
@@ -1556,14 +1637,14 @@ export default function Home({ teaserProducts }) {
                             <span style={{ fontSize: 18, fontFamily: "'Cormorant Garamond', serif", color: '#C9A961', fontWeight: 600 }}>01</span>
                             <h6 style={{ margin: 0, fontSize: 18, color: '#2C2416', fontWeight: 600 }}>{lang === 'fr' ? 'Nettoyer en douceur' : 'Gentle Cleanse'}</h6>
                           </div>
-                          
+
                           {teaserProducts?.morningCleanser && (
-                            <ProductCard 
-                              product={teaserProducts.morningCleanser} 
-                              lang={lang} 
-                              t={t} 
-                              userSkinType={teaserProducts.morningCleanser.skin_types?.[0] || teaserProducts.morningCleanser.skinTypes?.[0] || 'oily'} 
-                              userConcerns={teaserProducts.morningCleanser.skin_problem ? [teaserProducts.morningCleanser.skin_problem] : (teaserProducts.morningCleanser.concerns ? [teaserProducts.morningCleanser.concerns[0]] : ['acne'])} 
+                            <ProductCard
+                              product={teaserProducts.morningCleanser}
+                              lang={lang}
+                              t={t}
+                              userSkinType={teaserProducts.morningCleanser.skin_types?.[0] || teaserProducts.morningCleanser.skinTypes?.[0] || 'oily'}
+                              userConcerns={teaserProducts.morningCleanser.skin_problem ? [teaserProducts.morningCleanser.skin_problem] : (teaserProducts.morningCleanser.concerns ? [teaserProducts.morningCleanser.concerns[0]] : ['acne'])}
                             />
                           )}
 
@@ -1571,7 +1652,7 @@ export default function Home({ teaserProducts }) {
                             <div style={{ fontSize: 16 }}>💡</div>
                             <div style={{ fontSize: 13, color: '#5C4A3A', lineHeight: 1.5 }}>
                               <strong style={{ color: '#2C2416', display: 'block', marginBottom: 2 }}>{lang === 'fr' ? "Conseil de l'IA" : "AI Coaching"}</strong>
-                              {lang === 'fr' 
+                              {lang === 'fr'
                                 ? "Masse 60 secondes sur peau humide pour dissoudre l'excès de sébum détecté sur la zone T, puis rince à l'eau tiède."
                                 : "Massage for 60 seconds on damp skin to dissolve the excess sebum detected on your T-zone, then rinse with lukewarm water."}
                             </div>
@@ -1583,14 +1664,14 @@ export default function Home({ teaserProducts }) {
                             <span style={{ fontSize: 18, fontFamily: "'Cormorant Garamond', serif", color: '#C9A961', fontWeight: 600 }}>02</span>
                             <h6 style={{ margin: 0, fontSize: 18, color: '#2C2416', fontWeight: 600 }}>{lang === 'fr' ? 'Cibler l\'éclat' : 'Target Radiance'}</h6>
                           </div>
-                          
+
                           {teaserProducts?.morningSerum && (
-                            <ProductCard 
-                              product={teaserProducts.morningSerum} 
-                              lang={lang} 
-                              t={t} 
-                              userSkinType={teaserProducts.morningSerum.skin_types?.[0] || teaserProducts.morningSerum.skinTypes?.[0] || 'oily'} 
-                              userConcerns={teaserProducts.morningSerum.skin_problem ? [teaserProducts.morningSerum.skin_problem] : (teaserProducts.morningSerum.concerns ? [teaserProducts.morningSerum.concerns[0]] : ['hyperpigmentation'])} 
+                            <ProductCard
+                              product={teaserProducts.morningSerum}
+                              lang={lang}
+                              t={t}
+                              userSkinType={teaserProducts.morningSerum.skin_types?.[0] || teaserProducts.morningSerum.skinTypes?.[0] || 'oily'}
+                              userConcerns={teaserProducts.morningSerum.skin_problem ? [teaserProducts.morningSerum.skin_problem] : (teaserProducts.morningSerum.concerns ? [teaserProducts.morningSerum.concerns[0]] : ['hyperpigmentation'])}
                             />
                           )}
 
@@ -1598,7 +1679,7 @@ export default function Home({ teaserProducts }) {
                             <div style={{ fontSize: 16 }}>⏱️</div>
                             <div style={{ fontSize: 13, color: '#5C4A3A', lineHeight: 1.5 }}>
                               <strong style={{ color: '#2C2416', display: 'block', marginBottom: 2 }}>{lang === 'fr' ? "Application" : "Application"}</strong>
-                              {lang === 'fr' 
+                              {lang === 'fr'
                                 ? "Applique 3 à 4 gouttes. Laisse absorber 2 minutes avant de passer à l'hydratation pour maximiser son effet antioxydant."
                                 : "Apply 3 to 4 drops. Let it absorb for 2 minutes before moisturizing to maximize its antioxidant effect."}
                             </div>
@@ -1613,14 +1694,14 @@ export default function Home({ teaserProducts }) {
                             <span style={{ fontSize: 18, fontFamily: "'Cormorant Garamond', serif", color: '#C9A961', fontWeight: 600 }}>01</span>
                             <h6 style={{ margin: 0, fontSize: 18, color: '#2C2416', fontWeight: 600 }}>{lang === 'fr' ? 'Double nettoyage' : 'Double Cleanse'}</h6>
                           </div>
-                          
+
                           {teaserProducts?.eveningCleanser && (
-                            <ProductCard 
-                              product={teaserProducts.eveningCleanser} 
-                              lang={lang} 
-                              t={t} 
-                              userSkinType={teaserProducts.eveningCleanser.skin_types?.[0] || teaserProducts.eveningCleanser.skinTypes?.[0] || 'oily'} 
-                              userConcerns={teaserProducts.eveningCleanser.skin_problem ? [teaserProducts.eveningCleanser.skin_problem] : (teaserProducts.eveningCleanser.concerns ? [teaserProducts.eveningCleanser.concerns[0]] : ['acne'])} 
+                            <ProductCard
+                              product={teaserProducts.eveningCleanser}
+                              lang={lang}
+                              t={t}
+                              userSkinType={teaserProducts.eveningCleanser.skin_types?.[0] || teaserProducts.eveningCleanser.skinTypes?.[0] || 'oily'}
+                              userConcerns={teaserProducts.eveningCleanser.skin_problem ? [teaserProducts.eveningCleanser.skin_problem] : (teaserProducts.eveningCleanser.concerns ? [teaserProducts.eveningCleanser.concerns[0]] : ['acne'])}
                             />
                           )}
 
@@ -1628,7 +1709,7 @@ export default function Home({ teaserProducts }) {
                             <div style={{ fontSize: 16 }}>💡</div>
                             <div style={{ fontSize: 13, color: '#5C4A3A', lineHeight: 1.5 }}>
                               <strong style={{ color: '#2C2416', display: 'block', marginBottom: 2 }}>{lang === 'fr' ? "Conseil de l'IA" : "AI Coaching"}</strong>
-                              {lang === 'fr' 
+                              {lang === 'fr'
                                 ? "Masse sur peau sèche pendant 60 secondes. Les huiles du baume vont dissoudre tes bouchons de sébum incrustés dans les pores, puis rince."
                                 : "Massage on dry skin for 60 seconds. The balm's oils will dissolve the sebum plugs in your pores, then rinse."}
                             </div>
@@ -1640,14 +1721,14 @@ export default function Home({ teaserProducts }) {
                             <span style={{ fontSize: 18, fontFamily: "'Cormorant Garamond', serif", color: '#C9A961', fontWeight: 600 }}>02</span>
                             <h6 style={{ margin: 0, fontSize: 18, color: '#2C2416', fontWeight: 600 }}>{lang === 'fr' ? 'Traiter & Réparer' : 'Treat & Repair'}</h6>
                           </div>
-                          
+
                           {teaserProducts?.eveningTreatment && (
-                            <ProductCard 
-                              product={teaserProducts.eveningTreatment} 
-                              lang={lang} 
-                              t={t} 
-                              userSkinType={teaserProducts.eveningTreatment.skin_types?.[0] || teaserProducts.eveningTreatment.skinTypes?.[0] || 'oily'} 
-                              userConcerns={teaserProducts.eveningTreatment.skin_problem ? [teaserProducts.eveningTreatment.skin_problem] : (teaserProducts.eveningTreatment.concerns ? [teaserProducts.eveningTreatment.concerns[0]] : ['acne'])} 
+                            <ProductCard
+                              product={teaserProducts.eveningTreatment}
+                              lang={lang}
+                              t={t}
+                              userSkinType={teaserProducts.eveningTreatment.skin_types?.[0] || teaserProducts.eveningTreatment.skinTypes?.[0] || 'oily'}
+                              userConcerns={teaserProducts.eveningTreatment.skin_problem ? [teaserProducts.eveningTreatment.skin_problem] : (teaserProducts.eveningTreatment.concerns ? [teaserProducts.eveningTreatment.concerns[0]] : ['acne'])}
                             />
                           )}
 
@@ -1655,7 +1736,7 @@ export default function Home({ teaserProducts }) {
                             <div style={{ fontSize: 16 }}>⚠️</div>
                             <div style={{ fontSize: 13, color: '#5C4A3A', lineHeight: 1.5 }}>
                               <strong style={{ color: '#2C2416', display: 'block', marginBottom: 2 }}>{lang === 'fr' ? "Application progressive" : "Progressive Application"}</strong>
-                              {lang === 'fr' 
+                              {lang === 'fr'
                                 ? "Ne commence qu'avec 2 soirs par semaine ! Ton scan montre de légers signes de fragilité cutanée, on y va doucement."
                                 : "Start with only 2 nights a week! Your scan shows slight signs of skin fragility, we need to build tolerance slowly."}
                             </div>
@@ -1663,26 +1744,26 @@ export default function Home({ teaserProducts }) {
                         </div>
                       </>
                     )}
-                    
+
                     {/* Overlay Lock UI */}
                     <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: 280, background: 'linear-gradient(to bottom, rgba(255,255,255,0) 0%, rgba(255,255,255,0.9) 35%, rgba(255,255,255,1) 100%)', zIndex: 10, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'flex-end', paddingBottom: 24 }}>
-                       <div style={{ background: '#fff', border: '1px solid rgba(201,169,97,0.3)', borderRadius: 16, padding: '24px 20px', textAlign: 'center', boxShadow: '0 12px 30px rgba(44,36,22,0.08)', width: 'calc(100% - 48px)', maxWidth: 360 }}>
-                         <div style={{ background: '#F8F4ED', width: 48, height: 48, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 16px' }}>
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#D4A574" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
-                         </div>
-                         <h4 style={{ margin: '0 0 8px', color: '#2C2416', fontSize: 18, fontWeight: 700 }}>{lang === 'fr' ? 'Débloque ta routine' : 'Unlock your routine'}</h4>
-                         <p style={{ margin: '0 0 20px', color: '#5C4A3A', fontSize: 13, lineHeight: 1.4 }}>
-                           {lang === 'fr' ? 'Matin & soir, étapes complètes et conseils.' : 'AM & PM, full steps and tips.'}
-                         </p>
-                         <button
-                           onClick={() => setShowMultiAngle(true)}
-                           style={{
-                             background: '#2C2416', color: '#fff', border: 'none', padding: '14px 24px', borderRadius: 100, fontFamily: "'DM Sans', sans-serif", fontSize: 14, fontWeight: 700, cursor: 'pointer', transition: 'all 0.3s ease', boxShadow: '0 8px 24px rgba(44,36,22,0.15)', width: '100%',
-                           }}
-                         >
-                           {lang === 'fr' ? 'Créer ma routine →' : 'Create my routine →'}
-                         </button>
-                       </div>
+                      <div style={{ background: '#fff', border: '1px solid rgba(201,169,97,0.3)', borderRadius: 16, padding: '24px 20px', textAlign: 'center', boxShadow: '0 12px 30px rgba(44,36,22,0.08)', width: 'calc(100% - 48px)', maxWidth: 360 }}>
+                        <div style={{ background: '#F8F4ED', width: 48, height: 48, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 16px' }}>
+                          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#D4A574" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+                        </div>
+                        <h4 style={{ margin: '0 0 8px', color: '#2C2416', fontSize: 18, fontWeight: 700 }}>{lang === 'fr' ? 'Débloque ta routine' : 'Unlock your routine'}</h4>
+                        <p style={{ margin: '0 0 20px', color: '#5C4A3A', fontSize: 13, lineHeight: 1.4 }}>
+                          {lang === 'fr' ? 'Matin & soir, étapes complètes et conseils.' : 'AM & PM, full steps and tips.'}
+                        </p>
+                        <button
+                          onClick={() => setShowMultiAngle(true)}
+                          style={{
+                            background: '#2C2416', color: '#fff', border: 'none', padding: '14px 24px', borderRadius: 100, fontFamily: "'DM Sans', sans-serif", fontSize: 14, fontWeight: 700, cursor: 'pointer', transition: 'all 0.3s ease', boxShadow: '0 8px 24px rgba(44,36,22,0.15)', width: '100%',
+                          }}
+                        >
+                          {lang === 'fr' ? 'Créer ma routine →' : 'Create my routine →'}
+                        </button>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -1882,28 +1963,7 @@ export default function Home({ teaserProducts }) {
         ) : (
           /* Step: 'questions' */
           <div style={{ maxWidth: 480, margin: '0 auto', padding: '0 20px 60px' }}>
-            {/* Top skip button */}
-            <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 20 }}>
-              <button
-                onClick={handleSkipQuestions}
-                style={{
-                  background: 'none',
-                  border: 'none',
-                  fontFamily: "'DM Sans', sans-serif",
-                  fontSize: 'clamp(16px, 4vw, 17px)',
-                  fontWeight: 600,
-                  color: '#C5A028',
-                  cursor: 'pointer',
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: 6,
-                  padding: '8px 16px',
-                  textDecoration: 'underline',
-                }}
-              >
-                {t('skipQuestions')}
-              </button>
-            </div>
+
 
             {/* Questions Step Title */}
             <div style={{ textAlign: 'center', marginBottom: 20 }}>
@@ -2047,17 +2107,18 @@ export default function Home({ teaserProducts }) {
                       border: 'none',
                       fontFamily: "'DM Sans', sans-serif",
                       fontSize: 16,
-                      fontWeight: 600,
-                      color: '#C5A028',
+                      fontWeight: 500,
+                      color: '#2C2416',
                       cursor: 'pointer',
                       display: 'inline-flex',
                       alignItems: 'center',
                       gap: 6,
                       padding: '8px 16px',
+                      letterSpacing: '0.02em',
                     }}
                   >
                     {t('refineAnalysis')}
-                    <span style={{ fontSize: 10, display: 'inline-block', transition: 'transform 0.3s', transform: showOptionalFields ? 'rotate(180deg)' : 'rotate(0deg)' }}>▼</span>
+                    <span style={{ fontSize: 10, display: 'inline-block', transition: 'transform 0.3s', transform: showOptionalFields ? 'rotate(180deg)' : 'rotate(0deg)', opacity: 0.7 }}>▼</span>
                   </button>
                 </div>
 
@@ -2586,7 +2647,7 @@ export default function Home({ teaserProducts }) {
             </div>
 
             {/* ── BOTTOM: Facts card ── */}
-            <div 
+            <div
               onTouchStart={(e) => {
                 touchStartX.current = e.targetTouches[0].clientX;
                 touchEndX.current = e.targetTouches[0].clientX;
@@ -2632,8 +2693,8 @@ export default function Home({ teaserProducts }) {
                 {/* Dots indicator */}
                 <div style={{ marginLeft: 'auto', display: 'flex', gap: '6px' }}>
                   {FACTS.map((_, i) => (
-                    <div 
-                      key={i} 
+                    <div
+                      key={i}
                       onClick={() => handleFactChange(i)}
                       style={{
                         width: i === factIndex ? 16 : 5, height: 5,
@@ -2641,7 +2702,7 @@ export default function Home({ teaserProducts }) {
                         background: i === factIndex ? '#C9A961' : 'rgba(201,169,97,0.25)',
                         transition: 'all 0.4s ease',
                         cursor: 'pointer',
-                      }} 
+                      }}
                     />
                   ))}
                 </div>
@@ -2728,7 +2789,8 @@ export default function Home({ teaserProducts }) {
         />
       )}
 
-      <style dangerouslySetInnerHTML={{ __html: `
+      <style dangerouslySetInnerHTML={{
+        __html: `
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
         @keyframes fadeInUp { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
         @keyframes spin { to { transform: rotate(360deg); } }

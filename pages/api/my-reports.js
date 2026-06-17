@@ -22,9 +22,8 @@ export default async function handler(req, res) {
   // Path 1 — email stored directly on the analysis row (analyses created after the fix)
   const { data: directRows, error: directErr } = await supabase
     .from('analyses')
-    .select('id, created_at, report_json, skin_concern')
+    .select('id, created_at, report_json, skin_concern, is_paid')
     .eq('email', normalizedEmail)
-    .eq('is_paid', true)
     .order('created_at', { ascending: false })
     .limit(50);
 
@@ -44,9 +43,8 @@ export default async function handler(req, res) {
   if (userRow?.id) {
     const { data: userAnalyses } = await supabase
       .from('analyses')
-      .select('id, created_at, report_json, skin_concern')
+      .select('id, created_at, report_json, skin_concern, is_paid')
       .eq('user_id', userRow.id)
-      .eq('is_paid', true)
       .order('created_at', { ascending: false })
       .limit(50);
     viaUserRows = userAnalyses || [];
@@ -67,6 +65,7 @@ export default async function handler(req, res) {
     skinConcern: row.skin_concern ?? null,
     faceShape: row.report_json?.faceShape ?? null,
     skinTone: row.report_json?.skinTone ?? null,
+    isPaid: !!row.is_paid,
     reportJson: row.report_json,
   }));
 
