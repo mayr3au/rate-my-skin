@@ -1,6 +1,7 @@
 import Head from 'next/head';
 import Link from 'next/link';
 import Logo from '../../components/Logo';
+import NavBar from '../../components/NavBar';
 import { useLang } from '../../lib/LangContext';
 import { articles } from '../../lib/blogData';
 
@@ -100,8 +101,10 @@ export default function BlogIndex() {
         <meta name="twitter:image" content="https://ratemyskin.co/og-image.png" />
       </Head>
  
+      <NavBar />
       <div style={{ maxWidth: 900, margin: '0 auto', padding: '0 20px 80px' }}>
-        {/* Header */}
+        {/* Header — legacy hidden */}
+        {false && (
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '20px 0 8px', gap: 12, flexWrap: 'wrap' }}>
           <Link href="/" style={{ textDecoration: 'none' }}>
             <Logo height={32} />
@@ -190,6 +193,7 @@ export default function BlogIndex() {
             </div>
           </div>
         </div>
+        )}
 
         {/* Hero */}
         <div style={{ textAlign: 'center', padding: '48px 0 40px' }}>

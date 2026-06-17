@@ -8,6 +8,8 @@ import MultiAngleCamera from '../components/MultiAngleCamera';
 import ProductImage from '../components/ProductImage';
 import { ProductCard } from '../components/BeautyReport';
 import { createAdminClient } from '../lib/supabase';
+import HomeRefonte from '../components/HomeRefonte';
+import NavBar from '../components/NavBar';
 
 export async function getStaticProps() {
   let teaserProducts = {
@@ -922,13 +924,13 @@ export default function Home({ teaserProducts }) {
         }} />
       </Head>
 
-      {/* ── Welcoming Banner ── */}
+      {/* ── Welcoming Banner (legacy, always hidden) ── */}
       <div className="welcome-banner" style={{
         background: 'linear-gradient(90deg, #FDFCF9 0%, #FAF2EA 50%, #FDFCF9 100%)',
         borderBottom: '1px solid rgba(197, 160, 40, 0.12)',
         padding: 'calc(6px + env(safe-area-inset-top, 0px)) 12px 6px',
         textAlign: 'center',
-        display: 'flex',
+        display: 'none',
         alignItems: 'center',
         justifyContent: 'center',
         gap: '6px',
@@ -956,12 +958,17 @@ export default function Home({ teaserProducts }) {
         </svg>
       </div>
 
-      {/* ── Sticky nav ── */}
+      {/* ── New unified NavBar (replaces legacy) ── */}
+      {currentStep !== 'landing' && (
+        <NavBar ctaLabel={lang === 'fr' ? 'Continuer' : 'Continue'} ctaHref="#" />
+      )}
+      {/* ── Legacy sticky nav (always hidden) ── */}
       <div className="nav-blur" style={{
         position: 'sticky', top: 0, zIndex: 200,
         boxShadow: '0 4px 20px rgba(180, 160, 140, 0.04)',
         padding: '13px 24px',
-        display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+        display: 'none',
+        alignItems: 'center', justifyContent: 'space-between',
         width: '100%',
       }}>
         {/* Left Section */}
@@ -1110,6 +1117,12 @@ export default function Home({ teaserProducts }) {
         }}
       >
         {currentStep === 'landing' ? (
+          <HomeRefonte
+            onUploadClick={() => setShowUploadSelector(true)}
+            lang={lang}
+            t={t}
+          />
+        ) : false ? (
           <>
             <style>{`
               @keyframes float1 { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
@@ -1963,18 +1976,34 @@ export default function Home({ teaserProducts }) {
           </>
         ) : (
           /* Step: 'questions' */
-          <div style={{ maxWidth: 480, margin: '0 auto', padding: '0 20px 60px' }}>
+          <div style={{ maxWidth: 480, margin: '0 auto', padding: '40px 20px 60px' }}>
 
-
-            {/* Questions Step Title */}
-            <div style={{ textAlign: 'center', marginBottom: 20 }}>
+            {/* Questions Step Title — éditorial */}
+            <div style={{ textAlign: 'center', marginBottom: 28 }}>
+              <div style={{ color: '#C9A961', fontSize: 12, opacity: 0.7, marginBottom: 14 }}>✦</div>
+              <p style={{
+                fontFamily: "'DM Sans', sans-serif",
+                fontSize: 10, letterSpacing: '0.32em', textTransform: 'uppercase',
+                color: '#C9A961', fontWeight: 700, margin: '0 0 12px',
+              }}>
+                {lang === 'fr' ? 'Étape 2' : 'Step 2'}
+              </p>
               <h1 style={{
                 fontFamily: "'Cormorant Garamond', serif",
-                fontSize: 'clamp(28px, 5vw, 36px)', fontWeight: 400,
-                color: '#2C2416', lineHeight: 1.2, margin: '0 0 10px',
+                fontSize: 'clamp(30px, 5vw, 42px)', fontWeight: 400,
+                color: '#2C2416', lineHeight: 1.1, margin: '0 0 10px',
+                letterSpacing: '-0.01em',
               }}>
-                {t('questionsTitle')}
+                {lang === 'fr' ? (<>Affine ton <em style={{ color: '#B0885E', fontStyle: 'italic' }}>diagnostic</em></>) : (<>Refine your <em style={{ color: '#B0885E', fontStyle: 'italic' }}>diagnosis</em></>)}
               </h1>
+              <p style={{
+                fontFamily: "'Cormorant Garamond', serif",
+                fontStyle: 'italic',
+                fontSize: 16, color: '#5C4A3A', lineHeight: 1.5,
+                margin: '0',
+              }}>
+                {lang === 'fr' ? 'Quelques questions optionnelles pour une analyse plus précise' : 'A few optional questions for a more precise analysis'}
+              </p>
             </div>
 
             {/* Photo preview */}
@@ -2567,31 +2596,45 @@ export default function Home({ teaserProducts }) {
             alignItems: 'center', gap: '28px',
           }}>
 
-            {/* ── TOP: Flower + Live step ── */}
+            {/* ── TOP: ornament + Title (nouvelle DA) ── */}
             <div style={{
               display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '14px',
               width: '100%',
             }}>
-              {/* Flower spinning */}
+              {/* ✦ ornement pulsé */}
               <div style={{
-                filter: 'drop-shadow(0 0 12px rgba(201,169,97,0.35))',
-                animation: 'floatBob 3s ease-in-out infinite',
-              }}>
-                <LuxuryFlower width={52} height={52} />
-              </div>
+                color: '#C9A961',
+                fontSize: 22,
+                opacity: 0.8,
+                animation: 'floatBob 2.4s ease-in-out infinite',
+                textShadow: '0 0 18px rgba(201,169,97,0.45)',
+              }}>✦</div>
 
-              {/* Title */}
+              {/* Eyebrow + title */}
               <div>
-                <h2 style={{
-                  fontFamily: "'Playfair Display', serif",
-                  fontSize: '22px', fontWeight: 700,
-                  color: '#3D2914', margin: '0 0 4px',
-                  letterSpacing: '0.01em',
-                }}>Analyse en cours…</h2>
                 <p style={{
-                  fontFamily: "'Inter', sans-serif",
-                  fontSize: '13px', color: '#8C7A6B', margin: 0,
-                }}>Intelligence artificielle dermatologique</p>
+                  fontFamily: "'DM Sans', sans-serif",
+                  fontSize: 10, letterSpacing: '0.32em', textTransform: 'uppercase',
+                  color: '#C9A961', fontWeight: 700, margin: '0 0 10px',
+                }}>
+                  {lang === 'fr' ? 'Analyse en cours' : 'Analyzing'}
+                </p>
+                <h2 style={{
+                  fontFamily: "'Cormorant Garamond', serif",
+                  fontSize: '32px', fontWeight: 400,
+                  color: '#2C2416', margin: '0 0 6px',
+                  letterSpacing: '-0.01em',
+                  lineHeight: 1.1,
+                }}>
+                  {lang === 'fr' ? (<>L'IA <em style={{ color: '#B0885E', fontStyle: 'italic' }}>scanne</em> ta peau</>) : (<>The AI <em style={{ color: '#B0885E', fontStyle: 'italic' }}>scans</em> your skin</>)}
+                </h2>
+                <p style={{
+                  fontFamily: "'Cormorant Garamond', serif",
+                  fontStyle: 'italic',
+                  fontSize: '14px', color: '#8C7A6B', margin: 0,
+                }}>
+                  {lang === 'fr' ? 'Diagnostic dermatologique par IA' : 'Dermatology AI diagnosis'}
+                </p>
               </div>
 
               {/* Live step pill (clean capsule style) */}
@@ -2619,17 +2662,18 @@ export default function Home({ teaserProducts }) {
               </div>
             </div>
 
-            {/* ── CENTER: Horizontal progress bar (even thinner + shorter + centered) ── */}
+            {/* ── CENTER: Horizontal progress bar (nouvelle DA) ── */}
             <div style={{ width: '100%', marginTop: '12px', marginBottom: '12px', textAlign: 'center' }}>
               <div style={{
-                fontFamily: "'Playfair Display', serif",
-                fontSize: '36px',
-                fontWeight: 700,
-                color: '#3D2914',
+                fontFamily: "'Cormorant Garamond', serif",
+                fontSize: '52px',
+                fontWeight: 500,
+                color: '#A88947',
                 lineHeight: 1,
-                marginBottom: '14px',
+                marginBottom: '16px',
+                letterSpacing: '-0.02em',
               }}>
-                {Math.round(progress)}%
+                {Math.round(progress)}<span style={{ fontSize: 24, color: '#B0885E', fontStyle: 'italic' }}>%</span>
               </div>
               <div style={{
                 width: '180px',
@@ -2809,41 +2853,61 @@ export default function Home({ teaserProducts }) {
             animation: 'fadeIn 0.25s ease-out forwards',
           }}
         >
-          <div 
+          <div
             className="upload-selector-card"
             onClick={(e) => e.stopPropagation()}
             style={{
-              background: 'linear-gradient(150deg, rgba(255,255,255,0.95) 0%, rgba(253,246,237,0.9) 55%, rgba(246,235,222,0.95) 100%)',
-              border: '1px solid rgba(201, 169, 97, 0.35)',
-              borderRadius: 24,
-              padding: '24px 28px',
+              background: 'linear-gradient(180deg, #FBF6EE 0%, #F5EBDB 100%)',
+              border: '1px solid rgba(201, 169, 97, 0.3)',
+              borderRadius: 28,
+              padding: '36px 32px 28px',
               width: '100%',
-              maxWidth: 420,
-              boxShadow: '0 24px 64px rgba(61,41,20,0.12), inset 0 1px 0 rgba(255,255,255,0.95)',
+              maxWidth: 440,
+              boxShadow: '0 1px 0 rgba(255,255,255,0.95) inset, 0 30px 80px rgba(94,71,47,0.18), 0 12px 32px rgba(94,71,47,0.08)',
               animation: 'slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards',
               textAlign: 'center',
+              position: 'relative',
             }}
           >
-            <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 12 }}>
-              <LuxuryFlower width={48} height={48} />
-            </div>
-            <h3 style={{
-              fontFamily: "'Playfair Display', serif",
-              fontSize: 22,
-              fontWeight: 600,
-              color: '#2C2416',
-              margin: '0 0 6px',
-            }}>
-              {lang === 'fr' ? 'Analyser ma peau' : 'Analyze my skin'}
-            </h3>
+            <div style={{
+              position: 'absolute', top: -1, left: '50%', transform: 'translateX(-50%)',
+              width: 60, height: 2,
+              background: 'linear-gradient(90deg, transparent, #C9A961, transparent)',
+            }} />
+            <div style={{
+              color: '#C9A961', fontSize: 14, marginBottom: 14, opacity: 0.8, letterSpacing: '0.1em',
+            }}>✦</div>
             <p style={{
               fontFamily: "'DM Sans', sans-serif",
-              fontSize: 13,
-              color: '#6F6156',
-              lineHeight: 1.5,
-              margin: '0 0 24px',
+              fontSize: 10,
+              letterSpacing: '0.32em',
+              textTransform: 'uppercase',
+              color: '#C9A961',
+              fontWeight: 700,
+              margin: '0 0 12px',
             }}>
-              {lang === 'fr' ? 'Choisissez comment ajouter votre photo :' : 'Choose how to add your photo:'}
+              {lang === 'fr' ? 'Étape 1' : 'Step 1'}
+            </p>
+            <h3 style={{
+              fontFamily: "'Cormorant Garamond', serif",
+              fontSize: 30,
+              fontWeight: 400,
+              color: '#2C2416',
+              margin: '0 0 10px',
+              letterSpacing: '-0.01em',
+              lineHeight: 1.1,
+            }}>
+              {lang === 'fr' ? (<>Ajoute ta <em style={{ color: '#B0885E', fontStyle: 'italic' }}>photo</em></>) : (<>Add your <em style={{ color: '#B0885E', fontStyle: 'italic' }}>photo</em></>)}
+            </h3>
+            <p style={{
+              fontFamily: "'Cormorant Garamond', serif",
+              fontStyle: 'italic',
+              fontSize: 15,
+              color: '#5C4A3A',
+              lineHeight: 1.5,
+              margin: '0 0 28px',
+            }}>
+              {lang === 'fr' ? 'Choisis ton mode de capture :' : 'Choose your capture mode:'}
             </p>
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>

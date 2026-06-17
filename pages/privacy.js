@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 import Head from 'next/head';
 import Logo from '../components/Logo';
+import NavBar from '../components/NavBar';
 import { useLang } from '../lib/LangContext';
 
 function LangToggle() {
@@ -125,31 +126,7 @@ export default function Privacy() {
         <meta name="twitter:image" content="https://ratemyskin.co/og-image.png" />
       </Head>
 
-      {/* Sticky nav */}
-      <div className="nav-blur" style={{
-        position: 'sticky', top: 0, zIndex: 100,
-        padding: 'calc(13px + env(safe-area-inset-top, 0px)) 26px 13px',
-        display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-        animation: 'slideDown 0.55s ease',
-      }}>
-        <div onClick={() => router.push('/')} style={{ cursor: 'pointer', display: 'flex', alignItems: 'center' }}>
-          <Logo />
-        </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
-          <LangToggle />
-          <button
-            onClick={() => router.push('/')}
-            className="btn-liquid-glass"
-            style={{
-              borderRadius: 10,
-              padding: '9px 18px', fontSize: 12,
-              border: 'none',
-            }}
-          >
-            {activeContent.back}
-          </button>
-        </div>
-      </div>
+      <NavBar />
 
       {/* Privacy Policy Container */}
       <div style={{ maxWidth: 720, margin: '40px auto 80px', padding: '0 24px' }}>

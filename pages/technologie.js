@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import Head from 'next/head';
 import Link from 'next/link';
 import Logo from '../components/Logo';
+import NavBar from '../components/NavBar';
 import { useLang } from '../lib/LangContext';
 
 const GOLD = '#C9A961';
@@ -786,7 +787,8 @@ export default function NotreTechnologie() {
         `
       }} />
 
-      {/* Nav */}
+      <NavBar />
+      {false && (
       <div className="nav-blur" style={{
         position: 'sticky', top: 0, zIndex: 100,
         background: 'rgba(248, 244, 237, 0.85)',
@@ -883,6 +885,7 @@ export default function NotreTechnologie() {
           </div>
         </div>
       </div>
+      )}
 
       <main style={{ width: '100%', overflowX: 'hidden' }}>
         

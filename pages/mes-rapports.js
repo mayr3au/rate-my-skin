@@ -3,6 +3,7 @@ import { useRouter } from 'next/router';
 import Head from 'next/head';
 import Logo from '../components/Logo';
 import { useLang } from '../lib/LangContext';
+import NavBar from '../components/NavBar';
 
 const GOLD = '#C5A028';
 
@@ -123,7 +124,9 @@ export default function MesRapports() {
         <meta name="twitter:image" content="https://ratemyskin.co/og-image.png" />
       </Head>
 
-      {/* Nav */}
+      {/* New unified nav */}
+      <NavBar ctaLabel={lang === 'fr' ? 'Nouvelle analyse' : 'New analysis'} ctaHref="/" />
+      {false && (
       <div className="nav-blur" style={{
         position: 'sticky', top: 0, zIndex: 100,
         background: 'rgba(255, 255, 255, 0.45)',
@@ -245,6 +248,7 @@ export default function MesRapports() {
           </div>
         </div>
       </div>
+      )}
 
       <main style={{
         minHeight: 'calc(100vh - 60px)',
@@ -252,6 +256,7 @@ export default function MesRapports() {
         padding: '48px 20px 80px',
         maxWidth: 560,
         margin: '0 auto',
+        background: 'linear-gradient(180deg, #FBF6EE 0%, #F8F1E5 50%, #F5EBDB 100%)',
       }}>
         {/* Heading */}
         <div style={{ textAlign: 'center', marginBottom: 40 }}>

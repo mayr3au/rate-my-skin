@@ -1,6 +1,7 @@
 import Head from 'next/head';
 import Link from 'next/link';
 import Logo from '../../components/Logo';
+import NavBar from '../../components/NavBar';
 import { useLang } from '../../lib/LangContext';
 import { articles, getArticleBySlug } from '../../lib/blogData';
 
@@ -192,8 +193,10 @@ export default function ArticlePage({ article, relatedArticles }) {
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
       </Head>
 
+      <NavBar />
       <div style={{ maxWidth: 720, margin: '0 auto', padding: '0 20px 80px' }}>
-        {/* Header */}
+        {/* Header — legacy hidden */}
+        {false && (
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '20px 0 8px', gap: 12, flexWrap: 'wrap' }}>
           <Link href="/" style={{ textDecoration: 'none' }}>
             <Logo height={32} />
@@ -282,6 +285,7 @@ export default function ArticlePage({ article, relatedArticles }) {
             </div>
           </div>
         </div>
+        )}
 
         {/* Breadcrumb */}
         <nav style={{ padding: '16px 0 0', marginBottom: 8 }}>

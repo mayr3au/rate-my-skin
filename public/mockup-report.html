@@ -1,0 +1,1667 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mockup Refonte Rapport — Rate My Skin</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body {
+    background:
+      radial-gradient(ellipse 80% 60% at 50% 0%, rgba(212,181,116,0.08) 0%, transparent 60%),
+      linear-gradient(180deg, #FBF6EE 0%, #F8F1E5 50%, #F5EBDB 100%);
+    min-height: 100vh;
+    font-family: 'DM Sans', sans-serif;
+    color: #2C2416;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+  body::after {
+    content: "";
+    position: fixed;
+    inset: 0;
+    background: url("data:image/svg+xml,%3Csvg viewBox='0 0 1000 1000' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='silk'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.6' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23silk)' opacity='0.4'/%3E%3C/svg%3E");
+    opacity: 0.03;
+    pointer-events: none;
+    z-index: 1;
+  }
+  .page {
+    max-width: 1140px;
+    margin: 0 auto;
+    padding: 64px 24px 100px;
+    position: relative;
+    z-index: 2;
+  }
+  .page-header {
+    text-align: center;
+    margin-bottom: 56px;
+  }
+  .page-header .ornament {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 16px;
+  }
+  .page-header .ornament .line {
+    width: 32px;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, #C9A961, transparent);
+  }
+  .page-header .ornament .dot {
+    color: #C9A961;
+    font-size: 10px;
+  }
+  .page-eyebrow {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.28em;
+    text-transform: uppercase;
+    color: #C9A961;
+  }
+  .page-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 52px;
+    font-weight: 400;
+    color: #2C2416;
+    margin-bottom: 8px;
+    letter-spacing: -0.015em;
+    line-height: 1.05;
+  }
+  .page-title em {
+    font-style: italic;
+    color: #B0885E;
+    font-weight: 400;
+  }
+  .page-sub {
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    font-size: 18px;
+    color: #8A7A6B;
+    letter-spacing: 0.01em;
+  }
+  .compare {
+    display: flex;
+    gap: 48px;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+  .phone {
+    width: 410px;
+    background: linear-gradient(180deg, #FBF6EE 0%, #F5EBDB 100%);
+    border-radius: 44px;
+    overflow: hidden;
+    border: 1px solid rgba(201,169,97,0.18);
+    box-shadow:
+      0 1px 0 rgba(255,255,255,0.6) inset,
+      0 -1px 0 rgba(168,116,73,0.06) inset,
+      0 40px 80px rgba(94, 71, 47, 0.14),
+      0 20px 40px rgba(94, 71, 47, 0.06),
+      0 4px 8px rgba(94, 71, 47, 0.04);
+    position: relative;
+  }
+  .phone::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 16px;
+    right: 16px;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.7), transparent);
+    z-index: 10;
+  }
+  .phone-label {
+    text-align: center;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.32em;
+    text-transform: uppercase;
+    color: #C9A961;
+    margin-bottom: 16px;
+  }
+  .phone-label::before, .phone-label::after {
+    content: "✦";
+    color: #C9A961;
+    font-size: 8px;
+    margin: 0 12px;
+    opacity: 0.6;
+  }
+  .status-bar {
+    height: 32px;
+    background: transparent;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 26px;
+    font-size: 11px;
+    font-weight: 600;
+    color: #2C2416;
+    letter-spacing: 0.04em;
+  }
+  .status-bar span:last-child {
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    color: #B0885E;
+    font-weight: 500;
+    font-size: 12px;
+  }
+  .scroll-body {
+    height: 760px;
+    overflow-y: auto;
+    overflow-x: hidden;
+  }
+  .scroll-body::-webkit-scrollbar { width: 4px; }
+  .scroll-body::-webkit-scrollbar-thumb { background: rgba(201,169,97,0.3); border-radius: 4px; }
+
+  /* ── Score Hero ── */
+  .score-hero {
+    padding: 38px 26px 32px;
+    text-align: center;
+    position: relative;
+  }
+  .score-hero::before {
+    content: "✦";
+    position: absolute;
+    top: 18px;
+    left: 50%;
+    transform: translateX(-50%);
+    color: #C9A961;
+    font-size: 10px;
+    opacity: 0.5;
+  }
+  .score-hero .eyebrow {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.32em;
+    text-transform: uppercase;
+    color: #C9A961;
+    margin-bottom: 14px;
+    margin-top: 12px;
+  }
+  .score-hero h1 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 26px;
+    font-weight: 400;
+    color: #2C2416;
+    margin-bottom: 28px;
+    line-height: 1.18;
+    letter-spacing: -0.005em;
+  }
+  .score-hero h1 em {
+    font-style: italic;
+    color: #B0885E;
+  }
+  .gauge {
+    width: 200px;
+    height: 200px;
+    margin: 0 auto 22px;
+    position: relative;
+    filter: drop-shadow(0 8px 24px rgba(201,169,97,0.18));
+  }
+  .gauge svg { transform: rotate(-90deg); width: 100%; height: 100%; }
+  .gauge-num {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+  .gauge-num .n {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 72px;
+    font-weight: 500;
+    line-height: 1;
+    color: #2C2416;
+    letter-spacing: -0.02em;
+  }
+  .gauge-num .d {
+    font-size: 11px;
+    color: #B0885E;
+    margin-top: 4px;
+    letter-spacing: 0.16em;
+    font-weight: 600;
+    text-transform: uppercase;
+  }
+  .verdict {
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    font-size: 19px;
+    color: #5C4A3A;
+    line-height: 1.42;
+    max-width: 300px;
+    margin: 0 auto 18px;
+  }
+  .verdict strong {
+    color: #2C2416;
+    font-style: italic;
+    font-weight: 500;
+    background: linear-gradient(transparent 70%, rgba(201,169,97,0.25) 70%);
+    padding: 0 2px;
+  }
+  .badge-unlocked {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: linear-gradient(135deg, rgba(125,191,168,0.16) 0%, rgba(125,191,168,0.08) 100%);
+    color: #7AAE98;
+    border: 1px solid rgba(125,191,168,0.35);
+    border-radius: 100px;
+    padding: 6px 14px;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    box-shadow: 0 4px 12px rgba(77,140,118,0.08);
+  }
+
+  /* ── Section header ── */
+  .section { padding: 28px 26px 10px; }
+  .section-head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    margin-bottom: 18px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid rgba(201,169,97,0.18);
+    position: relative;
+  }
+  .section-head::after {
+    content: "";
+    position: absolute;
+    bottom: -1px;
+    left: 0;
+    width: 40px;
+    height: 1px;
+    background: linear-gradient(90deg, #C9A961, transparent);
+  }
+  .section-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 23px;
+    font-weight: 500;
+    color: #2C2416;
+    letter-spacing: -0.005em;
+  }
+  .section-title em {
+    font-style: italic;
+    color: #B0885E;
+    font-weight: 400;
+  }
+  .section-count {
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 0.24em;
+    text-transform: uppercase;
+    color: #B0885E;
+  }
+
+  /* ── Heatmap ── */
+  .heatmap {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    padding: 0 26px;
+  }
+  .metric {
+    background: linear-gradient(135deg, rgba(255,255,255,0.85) 0%, rgba(255,253,247,0.7) 100%);
+    border: 1px solid rgba(201,169,97,0.2);
+    border-radius: 16px;
+    padding: 14px 14px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    position: relative;
+    overflow: hidden;
+    box-shadow:
+      0 1px 0 rgba(255,255,255,0.9) inset,
+      0 6px 18px rgba(168,116,73,0.04),
+      0 1px 3px rgba(168,116,73,0.03);
+  }
+  .metric .ring {
+    width: 38px;
+    height: 38px;
+    flex-shrink: 0;
+    position: relative;
+  }
+  .metric .ring svg { width: 100%; height: 100%; transform: rotate(-90deg); }
+  .metric .ring .v {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 14px;
+    font-weight: 600;
+    color: #2C2416;
+  }
+  .metric .info { min-width: 0; flex: 1; }
+  .metric .label {
+    font-size: 13px;
+    font-weight: 600;
+    color: #2C2416;
+    margin-bottom: 3px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    letter-spacing: 0.01em;
+  }
+  .metric .status {
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+  }
+  .status-good { color: #7AAE98; }
+  .status-mid { color: #9AB5CE; }
+  .status-bad { color: #D199AB; }
+  .metric.locked {
+    filter: blur(4px);
+    pointer-events: none;
+    opacity: 0.85;
+  }
+  .metric.locked::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, rgba(201,169,97,0.06), rgba(201,169,97,0.02));
+    pointer-events: none;
+  }
+
+  /* ── Face map ── */
+  .face-map {
+    margin: 0 26px;
+    background:
+      radial-gradient(ellipse at top, rgba(201,169,97,0.06), transparent 60%),
+      linear-gradient(135deg, rgba(255,255,255,0.75) 0%, rgba(251,246,238,0.55) 100%);
+    border: 1px solid rgba(201,169,97,0.22);
+    border-radius: 24px;
+    padding: 24px 20px 20px;
+    position: relative;
+    box-shadow:
+      0 1px 0 rgba(255,255,255,0.9) inset,
+      0 12px 32px rgba(168,116,73,0.05);
+  }
+  .face-map::before {
+    content: "";
+    position: absolute;
+    top: -1px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 32px;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, #C9A961, transparent);
+  }
+  .face-svg {
+    width: 100%;
+    height: 260px;
+    position: relative;
+  }
+  .face-svg svg { width: 100%; height: 100%; }
+  .hotspot {
+    position: absolute;
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    background: #FFFFFF;
+    border: 2px solid;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    font-weight: 700;
+    font-family: 'Cormorant Garamond', serif;
+    box-shadow:
+      0 4px 12px rgba(0,0,0,0.1),
+      0 1px 0 rgba(255,255,255,0.9) inset;
+  }
+  .hotspot.bad { border-color: #D199AB; color: #D199AB; }
+  .hotspot.mid { border-color: #9AB5CE; color: #9AB5CE; }
+  .hotspot.good { border-color: #7AAE98; color: #7AAE98; }
+  .hotspot-legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 16px;
+    font-size: 11px;
+    justify-content: center;
+  }
+  .hotspot-legend .item {
+    background: rgba(255,255,255,0.75);
+    border: 1px solid rgba(201,169,97,0.18);
+    border-radius: 100px;
+    padding: 6px 12px;
+    color: #5C4A3A;
+    letter-spacing: 0.02em;
+  }
+  .hotspot-legend strong {
+    color: #B0885E;
+    font-weight: 700;
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 12px;
+    margin-right: 4px;
+  }
+
+  /* ── Priority cards ── */
+  .priorities {
+    padding: 0 26px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .prio-card {
+    background: linear-gradient(135deg, #FFFFFF 0%, #FDFAF4 100%);
+    border: 1px solid rgba(201,169,97,0.22);
+    border-radius: 18px;
+    padding: 20px;
+    position: relative;
+    overflow: hidden;
+    box-shadow:
+      0 1px 0 rgba(255,255,255,0.95) inset,
+      0 12px 28px rgba(168,116,73,0.05),
+      0 2px 4px rgba(168,116,73,0.02);
+  }
+  .prio-card::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    width: 4px;
+    background: linear-gradient(180deg, #D199AB 0%, #D4889A 100%);
+  }
+  .prio-card.mid-prio::before {
+    background: linear-gradient(180deg, #9AB5CE 0%, #9AB6CE 100%);
+  }
+  .prio-card .top {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    margin-bottom: 10px;
+    gap: 12px;
+  }
+  .prio-card .pname {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 20px;
+    font-weight: 500;
+    color: #2C2416;
+    letter-spacing: -0.005em;
+    line-height: 1.15;
+  }
+  .prio-card .pzone {
+    font-size: 9.5px;
+    color: #B0885E;
+    text-transform: uppercase;
+    letter-spacing: 0.22em;
+    font-weight: 700;
+    white-space: nowrap;
+  }
+  .prio-card .cause {
+    font-size: 13px;
+    color: #5C4A3A;
+    line-height: 1.55;
+    margin-bottom: 12px;
+  }
+  .prio-card .actif {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: linear-gradient(135deg, rgba(201,169,97,0.14) 0%, rgba(201,169,97,0.06) 100%);
+    color: #8B6E26;
+    border: 1px solid rgba(201,169,97,0.22);
+    border-radius: 100px;
+    padding: 5px 12px;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+  }
+
+  /* ── Routine timeline ── */
+  .routine-tl { padding: 0 26px; }
+  .routine-strip {
+    display: flex;
+    background: linear-gradient(135deg, rgba(255,255,255,0.85) 0%, rgba(251,246,238,0.7) 100%);
+    border-radius: 100px;
+    padding: 5px;
+    margin-bottom: 18px;
+    border: 1px solid rgba(201,169,97,0.2);
+    box-shadow: 0 1px 0 rgba(255,255,255,0.9) inset;
+  }
+  .routine-strip button {
+    flex: 1;
+    background: transparent;
+    border: none;
+    padding: 10px;
+    border-radius: 100px;
+    font-family: 'DM Sans';
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    color: #8A7A6B;
+    transition: all 0.3s;
+    letter-spacing: 0.04em;
+  }
+  .routine-strip button.active {
+    background: linear-gradient(135deg, #2C2416 0%, #1a1410 100%);
+    color: #fff;
+    box-shadow: 0 4px 12px rgba(44,36,22,0.18);
+  }
+  .steps {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    position: relative;
+  }
+  .step {
+    display: flex;
+    gap: 16px;
+    align-items: flex-start;
+    padding: 14px 0;
+    position: relative;
+  }
+  .step:not(:last-child)::before {
+    content: '';
+    position: absolute;
+    left: 17px;
+    top: 44px;
+    bottom: 0;
+    width: 1px;
+    background: linear-gradient(180deg, #C9A961 0%, transparent 100%);
+  }
+  .step-num {
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #FDFAF4 0%, #F5EBDB 100%);
+    border: 1px solid rgba(201,169,97,0.4);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 15px;
+    font-weight: 600;
+    color: #8B6E26;
+    flex-shrink: 0;
+    z-index: 1;
+    box-shadow:
+      0 1px 0 rgba(255,255,255,0.9) inset,
+      0 4px 12px rgba(168,116,73,0.06);
+  }
+  .step-body { flex: 1; padding-top: 4px; }
+  .step-label {
+    font-size: 9.5px;
+    font-weight: 700;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: #C9A961;
+    margin-bottom: 3px;
+  }
+  .step-product {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 17px;
+    color: #2C2416;
+    font-weight: 500;
+    line-height: 1.25;
+    letter-spacing: -0.005em;
+  }
+  .step-brand {
+    font-size: 11px;
+    color: #8A7A6B;
+    margin-top: 3px;
+    letter-spacing: 0.02em;
+  }
+
+  /* ── Progress chart ── */
+  .progress-card {
+    margin: 0 26px;
+    background:
+      radial-gradient(ellipse at top right, rgba(201,169,97,0.08), transparent 60%),
+      linear-gradient(135deg, #FFFFFF 0%, #FDF8F0 100%);
+    border: 1px solid rgba(201,169,97,0.28);
+    border-radius: 22px;
+    padding: 24px 20px;
+    position: relative;
+    box-shadow:
+      0 1px 0 rgba(255,255,255,0.95) inset,
+      0 12px 32px rgba(168,116,73,0.06);
+  }
+  .progress-card.locked { overflow: hidden; }
+  .progress-card.locked .chart-wrap {
+    filter: blur(4px);
+    opacity: 0.7;
+  }
+  .progress-card h3 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 20px;
+    font-weight: 500;
+    margin-bottom: 4px;
+    color: #2C2416;
+    letter-spacing: -0.01em;
+  }
+  .progress-card .pdesc {
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    font-size: 14px;
+    color: #8A7A6B;
+    margin-bottom: 18px;
+  }
+  .from-to {
+    display: flex;
+    justify-content: center;
+    align-items: baseline;
+    gap: 14px;
+    margin-bottom: 18px;
+  }
+  .from-to .from {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 36px;
+    color: #D199AB;
+    font-weight: 500;
+    letter-spacing: -0.02em;
+  }
+  .from-to .arrow {
+    color: #C9A961;
+    font-size: 18px;
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+  }
+  .from-to .to {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 48px;
+    color: #7AAE98;
+    font-weight: 500;
+    letter-spacing: -0.02em;
+  }
+  .from-to .weeks {
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    font-size: 13px;
+    color: #B0885E;
+    margin-left: 6px;
+  }
+  .chart-wrap { width: 100%; }
+  .progress-overlay {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background:
+      radial-gradient(ellipse at center, rgba(255,253,247,0.85) 0%, rgba(251,247,242,0.6) 100%);
+    backdrop-filter: blur(3px);
+    padding: 24px;
+    text-align: center;
+    border-radius: 22px;
+  }
+  .progress-overlay h4 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 22px;
+    font-weight: 500;
+    color: #2C2416;
+    margin-bottom: 8px;
+    letter-spacing: -0.005em;
+  }
+  .progress-overlay p {
+    font-size: 12.5px;
+    color: #5C4A3A;
+    max-width: 260px;
+    line-height: 1.5;
+  }
+  .progress-overlay::before {
+    content: "✦";
+    color: #C9A961;
+    font-size: 14px;
+    margin-bottom: 12px;
+  }
+
+  /* ── Paywall CTA ── */
+  .paywall-cta {
+    margin: 28px 26px 32px;
+    background:
+      radial-gradient(ellipse at top, rgba(201,169,97,0.06), transparent 60%),
+      linear-gradient(135deg, #FFFFFF 0%, #FDFAF4 100%);
+    border: 1px solid rgba(201,169,97,0.3);
+    border-radius: 24px;
+    padding: 28px 22px;
+    text-align: center;
+    position: relative;
+    box-shadow:
+      0 1px 0 rgba(255,255,255,0.95) inset,
+      0 20px 48px rgba(168,116,73,0.08);
+  }
+  .paywall-cta::before {
+    content: "";
+    position: absolute;
+    top: -1px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 60px;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, #C9A961, transparent);
+  }
+  .paywall-cta .anchor {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    padding: 12px 16px;
+    background: linear-gradient(135deg, rgba(201,169,97,0.06) 0%, rgba(201,169,97,0.02) 100%);
+    border: 1px solid rgba(201,169,97,0.14);
+    border-radius: 12px;
+    margin-bottom: 8px;
+    font-size: 12.5px;
+  }
+  .paywall-cta .anchor:last-of-type {
+    background: linear-gradient(135deg, rgba(201,169,97,0.22) 0%, rgba(201,169,97,0.12) 100%);
+    border-color: rgba(201,169,97,0.32);
+    margin-bottom: 18px;
+  }
+  .paywall-cta .anchor .strike {
+    color: #B9AC9E;
+    text-decoration: line-through;
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 16px;
+  }
+  .paywall-cta .anchor .price {
+    color: #8B6E26;
+    font-weight: 600;
+    font-size: 22px;
+    font-family: 'Cormorant Garamond', serif;
+    letter-spacing: -0.01em;
+  }
+  .paywall-cta button {
+    width: 100%;
+    background:
+      linear-gradient(180deg, #3A2F22 0%, #2C2416 50%, #1A1410 100%);
+    color: #fff;
+    border: none;
+    padding: 17px 14px;
+    border-radius: 100px;
+    font-family: 'DM Sans';
+    font-size: 12.5px;
+    font-weight: 700;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    cursor: pointer;
+    margin-bottom: 14px;
+    box-shadow:
+      0 1px 0 rgba(255,255,255,0.15) inset,
+      0 -1px 0 rgba(0,0,0,0.4) inset,
+      0 12px 28px rgba(44,36,22,0.28),
+      0 4px 8px rgba(44,36,22,0.16);
+    position: relative;
+    overflow: hidden;
+  }
+  .paywall-cta button::before {
+    content: "✦";
+    margin-right: 10px;
+    color: #C9A961;
+    font-size: 11px;
+  }
+  .paywall-cta .sub {
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    font-size: 13px;
+    color: #8A7A6B;
+    line-height: 1.5;
+  }
+  .guarantee {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 12px;
+    background: linear-gradient(135deg, rgba(125,191,168,0.16) 0%, rgba(125,191,168,0.08) 100%);
+    color: #7AAE98;
+    border: 1px solid rgba(125,191,168,0.3);
+    border-radius: 100px;
+    padding: 5px 14px;
+    font-size: 10.5px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+  }
+  .guarantee::before {
+    content: '✓';
+    font-weight: 700;
+  }
+  .testimonial-mini {
+    margin: 16px 26px 0;
+    background:
+      radial-gradient(ellipse at right, rgba(201,169,97,0.06), transparent 60%),
+      linear-gradient(135deg, #FDF9F4 0%, #FBF5EC 100%);
+    border: 1px solid rgba(201,169,97,0.18);
+    border-left: 3px solid #C9A961;
+    border-radius: 0 16px 16px 0;
+    padding: 16px 18px;
+    position: relative;
+  }
+  .testimonial-mini::before {
+    content: "“";
+    position: absolute;
+    top: 4px;
+    right: 14px;
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 48px;
+    color: #C9A961;
+    opacity: 0.18;
+    line-height: 1;
+  }
+  .testimonial-mini .q {
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    font-size: 15px;
+    color: #2C2416;
+    line-height: 1.45;
+    margin-bottom: 10px;
+  }
+  .testimonial-mini .a {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 11px;
+    color: #8A7A6B;
+    letter-spacing: 0.02em;
+  }
+  .testimonial-mini .stars { color: #C9A961; letter-spacing: 3px; font-size: 12px; }
+
+  /* ── PDF card ── */
+  .pdf-card {
+    margin: 22px 26px;
+    background:
+      radial-gradient(ellipse at top right, rgba(201,169,97,0.08), transparent 60%),
+      linear-gradient(135deg, #FFFFFF 0%, #FDF8EF 100%);
+    border: 1px solid rgba(201,169,97,0.3);
+    border-radius: 22px;
+    padding: 22px;
+    display: flex;
+    gap: 18px;
+    align-items: center;
+    box-shadow:
+      0 1px 0 rgba(255,255,255,0.95) inset,
+      0 16px 36px rgba(168,116,73,0.06);
+  }
+  .pdf-thumb {
+    width: 72px;
+    height: 92px;
+    background: linear-gradient(135deg, #FFFFFF 0%, #FBF5EC 100%);
+    border: 1px solid rgba(201,169,97,0.32);
+    border-radius: 6px;
+    flex-shrink: 0;
+    padding: 8px;
+    position: relative;
+    box-shadow:
+      0 1px 0 rgba(255,255,255,0.9) inset,
+      0 8px 16px rgba(168,116,73,0.12),
+      0 2px 4px rgba(168,116,73,0.06);
+  }
+  .pdf-thumb::before {
+    content: "✦";
+    position: absolute;
+    top: 4px;
+    left: 6px;
+    color: #C9A961;
+    font-size: 8px;
+    opacity: 0.6;
+  }
+  .pdf-thumb::after {
+    content: '';
+    position: absolute;
+    top: 12px;
+    left: 8px;
+    right: 8px;
+    height: 5px;
+    background: linear-gradient(90deg, #C9A961, #D4B574);
+    border-radius: 2px;
+  }
+  .pdf-lines {
+    margin-top: 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+  }
+  .pdf-lines span {
+    display: block;
+    height: 2px;
+    background: rgba(201,169,97,0.35);
+    border-radius: 2px;
+  }
+  .pdf-lines span:nth-child(1) { width: 90%; }
+  .pdf-lines span:nth-child(2) { width: 70%; }
+  .pdf-lines span:nth-child(3) { width: 85%; }
+  .pdf-lines span:nth-child(4) { width: 60%; }
+  .pdf-lines span:nth-child(5) { width: 75%; }
+  .pdf-info { flex: 1; }
+  .pdf-info h4 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 19px;
+    font-weight: 500;
+    color: #2C2416;
+    margin-bottom: 3px;
+    letter-spacing: -0.005em;
+  }
+  .pdf-info p {
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    font-size: 13px;
+    color: #8A7A6B;
+    margin-bottom: 12px;
+  }
+  .pdf-info button {
+    background: linear-gradient(180deg, #3A2F22 0%, #2C2416 50%, #1A1410 100%);
+    color: #fff;
+    border: none;
+    padding: 9px 18px;
+    border-radius: 100px;
+    font-size: 10.5px;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    cursor: pointer;
+    text-transform: uppercase;
+    font-family: 'DM Sans';
+    box-shadow:
+      0 1px 0 rgba(255,255,255,0.15) inset,
+      0 6px 14px rgba(44,36,22,0.2);
+  }
+
+  /* ── Captions ── */
+  .annotation {
+    margin: 32px auto 0;
+    max-width: 900px;
+    padding: 24px;
+    background: rgba(255,255,255,0.6);
+    border: 1px solid rgba(201,169,97,0.18);
+    border-radius: 18px;
+  }
+  .annotation h3 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 22px;
+    font-weight: 500;
+    color: #2C2416;
+    margin-bottom: 12px;
+  }
+  .annotation ul { padding-left: 18px; }
+  .annotation li {
+    font-size: 14px;
+    color: #5C4A3A;
+    line-height: 1.6;
+    margin-bottom: 6px;
+  }
+  .annotation li strong { color: #2C2416; }
+
+  @media (max-width: 880px) {
+    .compare { gap: 24px; }
+    .phone { width: min(390px, 96vw); }
+  }
+</style>
+</head>
+<body>
+<div class="page">
+  <div class="page-header">
+    <div class="page-title">Refonte rapport facial</div>
+    <div class="page-sub">Comparaison avant/après — Mockup</div>
+  </div>
+
+  <div class="compare">
+    <!-- ════════════ FREE VERSION ════════════ -->
+    <div>
+      <div class="phone-label">Gratuit · Refondu</div>
+      <div class="phone">
+        <div class="status-bar">
+          <span>9:41</span>
+          <span>RateMySkin.co</span>
+        </div>
+        <div class="scroll-body">
+
+          <div class="score-hero">
+            <div class="eyebrow">Ton diagnostic</div>
+            <h1>Bonjour Léa, voici ta peau aujourd'hui</h1>
+            <div class="gauge">
+              <svg viewBox="0 0 100 100">
+                <defs>
+                  <linearGradient id="score-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stop-color="#E8C988"/>
+                    <stop offset="40%" stop-color="#D4B574"/>
+                    <stop offset="70%" stop-color="#C9A961"/>
+                    <stop offset="100%" stop-color="#A88947"/>
+                  </linearGradient>
+                  <radialGradient id="center-glow" cx="50%" cy="50%" r="50%">
+                    <stop offset="0%" stop-color="#FFFFFF" stop-opacity="0.55"/>
+                    <stop offset="70%" stop-color="#FBF6EE" stop-opacity="0.2"/>
+                    <stop offset="100%" stop-color="#FBF6EE" stop-opacity="0"/>
+                  </radialGradient>
+                  <filter id="arc-glow">
+                    <feGaussianBlur in="SourceGraphic" stdDeviation="0.8"/>
+                  </filter>
+                </defs>
+
+                <circle cx="50" cy="50" r="36" fill="url(#center-glow)"/>
+
+                <circle cx="50" cy="50" r="48" fill="none" stroke="#C9A961" stroke-width="0.35" opacity="0.32"/>
+
+                <g fill="#C9A961">
+                  <circle cx="50" cy="3" r="0.9" opacity="0.6"/>
+                  <circle cx="73.5" cy="9.3" r="0.55" opacity="0.4"/>
+                  <circle cx="90.7" cy="26.5" r="0.55" opacity="0.4"/>
+                  <circle cx="97" cy="50" r="0.9" opacity="0.6"/>
+                  <circle cx="90.7" cy="73.5" r="0.55" opacity="0.4"/>
+                  <circle cx="73.5" cy="90.7" r="0.55" opacity="0.4"/>
+                  <circle cx="50" cy="97" r="0.9" opacity="0.6"/>
+                  <circle cx="26.5" cy="90.7" r="0.55" opacity="0.4"/>
+                  <circle cx="9.3" cy="73.5" r="0.55" opacity="0.4"/>
+                  <circle cx="3" cy="50" r="0.9" opacity="0.6"/>
+                  <circle cx="9.3" cy="26.5" r="0.55" opacity="0.4"/>
+                  <circle cx="26.5" cy="9.3" r="0.55" opacity="0.4"/>
+                </g>
+
+                <circle cx="50" cy="50" r="42" fill="none" stroke="rgba(201,169,97,0.14)" stroke-width="4.5"/>
+
+                <circle cx="50" cy="50" r="42" fill="none" stroke="url(#score-grad)" stroke-width="5"
+                  stroke-dasharray="153.1 263.9" stroke-linecap="round" opacity="0.55" filter="url(#arc-glow)"/>
+                <circle cx="50" cy="50" r="42" fill="none" stroke="url(#score-grad)" stroke-width="4.2"
+                  stroke-dasharray="153.1 263.9" stroke-linecap="round"/>
+
+                <circle cx="50" cy="50" r="37" fill="none" stroke="#C9A961" stroke-width="0.3" opacity="0.28"/>
+              </svg>
+              <div class="gauge-num">
+                <span class="n" style="color:#A88947">58</span>
+                <span class="d">/ 100</span>
+              </div>
+            </div>
+            <p class="verdict">Ta peau a du <strong>potentiel</strong> — mais 3 choses la ralentissent.</p>
+          </div>
+
+          <div class="section">
+            <div class="section-head">
+              <div class="section-title">Tes 8 dimensions</div>
+              <div class="section-count">3 / 8 visibles</div>
+            </div>
+          </div>
+          <div class="heatmap">
+            <div class="metric">
+              <div class="ring">
+                <svg viewBox="0 0 40 40">
+                  <circle cx="20" cy="20" r="17" fill="none" stroke="rgba(201,169,97,0.15)" stroke-width="2.5"/>
+                  <circle cx="20" cy="20" r="17" fill="none" stroke="#7AAE98" stroke-width="2.5"
+                    stroke-dasharray="95.6 106.8" stroke-linecap="round"/>
+                </svg>
+                <div class="v">89</div>
+              </div>
+              <div class="info">
+                <div class="label">Rougeurs</div>
+                <div class="status status-good">Excellent</div>
+              </div>
+            </div>
+            <div class="metric">
+              <div class="ring">
+                <svg viewBox="0 0 40 40">
+                  <circle cx="20" cy="20" r="17" fill="none" stroke="rgba(201,169,97,0.15)" stroke-width="2.5"/>
+                  <circle cx="20" cy="20" r="17" fill="none" stroke="#7AAE98" stroke-width="2.5"
+                    stroke-dasharray="87.6 106.8" stroke-linecap="round"/>
+                </svg>
+                <div class="v">82</div>
+              </div>
+              <div class="info">
+                <div class="label">Acné</div>
+                <div class="status status-good">Bonne</div>
+              </div>
+            </div>
+            <div class="metric">
+              <div class="ring">
+                <svg viewBox="0 0 40 40">
+                  <circle cx="20" cy="20" r="17" fill="none" stroke="rgba(201,169,97,0.15)" stroke-width="2.5"/>
+                  <circle cx="20" cy="20" r="17" fill="none" stroke="#9AB5CE" stroke-width="2.5"
+                    stroke-dasharray="83.3 106.8" stroke-linecap="round"/>
+                </svg>
+                <div class="v">78</div>
+              </div>
+              <div class="info">
+                <div class="label">Hydratation</div>
+                <div class="status status-mid">À surveiller</div>
+              </div>
+            </div>
+            <div class="metric locked">
+              <div class="ring">
+                <svg viewBox="0 0 40 40">
+                  <circle cx="20" cy="20" r="17" fill="none" stroke="rgba(201,169,97,0.15)" stroke-width="2.5"/>
+                  <circle cx="20" cy="20" r="17" fill="none" stroke="#9AB5CE" stroke-width="2.5"
+                    stroke-dasharray="79 106.8" stroke-linecap="round"/>
+                </svg>
+                <div class="v">74</div>
+              </div>
+              <div class="info">
+                <div class="label">Texture</div>
+                <div class="status status-mid">À surveiller</div>
+              </div>
+            </div>
+            <div class="metric locked">
+              <div class="ring">
+                <svg viewBox="0 0 40 40">
+                  <circle cx="20" cy="20" r="17" fill="none" stroke="rgba(201,169,97,0.15)" stroke-width="2.5"/>
+                  <circle cx="20" cy="20" r="17" fill="none" stroke="#9AB5CE" stroke-width="2.5"
+                    stroke-dasharray="74.8 106.8" stroke-linecap="round"/>
+                </svg>
+                <div class="v">70</div>
+              </div>
+              <div class="info">
+                <div class="label">Taches</div>
+                <div class="status status-mid">À surveiller</div>
+              </div>
+            </div>
+            <div class="metric locked">
+              <div class="ring">
+                <svg viewBox="0 0 40 40">
+                  <circle cx="20" cy="20" r="17" fill="none" stroke="rgba(201,169,97,0.15)" stroke-width="2.5"/>
+                  <circle cx="20" cy="20" r="17" fill="none" stroke="#9AB5CE" stroke-width="2.5"
+                    stroke-dasharray="69.4 106.8" stroke-linecap="round"/>
+                </svg>
+                <div class="v">65</div>
+              </div>
+              <div class="info">
+                <div class="label">Éclat</div>
+                <div class="status status-mid">À surveiller</div>
+              </div>
+            </div>
+            <div class="metric locked">
+              <div class="ring">
+                <svg viewBox="0 0 40 40">
+                  <circle cx="20" cy="20" r="17" fill="none" stroke="rgba(201,169,97,0.15)" stroke-width="2.5"/>
+                  <circle cx="20" cy="20" r="17" fill="none" stroke="#D199AB" stroke-width="2.5"
+                    stroke-dasharray="66.2 106.8" stroke-linecap="round"/>
+                </svg>
+                <div class="v">62</div>
+              </div>
+              <div class="info">
+                <div class="label">Cernes</div>
+                <div class="status status-bad">Priorité</div>
+              </div>
+            </div>
+            <div class="metric locked">
+              <div class="ring">
+                <svg viewBox="0 0 40 40">
+                  <circle cx="20" cy="20" r="17" fill="none" stroke="rgba(201,169,97,0.15)" stroke-width="2.5"/>
+                  <circle cx="20" cy="20" r="17" fill="none" stroke="#D199AB" stroke-width="2.5"
+                    stroke-dasharray="61.9 106.8" stroke-linecap="round"/>
+                </svg>
+                <div class="v">58</div>
+              </div>
+              <div class="info">
+                <div class="label">Pores</div>
+                <div class="status status-bad">Priorité</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="section">
+            <div class="section-head">
+              <div class="section-title">Ce que ton visage révèle</div>
+            </div>
+          </div>
+          <div class="face-map">
+            <div class="face-svg" style="position:relative;">
+              <svg viewBox="0 0 200 240" xmlns="http://www.w3.org/2000/svg">
+                <path d="M 100 30 C 70 30, 55 55, 55 90 C 55 130, 65 175, 100 215 C 135 175, 145 130, 145 90 C 145 55, 130 30, 100 30 Z"
+                      fill="rgba(255,255,255,0.5)" stroke="#C9A961" stroke-width="1.2" opacity="0.85"/>
+                <ellipse cx="78" cy="100" rx="6" ry="2.5" fill="#C9A961" opacity="0.4"/>
+                <ellipse cx="122" cy="100" rx="6" ry="2.5" fill="#C9A961" opacity="0.4"/>
+                <path d="M 100 110 L 96 135 L 100 138 L 104 135 Z" fill="none" stroke="#C9A961" stroke-width="1" opacity="0.4"/>
+                <path d="M 88 160 Q 100 168 112 160" stroke="#C9A961" stroke-width="1" fill="none" opacity="0.4"/>
+              </svg>
+              <div class="hotspot bad" style="top: 5%; left: 47%;">1</div>
+              <div class="hotspot bad" style="top: 36%; left: 28%;">2</div>
+              <div class="hotspot bad" style="top: 36%; left: 60%;">2</div>
+              <div class="hotspot mid" style="top: 50%; left: 18%;">3</div>
+              <div class="hotspot mid" style="top: 50%; left: 70%;">3</div>
+            </div>
+            <div class="hotspot-legend">
+              <div class="item"><strong>1.</strong> Front · Pores dilatés</div>
+              <div class="item"><strong>2.</strong> Contour œil · Cernes</div>
+              <div class="item"><strong>3.</strong> Joues · Déshydratation</div>
+            </div>
+          </div>
+
+          <div class="section">
+            <div class="section-head">
+              <div class="section-title">Ta progression possible</div>
+            </div>
+          </div>
+          <div class="progress-card locked">
+            <div class="chart-wrap">
+              <h3>De 58 à 78 en 8 semaines</h3>
+              <p class="pdesc">Routine optimisée + actifs ciblés</p>
+              <div class="from-to">
+                <span class="from">58</span>
+                <span class="arrow">→</span>
+                <span class="to">78</span>
+                <span class="weeks">en 8 sem.</span>
+              </div>
+              <svg viewBox="0 0 280 80" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:80px;">
+                <defs>
+                  <linearGradient id="grad-prog" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stop-color="#C9A961" stop-opacity="0.4"/>
+                    <stop offset="100%" stop-color="#C9A961" stop-opacity="0"/>
+                  </linearGradient>
+                </defs>
+                <path d="M 0 60 Q 70 55 140 35 T 280 12 L 280 80 L 0 80 Z" fill="url(#grad-prog)"/>
+                <path d="M 0 60 Q 70 55 140 35 T 280 12" stroke="#C9A961" stroke-width="2" fill="none"/>
+                <circle cx="0" cy="60" r="3" fill="#D199AB"/>
+                <circle cx="280" cy="12" r="3" fill="#7AAE98"/>
+              </svg>
+            </div>
+            <div class="progress-overlay">
+              <h4>Débloque ta trajectoire</h4>
+              <p>Semaine par semaine, vois exactement comment passer de 58 à 78.</p>
+            </div>
+          </div>
+
+          <div class="testimonial-mini">
+            <p class="q">"J'avais 54/100. Trois mois plus tard, 82. La routine est claire et abordable."</p>
+            <div class="a">
+              <span>Sarah · 28 ans · Acné + taches</span>
+              <span class="stars">★★★★★</span>
+            </div>
+          </div>
+
+          <div class="paywall-cta">
+            <div class="anchor">
+              <span>Consultation dermato</span>
+              <span class="strike">40 – 60 €</span>
+            </div>
+            <div class="anchor" style="background:rgba(201,169,97,0.15);">
+              <span style="color:#2C2416;font-weight:600;">Ton diagnostic complet</span>
+              <span class="price">7,99 €</span>
+            </div>
+            <button>Débloquer mon rapport complet</button>
+            <p class="sub">Paiement unique · Accès à vie au rapport · Sans abonnement</p>
+            <div class="guarantee">Remboursé 7 jours si pas satisfaite</div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- ════════════ PAID VERSION ════════════ -->
+    <div>
+      <div class="phone-label">Premium · Refondu</div>
+      <div class="phone">
+        <div class="status-bar">
+          <span>9:41</span>
+          <span>RateMySkin.co</span>
+        </div>
+        <div class="scroll-body">
+
+          <div class="score-hero">
+            <div class="eyebrow">Diagnostic complet</div>
+            <h1>Voici l'écosystème de ta peau</h1>
+            <div class="gauge">
+              <svg viewBox="0 0 100 100">
+                <defs>
+                  <linearGradient id="score-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stop-color="#E8C988"/>
+                    <stop offset="40%" stop-color="#D4B574"/>
+                    <stop offset="70%" stop-color="#C9A961"/>
+                    <stop offset="100%" stop-color="#A88947"/>
+                  </linearGradient>
+                  <radialGradient id="center-glow" cx="50%" cy="50%" r="50%">
+                    <stop offset="0%" stop-color="#FFFFFF" stop-opacity="0.55"/>
+                    <stop offset="70%" stop-color="#FBF6EE" stop-opacity="0.2"/>
+                    <stop offset="100%" stop-color="#FBF6EE" stop-opacity="0"/>
+                  </radialGradient>
+                  <filter id="arc-glow">
+                    <feGaussianBlur in="SourceGraphic" stdDeviation="0.8"/>
+                  </filter>
+                </defs>
+
+                <circle cx="50" cy="50" r="36" fill="url(#center-glow)"/>
+
+                <circle cx="50" cy="50" r="48" fill="none" stroke="#C9A961" stroke-width="0.35" opacity="0.32"/>
+
+                <g fill="#C9A961">
+                  <circle cx="50" cy="3" r="0.9" opacity="0.6"/>
+                  <circle cx="73.5" cy="9.3" r="0.55" opacity="0.4"/>
+                  <circle cx="90.7" cy="26.5" r="0.55" opacity="0.4"/>
+                  <circle cx="97" cy="50" r="0.9" opacity="0.6"/>
+                  <circle cx="90.7" cy="73.5" r="0.55" opacity="0.4"/>
+                  <circle cx="73.5" cy="90.7" r="0.55" opacity="0.4"/>
+                  <circle cx="50" cy="97" r="0.9" opacity="0.6"/>
+                  <circle cx="26.5" cy="90.7" r="0.55" opacity="0.4"/>
+                  <circle cx="9.3" cy="73.5" r="0.55" opacity="0.4"/>
+                  <circle cx="3" cy="50" r="0.9" opacity="0.6"/>
+                  <circle cx="9.3" cy="26.5" r="0.55" opacity="0.4"/>
+                  <circle cx="26.5" cy="9.3" r="0.55" opacity="0.4"/>
+                </g>
+
+                <circle cx="50" cy="50" r="42" fill="none" stroke="rgba(201,169,97,0.14)" stroke-width="4.5"/>
+
+                <circle cx="50" cy="50" r="42" fill="none" stroke="url(#score-grad)" stroke-width="5"
+                  stroke-dasharray="153.1 263.9" stroke-linecap="round" opacity="0.55" filter="url(#arc-glow)"/>
+                <circle cx="50" cy="50" r="42" fill="none" stroke="url(#score-grad)" stroke-width="4.2"
+                  stroke-dasharray="153.1 263.9" stroke-linecap="round"/>
+
+                <circle cx="50" cy="50" r="37" fill="none" stroke="#C9A961" stroke-width="0.3" opacity="0.28"/>
+              </svg>
+              <div class="gauge-num">
+                <span class="n" style="color:#A88947">58</span>
+                <span class="d">/ 100</span>
+              </div>
+            </div>
+            <p class="verdict" style="margin-bottom:10px;">Plan personnalisé prêt — <strong>objectif 78 en 8 semaines</strong></p>
+            <span class="badge-unlocked">✓ Rapport débloqué</span>
+          </div>
+
+          <div class="section">
+            <div class="section-head">
+              <div class="section-title">Tes 3 priorités</div>
+              <div class="section-count">À traiter d'abord</div>
+            </div>
+          </div>
+          <div class="priorities">
+            <div class="prio-card">
+              <div class="top">
+                <span class="pname">Pores dilatés</span>
+                <span class="pzone">Front · Nez</span>
+              </div>
+              <p class="cause">Excès de sébum + cellules mortes qui s'accumulent. Ce n'est pas un problème de propreté.</p>
+              <span class="actif">✦ Niacinamide 5% + BHA</span>
+            </div>
+            <div class="prio-card">
+              <div class="top">
+                <span class="pname">Cernes marqués</span>
+                <span class="pzone">Contour des yeux</span>
+              </div>
+              <p class="cause">Microcirculation ralentie et peau fine — souvent lié au sommeil et à la déshydratation.</p>
+              <span class="actif">✦ Caféine + Vitamine K</span>
+            </div>
+            <div class="prio-card mid-prio">
+              <div class="top">
+                <span class="pname">Déshydratation</span>
+                <span class="pzone">Joues · Tempes</span>
+              </div>
+              <p class="cause">Barrière cutanée affaiblie qui laisse l'eau s'évaporer plus vite que la normale.</p>
+              <span class="actif">✦ Acide Hyaluronique + Céramides</span>
+            </div>
+          </div>
+
+          <div class="section">
+            <div class="section-head">
+              <div class="section-title">Cartographie complète</div>
+            </div>
+          </div>
+          <div class="face-map">
+            <div class="face-svg" style="position:relative;">
+              <svg viewBox="0 0 200 240" xmlns="http://www.w3.org/2000/svg">
+                <path d="M 100 30 C 70 30, 55 55, 55 90 C 55 130, 65 175, 100 215 C 135 175, 145 130, 145 90 C 145 55, 130 30, 100 30 Z"
+                      fill="rgba(255,255,255,0.5)" stroke="#C9A961" stroke-width="1.2" opacity="0.85"/>
+                <ellipse cx="78" cy="100" rx="6" ry="2.5" fill="#C9A961" opacity="0.4"/>
+                <ellipse cx="122" cy="100" rx="6" ry="2.5" fill="#C9A961" opacity="0.4"/>
+                <path d="M 100 110 L 96 135 L 100 138 L 104 135 Z" fill="none" stroke="#C9A961" stroke-width="1" opacity="0.4"/>
+                <path d="M 88 160 Q 100 168 112 160" stroke="#C9A961" stroke-width="1" fill="none" opacity="0.4"/>
+              </svg>
+              <div class="hotspot bad" style="top: 6%; left: 47%;">1</div>
+              <div class="hotspot bad" style="top: 36%; left: 28%;">2</div>
+              <div class="hotspot bad" style="top: 36%; left: 60%;">2</div>
+              <div class="hotspot mid" style="top: 50%; left: 18%;">3</div>
+              <div class="hotspot mid" style="top: 50%; left: 70%;">3</div>
+              <div class="hotspot mid" style="top: 18%; left: 33%;">4</div>
+              <div class="hotspot mid" style="top: 18%; left: 56%;">4</div>
+              <div class="hotspot good" style="top: 65%; left: 44%;">5</div>
+            </div>
+            <div class="hotspot-legend">
+              <div class="item"><strong>1.</strong> Pores</div>
+              <div class="item"><strong>2.</strong> Cernes</div>
+              <div class="item"><strong>3.</strong> Hydratation</div>
+              <div class="item"><strong>4.</strong> Texture</div>
+              <div class="item"><strong>5.</strong> Acné OK</div>
+            </div>
+          </div>
+
+          <div class="section">
+            <div class="section-head">
+              <div class="section-title">Bilan détaillé</div>
+            </div>
+          </div>
+          <div class="section" style="padding-top:0;">
+            <div style="font-size:11px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:#7AAE98;margin-bottom:8px;">✓ Tes forces (2)</div>
+          </div>
+          <div class="heatmap">
+            <div class="metric">
+              <div class="ring">
+                <svg viewBox="0 0 40 40">
+                  <circle cx="20" cy="20" r="17" fill="none" stroke="rgba(201,169,97,0.15)" stroke-width="2.5"/>
+                  <circle cx="20" cy="20" r="17" fill="none" stroke="#7AAE98" stroke-width="2.5"
+                    stroke-dasharray="95.6 106.8" stroke-linecap="round"/>
+                </svg>
+                <div class="v">89</div>
+              </div>
+              <div class="info">
+                <div class="label">Rougeurs</div>
+                <div class="status status-good">Excellent</div>
+              </div>
+            </div>
+            <div class="metric">
+              <div class="ring">
+                <svg viewBox="0 0 40 40">
+                  <circle cx="20" cy="20" r="17" fill="none" stroke="rgba(201,169,97,0.15)" stroke-width="2.5"/>
+                  <circle cx="20" cy="20" r="17" fill="none" stroke="#7AAE98" stroke-width="2.5"
+                    stroke-dasharray="87.6 106.8" stroke-linecap="round"/>
+                </svg>
+                <div class="v">82</div>
+              </div>
+              <div class="info">
+                <div class="label">Acné</div>
+                <div class="status status-good">Bonne</div>
+              </div>
+            </div>
+          </div>
+          <div class="section" style="padding-top:14px;">
+            <div style="font-size:11px;font-weight:700;letter-spacing:0.18em;text-transform:uppercase;color:#9AB5CE;margin-bottom:8px;">◐ À surveiller (4)</div>
+          </div>
+          <div class="heatmap">
+            <div class="metric">
+              <div class="ring">
+                <svg viewBox="0 0 40 40">
+                  <circle cx="20" cy="20" r="17" fill="none" stroke="rgba(201,169,97,0.15)" stroke-width="2.5"/>
+                  <circle cx="20" cy="20" r="17" fill="none" stroke="#9AB5CE" stroke-width="2.5"
+                    stroke-dasharray="83.3 106.8" stroke-linecap="round"/>
+                </svg>
+                <div class="v">78</div>
+              </div>
+              <div class="info">
+                <div class="label">Hydratation</div>
+                <div class="status status-mid">Surveiller</div>
+              </div>
+            </div>
+            <div class="metric">
+              <div class="ring">
+                <svg viewBox="0 0 40 40">
+                  <circle cx="20" cy="20" r="17" fill="none" stroke="rgba(201,169,97,0.15)" stroke-width="2.5"/>
+                  <circle cx="20" cy="20" r="17" fill="none" stroke="#9AB5CE" stroke-width="2.5"
+                    stroke-dasharray="79 106.8" stroke-linecap="round"/>
+                </svg>
+                <div class="v">74</div>
+              </div>
+              <div class="info">
+                <div class="label">Texture</div>
+                <div class="status status-mid">Surveiller</div>
+              </div>
+            </div>
+            <div class="metric">
+              <div class="ring">
+                <svg viewBox="0 0 40 40">
+                  <circle cx="20" cy="20" r="17" fill="none" stroke="rgba(201,169,97,0.15)" stroke-width="2.5"/>
+                  <circle cx="20" cy="20" r="17" fill="none" stroke="#9AB5CE" stroke-width="2.5"
+                    stroke-dasharray="74.8 106.8" stroke-linecap="round"/>
+                </svg>
+                <div class="v">70</div>
+              </div>
+              <div class="info">
+                <div class="label">Taches</div>
+                <div class="status status-mid">Surveiller</div>
+              </div>
+            </div>
+            <div class="metric">
+              <div class="ring">
+                <svg viewBox="0 0 40 40">
+                  <circle cx="20" cy="20" r="17" fill="none" stroke="rgba(201,169,97,0.15)" stroke-width="2.5"/>
+                  <circle cx="20" cy="20" r="17" fill="none" stroke="#9AB5CE" stroke-width="2.5"
+                    stroke-dasharray="69.4 106.8" stroke-linecap="round"/>
+                </svg>
+                <div class="v">65</div>
+              </div>
+              <div class="info">
+                <div class="label">Éclat</div>
+                <div class="status status-mid">Surveiller</div>
+              </div>
+            </div>
+          </div>
+          <div class="section" style="padding-top:14px;">
+            <div style="font-size:11px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:#D199AB;margin-bottom:8px;">● Priorités (2)</div>
+          </div>
+          <div class="heatmap">
+            <div class="metric" style="border-color:rgba(184,92,117,0.3);background:rgba(184,92,117,0.04);">
+              <div class="ring">
+                <svg viewBox="0 0 40 40">
+                  <circle cx="20" cy="20" r="17" fill="none" stroke="rgba(201,169,97,0.15)" stroke-width="2.5"/>
+                  <circle cx="20" cy="20" r="17" fill="none" stroke="#D199AB" stroke-width="2.5"
+                    stroke-dasharray="66.2 106.8" stroke-linecap="round"/>
+                </svg>
+                <div class="v">62</div>
+              </div>
+              <div class="info">
+                <div class="label">Cernes</div>
+                <div class="status status-bad">Priorité</div>
+              </div>
+            </div>
+            <div class="metric" style="border-color:rgba(184,92,117,0.3);background:rgba(184,92,117,0.04);">
+              <div class="ring">
+                <svg viewBox="0 0 40 40">
+                  <circle cx="20" cy="20" r="17" fill="none" stroke="rgba(201,169,97,0.15)" stroke-width="2.5"/>
+                  <circle cx="20" cy="20" r="17" fill="none" stroke="#D199AB" stroke-width="2.5"
+                    stroke-dasharray="61.9 106.8" stroke-linecap="round"/>
+                </svg>
+                <div class="v">58</div>
+              </div>
+              <div class="info">
+                <div class="label">Pores</div>
+                <div class="status status-bad">Priorité</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="section">
+            <div class="section-head">
+              <div class="section-title">Ta routine sur-mesure</div>
+            </div>
+          </div>
+          <div class="routine-tl">
+            <div class="routine-strip">
+              <button class="active">☀ Matin</button>
+              <button>🌙 Soir</button>
+            </div>
+            <div class="steps">
+              <div class="step">
+                <div class="step-num">1</div>
+                <div class="step-body">
+                  <div class="step-label">Nettoyage doux</div>
+                  <div class="step-product">Gel Moussant Effaclar</div>
+                  <div class="step-brand">La Roche-Posay · 13,90 €</div>
+                </div>
+              </div>
+              <div class="step">
+                <div class="step-num">2</div>
+                <div class="step-body">
+                  <div class="step-label">Sérum ciblé</div>
+                  <div class="step-product">C15 Booster Vitamine C</div>
+                  <div class="step-brand">Paula's Choice · 49,00 €</div>
+                </div>
+              </div>
+              <div class="step">
+                <div class="step-num">3</div>
+                <div class="step-body">
+                  <div class="step-label">Hydratation</div>
+                  <div class="step-product">Hyaluron Skin Replumping</div>
+                  <div class="step-brand">Eucerin · 18,50 €</div>
+                </div>
+              </div>
+              <div class="step">
+                <div class="step-num">4</div>
+                <div class="step-body">
+                  <div class="step-label">Protection SPF</div>
+                  <div class="step-product">Anthelios UVMune 400 SPF50</div>
+                  <div class="step-brand">La Roche-Posay · 19,90 €</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="section">
+            <div class="section-head">
+              <div class="section-title">Ta trajectoire 8 semaines</div>
+            </div>
+          </div>
+          <div class="progress-card">
+            <h3>De 58 à 78 en 8 semaines</h3>
+            <p class="pdesc">Si tu suis la routine, voici la courbe attendue</p>
+            <div class="from-to">
+              <span class="from">58</span>
+              <span class="arrow">→</span>
+              <span class="to">78</span>
+              <span class="weeks">en 8 sem.</span>
+            </div>
+            <svg viewBox="0 0 280 80" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:80px;">
+              <defs>
+                <linearGradient id="grad-prog2" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stop-color="#C9A961" stop-opacity="0.4"/>
+                  <stop offset="100%" stop-color="#C9A961" stop-opacity="0"/>
+                </linearGradient>
+              </defs>
+              <path d="M 0 60 Q 70 55 140 35 T 280 12 L 280 80 L 0 80 Z" fill="url(#grad-prog2)"/>
+              <path d="M 0 60 Q 70 55 140 35 T 280 12" stroke="#C9A961" stroke-width="2" fill="none"/>
+              <circle cx="0" cy="60" r="4" fill="#D199AB"/>
+              <text x="8" y="56" font-size="9" fill="#D199AB" font-weight="700">Aujourd'hui</text>
+              <circle cx="280" cy="12" r="4" fill="#7AAE98"/>
+              <text x="244" y="9" font-size="9" fill="#7AAE98" font-weight="700">Sem. 8</text>
+            </svg>
+          </div>
+
+          <div class="pdf-card">
+            <div class="pdf-thumb">
+              <div class="pdf-lines">
+                <span></span>
+                <span></span>
+                <span></span>
+                <span></span>
+                <span></span>
+              </div>
+            </div>
+            <div class="pdf-info">
+              <h4>Ton rapport PDF</h4>
+              <p>5 pages élégantes, à conserver à vie</p>
+              <button>Télécharger</button>
+            </div>
+          </div>
+
+          <div style="height:24px;"></div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="annotation">
+    <h3>Pourquoi cette refonte fonctionne mieux</h3>
+    <ul>
+      <li><strong>Le score domine.</strong> Sur les deux versions, le 58/100 prend toute la largeur — c'est LE moment émotionnel, plus une vignette parmi d'autres.</li>
+      <li><strong>Heatmap visible mais incomplète (gratuit).</strong> L'utilisatrice voit 3 résultats en clair et 5 floutés — la curiosité est physique, pas abstraite.</li>
+      <li><strong>Visage annoté = signature produit.</strong> Le visuel anatomique justifie immédiatement la précision et donne envie de comparer avec son propre visage.</li>
+      <li><strong>3 priorités en haut (payant).</strong> Avant la liste exhaustive, on dit où regarder. C'est le tri que ferait une dermato.</li>
+      <li><strong>Métriques segmentées par gravité.</strong> Vert/ambre/rouge plutôt qu'une liste verticale uniforme — le cerveau scanne 3× plus vite.</li>
+      <li><strong>Routine = parcours, pas catalogue.</strong> Timeline 1→2→3→4 avec étapes connectées plutôt qu'une grille de cartes produits déconnectées.</li>
+      <li><strong>Courbe de progression.</strong> "58 → 78 en 8 semaines" est un argument de vente bien plus fort que "plan 8 semaines" en texte.</li>
+      <li><strong>Garantie remboursée.</strong> Ajoutée à la paywall — risque psychologique zéro.</li>
+      <li><strong>Ancre prix au bon endroit.</strong> Consultation dermato 40-60€ juste avant le CTA, pas perdue à 80% de scroll.</li>
+    </ul>
+  </div>
+</div>
+</body>
+</html>
