@@ -524,6 +524,15 @@ export default function HomeRefonte({ onUploadClick, lang = "fr", t = (k) => k }
           .hrf-nav-links { display: none; }
           .hrf-nav { padding: 12px 18px; }
         }
+        @media (max-width: 640px) {
+          .hrf-nav { padding: 8px 14px; }
+          .hrf-nav-left, .hrf-nav-right { gap: 10px; }
+          .hrf-logo { font-size: 19px; padding: 0; gap: 4px; }
+          .hrf-logo .star { font-size: 12px; }
+          .hrf-lang { font-size: 10px; }
+          .hrf-burger { padding: 6px 8px; }
+          .hrf-burger svg { width: 16px; height: 16px; }
+        }
 
         /* ── HERO ───────────────────────────────────────────────── */
         .hrf-hero {
