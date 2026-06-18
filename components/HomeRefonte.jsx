@@ -527,7 +527,7 @@ export default function HomeRefonte({ onUploadClick, lang = "fr", t = (k) => k }
 
         /* ── HERO ───────────────────────────────────────────────── */
         .hrf-hero {
-          padding: clamp(120px, 16vw, 180px) 0 clamp(80px, 12vw, 120px);
+          padding: clamp(24px, 4vw, 56px) 0 clamp(64px, 8vw, 96px);
           display: grid;
           grid-template-columns: 1fr 1fr;
           gap: clamp(40px, 6vw, 80px);
