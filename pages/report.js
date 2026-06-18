@@ -108,7 +108,10 @@ export default function Report() {
 
   const [emailCaptured, setEmailCaptured] = useState(true);
   const [email, setEmail] = useState('');
-  const [firstName, setFirstName] = useState('');
+  const [firstName, setFirstName] = useState(() => {
+    if (typeof window === 'undefined') return '';
+    return localStorage.getItem('rms_first_name') || '';
+  });
   const [emailLoading, setEmailLoading] = useState(false);
   const [newsletterConsent, setNewsletterConsent] = useState(false);
   const [emailSkipped, setEmailSkipped] = useState(false);
@@ -844,7 +847,8 @@ export default function Report() {
 
       {!checkingPayment && (
         <>
-          {/* Sticky frosted-glass nav */}
+          {/* Legacy nav hidden — NavBar is now rendered inside ReportRefonte */}
+          {false && (
           <div className="rpt-nav" style={{
         position: 'sticky', top: 0, zIndex: 100,
         background: 'rgba(255, 255, 255, 0.45)',
@@ -989,6 +993,7 @@ export default function Report() {
           </div>
         </div>
       </div>
+      )}
 
       <div>
         <BeautyReport

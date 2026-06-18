@@ -2,6 +2,7 @@ import Head from 'next/head';
 import Link from 'next/link';
 import Logo from '../../components/Logo';
 import NavBar from '../../components/NavBar';
+import Footer from '../../components/Footer';
 import { useLang } from '../../lib/LangContext';
 import { articles } from '../../lib/blogData';
 
@@ -247,6 +248,7 @@ export default function BlogIndex() {
           </Link>
         </div>
       </div>
+      <Footer />
     </>
   );
 }

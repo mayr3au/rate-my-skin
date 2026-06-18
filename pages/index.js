@@ -803,6 +803,15 @@ export default function Home({ teaserProducts }) {
 
   const handleAnalyse = async () => {
     if (!image) return;
+    if (!firstName.trim()) {
+      setError('firstName');
+      const el = document.querySelector('input[placeholder*="L"][placeholder*="éa"], input[placeholder*="Lea"]');
+      if (el) { el.focus(); el.scrollIntoView({ behavior: 'smooth', block: 'center' }); }
+      return;
+    }
+
+    // Persist first name for the report greeting
+    localStorage.setItem('rms_first_name', firstName.trim());
 
     setLoading(true);
     setError('');
@@ -1116,6 +1125,12 @@ export default function Home({ teaserProducts }) {
           userSelect: (overlayVisible && !emailCaptured) ? 'none' : 'auto',
         }}
       >
+        {/* Persistent file inputs (used by modal and questions step) */}
+        <input ref={fileInputRef} type="file" accept="image/*" style={{ display: 'none' }}
+          onChange={(e) => processFile(e.target.files[0])} />
+        <input ref={cameraInputRef} type="file" accept="image/*" capture="user" style={{ display: 'none' }}
+          onChange={(e) => processFile(e.target.files[0])} />
+
         {currentStep === 'landing' ? (
           <HomeRefonte
             onUploadClick={() => setShowUploadSelector(true)}
@@ -2006,42 +2021,117 @@ export default function Home({ teaserProducts }) {
               </p>
             </div>
 
-            {/* Photo preview */}
+            {/* Prénom — required first */}
+            <div style={{ marginBottom: 28 }}>
+              <div style={{ marginBottom: 12 }}>
+                <span style={{
+                  fontFamily: "'Cormorant Garamond', serif",
+                  fontSize: 15, fontStyle: 'italic',
+                  color: '#C9A961', fontWeight: 500,
+                  letterSpacing: '0.04em', marginRight: 10,
+                }}>00.</span>
+                <label style={{
+                  fontFamily: "'Cormorant Garamond', serif",
+                  fontSize: 22, color: '#2C2416', fontWeight: 500,
+                  letterSpacing: '-0.005em',
+                }}>
+                  {lang === 'fr' ? 'Comment t\'appelles-tu ?' : "What's your name?"}
+                  <span style={{ color: '#D199AB', marginLeft: 6, fontStyle: 'italic' }}>*</span>
+                </label>
+                <div style={{
+                  fontSize: 11.5, color: '#8A7A6B', fontFamily: "'Cormorant Garamond', serif",
+                  fontStyle: 'italic', marginTop: 4,
+                }}>
+                  {lang === 'fr' ? 'Prénom ou pseudonyme — personnalise ton rapport' : 'First name or nickname — to personalize your report'}
+                </div>
+              </div>
+              <input
+                type="text"
+                value={firstName}
+                onChange={(e) => setFirstName(e.target.value.slice(0, 30))}
+                placeholder={lang === 'fr' ? 'ex : Léa' : 'e.g. Lea'}
+                className="input-nacré"
+                style={{
+                  width: '100%', boxSizing: 'border-box',
+                  borderRadius: 18,
+                  padding: '14px 18px', fontSize: 16, color: '#2C2416',
+                  fontFamily: "'DM Sans', sans-serif", outline: 'none',
+                  border: !firstName.trim() && error === 'firstName' ? '1.5px solid #D199AB' : undefined,
+                }}
+                autoFocus
+              />
+            </div>
+
+            {/* Photo preview — card premium */}
             {imageUrl && (
-              <div style={{ position: 'relative', marginBottom: 24, borderRadius: 16, overflow: 'hidden' }}>
-                <img
-                  src={imageUrl} alt="Preview"
-                  style={{ width: '100%', maxHeight: 340, objectFit: 'cover', display: 'block', borderRadius: 16 }}
-                />
-                <button
-                  onClick={(e) => { e.stopPropagation(); fileInputRef.current?.click(); }}
-                  style={{
-                    position: 'absolute', bottom: 12, right: 12,
-                    background: 'rgba(13,13,13,0.82)', color: '#fff',
-                    border: 'none', borderRadius: 8, padding: '7px 14px',
-                    fontSize: 12, cursor: 'pointer', fontFamily: "'DM Sans', sans-serif",
-                  }}
-                >
-                  {t('changePhoto')}
-                </button>
+              <div style={{
+                marginBottom: 36,
+                background: 'linear-gradient(180deg, #FBF6EE 0%, #F5EBDB 100%)',
+                border: '1px solid rgba(201,169,97,0.25)',
+                borderRadius: 22,
+                padding: 12,
+                position: 'relative',
+                boxShadow: '0 1px 0 rgba(255,255,255,0.95) inset, 0 18px 48px rgba(94,71,47,0.08)',
+              }}>
+                <div style={{
+                  display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+                  padding: '4px 8px 10px',
+                }}>
+                  <span style={{
+                    fontFamily: "'DM Sans', sans-serif",
+                    fontSize: 9.5, letterSpacing: '0.24em', textTransform: 'uppercase',
+                    color: '#C9A961', fontWeight: 700,
+                  }}>
+                    ✦ {lang === 'fr' ? 'Ta photo' : 'Your photo'}
+                  </span>
+                  <button
+                    onClick={(e) => { e.stopPropagation(); fileInputRef.current?.click(); }}
+                    style={{
+                      background: 'rgba(255,255,255,0.6)',
+                      color: '#2C2416',
+                      border: '1px solid rgba(201,169,97,0.3)',
+                      borderRadius: 100,
+                      padding: '6px 14px',
+                      fontSize: 10.5, fontWeight: 700, cursor: 'pointer',
+                      fontFamily: "'DM Sans', sans-serif",
+                      letterSpacing: '0.08em', textTransform: 'uppercase',
+                      transition: 'all 0.25s',
+                    }}
+                    onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(201,169,97,0.14)'}
+                    onMouseLeave={(e) => e.currentTarget.style.background = 'rgba(255,255,255,0.6)'}
+                  >
+                    {t('changePhoto')}
+                  </button>
+                </div>
+                <div style={{ borderRadius: 14, overflow: 'hidden', boxShadow: 'inset 0 0 0 1px rgba(201,169,97,0.18)' }}>
+                  <img
+                    src={imageUrl} alt="Preview"
+                    style={{ width: '100%', maxHeight: 360, objectFit: 'cover', display: 'block' }}
+                  />
+                </div>
               </div>
             )}
 
-            <input ref={fileInputRef} type="file" accept="image/*" style={{ display: 'none' }}
-              onChange={(e) => processFile(e.target.files[0])} />
-            <input ref={cameraInputRef} type="file" accept="image/*" capture="user" style={{ display: 'none' }}
-              onChange={(e) => processFile(e.target.files[0])} />
-
             {/* Skin concern */}
-            <div style={{ marginTop: 24 }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 8, flexWrap: 'wrap', gap: 4 }}>
+            <div style={{ marginTop: 8 }}>
+              <div style={{ marginBottom: 14 }}>
+                <span style={{
+                  fontFamily: "'Cormorant Garamond', serif",
+                  fontSize: 15, fontStyle: 'italic',
+                  color: '#C9A961', fontWeight: 500,
+                  letterSpacing: '0.04em', marginRight: 10,
+                }}>01.</span>
                 <label style={{
                   fontFamily: "'Cormorant Garamond', serif",
-                  fontSize: 18, color: '#2C2416', fontWeight: 600,
+                  fontSize: 22, color: '#2C2416', fontWeight: 500,
+                  letterSpacing: '-0.005em',
                 }}>
                   {t('skinConcernLabel')}
                 </label>
-                <span style={{ fontSize: 16, color: '#2C2416', fontFamily: "'DM Sans', sans-serif", marginLeft: 'auto', textAlign: 'right' }}>{t('skinConcernOptional')}</span>
+                <div style={{
+                  fontSize: 11.5, color: '#8A7A6B', fontFamily: "'Cormorant Garamond', serif",
+                  fontStyle: 'italic', marginTop: 4,
+                }}>{t('skinConcernOptional')}</div>
               </div>
 
               {/* Quick-select chips */}
@@ -2103,14 +2193,24 @@ export default function Home({ teaserProducts }) {
               <div style={{ marginTop: 24, display: 'flex', flexDirection: 'column', gap: 20 }}>
                 {/* Age */}
                 <div>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 8, flexWrap: 'wrap', gap: 4 }}>
+                  <div style={{ marginBottom: 12 }}>
+                    <span style={{
+                      fontFamily: "'Cormorant Garamond', serif",
+                      fontSize: 15, fontStyle: 'italic',
+                      color: '#C9A961', fontWeight: 500,
+                      letterSpacing: '0.04em', marginRight: 10,
+                    }}>02.</span>
                     <label style={{
                       fontFamily: "'Cormorant Garamond', serif",
-                      fontSize: 18, color: '#2C2416', fontWeight: 600,
+                      fontSize: 22, color: '#2C2416', fontWeight: 500,
+                      letterSpacing: '-0.005em',
                     }}>
                       {t('ageLabel')}
                     </label>
-                    <span style={{ fontSize: 16, color: '#2C2416', fontFamily: "'DM Sans', sans-serif" }}>{t('skinConcernOptional')}</span>
+                    <div style={{
+                      fontSize: 11.5, color: '#8A7A6B', fontFamily: "'Cormorant Garamond', serif",
+                      fontStyle: 'italic', marginTop: 4,
+                    }}>{t('skinConcernOptional')}</div>
                   </div>
                   <input
                     type="text"

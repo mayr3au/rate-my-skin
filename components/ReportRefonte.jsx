@@ -3,6 +3,8 @@ import { useLang } from "../lib/LangContext";
 import { sanitizeReport } from "../lib/textSanitizer";
 import MedicalDisclaimer from "./MedicalDisclaimer";
 import ProductImage from "./ProductImage";
+import NavBar from "./NavBar";
+import Footer from "./Footer";
 
 /* ════════════════════════════════════════════════════════════════════════
    Helpers
@@ -230,6 +232,270 @@ function HeatmapFree({ metrics, lang }) {
   );
 }
 
+/* ════════════════════════════════════════════════════════════════════════
+   Free-only value-adds: Diagnostic en clair, Atouts, Conseil offert
+   ════════════════════════════════════════════════════════════════════════ */
+
+const FREE_TIPS_FR = {
+  hydration: "Bois 1,5L d'eau par jour et applique ton hydratant sur peau encore humide pour piéger l'eau.",
+  radiance: "Une exfoliation douce 2× par semaine + vitamine C le matin réveillent l'éclat en 3 semaines.",
+  acne: "Évite de toucher ton visage et change ta taie d'oreiller tous les 2-3 jours pour limiter les bactéries.",
+  pores: "Le rétinol et le niacinamide, appliqués régulièrement le soir, affinent visiblement le grain de peau.",
+  dark_spots: "Le SPF 50 quotidien est non-négociable — c'est lui qui empêche les nouvelles taches d'apparaître.",
+  dark_circles: "Dors sur le dos avec un oreiller supplémentaire pour limiter la rétention sous les yeux.",
+  texture: "Un AHA 1× par semaine lisse le grain plus vite qu'aucune crème — sans agresser.",
+  redness: "Évite l'eau très chaude au visage et adopte des nettoyants sans tensioactifs agressifs.",
+};
+const FREE_TIPS_EN = {
+  hydration: "Drink 1.5L of water daily and apply moisturizer on slightly damp skin to trap moisture.",
+  radiance: "Gentle exfoliation 2x/week + morning vitamin C wakes up radiance in 3 weeks.",
+  acne: "Stop touching your face and change pillowcases every 2-3 days to limit bacteria.",
+  pores: "Niacinamide + retinol applied regularly at night visibly refine skin texture.",
+  dark_spots: "Daily SPF 50 is non-negotiable — it stops new spots from forming.",
+  dark_circles: "Sleep on your back with an extra pillow to reduce under-eye fluid retention.",
+  texture: "A weekly AHA smooths texture faster than any cream — without irritating.",
+  redness: "Avoid very hot water on the face and use gentle cleansers without harsh surfactants.",
+};
+
+function PersonalAnalysis({ score, topConcern, lang }) {
+  const fr = lang === "fr";
+  const labels = fr ? METRIC_LABELS_FR : METRIC_LABELS_EN;
+  const concernLabel = labels[topConcern?.id] || "";
+  const bracket = score >= 75 ? "high" : score >= 55 ? "mid" : "low";
+  const text = fr
+    ? bracket === "high"
+      ? <>Ta peau est en <strong>bonne santé globale</strong>. Quelques détails à affiner sur <strong>{concernLabel.toLowerCase()}</strong> pourraient te faire passer dans le top 10%.</>
+      : bracket === "mid"
+        ? <>Ta peau a un <strong>vrai potentiel</strong>, mais <strong>{concernLabel.toLowerCase()}</strong> freine son éclat. Quelques ajustements ciblés peuvent transformer ton score en 8 semaines.</>
+        : <>Ta peau envoie des <strong>signaux d'alarme</strong> sur plusieurs zones, notamment <strong>{concernLabel.toLowerCase()}</strong>. Une routine adaptée peut renverser la tendance rapidement.</>
+    : bracket === "high"
+      ? <>Your skin is in <strong>great overall shape</strong>. Refining <strong>{concernLabel.toLowerCase()}</strong> could push you into the top 10%.</>
+      : bracket === "mid"
+        ? <>Your skin has <strong>real potential</strong>, but <strong>{concernLabel.toLowerCase()}</strong> is holding back its glow. Targeted tweaks can transform your score in 8 weeks.</>
+        : <>Your skin is sending <strong>distress signals</strong> in several zones, especially <strong>{concernLabel.toLowerCase()}</strong>. The right routine can reverse this fast.</>;
+
+  return (
+    <div className="rfn-section">
+      <div className="rfn-section-head">
+        <h2 className="rfn-section-title">{fr ? "Diagnostic en clair" : "Plain-language diagnosis"}</h2>
+      </div>
+      <div className="rfn-personal-card">
+        <span className="rfn-personal-mark">❝</span>
+        <p className="rfn-personal-text">{text}</p>
+      </div>
+    </div>
+  );
+}
+
+function StrengthsShowcase({ metrics, lang }) {
+  const fr = lang === "fr";
+  const labels = fr ? METRIC_LABELS_FR : METRIC_LABELS_EN;
+  const strengths = metrics.filter((m) => m.score >= 75).sort((a, b) => b.score - a.score).slice(0, 2);
+  if (strengths.length === 0) return null;
+  return (
+    <div className="rfn-section">
+      <div className="rfn-section-head">
+        <h2 className="rfn-section-title">{fr ? "Tes atouts" : "Your strengths"}</h2>
+        <span className="rfn-section-count">{fr ? "À célébrer" : "To celebrate"}</span>
+      </div>
+      <div className="rfn-strengths">
+        {strengths.map((m, i) => (
+          <div key={m.id} className="rfn-strength-card">
+            <div className="rfn-strength-medal">
+              <svg viewBox="0 0 60 60">
+                <defs>
+                  <linearGradient id={`rfn-medal-${i}`} x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stopColor="#E8C988" />
+                    <stop offset="100%" stopColor="#A88947" />
+                  </linearGradient>
+                </defs>
+                <circle cx="30" cy="30" r="26" fill="url(#rfn-medal-${i})" opacity="0.18" />
+                <circle cx="30" cy="30" r="22" fill="none" stroke={`url(#rfn-medal-${i})`} strokeWidth="2" />
+                <circle cx="30" cy="30" r="14" fill={`url(#rfn-medal-${i})`} opacity="0.4" />
+              </svg>
+              <span className="rfn-strength-medal-num">{m.score}</span>
+            </div>
+            <div className="rfn-strength-info">
+              <div className="rfn-strength-label">{labels[m.id] || m.label}</div>
+              <div className="rfn-strength-tag">{fr ? "Top 10% des utilisateurs" : "Top 10% of users"}</div>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function TrajectoryTimeline({ score, lang }) {
+  const fr = lang === "fr";
+  const from = Math.max(1, Math.min(100, Math.round(score || 0)));
+  const to = Math.min(100, from + 20);
+  const diff = to - from;
+  const diffStr = "+" + diff;
+  const w2 = Math.round(from + diff * 0.25);
+  const w4 = Math.round(from + diff * 0.55);
+
+  return (
+    <div className="rfn-section">
+      <div className="rfn-section-head">
+        <h2 className="rfn-section-title">{fr ? "Ta projection 8 semaines" : "Your 8-week projection"}</h2>
+        <span className="rfn-section-count">{fr ? "Évolution attendue" : "Expected"}</span>
+      </div>
+      <div className="rfn-traj-card">
+        <p className="rfn-traj-intro">
+          {fr
+            ? <>En suivant une routine adaptée, <strong>ta peau peut gagner {diffStr} points en 8 semaines.</strong></>
+            : <>Following a tailored routine, <strong>your skin can gain {diffStr} points in 8 weeks.</strong></>}
+        </p>
+        <div className="rfn-traj-timeline">
+          <svg viewBox="0 0 300 100" preserveAspectRatio="none" style={{ width: "100%", height: "70px", position: "absolute", top: "16px", left: 0, pointerEvents: "none" }}>
+            <defs>
+              <linearGradient id="rfn-traj-line" x1="0%" y1="0%" x2="100%" y2="0%">
+                <stop offset="0%" stopColor="#D199AB" />
+                <stop offset="100%" stopColor="#7AAE98" />
+              </linearGradient>
+              <linearGradient id="rfn-traj-fill" x1="0%" y1="0%" x2="0%" y2="100%">
+                <stop offset="0%" stopColor="#C9A961" stopOpacity="0.22" />
+                <stop offset="100%" stopColor="#C9A961" stopOpacity="0" />
+              </linearGradient>
+            </defs>
+            <path d="M 6 60 Q 80 50 150 30 T 294 8 L 294 100 L 6 100 Z" fill="url(#rfn-traj-fill)" />
+            <path d="M 6 60 Q 80 50 150 30 T 294 8" stroke="url(#rfn-traj-line)" strokeWidth="2.2" fill="none" />
+          </svg>
+          <div className="rfn-traj-points">
+            <div className="rfn-traj-pt rfn-traj-pt-from">
+              <span className="rfn-traj-pt-dot"></span>
+              <span className="rfn-traj-pt-val">{from}</span>
+              <span className="rfn-traj-pt-lbl">{fr ? "Auj." : "Now"}</span>
+            </div>
+            <div className="rfn-traj-pt">
+              <span className="rfn-traj-pt-dot rfn-traj-pt-dot-mid"></span>
+              <span className="rfn-traj-pt-val rfn-traj-pt-val-soft">{w2}</span>
+              <span className="rfn-traj-pt-lbl">{fr ? "S. 2" : "W. 2"}</span>
+            </div>
+            <div className="rfn-traj-pt">
+              <span className="rfn-traj-pt-dot rfn-traj-pt-dot-mid"></span>
+              <span className="rfn-traj-pt-val rfn-traj-pt-val-soft">{w4}</span>
+              <span className="rfn-traj-pt-lbl">{fr ? "S. 4" : "W. 4"}</span>
+            </div>
+            <div className="rfn-traj-pt rfn-traj-pt-to">
+              <span className="rfn-traj-pt-dot"></span>
+              <span className="rfn-traj-pt-val">{to}</span>
+              <span className="rfn-traj-pt-lbl">{fr ? "S. 8" : "W. 8"}</span>
+            </div>
+          </div>
+        </div>
+        <div className="rfn-traj-stats">
+          <div className="rfn-traj-stat">
+            <div className="rfn-traj-stat-num">{diffStr}</div>
+            <div className="rfn-traj-stat-lbl">{fr ? "Points gagnés" : "Points gained"}</div>
+          </div>
+          <div className="rfn-traj-stat">
+            <div className="rfn-traj-stat-num">8</div>
+            <div className="rfn-traj-stat-lbl">{fr ? "Semaines" : "Weeks"}</div>
+          </div>
+          <div className="rfn-traj-stat">
+            <div className="rfn-traj-stat-num">{fr ? "82%" : "82%"}</div>
+            <div className="rfn-traj-stat-lbl">{fr ? "Y arrivent" : "Reach it"}</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+   Free Cleanser Teaser — step 1 of routine
+   ════════════════════════════════════════════════════════════════════════ */
+
+const CLEANSER_BY_CONCERN_FR = {
+  hydration: { name: "Toleriane Caring Wash", brand: "La Roche-Posay", price: "13,50 €", why: "Nettoie sans agresser la barrière, préserve l'hydratation.", actives: "Glycérine · Niacinamide" },
+  acne: { name: "Effaclar Gel Moussant", brand: "La Roche-Posay", price: "13,90 €", why: "Élimine l'excès de sébum sans assécher.", actives: "Zinc PCA · Eau Thermale" },
+  pores: { name: "Effaclar Gel Moussant", brand: "La Roche-Posay", price: "13,90 €", why: "Élimine l'excès de sébum sans assécher.", actives: "Zinc PCA · Eau Thermale" },
+  texture: { name: "CeraVe SA Smoothing Cleanser", brand: "CeraVe", price: "14,90 €", why: "Exfolie en douceur grâce à l'acide salicylique.", actives: "Acide Salicylique · Céramides" },
+  dark_spots: { name: "Vitamin C Cleansing Foam", brand: "Caudalie", price: "16,00 €", why: "Réveille l'éclat dès le nettoyage.", actives: "Vitamine C · Antioxydants" },
+  radiance: { name: "Vitamin C Cleansing Foam", brand: "Caudalie", price: "16,00 €", why: "Réveille l'éclat dès le nettoyage.", actives: "Vitamine C · Antioxydants" },
+  redness: { name: "Toleriane Caring Wash", brand: "La Roche-Posay", price: "13,50 €", why: "Apaise les peaux sensibles, sans tensioactifs agressifs.", actives: "Glycérine · Eau Thermale" },
+  dark_circles: { name: "Toleriane Caring Wash", brand: "La Roche-Posay", price: "13,50 €", why: "Nettoie le contour des yeux en douceur.", actives: "Glycérine · Niacinamide" },
+};
+const CLEANSER_BY_CONCERN_EN = {
+  hydration: { name: "Toleriane Caring Wash", brand: "La Roche-Posay", price: "€13.50", why: "Cleanses without disrupting the barrier, preserves hydration.", actives: "Glycerin · Niacinamide" },
+  acne: { name: "Effaclar Foaming Gel", brand: "La Roche-Posay", price: "€13.90", why: "Removes excess sebum without drying.", actives: "Zinc PCA · Thermal Water" },
+  pores: { name: "Effaclar Foaming Gel", brand: "La Roche-Posay", price: "€13.90", why: "Removes excess sebum without drying.", actives: "Zinc PCA · Thermal Water" },
+  texture: { name: "CeraVe SA Smoothing Cleanser", brand: "CeraVe", price: "€14.90", why: "Gently exfoliates with salicylic acid.", actives: "Salicylic Acid · Ceramides" },
+  dark_spots: { name: "Vitamin C Cleansing Foam", brand: "Caudalie", price: "€16.00", why: "Wakes up radiance from cleansing.", actives: "Vitamin C · Antioxidants" },
+  radiance: { name: "Vitamin C Cleansing Foam", brand: "Caudalie", price: "€16.00", why: "Wakes up radiance from cleansing.", actives: "Vitamin C · Antioxidants" },
+  redness: { name: "Toleriane Caring Wash", brand: "La Roche-Posay", price: "€13.50", why: "Soothes sensitive skin, no harsh surfactants.", actives: "Glycerin · Thermal Water" },
+  dark_circles: { name: "Toleriane Caring Wash", brand: "La Roche-Posay", price: "€13.50", why: "Gently cleanses the eye area.", actives: "Glycerin · Niacinamide" },
+};
+
+function CleanserTeaser({ topConcern, lang }) {
+  const fr = lang === "fr";
+  const map = fr ? CLEANSER_BY_CONCERN_FR : CLEANSER_BY_CONCERN_EN;
+  const product = map[topConcern?.id] || map.hydration;
+  return (
+    <div className="rfn-section">
+      <div className="rfn-section-head">
+        <h2 className="rfn-section-title">{fr ? "Ton 1er produit, offert" : "Your 1st product, free"}</h2>
+        <span className="rfn-section-count">{fr ? "Aperçu routine" : "Routine preview"}</span>
+      </div>
+      <div className="rfn-cleanser-card">
+        <div className="rfn-cleanser-step">
+          <span className="rfn-cleanser-step-num">01</span>
+          <span className="rfn-cleanser-step-lbl">{fr ? "Nettoyage" : "Cleanse"}</span>
+        </div>
+        <div className="rfn-cleanser-body">
+          <div className="rfn-cleanser-tag">{fr ? "Adapté à ta peau" : "Tailored to your skin"}</div>
+          <h3 className="rfn-cleanser-name">{product.name}</h3>
+          <div className="rfn-cleanser-brand">{product.brand} · <span className="rfn-cleanser-price">{product.price}</span></div>
+          <p className="rfn-cleanser-why">{product.why}</p>
+          <div className="rfn-cleanser-actives">
+            <span className="rfn-cleanser-actives-lbl">{fr ? "Actifs clés" : "Key actives"}</span>
+            <span className="rfn-cleanser-actives-val">{product.actives}</span>
+          </div>
+        </div>
+      </div>
+      <div className="rfn-cleanser-locked">
+        <div className="rfn-cleanser-locked-dots">
+          <span className="rfn-cleanser-locked-num">02</span>
+          <span className="rfn-cleanser-locked-num">03</span>
+          <span className="rfn-cleanser-locked-num">04</span>
+        </div>
+        <div className="rfn-cleanser-locked-text">
+          <strong>{fr ? "3 étapes restantes" : "3 steps remaining"}</strong>
+          <span>{fr ? "Sérum · Hydratant · Protection SPF" : "Serum · Moisturizer · SPF"}</span>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function FreeTip({ topConcern, lang }) {
+  const fr = lang === "fr";
+  const tips = fr ? FREE_TIPS_FR : FREE_TIPS_EN;
+  const tip = tips[topConcern?.id] || (fr ? "Hydrate-toi de l'intérieur et applique un SPF 50 chaque matin, c'est la base." : "Hydrate from within and apply SPF 50 every morning — that's the base.");
+  const labels = fr ? METRIC_LABELS_FR : METRIC_LABELS_EN;
+  return (
+    <div className="rfn-section">
+      <div className="rfn-section-head">
+        <h2 className="rfn-section-title">{fr ? "Conseil offert" : "Free tip"}</h2>
+        <span className="rfn-section-count">{fr ? "Sans paiement" : "No payment"}</span>
+      </div>
+      <div className="rfn-tip-card">
+        <div className="rfn-tip-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M9 18h6M10 22h4M12 2a7 7 0 0 0-4 12.7c.7.5 1 1.3 1 2.1V18h6v-1.2c0-.8.3-1.6 1-2.1A7 7 0 0 0 12 2z" />
+          </svg>
+        </div>
+        <div className="rfn-tip-body">
+          <div className="rfn-tip-tag">{fr ? "Pour ton " : "For your "}{(labels[topConcern?.id] || "").toLowerCase()}</div>
+          <p className="rfn-tip-text">{tip}</p>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function HeatmapPaid({ metrics, lang }) {
   const good = metrics.filter((m) => categorize(m.score) === "good");
   const mid = metrics.filter((m) => categorize(m.score) === "mid");
@@ -277,20 +543,38 @@ function HeatmapPaid({ metrics, lang }) {
    Section: Face Map
    ════════════════════════════════════════════════════════════════════════ */
 
+/* Anatomically correct hotspot positions on the face SVG
+   Face SVG viewBox 0 0 200 260, container height 260px.
+   y references: forehead 30-90, eyes 100, nose 110-145, lips 168, chin 200-225 */
 const ZONE_BY_METRIC = {
-  pores: { top: "6%", left: "47%" },
-  dark_circles_l: { top: "38%", left: "27%" },
-  dark_circles_r: { top: "38%", left: "60%" },
-  hydration_l: { top: "53%", left: "16%" },
-  hydration_r: { top: "53%", left: "70%" },
-  texture_l: { top: "22%", left: "32%" },
-  texture_r: { top: "22%", left: "56%" },
-  acne: { top: "65%", left: "44%" },
-  redness_l: { top: "44%", left: "22%" },
-  redness_r: { top: "44%", left: "65%" },
-  dark_spots_l: { top: "32%", left: "20%" },
-  dark_spots_r: { top: "32%", left: "67%" },
-  radiance: { top: "48%", left: "44%" },
+  // Pores: tip of nose (T-zone)
+  pores: { top: "52%", left: "50%" },
+
+  // Dark circles: directly under each eye
+  dark_circles_l: { top: "44%", left: "37%" },
+  dark_circles_r: { top: "44%", left: "59%" },
+
+  // Hydration: mid-cheeks (lower)
+  hydration_l: { top: "62%", left: "30%" },
+  hydration_r: { top: "62%", left: "66%" },
+
+  // Texture: between eye and cheekbone
+  texture_l: { top: "55%", left: "32%" },
+  texture_r: { top: "55%", left: "64%" },
+
+  // Acne: chin
+  acne: { top: "82%", left: "50%" },
+
+  // Redness: cheekbones
+  redness_l: { top: "50%", left: "34%" },
+  redness_r: { top: "50%", left: "62%" },
+
+  // Dark spots: upper cheeks / under temples
+  dark_spots_l: { top: "38%", left: "28%" },
+  dark_spots_r: { top: "38%", left: "68%" },
+
+  // Radiance: forehead center
+  radiance: { top: "24%", left: "50%" },
 };
 
 function FaceMap({ metrics, lang, limitTo3 }) {
@@ -334,13 +618,50 @@ function FaceMap({ metrics, lang, limitTo3 }) {
       </div>
       <div className="rfn-face-card">
         <div className="rfn-face-svg">
-          <svg viewBox="0 0 200 240" xmlns="http://www.w3.org/2000/svg">
-            <path d="M 100 30 C 70 30, 55 55, 55 90 C 55 130, 65 175, 100 215 C 135 175, 145 130, 145 90 C 145 55, 130 30, 100 30 Z"
-              fill="rgba(255,255,255,0.5)" stroke="#C9A961" strokeWidth="1.2" opacity="0.85" />
-            <ellipse cx="78" cy="100" rx="6" ry="2.5" fill="#C9A961" opacity="0.4" />
-            <ellipse cx="122" cy="100" rx="6" ry="2.5" fill="#C9A961" opacity="0.4" />
-            <path d="M 100 110 L 96 135 L 100 138 L 104 135 Z" fill="none" stroke="#C9A961" strokeWidth="1" opacity="0.4" />
-            <path d="M 88 160 Q 100 168 112 160" stroke="#C9A961" strokeWidth="1" fill="none" opacity="0.4" />
+          <svg viewBox="0 0 200 260" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet">
+            <defs>
+              <radialGradient id="rfn-face-shade" cx="50%" cy="42%" r="58%">
+                <stop offset="0%" stopColor="#FFFFFF" stopOpacity="0.65" />
+                <stop offset="70%" stopColor="#FBF6EE" stopOpacity="0.28" />
+                <stop offset="100%" stopColor="#F5EBDB" stopOpacity="0" />
+              </radialGradient>
+            </defs>
+            {/* Face — oval doux, mâchoire affinée */}
+            <path
+              d="M 100 32
+                 C 82 32, 66 50, 62 78
+                 C 58 108, 62 138, 72 165
+                 C 80 188, 90 210, 100 224
+                 C 110 210, 120 188, 128 165
+                 C 138 138, 142 108, 138 78
+                 C 134 50, 118 32, 100 32 Z"
+              fill="url(#rfn-face-shade)"
+              stroke="#C9A961" strokeWidth="1.2" opacity="0.9"
+            />
+
+            {/* Sourcils — arcs fins */}
+            <path d="M 70 86 Q 78 82 86 86" stroke="#C9A961" strokeWidth="1.1" fill="none" opacity="0.4" strokeLinecap="round" />
+            <path d="M 114 86 Q 122 82 130 86" stroke="#C9A961" strokeWidth="1.1" fill="none" opacity="0.4" strokeLinecap="round" />
+
+            {/* Yeux — amande */}
+            <path d="M 70 100 Q 78 95 86 100 Q 78 105 70 100 Z" fill="#C9A961" opacity="0.5" />
+            <path d="M 114 100 Q 122 95 130 100 Q 122 105 114 100 Z" fill="#C9A961" opacity="0.5" />
+            <circle cx="78" cy="100" r="1.3" fill="#5C4A3A" opacity="0.6" />
+            <circle cx="122" cy="100" r="1.3" fill="#5C4A3A" opacity="0.6" />
+
+            {/* Nez */}
+            <path d="M 100 110 L 100 130 Q 100 140 95 142 M 100 142 Q 105 140 105 142"
+              fill="none" stroke="#C9A961" strokeWidth="1" opacity="0.42" strokeLinecap="round" strokeLinejoin="round" />
+            <path d="M 95 142 Q 100 145 105 142" stroke="#C9A961" strokeWidth="0.9" fill="none" opacity="0.32" strokeLinecap="round" />
+
+            {/* Lèvres — courbe douce avec ombre subtile */}
+            <path d="M 86 168 Q 100 162 114 168 Q 100 172 86 168 Z"
+              fill="#C9A961" opacity="0.18" />
+            <path d="M 86 168 Q 93 165 100 167 Q 107 165 114 168" stroke="#C9A961" strokeWidth="0.9" fill="none" opacity="0.45" strokeLinecap="round" />
+            <path d="M 88 168 Q 100 175 112 168" stroke="#C9A961" strokeWidth="0.7" fill="none" opacity="0.28" strokeLinecap="round" />
+
+            {/* Menton — ombre légère */}
+            <path d="M 92 200 Q 100 206 108 200" stroke="#C9A961" strokeWidth="0.6" fill="none" opacity="0.16" strokeLinecap="round" />
           </svg>
           {hotspots.map((h, i) => (
             <div key={i} className={`rfn-hotspot rfn-hot-${h.cat}`} style={{ top: h.top, left: h.left }}>
@@ -822,6 +1143,405 @@ export default function ReportRefonte({
         .rfn-status-good { color: #7AAE98; }
         .rfn-status-mid { color: #9AB5CE; }
         .rfn-status-bad { color: #D199AB; }
+
+        /* Personal analysis card */
+        .rfn-personal-card {
+          background:
+            radial-gradient(ellipse at top left, rgba(201,169,97,0.08), transparent 60%),
+            linear-gradient(135deg, #FFFFFF 0%, #FDFAF4 100%);
+          border: 1px solid rgba(201,169,97,0.22);
+          border-radius: 22px;
+          padding: 26px 24px;
+          position: relative;
+          box-shadow: 0 1px 0 rgba(255,255,255,0.95) inset, 0 14px 32px rgba(168,116,73,0.05);
+        }
+        .rfn-personal-mark {
+          position: absolute;
+          top: 8px; left: 18px;
+          font-family: 'Cormorant Garamond', serif;
+          font-size: 56px;
+          color: #C9A961;
+          opacity: 0.18;
+          line-height: 1;
+        }
+        .rfn-personal-text {
+          font-family: 'Cormorant Garamond', serif;
+          font-style: italic;
+          font-size: 17px;
+          line-height: 1.55;
+          color: #2C2416;
+          margin: 0;
+          padding-left: 36px;
+        }
+        .rfn-personal-text strong {
+          font-style: normal;
+          font-weight: 600;
+          color: #A88947;
+          background: linear-gradient(transparent 70%, rgba(201,169,97,0.22) 70%);
+          padding: 0 2px;
+        }
+
+        /* Strengths showcase */
+        .rfn-strengths {
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 12px;
+        }
+        @media (max-width: 420px) {
+          .rfn-strengths { grid-template-columns: 1fr; }
+        }
+        .rfn-strength-card {
+          background: linear-gradient(135deg, #FFFFFF 0%, #FDF5E8 100%);
+          border: 1px solid rgba(201,169,97,0.28);
+          border-radius: 18px;
+          padding: 18px 16px;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          gap: 10px;
+          text-align: center;
+          box-shadow: 0 1px 0 rgba(255,255,255,0.95) inset, 0 10px 24px rgba(168,116,73,0.06);
+        }
+        .rfn-strength-medal {
+          position: relative;
+          width: 60px;
+          height: 60px;
+          filter: drop-shadow(0 4px 12px rgba(201,169,97,0.22));
+        }
+        .rfn-strength-medal svg { width: 100%; height: 100%; }
+        .rfn-strength-medal-num {
+          position: absolute;
+          inset: 0;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-family: 'Cormorant Garamond', serif;
+          font-size: 22px;
+          font-weight: 600;
+          color: #A88947;
+        }
+        .rfn-strength-label {
+          font-family: 'Cormorant Garamond', serif;
+          font-size: 17px;
+          font-weight: 500;
+          color: #2C2416;
+          line-height: 1.15;
+        }
+        .rfn-strength-tag {
+          font-size: 9.5px;
+          letter-spacing: 0.18em;
+          text-transform: uppercase;
+          color: #C9A961;
+          font-weight: 700;
+        }
+
+        /* Trajectory timeline (free) */
+        .rfn-traj-card {
+          background:
+            radial-gradient(ellipse at top right, rgba(201,169,97,0.08), transparent 60%),
+            linear-gradient(135deg, #FFFFFF 0%, #FDF8F0 100%);
+          border: 1px solid rgba(201,169,97,0.28);
+          border-radius: 22px;
+          padding: 22px 20px;
+          box-shadow: 0 1px 0 rgba(255,255,255,0.95) inset, 0 12px 32px rgba(168,116,73,0.06);
+        }
+        .rfn-traj-intro {
+          font-family: 'Cormorant Garamond', serif;
+          font-style: italic;
+          font-size: 16px;
+          color: #5C4A3A;
+          line-height: 1.5;
+          margin: 0 0 18px;
+        }
+        .rfn-traj-intro strong {
+          font-style: normal;
+          font-weight: 600;
+          color: #A88947;
+        }
+        .rfn-traj-timeline {
+          position: relative;
+          height: 110px;
+          margin-bottom: 18px;
+        }
+        .rfn-traj-points {
+          position: relative;
+          z-index: 2;
+          height: 100%;
+          display: flex;
+          justify-content: space-between;
+          align-items: flex-start;
+          padding: 0 4px;
+        }
+        .rfn-traj-pt {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          gap: 6px;
+        }
+        .rfn-traj-pt-dot {
+          width: 12px;
+          height: 12px;
+          border-radius: 50%;
+          background: #C9A961;
+          border: 2px solid #FBF6EE;
+          box-shadow: 0 0 0 1px rgba(201,169,97,0.3), 0 4px 8px rgba(168,116,73,0.18);
+        }
+        .rfn-traj-pt-dot-mid {
+          width: 9px; height: 9px;
+          background: #FBF6EE;
+          border: 2px solid #C9A961;
+          box-shadow: none;
+        }
+        .rfn-traj-pt-from .rfn-traj-pt-dot { background: #D199AB; box-shadow: 0 0 0 1px rgba(209,153,171,0.3), 0 4px 8px rgba(209,153,171,0.18); }
+        .rfn-traj-pt-to .rfn-traj-pt-dot { background: #7AAE98; box-shadow: 0 0 0 1px rgba(122,174,152,0.3), 0 4px 10px rgba(122,174,152,0.22); }
+        .rfn-traj-pt-val {
+          font-family: 'Cormorant Garamond', serif;
+          font-size: 22px;
+          font-weight: 600;
+          color: #2C2416;
+          line-height: 1;
+          margin-top: 14px;
+        }
+        .rfn-traj-pt-val-soft {
+          font-size: 16px;
+          color: #8A7A6B;
+          font-weight: 500;
+          margin-top: 18px;
+        }
+        .rfn-traj-pt-from .rfn-traj-pt-val { color: #B85C75; }
+        .rfn-traj-pt-to .rfn-traj-pt-val { color: #4D8C76; }
+        .rfn-traj-pt-lbl {
+          font-size: 9.5px;
+          font-weight: 700;
+          letter-spacing: 0.18em;
+          text-transform: uppercase;
+          color: #B0885E;
+        }
+        .rfn-traj-stats {
+          display: grid;
+          grid-template-columns: repeat(3, 1fr);
+          gap: 8px;
+          padding-top: 16px;
+          border-top: 1px solid rgba(201,169,97,0.18);
+        }
+        .rfn-traj-stat { text-align: center; }
+        .rfn-traj-stat-num {
+          font-family: 'Cormorant Garamond', serif;
+          font-size: 26px;
+          font-weight: 500;
+          color: #A88947;
+          letter-spacing: -0.01em;
+          line-height: 1;
+        }
+        .rfn-traj-stat-lbl {
+          font-size: 9.5px;
+          font-weight: 700;
+          letter-spacing: 0.16em;
+          text-transform: uppercase;
+          color: #8A7A6B;
+          margin-top: 5px;
+        }
+
+        /* Cleanser teaser */
+        .rfn-cleanser-card {
+          background:
+            radial-gradient(ellipse at top, rgba(201,169,97,0.06), transparent 60%),
+            linear-gradient(135deg, #FFFFFF 0%, #FDFAF4 100%);
+          border: 1px solid rgba(201,169,97,0.28);
+          border-radius: 20px;
+          padding: 22px 20px;
+          display: flex;
+          gap: 16px;
+          align-items: flex-start;
+          box-shadow: 0 1px 0 rgba(255,255,255,0.95) inset, 0 14px 32px rgba(168,116,73,0.06);
+        }
+        .rfn-cleanser-step {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          gap: 4px;
+          flex-shrink: 0;
+          padding: 8px 4px 0;
+        }
+        .rfn-cleanser-step-num {
+          width: 48px;
+          height: 48px;
+          border-radius: 50%;
+          background: linear-gradient(135deg, #E8C988 0%, #A88947 100%);
+          color: #FBF6EE;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-family: 'Cormorant Garamond', serif;
+          font-size: 20px;
+          font-weight: 600;
+          box-shadow: 0 1px 0 rgba(255,255,255,0.4) inset, 0 4px 12px rgba(168,116,73,0.22);
+        }
+        .rfn-cleanser-step-lbl {
+          font-size: 8.5px;
+          font-weight: 700;
+          letter-spacing: 0.18em;
+          text-transform: uppercase;
+          color: #B0885E;
+          margin-top: 4px;
+        }
+        .rfn-cleanser-body { flex: 1; min-width: 0; }
+        .rfn-cleanser-tag {
+          display: inline-block;
+          font-size: 9.5px;
+          font-weight: 700;
+          letter-spacing: 0.18em;
+          text-transform: uppercase;
+          color: #4D8C76;
+          background: rgba(122,174,152,0.12);
+          border: 1px solid rgba(122,174,152,0.28);
+          border-radius: 100px;
+          padding: 3px 10px;
+          margin-bottom: 8px;
+        }
+        .rfn-cleanser-name {
+          font-family: 'Cormorant Garamond', serif;
+          font-size: 22px;
+          font-weight: 500;
+          color: #2C2416;
+          margin: 0 0 4px;
+          letter-spacing: -0.005em;
+          line-height: 1.15;
+        }
+        .rfn-cleanser-brand {
+          font-size: 12.5px;
+          color: #8A7A6B;
+          margin-bottom: 10px;
+        }
+        .rfn-cleanser-price {
+          font-family: 'Cormorant Garamond', serif;
+          font-weight: 600;
+          color: #A88947;
+          font-size: 15px;
+          font-style: italic;
+        }
+        .rfn-cleanser-why {
+          font-family: 'Cormorant Garamond', serif;
+          font-style: italic;
+          font-size: 14px;
+          color: #5C4A3A;
+          line-height: 1.5;
+          margin: 0 0 12px;
+        }
+        .rfn-cleanser-actives {
+          display: flex;
+          flex-direction: column;
+          gap: 2px;
+          padding: 10px 12px;
+          background: rgba(201,169,97,0.08);
+          border: 1px solid rgba(201,169,97,0.18);
+          border-radius: 10px;
+        }
+        .rfn-cleanser-actives-lbl {
+          font-size: 9px;
+          font-weight: 700;
+          letter-spacing: 0.18em;
+          text-transform: uppercase;
+          color: #B0885E;
+        }
+        .rfn-cleanser-actives-val {
+          font-family: 'Cormorant Garamond', serif;
+          font-style: italic;
+          font-size: 14px;
+          color: #2C2416;
+        }
+        .rfn-cleanser-locked {
+          margin-top: 12px;
+          padding: 14px 18px;
+          background: linear-gradient(135deg, rgba(255,255,255,0.6) 0%, rgba(253,250,244,0.4) 100%);
+          border: 1px dashed rgba(201,169,97,0.32);
+          border-radius: 16px;
+          display: flex;
+          gap: 14px;
+          align-items: center;
+        }
+        .rfn-cleanser-locked-dots {
+          display: inline-flex;
+          gap: 6px;
+        }
+        .rfn-cleanser-locked-num {
+          width: 32px;
+          height: 32px;
+          border-radius: 50%;
+          background: rgba(255,255,255,0.5);
+          border: 1px solid rgba(201,169,97,0.22);
+          color: #B9AC9E;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-family: 'Cormorant Garamond', serif;
+          font-size: 14px;
+          font-weight: 500;
+          filter: blur(0.6px);
+        }
+        .rfn-cleanser-locked-text {
+          flex: 1;
+          display: flex;
+          flex-direction: column;
+          gap: 2px;
+          font-family: 'DM Sans', sans-serif;
+        }
+        .rfn-cleanser-locked-text strong {
+          font-size: 12.5px;
+          color: #2C2416;
+          font-weight: 700;
+          letter-spacing: 0.02em;
+        }
+        .rfn-cleanser-locked-text span {
+          font-size: 11px;
+          color: #8A7A6B;
+          font-family: 'Cormorant Garamond', serif;
+          font-style: italic;
+        }
+
+        /* Free tip */
+        .rfn-tip-card {
+          background:
+            radial-gradient(ellipse at top right, rgba(122,174,152,0.1), transparent 60%),
+            linear-gradient(135deg, #FFFFFF 0%, #F4F8F2 100%);
+          border: 1px solid rgba(122,174,152,0.28);
+          border-radius: 20px;
+          padding: 20px 22px;
+          display: flex;
+          gap: 16px;
+          align-items: flex-start;
+          box-shadow: 0 1px 0 rgba(255,255,255,0.95) inset, 0 12px 28px rgba(77,140,118,0.06);
+        }
+        .rfn-tip-icon {
+          width: 42px;
+          height: 42px;
+          border-radius: 50%;
+          background: linear-gradient(135deg, rgba(122,174,152,0.22) 0%, rgba(122,174,152,0.08) 100%);
+          border: 1px solid rgba(122,174,152,0.32);
+          color: #4D8C76;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          flex-shrink: 0;
+        }
+        .rfn-tip-icon svg { width: 22px; height: 22px; }
+        .rfn-tip-body { flex: 1; }
+        .rfn-tip-tag {
+          font-size: 10px;
+          font-weight: 700;
+          letter-spacing: 0.2em;
+          text-transform: uppercase;
+          color: #4D8C76;
+          margin-bottom: 6px;
+        }
+        .rfn-tip-text {
+          font-family: 'Cormorant Garamond', serif;
+          font-size: 16px;
+          color: #2C2416;
+          line-height: 1.5;
+          margin: 0;
+          font-style: italic;
+        }
 
         /* Heatmap */
         .rfn-heatmap {
@@ -1437,8 +2157,19 @@ export default function ReportRefonte({
         }
       `}</style>
 
+      <NavBar ctaLabel={lang === 'fr' ? 'Nouvelle analyse' : 'New analysis'} ctaHref="/" />
+
       <div className="rfn-container">
         <ScoreHero score={score} lang={lang} firstName={firstName} isPaid={isPaid} />
+
+        {/* Personal analysis (free only) */}
+        {!isPaid && metrics.length > 0 && (
+          <PersonalAnalysis
+            score={score}
+            topConcern={[...metrics].sort((a, b) => a.score - b.score)[0]}
+            lang={lang}
+          />
+        )}
 
         {/* Heatmap */}
         {metrics.length > 0 && (isPaid ? (
@@ -1447,9 +2178,35 @@ export default function ReportRefonte({
           <HeatmapFree metrics={metrics} lang={lang} />
         ))}
 
+        {/* Strengths showcase (free only) */}
+        {!isPaid && metrics.length > 0 && (
+          <StrengthsShowcase metrics={metrics} lang={lang} />
+        )}
+
         {/* Face Map */}
         {metrics.length > 0 && (
           <FaceMap metrics={metrics} lang={lang} limitTo3={!isPaid} />
+        )}
+
+        {/* Free tip (free only) */}
+        {!isPaid && metrics.length > 0 && (
+          <FreeTip
+            topConcern={[...metrics].sort((a, b) => a.score - b.score)[0]}
+            lang={lang}
+          />
+        )}
+
+        {/* Trajectory timeline (free only — replaces locked progression) */}
+        {!isPaid && (
+          <TrajectoryTimeline score={score} lang={lang} />
+        )}
+
+        {/* Cleanser teaser (free only) */}
+        {!isPaid && metrics.length > 0 && (
+          <CleanserTeaser
+            topConcern={[...metrics].sort((a, b) => a.score - b.score)[0]}
+            lang={lang}
+          />
         )}
 
         {/* Priorities (paid) */}
@@ -1462,8 +2219,10 @@ export default function ReportRefonte({
           <RoutineTimeline routine={paid.routine} lang={lang} />
         )}
 
-        {/* Progression Chart */}
-        <ProgressionChart score={score} lang={lang} locked={!isPaid} />
+        {/* Progression Chart (paid only — free uses TrajectoryTimeline above) */}
+        {isPaid && (
+          <ProgressionChart score={score} lang={lang} locked={false} />
+        )}
 
         {/* PDF Card (paid) */}
         {isPaid && (
@@ -1482,6 +2241,8 @@ export default function ReportRefonte({
           <MedicalDisclaimer style={{ marginTop: 24 }} />
         </div>
       </div>
+
+      <Footer />
     </div>
   );
 }

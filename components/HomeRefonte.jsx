@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from "react";
+import Footer from "./Footer";
 
 /* ════════════════════════════════════════════════════════════════════════
    HomeRefonte — landing en 7 actes éditoriaux
@@ -2409,6 +2410,8 @@ export default function HomeRefonte({ onUploadClick, lang = "fr", t = (k) => k }
           </button>
         </div>
       </div>
+
+      <Footer />
     </div>
   );
 }

@@ -4,6 +4,7 @@ import Head from 'next/head';
 import Logo from '../components/Logo';
 import { useLang } from '../lib/LangContext';
 import NavBar from '../components/NavBar';
+import Footer from '../components/Footer';
 
 const GOLD = '#C5A028';
 
@@ -250,70 +251,118 @@ export default function MesRapports() {
       </div>
       )}
 
-      <main style={{
-        minHeight: 'calc(100vh - 60px)',
-        fontFamily: "'DM Sans', sans-serif",
-        padding: '48px 20px 80px',
-        maxWidth: 560,
-        margin: '0 auto',
+      <div style={{
         background: 'linear-gradient(180deg, #FBF6EE 0%, #F8F1E5 50%, #F5EBDB 100%)',
+        minHeight: 'calc(100vh - 60px)',
+        padding: '0 0 80px',
       }}>
-        {/* Heading */}
-        <div style={{ textAlign: 'center', marginBottom: 40 }}>
+      <main style={{
+        fontFamily: "'DM Sans', sans-serif",
+        padding: '64px 20px 0',
+        maxWidth: 640,
+        margin: '0 auto',
+      }}>
+        {/* Editorial heading */}
+        <div style={{ textAlign: 'center', marginBottom: 36 }}>
+          <div style={{ color: '#C9A961', fontSize: 14, opacity: 0.7, marginBottom: 14 }}>✦</div>
           <p style={{
-            fontSize: 11, letterSpacing: '0.2em', textTransform: 'uppercase',
-            color: '#B0885E', fontWeight: 600, marginBottom: 10,
+            fontFamily: "'DM Sans', sans-serif",
+            fontSize: 10, letterSpacing: '0.32em', textTransform: 'uppercase',
+            color: '#C9A961', fontWeight: 700, marginBottom: 14,
           }}>
-            {t('myReportsAccessLabel')}
+            {lang === 'fr' ? 'Accède à tes analyses' : 'Access your analyses'}
           </p>
           <h1 style={{
             fontFamily: "'Cormorant Garamond', serif",
-            fontSize: 'clamp(26px, 5vw, 38px)', fontWeight: 400,
-            color: '#3A2E26', margin: '0 0 12px', lineHeight: 1.2,
+            fontSize: 'clamp(36px, 6vw, 52px)', fontWeight: 400,
+            color: '#2C2416', margin: '0 0 14px', lineHeight: 1.05,
+            letterSpacing: '-0.015em',
           }}>
-            {t('myReportsTitle')}
+            {lang === 'fr' ? (<>Tes rapports, <em style={{ color: '#B0885E', fontStyle: 'italic' }}>retrouvés.</em></>) : (<>Your reports, <em style={{ color: '#B0885E', fontStyle: 'italic' }}>found.</em></>)}
           </h1>
-          <p style={{ fontSize: 13, color: '#8C7A6B', margin: 0, lineHeight: 1.6 }}>
-            {t('myReportsDesc')}
+          <p style={{
+            fontFamily: "'Cormorant Garamond', serif",
+            fontStyle: 'italic',
+            fontSize: 16, color: '#5C4A3A', lineHeight: 1.5,
+            margin: '0 auto', maxWidth: 460,
+          }}>
+            {lang === 'fr'
+              ? "Entre l'email utilisé lors de tes analyses pour retrouver tous tes diagnostics."
+              : "Enter the email used for your analyses to access all your diagnoses."}
           </p>
         </div>
 
-        {/* Email form */}
-        <form onSubmit={handleSubmit} style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
-          <input
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            placeholder="your@email.com"
-            required
-            autoFocus
-            style={{
-              flex: '1 1 220px',
-              border: '1px solid rgba(255, 255, 255, 0.45)', borderRadius: 14,
-              padding: '13px 18px', fontSize: 14,
-              fontFamily: "'DM Sans', sans-serif",
-              outline: 'none',
-              background: 'rgba(255, 255, 255, 0.35)', color: '#3A2E26',
-              backdropFilter: 'blur(10px)',
-              WebkitBackdropFilter: 'blur(10px)',
-              boxShadow: 'inset 0 1px 1px rgba(255, 255, 255, 0.5), 0 4px 12px rgba(180, 160, 140, 0.04)',
-            }}
-          />
-          <button
-            type="submit"
-            disabled={loading}
-            className="btn-liquid-glass-dark"
-            style={{
-              flex: '0 0 auto',
-              borderRadius: 14, padding: '13px 22px',
-              fontSize: 13, fontWeight: 600, cursor: loading ? 'wait' : 'pointer',
-              whiteSpace: 'nowrap',
-              border: 'none',
-            }}
-          >
-            {loading ? t('myReportsLoading') : t('myReportsButton')}
-          </button>
-        </form>
+        {/* Email form — premium card */}
+        <div style={{
+          background: 'linear-gradient(180deg, #FFFFFF 0%, #FDFAF4 100%)',
+          border: '1px solid rgba(201,169,97,0.25)',
+          borderRadius: 22,
+          padding: 22,
+          boxShadow: '0 1px 0 rgba(255,255,255,0.95) inset, 0 16px 40px rgba(94,71,47,0.06)',
+        }}>
+          <label style={{
+            display: 'block',
+            fontSize: 10, letterSpacing: '0.22em', textTransform: 'uppercase',
+            color: '#B0885E', fontWeight: 700, marginBottom: 10,
+          }}>
+            {lang === 'fr' ? 'Ton email' : 'Your email'}
+          </label>
+          <form onSubmit={handleSubmit} style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
+            <input
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="exemple@email.com"
+              required
+              autoFocus
+              style={{
+                flex: '1 1 220px',
+                border: '1px solid rgba(201,169,97,0.28)',
+                borderRadius: 100,
+                padding: '14px 20px', fontSize: 14,
+                fontFamily: "'DM Sans', sans-serif",
+                outline: 'none',
+                background: '#FFFFFF',
+                color: '#2C2416',
+                boxShadow: 'inset 0 1px 2px rgba(168,116,73,0.04)',
+                transition: 'border-color 0.2s',
+              }}
+              onFocus={(e) => e.target.style.borderColor = 'rgba(201,169,97,0.6)'}
+              onBlur={(e) => e.target.style.borderColor = 'rgba(201,169,97,0.28)'}
+            />
+            <button
+              type="submit"
+              disabled={loading}
+              style={{
+                flex: '0 0 auto',
+                background: 'linear-gradient(180deg, #3A2F22 0%, #2C2416 50%, #1A1410 100%)',
+                color: '#fff',
+                border: 'none',
+                borderRadius: 100,
+                padding: '14px 24px',
+                fontSize: 11.5, fontWeight: 700,
+                letterSpacing: '0.14em', textTransform: 'uppercase',
+                fontFamily: "'DM Sans', sans-serif",
+                cursor: loading ? 'wait' : 'pointer',
+                whiteSpace: 'nowrap',
+                boxShadow: '0 1px 0 rgba(255,255,255,0.12) inset, 0 8px 20px rgba(44,36,22,0.22)',
+                display: 'inline-flex', alignItems: 'center', gap: 8,
+              }}
+            >
+              <span style={{ color: '#C9A961', fontSize: 10 }}>✦</span>
+              {loading ? t('myReportsLoading') : t('myReportsButton')}
+            </button>
+          </form>
+          <p style={{
+            fontSize: 11.5, color: '#8A7A6B', marginTop: 14, marginBottom: 0,
+            fontFamily: "'Cormorant Garamond', serif", fontStyle: 'italic',
+            textAlign: 'center',
+          }}>
+            {lang === 'fr'
+              ? "Nous ne stockons jamais ta photo, uniquement les rapports liés à ton email."
+              : "We never store your photo, only the reports linked to your email."}
+          </p>
+        </div>
 
         {/* Error */}
         {error && (
@@ -410,7 +459,149 @@ export default function MesRapports() {
             )}
           </div>
         )}
+
+        {/* Première analyse CTA (visible quand pas de reports chargés) */}
+        {reports === null && (
+          <div style={{
+            marginTop: 48,
+            padding: 28,
+            background: 'linear-gradient(180deg, #FFFFFF 0%, #FDF5E8 100%)',
+            border: '1px solid rgba(201,169,97,0.32)',
+            borderRadius: 22,
+            textAlign: 'center',
+            boxShadow: '0 1px 0 rgba(255,255,255,0.95) inset, 0 16px 40px rgba(168,116,73,0.08)',
+            position: 'relative',
+          }}>
+            <div style={{
+              position: 'absolute', top: -1, left: '50%', transform: 'translateX(-50%)',
+              width: 60, height: 2,
+              background: 'linear-gradient(90deg, transparent, #C9A961, transparent)',
+            }} />
+            <p style={{
+              fontSize: 10, letterSpacing: '0.28em', textTransform: 'uppercase',
+              color: '#C9A961', fontWeight: 700, marginTop: 6, marginBottom: 10,
+            }}>
+              {lang === 'fr' ? 'Premier passage ?' : 'First time?'}
+            </p>
+            <h2 style={{
+              fontFamily: "'Cormorant Garamond', serif",
+              fontSize: 'clamp(22px, 4vw, 28px)', fontWeight: 400,
+              color: '#2C2416', margin: '0 0 10px', lineHeight: 1.15,
+              letterSpacing: '-0.005em',
+            }}>
+              {lang === 'fr' ? (<>Aucune analyse <em style={{ color: '#B0885E', fontStyle: 'italic' }}>encore</em></>) : (<>No analysis <em style={{ color: '#B0885E', fontStyle: 'italic' }}>yet</em></>)}
+            </h2>
+            <p style={{
+              fontFamily: "'Cormorant Garamond', serif", fontStyle: 'italic',
+              fontSize: 15, color: '#5C4A3A', lineHeight: 1.5,
+              margin: '0 auto 18px', maxWidth: 360,
+            }}>
+              {lang === 'fr'
+                ? "Lance ta première analyse en 30 secondes, gratuite et sans inscription."
+                : "Start your first analysis in 30 seconds — free, no signup."}
+            </p>
+            <button
+              onClick={() => router.push('/')}
+              style={{
+                background: 'linear-gradient(180deg, #3A2F22 0%, #2C2416 50%, #1A1410 100%)',
+                color: '#fff', border: 'none',
+                borderRadius: 100,
+                padding: '14px 28px',
+                fontSize: 12, fontWeight: 700,
+                letterSpacing: '0.14em', textTransform: 'uppercase',
+                fontFamily: "'DM Sans', sans-serif",
+                cursor: 'pointer',
+                boxShadow: '0 1px 0 rgba(255,255,255,0.12) inset, 0 10px 22px rgba(44,36,22,0.22)',
+                display: 'inline-flex', alignItems: 'center', gap: 8,
+              }}
+            >
+              <span style={{ color: '#C9A961', fontSize: 11 }}>✦</span>
+              {lang === 'fr' ? 'Lancer mon analyse' : 'Start my analysis'}
+            </button>
+          </div>
+        )}
+
+        {/* Comment ça marche */}
+        <div style={{ marginTop: 48 }}>
+          <div style={{ textAlign: 'center', marginBottom: 24 }}>
+            <p style={{
+              fontSize: 10, letterSpacing: '0.28em', textTransform: 'uppercase',
+              color: '#B0885E', fontWeight: 700, marginBottom: 10,
+            }}>
+              {lang === 'fr' ? 'Bon à savoir' : 'Good to know'}
+            </p>
+            <h3 style={{
+              fontFamily: "'Cormorant Garamond', serif",
+              fontSize: 'clamp(22px, 4vw, 28px)', fontWeight: 400,
+              color: '#2C2416', margin: 0, letterSpacing: '-0.005em',
+            }}>
+              {lang === 'fr' ? <>Comment <em style={{ color: '#B0885E', fontStyle: 'italic' }}>ça marche</em></> : <>How <em style={{ color: '#B0885E', fontStyle: 'italic' }}>it works</em></>}
+            </h3>
+          </div>
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))',
+            gap: 12,
+          }}>
+            {[
+              {
+                icon: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="6" width="18" height="13" rx="2" /><circle cx="12" cy="12.5" r="3" /><path d="M9 6V4h6v2" /></svg>,
+                title: lang === 'fr' ? 'Tu scannes' : 'You scan',
+                desc: lang === 'fr' ? 'Photo de ta peau, en 30 secondes' : 'Photo of your skin, in 30 seconds'
+              },
+              {
+                icon: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M22 6H2v12h20z" /><path d="M10 12h.01M14 12h.01" /><path d="M6 10v4" /><path d="M18 10v4" /></svg>,
+                title: lang === 'fr' ? 'Tu reçois' : 'You receive',
+                desc: lang === 'fr' ? 'Ton rapport envoyé sur ton email' : 'Your report sent to your email'
+              },
+              {
+                icon: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="9" /><polyline points="12 7 12 12 15 14" /></svg>,
+                title: lang === 'fr' ? 'Tu y retournes' : 'You come back',
+                desc: lang === 'fr' ? 'Accès à vie via cet email' : 'Lifetime access via this email'
+              },
+            ].map((step, i) => (
+              <div key={i} style={{
+                padding: '20px 18px',
+                background: 'rgba(255,255,255,0.6)',
+                border: '1px solid rgba(201,169,97,0.18)',
+                borderRadius: 16,
+                textAlign: 'center',
+                boxShadow: '0 6px 18px rgba(168,116,73,0.04)',
+              }}>
+                <div style={{
+                  width: 38, height: 38, borderRadius: '50%',
+                  background: 'linear-gradient(135deg, rgba(201,169,97,0.16) 0%, rgba(201,169,97,0.04) 100%)',
+                  border: '1px solid rgba(201,169,97,0.25)',
+                  display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+                  color: '#8B6E26', marginBottom: 12,
+                }}>
+                  <div style={{ width: 18, height: 18 }}>{step.icon}</div>
+                </div>
+                <h4 style={{
+                  fontFamily: "'Cormorant Garamond', serif",
+                  fontSize: 18, fontWeight: 500, color: '#2C2416',
+                  margin: '0 0 4px', letterSpacing: '-0.005em',
+                }}>{step.title}</h4>
+                <p style={{
+                  fontSize: 12.5, color: '#5C4A3A', lineHeight: 1.5, margin: 0,
+                }}>{step.desc}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Footer help */}
+        <p style={{
+          textAlign: 'center', marginTop: 36, fontSize: 11.5, color: '#8A7A6B',
+          fontFamily: "'Cormorant Garamond', serif", fontStyle: 'italic',
+        }}>
+          {lang === 'fr'
+            ? "Pas d'email reçu ? Vérifie tes spams ou contacte hello@ratemyskin.co"
+            : "No email received? Check spam or contact hello@ratemyskin.co"}
+        </p>
       </main>
+      <Footer />
+      </div>
     </>
   );
 }

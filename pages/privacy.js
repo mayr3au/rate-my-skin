@@ -3,6 +3,7 @@ import { useRouter } from 'next/router';
 import Head from 'next/head';
 import Logo from '../components/Logo';
 import NavBar from '../components/NavBar';
+import Footer from '../components/Footer';
 import { useLang } from '../lib/LangContext';
 
 function LangToggle() {
@@ -212,6 +213,7 @@ export default function Privacy() {
           </div>
         </div>
       </div>
+      <Footer />
     </>
   );
 }
