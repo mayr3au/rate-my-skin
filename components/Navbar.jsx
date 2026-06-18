@@ -242,6 +242,15 @@ export default function NavBar({ ctaLabel, ctaHref = "/", ctaOnClick }) {
           .nbr-nav-cta { display: none; }
           .nbr-burger { display: inline-flex; }
         }
+        @media (max-width: 640px) {
+          .nbr-nav { padding: 8px 14px; }
+          .nbr-nav-left, .nbr-nav-right { gap: 10px; }
+          .nbr-logo { font-size: 19px; padding: 0; gap: 4px; }
+          .nbr-logo .star { font-size: 12px; }
+          .nbr-lang { font-size: 10px; }
+          .nbr-burger { padding: 6px 8px; }
+          .nbr-burger svg { width: 16px; height: 16px; }
+        }
 
         .nbr-mobile-backdrop {
           position: fixed;
