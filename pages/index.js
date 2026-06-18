@@ -21,6 +21,9 @@ export async function getStaticProps() {
 
   try {
     const supabase = createAdminClient();
+    if (!supabase) {
+      throw new Error("Supabase admin client is not initialized (missing environment variables)");
+    }
     const { data: products } = await supabase.from('products').select('*');
 
     if (products && products.length > 0) {

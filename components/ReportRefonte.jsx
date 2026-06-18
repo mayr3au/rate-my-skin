@@ -1,7 +1,6 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { useLang } from "../lib/LangContext";
 import { sanitizeReport } from "../lib/textSanitizer";
-import MedicalDisclaimer from "./MedicalDisclaimer";
 import ProductImage from "./ProductImage";
 import NavBar from "./NavBar";
 import Footer from "./Footer";
@@ -69,6 +68,32 @@ const METRIC_LABELS_EN = {
   redness: "Redness",
 };
 
+/* Grammaire correcte FR pour chaque métrique */
+const METRIC_PHRASE_FR = {
+  hydration:    { articled: "l'hydratation", possessive: "ton hydratation", isPlural: false },
+  radiance:     { articled: "l'éclat",       possessive: "ton éclat",       isPlural: false },
+  acne:         { articled: "l'acné",        possessive: "ton acné",        isPlural: false },
+  pores:        { articled: "les pores",     possessive: "tes pores",       isPlural: true  },
+  dark_spots:   { articled: "les taches",    possessive: "tes taches",      isPlural: true  },
+  dark_circles: { articled: "les cernes",    possessive: "tes cernes",      isPlural: true  },
+  texture:      { articled: "la texture",    possessive: "ta texture",      isPlural: false },
+  redness:      { articled: "les rougeurs",  possessive: "tes rougeurs",    isPlural: true  },
+};
+const METRIC_PHRASE_EN = {
+  hydration:    { articled: "hydration",   possessive: "your hydration",   isPlural: false },
+  radiance:     { articled: "radiance",    possessive: "your radiance",    isPlural: false },
+  acne:         { articled: "acne",        possessive: "your acne",        isPlural: false },
+  pores:        { articled: "pores",       possessive: "your pores",       isPlural: true  },
+  dark_spots:   { articled: "dark spots",  possessive: "your dark spots",  isPlural: true  },
+  dark_circles: { articled: "dark circles",possessive: "your dark circles",isPlural: true  },
+  texture:      { articled: "texture",     possessive: "your texture",     isPlural: false },
+  redness:      { articled: "redness",     possessive: "your redness",     isPlural: false },
+};
+function phraseFor(id, lang) {
+  const map = lang === "fr" ? METRIC_PHRASE_FR : METRIC_PHRASE_EN;
+  return map[id] || { articled: id, possessive: id, isPlural: false };
+}
+
 function normalizeMetric(m) {
   const raw = (m.id || m.key || m.label || "").toString().toLowerCase().replace(/\s+/g, "_");
   if (raw.includes("hydra")) return "hydration";
@@ -88,7 +113,29 @@ function normalizeMetric(m) {
 
 function ScoreHero({ score, lang, firstName, isPaid }) {
   const safeScore = Math.max(1, Math.min(100, Math.round(score || 0)));
-  const dash = (safeScore / 100) * 263.9;
+  const finalDash = (safeScore / 100) * 263.9;
+  const [animDash, setAnimDash] = useState(0);
+  const [animNum, setAnimNum] = useState(0);
+
+  useEffect(() => {
+    let start = null;
+    const duration = 1600;
+    // easeOutCubic
+    const ease = (t) => 1 - Math.pow(1 - t, 3);
+    let rafId;
+    const tick = (ts) => {
+      if (start === null) start = ts;
+      const elapsed = ts - start;
+      const t = Math.min(1, elapsed / duration);
+      const e = ease(t);
+      setAnimDash(finalDash * e);
+      setAnimNum(Math.round(safeScore * e));
+      if (t < 1) rafId = requestAnimationFrame(tick);
+    };
+    rafId = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(rafId);
+  }, [safeScore, finalDash]);
+
   const greeting =
     lang === "fr"
       ? firstName
@@ -147,17 +194,34 @@ function ScoreHero({ score, lang, firstName, isPaid }) {
             <circle cx="26.5" cy="9.3" r="0.55" opacity="0.4" />
           </g>
           <circle cx="50" cy="50" r="42" fill="none" stroke="rgba(201,169,97,0.14)" strokeWidth="4.5" />
-          <circle cx="50" cy="50" r="42" fill="none" stroke="url(#rfn-score-grad)" strokeWidth="5"
-            strokeDasharray={`${dash} 263.9`} strokeLinecap="round" opacity="0.55" filter="url(#rfn-arc-glow)" />
-          <circle cx="50" cy="50" r="42" fill="none" stroke="url(#rfn-score-grad)" strokeWidth="4.2"
-            strokeDasharray={`${dash} 263.9`} strokeLinecap="round" />
+          <g transform="rotate(-90 50 50)">
+            <circle cx="50" cy="50" r="42" fill="none" stroke="url(#rfn-score-grad)" strokeWidth="5"
+              strokeDasharray={`${animDash} 263.9`} strokeLinecap="round" opacity="0.55" filter="url(#rfn-arc-glow)" />
+            <circle cx="50" cy="50" r="42" fill="none" stroke="url(#rfn-score-grad)" strokeWidth="4.2"
+              strokeDasharray={`${animDash} 263.9`} strokeLinecap="round" />
+          </g>
           <circle cx="50" cy="50" r="37" fill="none" stroke="#C9A961" strokeWidth="0.3" opacity="0.28" />
         </svg>
         <div className="rfn-gauge-num">
-          <span className="rfn-gauge-n">{safeScore}</span>
+          <span className="rfn-gauge-n">{animNum}</span>
           <span className="rfn-gauge-d">/ 100</span>
         </div>
       </div>
+      {/* Score scale bar — 0→100 rose→bleu→vert avec marqueur animé */}
+      <div className="rfn-scale">
+        <div className="rfn-scale-track">
+          <div className="rfn-scale-marker" style={{ left: `${animNum}%` }}>
+            <div className="rfn-scale-marker-num">{animNum}</div>
+            <div className="rfn-scale-marker-arrow"></div>
+          </div>
+        </div>
+        <div className="rfn-scale-labels">
+          <span className="rfn-scale-lbl-l">{lang === "fr" ? "Priorité" : "Priority"}</span>
+          <span className="rfn-scale-lbl-m">{lang === "fr" ? "À surveiller" : "Monitor"}</span>
+          <span className="rfn-scale-lbl-r">{lang === "fr" ? "Excellent" : "Excellent"}</span>
+        </div>
+      </div>
+
       <p className="rfn-verdict">{lang === "fr" ? verdictFr : verdictEn}</p>
       {isPaid && (
         <span className="rfn-badge-unlocked">
@@ -214,20 +278,36 @@ function HeatmapFree({ metrics, lang }) {
   const ordered = [...metrics].sort((a, b) => b.score - a.score);
   const visible = ordered.slice(0, 3);
   const locked = ordered.slice(3);
+  const fr = lang === "fr";
   return (
     <div className="rfn-section">
       <div className="rfn-section-head">
-        <h2 className="rfn-section-title">{lang === "fr" ? "Tes 8 dimensions" : "Your 8 dimensions"}</h2>
-        <span className="rfn-section-count">{lang === "fr" ? `${visible.length} / 8 visibles` : `${visible.length} / 8 visible`}</span>
+        <h2 className="rfn-section-title">{fr ? "Tes 8 dimensions" : "Your 8 dimensions"}</h2>
+        <span className="rfn-section-count">{fr ? `${visible.length} / 8 visibles` : `${visible.length} / 8 visible`}</span>
       </div>
       <div className="rfn-heatmap">
         {visible.map((m) => (
           <MetricCard key={m.id} metric={m} lang={lang} locked={false} />
         ))}
-        {locked.map((m) => (
-          <MetricCard key={m.id} metric={m} lang={lang} locked={true} />
-        ))}
+        {/* Desktop: show all 5 locked cards. Mobile: hidden via CSS. */}
+        <div className="rfn-locked-desktop" style={{ display: "contents" }}>
+          {locked.map((m) => (
+            <MetricCard key={m.id} metric={m} lang={lang} locked={true} />
+          ))}
+        </div>
       </div>
+      {/* Mobile-only compact locked block */}
+      {locked.length > 0 && (
+      <div className="rfn-locked-mobile">
+        <div className="rfn-locked-mobile-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>
+        </div>
+        <div className="rfn-locked-mobile-text">
+          <strong>{fr ? `${locked.length} dimensions cachées` : `${locked.length} dimensions hidden`}</strong>
+          <span>{fr ? "Débloque pour voir Cernes, Taches, Pores, Texture, Hydratation…" : "Unlock to see all metrics…"}</span>
+        </div>
+      </div>
+      )}
     </div>
   );
 }
@@ -259,20 +339,23 @@ const FREE_TIPS_EN = {
 
 function PersonalAnalysis({ score, topConcern, lang }) {
   const fr = lang === "fr";
-  const labels = fr ? METRIC_LABELS_FR : METRIC_LABELS_EN;
-  const concernLabel = labels[topConcern?.id] || "";
+  const phrase = phraseFor(topConcern?.id, lang);
   const bracket = score >= 75 ? "high" : score >= 55 ? "mid" : "low";
+  // Conjugaison correcte selon pluriel
+  const verbFreine = fr ? (phrase.isPlural ? "freinent" : "freine") : (phrase.isPlural ? "are holding back" : "is holding back");
+  const verbAlarme = fr ? (phrase.isPlural ? "envoient" : "envoie") : (phrase.isPlural ? "are sending" : "is sending");
+
   const text = fr
     ? bracket === "high"
-      ? <>Ta peau est en <strong>bonne santé globale</strong>. Quelques détails à affiner sur <strong>{concernLabel.toLowerCase()}</strong> pourraient te faire passer dans le top 10%.</>
+      ? <>Ta peau est en <strong>bonne santé globale</strong>. Quelques détails à affiner sur <strong>{phrase.articled}</strong> pourraient te faire passer dans le top 10%.</>
       : bracket === "mid"
-        ? <>Ta peau a un <strong>vrai potentiel</strong>, mais <strong>{concernLabel.toLowerCase()}</strong> freine son éclat. Quelques ajustements ciblés peuvent transformer ton score en 8 semaines.</>
-        : <>Ta peau envoie des <strong>signaux d'alarme</strong> sur plusieurs zones, notamment <strong>{concernLabel.toLowerCase()}</strong>. Une routine adaptée peut renverser la tendance rapidement.</>
+        ? <>Ta peau a un <strong>vrai potentiel</strong> — <strong>{phrase.articled}</strong> {verbFreine} sa progression. Quelques ajustements ciblés peuvent transformer ton score en 8 semaines.</>
+        : <>Ta peau envoie des <strong>signaux d'alarme</strong>, notamment sur <strong>{phrase.articled}</strong>. Une routine adaptée peut renverser la tendance rapidement.</>
     : bracket === "high"
-      ? <>Your skin is in <strong>great overall shape</strong>. Refining <strong>{concernLabel.toLowerCase()}</strong> could push you into the top 10%.</>
+      ? <>Your skin is in <strong>great overall shape</strong>. Refining <strong>{phrase.articled}</strong> could push you into the top 10%.</>
       : bracket === "mid"
-        ? <>Your skin has <strong>real potential</strong>, but <strong>{concernLabel.toLowerCase()}</strong> is holding back its glow. Targeted tweaks can transform your score in 8 weeks.</>
-        : <>Your skin is sending <strong>distress signals</strong> in several zones, especially <strong>{concernLabel.toLowerCase()}</strong>. The right routine can reverse this fast.</>;
+        ? <>Your skin has <strong>real potential</strong> — <strong>{phrase.articled}</strong> {verbFreine} your glow. Targeted tweaks can transform your score in 8 weeks.</>
+        : <>Your skin is showing <strong>distress signals</strong>, particularly around <strong>{phrase.articled}</strong>. The right routine can reverse this fast.</>;
 
   return (
     <div className="rfn-section">
@@ -474,7 +557,7 @@ function FreeTip({ topConcern, lang }) {
   const fr = lang === "fr";
   const tips = fr ? FREE_TIPS_FR : FREE_TIPS_EN;
   const tip = tips[topConcern?.id] || (fr ? "Hydrate-toi de l'intérieur et applique un SPF 50 chaque matin, c'est la base." : "Hydrate from within and apply SPF 50 every morning — that's the base.");
-  const labels = fr ? METRIC_LABELS_FR : METRIC_LABELS_EN;
+  const phrase = phraseFor(topConcern?.id, lang);
   return (
     <div className="rfn-section">
       <div className="rfn-section-head">
@@ -488,7 +571,7 @@ function FreeTip({ topConcern, lang }) {
           </svg>
         </div>
         <div className="rfn-tip-body">
-          <div className="rfn-tip-tag">{fr ? "Pour ton " : "For your "}{(labels[topConcern?.id] || "").toLowerCase()}</div>
+          <div className="rfn-tip-tag">{fr ? "Pour " : "For "}{phrase.articled}</div>
           <p className="rfn-tip-text">{tip}</p>
         </div>
       </div>
@@ -886,7 +969,7 @@ function Paywall({ onUnlock, unlocking, lang }) {
         <span>{lang === "fr" ? "Ton rapport complet" : "Your full report"}</span>
         <span className="rfn-price">7,99 €</span>
       </div>
-      <button onClick={onUnlock} disabled={unlocking} className="rfn-cta">
+      <button onClick={() => onUnlock("single")} disabled={unlocking} className="rfn-cta">
         <span className="rfn-cta-star">✦</span>
         {unlocking ? (lang === "fr" ? "Redirection..." : "Redirecting...") : (lang === "fr" ? "Débloquer mon rapport complet" : "Unlock my full report")}
       </button>
@@ -941,6 +1024,19 @@ export default function ReportRefonte({
   const data = useMemo(() => sanitizeReport(rawData, lang), [rawData, lang]);
   const [unlocking, setUnlocking] = useState(false);
   const [pdfLoading, setPdfLoading] = useState(false);
+  const [showStickyCta, setShowStickyCta] = useState(false);
+
+  useEffect(() => {
+    if (isPaid) return;
+    const onScroll = () => {
+      const paywall = document.querySelector('.rfn-paywall');
+      const past = window.scrollY > 700;
+      const paywallVisible = paywall && paywall.getBoundingClientRect().top < window.innerHeight - 60;
+      setShowStickyCta(past && !paywallVisible);
+    };
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
+  }, [isPaid]);
 
   const metrics = useMemo(() => {
     if (!data) return [];
@@ -1065,6 +1161,91 @@ export default function ReportRefonte({
           font-weight: 600;
           text-transform: uppercase;
         }
+        /* Score scale bar */
+        .rfn-scale {
+          width: min(320px, 90%);
+          margin: 4px auto 22px;
+        }
+        .rfn-scale-track {
+          position: relative;
+          height: 10px;
+          border-radius: 100px;
+          background: linear-gradient(90deg,
+            #C97883 0%,
+            #D199AB 22%,
+            #BFAFC5 40%,
+            #9AB5CE 50%,
+            #ABBEB5 60%,
+            #7AAE98 78%,
+            #5E9A82 100%
+          );
+          box-shadow:
+            inset 0 1px 2px rgba(0,0,0,0.08),
+            0 1px 0 rgba(255,255,255,0.6);
+        }
+        .rfn-scale-marker {
+          position: absolute;
+          top: 50%;
+          transform: translate(-50%, -50%);
+          transition: left 0.06s linear;
+        }
+        .rfn-scale-marker-num {
+          font-family: 'Cormorant Garamond', serif;
+          font-size: 13px;
+          font-weight: 600;
+          color: #2C2416;
+          background: #FBF6EE;
+          border: 1px solid rgba(201,169,97,0.4);
+          border-radius: 100px;
+          padding: 2px 9px;
+          line-height: 1.1;
+          margin-bottom: 6px;
+          box-shadow: 0 4px 10px rgba(94,71,47,0.12);
+          letter-spacing: -0.01em;
+          white-space: nowrap;
+          position: relative;
+          left: 50%;
+          transform: translateX(-50%);
+          display: inline-block;
+        }
+        .rfn-scale-marker-arrow {
+          position: absolute;
+          top: 100%;
+          left: 50%;
+          transform: translate(-50%, -2px);
+          width: 0;
+          height: 0;
+          border-left: 6px solid transparent;
+          border-right: 6px solid transparent;
+          border-top: 7px solid #FBF6EE;
+          filter: drop-shadow(0 2px 1px rgba(94,71,47,0.15));
+        }
+        .rfn-scale-marker-arrow::before {
+          content: "";
+          position: absolute;
+          top: -8px;
+          left: -7px;
+          width: 0;
+          height: 0;
+          border-left: 7px solid transparent;
+          border-right: 7px solid transparent;
+          border-top: 8px solid rgba(201,169,97,0.4);
+          z-index: -1;
+        }
+        .rfn-scale-labels {
+          display: flex;
+          justify-content: space-between;
+          margin-top: 12px;
+          font-size: 9.5px;
+          letter-spacing: 0.16em;
+          text-transform: uppercase;
+          font-weight: 700;
+          font-family: 'DM Sans', sans-serif;
+        }
+        .rfn-scale-lbl-l { color: #C97883; }
+        .rfn-scale-lbl-m { color: #6B8FB0; }
+        .rfn-scale-lbl-r { color: #5E9A82; }
+
         .rfn-verdict {
           font-family: 'Cormorant Garamond', serif;
           font-style: italic;
@@ -1097,7 +1278,7 @@ export default function ReportRefonte({
         }
 
         /* Section */
-        .rfn-section { padding: 28px 26px 10px; }
+        .rfn-section { padding: clamp(20px, 4vw, 28px) clamp(16px, 4vw, 26px) 10px; }
         .rfn-section-head {
           display: flex;
           align-items: baseline;
@@ -1597,6 +1778,88 @@ export default function ReportRefonte({
           filter: blur(4px);
           pointer-events: none;
           opacity: 0.85;
+        }
+        /* Compact mobile locked block — replaces 5 blurred cards on small screens */
+        .rfn-locked-mobile {
+          display: none;
+          margin-top: 10px;
+          padding: 14px 18px;
+          background: linear-gradient(135deg, rgba(255,255,255,0.7) 0%, rgba(253,250,244,0.5) 100%);
+          border: 1px dashed rgba(201,169,97,0.35);
+          border-radius: 16px;
+          gap: 14px;
+          align-items: center;
+          font-family: 'DM Sans', sans-serif;
+        }
+        .rfn-locked-mobile-icon {
+          width: 36px; height: 36px;
+          border-radius: 50%;
+          background: rgba(44,36,22,0.85);
+          color: #fff;
+          display: flex; align-items: center; justify-content: center;
+          flex-shrink: 0;
+        }
+        .rfn-locked-mobile-icon svg { width: 16px; height: 16px; }
+        .rfn-locked-mobile-text { flex: 1; display: flex; flex-direction: column; gap: 2px; }
+        .rfn-locked-mobile-text strong { font-size: 13px; color: #2C2416; }
+        .rfn-locked-mobile-text span {
+          font-family: 'Cormorant Garamond', serif;
+          font-style: italic;
+          font-size: 12px;
+          color: #5C4A3A;
+        }
+        @media (max-width: 640px) {
+          .rfn-locked-mobile { display: flex; }
+          .rfn-locked-desktop { display: none !important; }
+        }
+
+        /* Sticky CTA mobile (only visible <760px) */
+        .rfn-sticky-cta {
+          display: none;
+          position: fixed;
+          left: 0; right: 0; bottom: 0;
+          z-index: 80;
+          padding: 12px 14px calc(12px + env(safe-area-inset-bottom, 0px));
+          background: rgba(251,246,238,0.96);
+          backdrop-filter: blur(18px);
+          -webkit-backdrop-filter: blur(18px);
+          border-top: 1px solid rgba(201,169,97,0.22);
+          box-shadow: 0 -8px 24px rgba(94,71,47,0.1);
+          transform: translateY(100%);
+          transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .rfn-sticky-cta.show { transform: translateY(0); }
+        .rfn-sticky-cta button {
+          width: 100%;
+          background: linear-gradient(180deg, #3A2F22 0%, #2C2416 50%, #1A1410 100%);
+          color: #fff;
+          border: none;
+          border-radius: 100px;
+          padding: 14px 18px;
+          font-family: 'DM Sans', sans-serif;
+          font-size: 12px;
+          font-weight: 700;
+          letter-spacing: 0.12em;
+          text-transform: uppercase;
+          cursor: pointer;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 10px;
+          box-shadow: 0 1px 0 rgba(255,255,255,0.12) inset, 0 10px 24px rgba(44,36,22,0.24);
+        }
+        .rfn-sticky-cta .s { color: #C9A961; font-size: 11px; }
+        .rfn-sticky-cta .lbl { flex: 1; text-align: left; }
+        .rfn-sticky-cta .price {
+          font-family: 'Cormorant Garamond', serif;
+          font-size: 18px;
+          font-weight: 600;
+          color: #C9A961;
+          letter-spacing: -0.01em;
+          text-transform: none;
+        }
+        @media (max-width: 760px) {
+          .rfn-sticky-cta { display: block; }
         }
 
         /* Face Map */
@@ -2237,12 +2500,22 @@ export default function ReportRefonte({
           </>
         )}
 
-        <div style={{ padding: "0 26px" }}>
-          <MedicalDisclaimer style={{ marginTop: 24 }} />
-        </div>
       </div>
 
       <Footer />
+
+      {/* Sticky CTA mobile — apparaît après scroll, masqué si paywall visible */}
+      {!isPaid && (
+        <div className={`rfn-sticky-cta ${showStickyCta ? "show" : ""}`}>
+          <button onClick={() => handleUnlock("single")} disabled={unlocking}>
+            <span className="s">✦</span>
+            <span className="lbl">
+              {lang === "fr" ? "Débloquer mon rapport" : "Unlock my report"}
+            </span>
+            <span className="price">7,99 €</span>
+          </button>
+        </div>
+      )}
     </div>
   );
 }

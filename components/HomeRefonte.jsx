@@ -79,7 +79,7 @@ export default function HomeRefonte({ onUploadClick, lang = "fr", t = (k) => k }
           padding: 0 28px;
         }
         .hrf-section {
-          padding: clamp(48px, 7vw, 90px) 0;
+          padding: clamp(32px, 5vw, 72px) 0;
           position: relative;
         }
 
@@ -251,19 +251,6 @@ export default function HomeRefonte({ onUploadClick, lang = "fr", t = (k) => k }
           margin: 0 auto 40px;
         }
         .hrf-center { text-align: center; }
-
-        /* ── Top bar éditorial (always visible) ────────────────── */
-        .hrf-topbar {
-          background: linear-gradient(90deg, #FDFCF9 0%, #FAF2EA 50%, #FDFCF9 100%);
-          border-bottom: 1px solid rgba(201,169,97,0.14);
-          padding: 8px 12px;
-          text-align: center;
-          font-size: 11px;
-          letter-spacing: 0.06em;
-          color: #8C6A4F;
-          font-weight: 500;
-        }
-        .hrf-topbar .star { color: #C9A961; margin: 0 8px; opacity: 0.85; }
 
         /* ── Nav (sticky, blur on scroll) ────────────────────── */
         .hrf-nav {
@@ -1050,6 +1037,13 @@ export default function HomeRefonte({ onUploadClick, lang = "fr", t = (k) => k }
         .hrf-float-3 {
           bottom: 20%; left: -2%;
           animation: hrf-float3 9s ease-in-out infinite;
+        }
+        @media (max-width: 640px) {
+          .hrf-float-1 { top: 12%; left: 8%; }
+          .hrf-float-2 { top: 40%; right: 4%; }
+          .hrf-float-3 { bottom: 22%; left: 6%; }
+          .hrf-float .num { font-size: 13px; }
+          .hrf-float { font-size: 9px; padding: 4px 9px; }
         }
         @keyframes hrf-float1 {
           0%, 100% { transform: translate(0, 0); }
