@@ -13,7 +13,7 @@ export default async function handler(req, res) {
   if (!analysisId) return res.status(400).json({ error: 'Missing analysisId.' });
 
   const isPack = planId === 'pack';
-  const amount = isPack ? 499 : 799;
+  const amount = isPack ? 1999 : 799;
   const product_type = isPack ? 'five_analyses' : 'single_analysis';
   const productId = isPack 
     ? (process.env.STRIPE_PRODUCT_5_PACK || 'prod_UW0urukCJLR5yF')

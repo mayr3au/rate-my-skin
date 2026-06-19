@@ -1886,6 +1886,20 @@ export default function Home({ teaserProducts }) {
                       ? 'Une routine matin/soir sur-mesure, les bons produits, et un plan pour viser de vrais résultats en quelques semaines. Tu sais exactement quoi faire.'
                       : 'A bespoke AM/PM routine, the right products, and a plan targeting real results in weeks. You know exactly what to do.',
                   },
+                  {
+                    num: '04',
+                    icon: (
+                      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#C9A961" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M21 12a9 9 0 1 1-2.64-6.36" />
+                        <path d="M21 4v5h-5" />
+                        <path d="M8 13l2.5 2.5L16 10" />
+                      </svg>
+                    ),
+                    title: lang === 'fr' ? 'Mesure tes progrès' : 'Track your progress',
+                    desc: lang === 'fr'
+                      ? 'Reviens dans 2 mois pour un nouveau scan : on compare ton avant/après score par score et on te livre ton évolution réelle, chiffres et commentaire à l\'appui.'
+                      : 'Come back in 2 months for a new scan: we compare your before/after score by score and show your real progress, with numbers and a personal note.',
+                  },
                 ].map((step) => (
                   <div
                     key={step.num}

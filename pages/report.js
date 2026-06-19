@@ -202,15 +202,15 @@ export default function Report() {
           ],
           routine: isFr ? {
             morning: [
-              "Nettoyer avec un soin doux à pH neutre.",
-              "Appliquer un sérum Vitamine C pour l’action antioxydante.",
-              "Utiliser une protection solaire SPF 50+ large spectre."
+              { stepText: "Nettoyer avec un soin doux à pH neutre.", productData: { product_name: "Gel Nettoyant Hydratant", brand: "CeraVe", price: "12,99", routine_step: "cleanser", whyItHelps: "Nettoie sans décaper : préserve le film hydrolipidique mis à mal par ta déshydratation.", applicationTip: "Le matin, masse 20 s sur peau humide, rince à l'eau tiède (jamais chaude) et tamponne sans frotter.", product_image_url: "https://images.unsplash.com/photo-1556228720-195a672e8a03?auto=format&fit=crop&w=200&q=60", amazon_link: "https://www.amazon.fr/dp/B07RK7L1X9?tag=tonid-21" } },
+              { stepText: "Appliquer un sérum Vitamine C pour l’action antioxydante.", productData: { product_name: "Sérum Vitamine C 10%", brand: "La Roche-Posay", price: "29,90", routine_step: "serum", whyItHelps: "Antioxydant qui ravive l'éclat terne et estompe progressivement tes taches pigmentaires.", applicationTip: "3 à 4 gouttes sur peau sèche, avant l'hydratant. Toujours suivi du SPF, sinon les taches reviennent.", product_image_url: "https://images.unsplash.com/photo-1620916566398-39f1143ab7be?auto=format&fit=crop&w=200&q=60", amazon_link: "https://www.amazon.fr/dp/B08XYZ1234?tag=tonid-21" } },
+              { stepText: "Utiliser une protection solaire SPF 50+ large spectre.", productData: { product_name: "Anthelios UVMune 400 SPF50+", brand: "La Roche-Posay", price: "19,90", routine_step: "sunscreen", whyItHelps: "Indispensable contre tes taches : 80 % du vieillissement et de la pigmentation vient du soleil.", applicationTip: "Dernière étape du matin, l'équivalent de 2 doigts sur le visage. Ré-applique vers midi si tu sors.", product_image_url: "https://images.unsplash.com/photo-1556228578-8c89e6adf883?auto=format&fit=crop&w=200&q=60", amazon_link: "https://www.amazon.fr/dp/B09ABCD567?tag=tonid-21" } }
             ],
             evening: [
-              "Double nettoyage pour éliminer la pollution.",
-              "Appliquer délicatement une crème contour des yeux pour cibler les cernes.",
-              "Appliquer du Rétinol 0,3 % pour stimuler le renouvellement cellulaire.",
-              "Utiliser une crème riche en céramides pour renforcer la barrière cutanée."
+              { stepText: "Double nettoyage pour éliminer la pollution.", productData: { product_name: "Huile Démaquillante Deep Cleansing", brand: "DHC", price: "23,00", routine_step: "oil_cleanser", whyItHelps: "Dissout SPF et pollution sans frotter : évite d'agresser une peau déjà sensibilisée.", applicationTip: "Le soir sur peau sèche, masse 1 min, puis émulsionne avec un peu d'eau avant de rincer.", product_image_url: "https://images.unsplash.com/photo-1608248543803-ba4f8c70ae0b?auto=format&fit=crop&w=200&q=60", amazon_link: "https://www.amazon.fr/dp/B001UE60E8?tag=tonid-21" } },
+              { stepText: "Appliquer délicatement une crème contour des yeux pour cibler les cernes.", productData: { product_name: "Caffeine Solution 5% + EGCG", brand: "The Ordinary", price: "8,90", routine_step: "eye_cream", whyItHelps: "La caféine décongestionne et atténue tes cernes en relançant la microcirculation.", applicationTip: "Tapote l'équivalent d'un grain de riz sous l'œil, matin et soir, avec l'annulaire (pression douce).", product_image_url: "https://images.unsplash.com/photo-1571781926291-c477ebfd024b?auto=format&fit=crop&w=200&q=60", amazon_link: "https://www.amazon.fr/dp/B06XYZ8901?tag=tonid-21" } },
+              { stepText: "Appliquer du Rétinol 0,3 % pour stimuler le renouvellement cellulaire.", productData: { product_name: "Rétinol 0.3% in Squalane", brand: "The Ordinary", price: "9,90", routine_step: "treatment", whyItHelps: "Stimule le renouvellement cellulaire : lisse la texture et resserre visiblement tes pores.", applicationTip: "Le soir, 2 à 3 fois/semaine au début pour habituer la peau. Évite le contour des yeux. Jamais sans SPF le lendemain.", product_image_url: "https://images.unsplash.com/photo-1598440947619-2c35fc9aa908?auto=format&fit=crop&w=200&q=60", amazon_link: "https://www.amazon.fr/dp/B07L1PHSZ9?tag=tonid-21" } },
+              { stepText: "Utiliser une crème riche en céramides pour renforcer la barrière cutanée.", productData: { product_name: "Crème Réparatrice Céramides", brand: "CeraVe", price: "14,99", routine_step: "moisturizer", whyItHelps: "Les céramides scellent l'hydratation et réparent ta barrière cutanée fragilisée.", applicationTip: "Le soir, sur peau encore légèrement humide pour piéger l'eau. Insiste sur les zones qui tiraillent.", product_image_url: "https://images.unsplash.com/photo-1556228453-efd6c1ff04f6?auto=format&fit=crop&w=200&q=60", amazon_link: "https://www.amazon.fr/dp/B00TTD9BRC?tag=tonid-21" } }
             ],
             weekly: [
               "Exfoliant AHA/BHA deux fois par semaine pour affiner le grain de peau.",
@@ -218,15 +218,15 @@ export default function Report() {
             ]
           } : {
             morning: [
-              "Cleanse with a mild, pH-balanced cleanser.",
-              "Apply Vitamin C Serum for antioxidant defence.",
-              "Use SPF 50+ broad-spectrum sunscreen."
+              { stepText: "Cleanse with a mild, pH-balanced cleanser.", productData: { product_name: "Hydrating Facial Cleanser", brand: "CeraVe", price: "12.99", routine_step: "cleanser", whyItHelps: "Cleanses without stripping: protects the moisture barrier weakened by your dehydration.", applicationTip: "In the morning, massage for 20s on damp skin, rinse with lukewarm (never hot) water and pat dry.", product_image_url: "https://images.unsplash.com/photo-1556228720-195a672e8a03?auto=format&fit=crop&w=200&q=60", amazon_link: "https://www.amazon.com/dp/B07RK7L1X9?tag=tonid-20" } },
+              { stepText: "Apply Vitamin C Serum for antioxidant defence.", productData: { product_name: "Vitamin C 10% Serum", brand: "La Roche-Posay", price: "29.90", routine_step: "serum", whyItHelps: "Antioxidant that revives dull radiance and gradually fades your dark spots.", applicationTip: "3-4 drops on dry skin, before moisturiser. Always follow with SPF, or the spots come back.", product_image_url: "https://images.unsplash.com/photo-1620916566398-39f1143ab7be?auto=format&fit=crop&w=200&q=60", amazon_link: "https://www.amazon.com/dp/B08XYZ1234?tag=tonid-20" } },
+              { stepText: "Use SPF 50+ broad-spectrum sunscreen.", productData: { product_name: "Anthelios UVMune 400 SPF50+", brand: "La Roche-Posay", price: "19.90", routine_step: "sunscreen", whyItHelps: "Essential against your dark spots: 80% of ageing and pigmentation comes from the sun.", applicationTip: "Last step of the morning, two-finger length on the face. Re-apply around noon if you go out.", product_image_url: "https://images.unsplash.com/photo-1556228578-8c89e6adf883?auto=format&fit=crop&w=200&q=60", amazon_link: "https://www.amazon.com/dp/B09ABCD567?tag=tonid-20" } }
             ],
             evening: [
-              "Double cleanse to remove pollution.",
-              "Gently apply an eye repair cream to target dark circles.",
-              "Apply Retinol 0.3% to boost cellular turnover.",
-              "Use a ceramide-rich barrier support cream."
+              { stepText: "Double cleanse to remove pollution.", productData: { product_name: "Deep Cleansing Oil", brand: "DHC", price: "23.00", routine_step: "oil_cleanser", whyItHelps: "Dissolves SPF and pollution without rubbing: avoids irritating already-sensitised skin.", applicationTip: "At night on dry skin, massage for 1 min, then emulsify with a little water before rinsing.", product_image_url: "https://images.unsplash.com/photo-1608248543803-ba4f8c70ae0b?auto=format&fit=crop&w=200&q=60", amazon_link: "https://www.amazon.com/dp/B001UE60E8?tag=tonid-20" } },
+              { stepText: "Gently apply an eye repair cream to target dark circles.", productData: { product_name: "Caffeine Solution 5% + EGCG", brand: "The Ordinary", price: "8.90", routine_step: "eye_cream", whyItHelps: "Caffeine de-puffs and reduces your dark circles by boosting microcirculation.", applicationTip: "Tap a rice-grain amount under the eye, morning and night, with your ring finger (gentle pressure).", product_image_url: "https://images.unsplash.com/photo-1571781926291-c477ebfd024b?auto=format&fit=crop&w=200&q=60", amazon_link: "https://www.amazon.com/dp/B06XYZ8901?tag=tonid-20" } },
+              { stepText: "Apply Retinol 0.3% to boost cellular turnover.", productData: { product_name: "Retinol 0.3% in Squalane", brand: "The Ordinary", price: "9.90", routine_step: "treatment", whyItHelps: "Boosts cell turnover: smooths texture and visibly tightens your pores.", applicationTip: "At night, 2-3 times/week at first to let skin adjust. Avoid the eye area. Never skip SPF the next day.", product_image_url: "https://images.unsplash.com/photo-1598440947619-2c35fc9aa908?auto=format&fit=crop&w=200&q=60", amazon_link: "https://www.amazon.com/dp/B07L1PHSZ9?tag=tonid-20" } },
+              { stepText: "Use a ceramide-rich barrier support cream.", productData: { product_name: "Moisturising Cream", brand: "CeraVe", price: "14.99", routine_step: "moisturizer", whyItHelps: "Ceramides lock in hydration and repair your weakened skin barrier.", applicationTip: "At night, on slightly damp skin to trap water. Focus on the areas that feel tight.", product_image_url: "https://images.unsplash.com/photo-1556228453-efd6c1ff04f6?auto=format&fit=crop&w=200&q=60", amazon_link: "https://www.amazon.com/dp/B00TTD9BRC?tag=tonid-20" } }
             ],
             weekly: [
               "AHA/BHA exfoliant twice a week to refine texture.",
@@ -481,7 +481,7 @@ export default function Report() {
           
           if (should_fire_purchase && !isPurchaseAlreadySent && typeof window !== 'undefined' && window.gtag) {
             const pendingPlanId = sessionStorage.getItem('rms_pending_plan_id') || 'single';
-            const value = pendingPlanId === 'pack' ? 4.99 : 7.99;
+            const value = pendingPlanId === 'pack' ? 19.99 : 7.99;
             const itemId = pendingPlanId === 'pack' ? 'five_analyses' : 'single_analysis';
             const itemName = pendingPlanId === 'pack' ? 'Pack 5 Analyses' : 'Analyse Individuelle';
 

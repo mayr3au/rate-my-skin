@@ -520,6 +520,27 @@ export default function HomeRefonte({ onUploadClick, lang = "fr", t = (k) => k }
         }
         .hrf-nav-cta:hover { transform: translateY(-1px); box-shadow: 0 6px 16px rgba(44,36,22,0.24); }
         .hrf-nav-cta .star { color: #C9A961; font-size: 10px; }
+        .hrf-account {
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          width: 38px;
+          height: 38px;
+          border-radius: 100px;
+          background: rgba(201,169,97,0.08);
+          border: 1px solid rgba(201,169,97,0.28);
+          color: #6F5A44;
+          cursor: pointer;
+          flex-shrink: 0;
+          margin-left: 4px;
+          transition: all 0.22s;
+        }
+        .hrf-account:hover { background: rgba(201,169,97,0.16); color: #2C2416; transform: translateY(-1px); }
+        .hrf-account svg { width: 18px; height: 18px; display: block; }
+        @media (max-width: 640px) {
+          .hrf-account { width: 34px; height: 34px; }
+          .hrf-account svg { width: 16px; height: 16px; }
+        }
         @media (max-width: 720px) {
           .hrf-nav-links { display: none; }
           .hrf-nav { padding: 12px 18px; }
@@ -1122,7 +1143,7 @@ export default function HomeRefonte({ onUploadClick, lang = "fr", t = (k) => k }
         /* ── 3. HOW ─────────────────────────────────────────────── */
         .hrf-how-grid {
           display: grid;
-          grid-template-columns: repeat(3, 1fr);
+          grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
           gap: 32px;
           margin-top: 56px;
           position: relative;
@@ -1735,10 +1756,24 @@ export default function HomeRefonte({ onUploadClick, lang = "fr", t = (k) => k }
                     <span className="hrf-menu-desc">{fr ? "Retrouve tes analyses précédentes" : "Access your previous analyses"}</span>
                   </span>
                 </a>
+                <a href="/compte" className="hrf-menu-item">
+                  <span className="hrf-menu-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                      <circle cx="12" cy="8" r="4" /><path d="M4 21v-1a6 6 0 0 1 6-6h4a6 6 0 0 1 6 6v1" />
+                    </svg>
+                  </span>
+                  <span className="hrf-menu-body">
+                    <span className="hrf-menu-title">{fr ? "Mon compte" : "My account"}</span>
+                    <span className="hrf-menu-desc">{fr ? "Connexion Google · suivi & rescan" : "Google sign-in · tracking & rescan"}</span>
+                  </span>
+                </a>
               </div>
             </div>
 
           </div>
+          <a href="/compte" className="hrf-account" aria-label={fr ? "Mon compte" : "My account"} title={fr ? "Mon compte" : "My account"}>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="8" r="4" /><path d="M4 21v-1a6 6 0 0 1 6-6h4a6 6 0 0 1 6 6v1" /></svg>
+          </a>
           <button className="hrf-nav-cta" onClick={onUploadClick}>
             <span className="star">✦</span>
             {fr ? "Analyser" : "Analyze"}
@@ -1986,8 +2021,8 @@ export default function HomeRefonte({ onUploadClick, lang = "fr", t = (k) => k }
       {/* ═══ ACT 3: HOW IT WORKS ════════════════════════════════════════ */}
       <div className="hrf-container">
         <div className="hrf-section hrf-center" id="how">
-          <div className="hrf-eyebrow">{fr ? "En 3 étapes" : "In 3 steps"}</div>
-          <h2 className="hrf-h2">{fr ? <>Une analyse précise, <em>en 30 secondes.</em></> : <>A precise analysis, <em>in 30 seconds.</em></>}</h2>
+          <div className="hrf-eyebrow">{fr ? "En 4 étapes" : "In 4 steps"}</div>
+          <h2 className="hrf-h2">{fr ? <>Une analyse précise, <em>et un suivi réel.</em></> : <>A precise analysis, <em>and real follow-up.</em></>}</h2>
           <div className="hrf-how-grid">
             <div className="hrf-step">
               <div className="hrf-step-num">01</div>
@@ -2036,6 +2071,23 @@ export default function HomeRefonte({ onUploadClick, lang = "fr", t = (k) => k }
                 {fr
                   ? "Score sur 100, 3 priorités, routine matin & soir, produits par budget, plan 8 semaines."
                   : "Score out of 100, 3 priorities, AM & PM routine, products by budget, 8-week plan."}
+              </p>
+              <span className="hrf-step-arrow">→</span>
+            </div>
+            <div className="hrf-step">
+              <div className="hrf-step-num">04</div>
+              <div className="hrf-step-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M21 12a9 9 0 1 1-2.64-6.36" />
+                  <path d="M21 4v5h-5" />
+                  <path d="M8 13l2.5 2.5L16 10" />
+                </svg>
+              </div>
+              <h3 className="hrf-step-title">{fr ? "Mesure tes progrès" : "Track your progress"}</h3>
+              <p className="hrf-step-desc">
+                {fr
+                  ? "Reviens dans 2 mois pour un nouveau scan : ton évolution réelle, score par score, avec le commentaire de l'équipe."
+                  : "Come back in 2 months for a new scan: your real progress, score by score, with the team's personal note."}
               </p>
             </div>
           </div>
@@ -2287,6 +2339,7 @@ export default function HomeRefonte({ onUploadClick, lang = "fr", t = (k) => k }
                 <li className="no">{fr ? "Routine sur-mesure" : "Custom routine"}</li>
                 <li className="no">{fr ? "Plan 8 semaines" : "8-week plan"}</li>
                 <li className="no">{fr ? "Rapport PDF" : "PDF report"}</li>
+                <li className="no">{fr ? "Rescan dans 2 mois" : "Rescan in 2 months"}</li>
               </ul>
               <button className="hrf-plan-cta" onClick={onUploadClick}>
                 {fr ? "Essayer gratuitement" : "Try for free"}
@@ -2305,6 +2358,7 @@ export default function HomeRefonte({ onUploadClick, lang = "fr", t = (k) => k }
                 <li>{fr ? "Routine matin & soir sur-mesure" : "Custom AM & PM routine"}</li>
                 <li>{fr ? "Plan de progression 8 semaines" : "8-week progression plan"}</li>
                 <li>{fr ? "Rapport PDF (5 pages)" : "PDF report (5 pages)"}</li>
+                <li>{fr ? "Rescan dans 2 mois : ton évolution réelle" : "Rescan in 2 months: your real progress"}</li>
               </ul>
               <button className="hrf-plan-cta" onClick={onUploadClick}>
                 {fr ? "Analyser ma peau" : "Analyze my skin"}

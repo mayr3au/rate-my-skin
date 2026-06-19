@@ -227,6 +227,27 @@ export default function NavBar({ ctaLabel, ctaHref = "/", ctaOnClick }) {
         .nbr-nav-cta:hover { transform: translateY(-1px); box-shadow: 0 6px 16px rgba(44,36,22,0.24); }
         .nbr-nav-cta .star { color: #C9A961; font-size: 10px; }
 
+        .nbr-account {
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          width: 38px;
+          height: 38px;
+          border-radius: 100px;
+          background: rgba(201,169,97,0.08);
+          border: 1px solid rgba(201,169,97,0.28);
+          color: #6F5A44;
+          cursor: pointer;
+          flex-shrink: 0;
+          transition: all 0.22s;
+        }
+        .nbr-account:hover { background: rgba(201,169,97,0.16); color: #2C2416; transform: translateY(-1px); }
+        .nbr-account svg { width: 18px; height: 18px; display: block; }
+        @media (max-width: 640px) {
+          .nbr-account { width: 34px; height: 34px; }
+          .nbr-account svg { width: 16px; height: 16px; }
+        }
+
         .nbr-burger {
           display: none;
           background: none;
@@ -352,10 +373,22 @@ export default function NavBar({ ctaLabel, ctaHref = "/", ctaOnClick }) {
                   <span className="nbr-menu-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" /><polyline points="14 2 14 8 20 8" /><line x1="9" y1="13" x2="15" y2="13" /></svg></span>
                   <span className="nbr-menu-body"><span className="nbr-menu-title">{fr ? "Mes rapports" : "My reports"}</span><span className="nbr-menu-desc">{fr ? "Retrouve tes analyses précédentes" : "Access your previous analyses"}</span></span>
                 </a>
+                <a href="/compte" className="nbr-menu-item">
+                  <span className="nbr-menu-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="8" r="4" /><path d="M4 21v-1a6 6 0 0 1 6-6h4a6 6 0 0 1 6 6v1" /></svg></span>
+                  <span className="nbr-menu-body"><span className="nbr-menu-title">{fr ? "Mon compte" : "My account"}</span><span className="nbr-menu-desc">{fr ? "Connexion Google · suivi & rescan" : "Google sign-in · tracking & rescan"}</span></span>
+                </a>
               </div>
             </div>
 
           </div>
+          <button
+            className="nbr-account"
+            onClick={() => router.push("/compte")}
+            aria-label={fr ? "Mon compte" : "My account"}
+            title={fr ? "Mon compte" : "My account"}
+          >
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="8" r="4" /><path d="M4 21v-1a6 6 0 0 1 6-6h4a6 6 0 0 1 6 6v1" /></svg>
+          </button>
           <button className="nbr-nav-cta" onClick={onCTA}>
             <span className="star">✦</span>
             {ctaLabel || (fr ? "Analyser" : "Analyze")}
@@ -381,6 +414,7 @@ export default function NavBar({ ctaLabel, ctaHref = "/", ctaOnClick }) {
         <a href="/blog" className="nbr-menu-item"><span className="nbr-menu-body"><span className="nbr-menu-title">Blog</span></span></a>
         <a href="/technologie" className="nbr-menu-item"><span className="nbr-menu-body"><span className="nbr-menu-title">{fr ? "Technologie" : "Technology"}</span></span></a>
         <a href="/mes-rapports" className="nbr-menu-item"><span className="nbr-menu-body"><span className="nbr-menu-title">{fr ? "Mes rapports" : "My reports"}</span></span></a>
+        <a href="/compte" className="nbr-menu-item"><span className="nbr-menu-body"><span className="nbr-menu-title">{fr ? "Mon compte" : "My account"}</span></span></a>
         <div style={{ marginTop: "auto", paddingTop: 16 }}>
           <button className="nbr-nav-cta" onClick={() => { setMobileNavOpen(false); onCTA(); }} style={{ display: "flex", width: "100%", justifyContent: "center", padding: "14px", margin: 0 }}>
             <span className="star">✦</span>
