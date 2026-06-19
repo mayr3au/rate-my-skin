@@ -5,7 +5,7 @@ import Footer from "./Footer";
    HomeRefonte — landing en 7 actes éditoriaux
    ════════════════════════════════════════════════════════════════════════ */
 
-export default function HomeRefonte({ onUploadClick, lang = "fr", t = (k) => k }) {
+export default function HomeRefonte({ onUploadClick, lang = "fr", setLang = () => {}, t = (k) => k }) {
   const [scrolled, setScrolled] = useState(false);
   const [scoreAnim, setScoreAnim] = useState(0);
   const [openFaq, setOpenFaq] = useState(0);
@@ -303,6 +303,11 @@ export default function HomeRefonte({ onUploadClick, lang = "fr", t = (k) => k }
           font-weight: 600;
         }
         .hrf-lang .sep { color: rgba(201,169,97,0.5); margin: 0 4px; }
+        .hrf-lang-btn {
+          background: none; border: none; padding: 0; cursor: pointer;
+          font: inherit; color: inherit; letter-spacing: inherit;
+          transition: opacity 0.2s;
+        }
         .hrf-nav-links {
           display: flex;
           gap: 24px;
@@ -499,6 +504,29 @@ export default function HomeRefonte({ onUploadClick, lang = "fr", t = (k) => k }
           color: #2C2416;
           margin-bottom: 18px;
         }
+        .hrf-drawer-lang {
+          display: flex; align-items: center; justify-content: space-between;
+          margin-top: 16px; padding-top: 16px;
+          border-top: 1px solid rgba(201,169,97,0.2);
+        }
+        .hrf-drawer-lang-label {
+          font-size: 13px; font-weight: 600; color: #6F5A44;
+        }
+        .hrf-drawer-lang-toggle {
+          display: inline-flex; padding: 3px;
+          background: rgba(201,169,97,0.1); border: 1px solid rgba(201,169,97,0.24);
+          border-radius: 100px;
+        }
+        .hrf-drawer-lang-opt {
+          border: none; background: none; cursor: pointer;
+          padding: 6px 16px; border-radius: 100px;
+          font-family: 'DM Sans'; font-size: 12px; font-weight: 700;
+          letter-spacing: 0.06em; color: #8A7A6B; transition: all 0.2s;
+        }
+        .hrf-drawer-lang-opt.active {
+          background: #fff; color: #2C2416;
+          box-shadow: 0 2px 6px rgba(94,71,47,0.1);
+        }
         .hrf-nav-cta {
           background: linear-gradient(180deg, #3A2F22 0%, #2C2416 100%);
           color: #fff;
@@ -537,22 +565,21 @@ export default function HomeRefonte({ onUploadClick, lang = "fr", t = (k) => k }
         }
         .hrf-account:hover { background: rgba(201,169,97,0.16); color: #2C2416; transform: translateY(-1px); }
         .hrf-account svg { width: 18px; height: 18px; display: block; }
-        @media (max-width: 640px) {
-          .hrf-account { width: 34px; height: 34px; }
-          .hrf-account svg { width: 16px; height: 16px; }
-        }
         @media (max-width: 720px) {
           .hrf-nav-links { display: none; }
           .hrf-nav { padding: 12px 18px; }
         }
         @media (max-width: 640px) {
-          .hrf-nav { padding: 8px 14px; }
-          .hrf-nav-left, .hrf-nav-right { gap: 10px; }
-          .hrf-logo { font-size: 19px; padding: 0; gap: 4px; }
+          .hrf-nav { padding: 8px 16px; }
+          .hrf-nav-left, .hrf-nav-right { gap: 8px; }
+          .hrf-logo { font-size: 20px; padding: 0; gap: 4px; }
           .hrf-logo .star { font-size: 12px; }
-          .hrf-lang { font-size: 10px; }
+          /* Declutter: language switch lives in the drawer, account is in the menu */
+          .hrf-lang { display: none; }
+          .hrf-account { display: none; }
+          .hrf-nav-cta { margin-left: 0; padding: 9px 15px; font-size: 10px; }
           .hrf-burger { padding: 6px 8px; }
-          .hrf-burger svg { width: 16px; height: 16px; }
+          .hrf-burger svg { width: 18px; height: 18px; }
         }
 
         /* ── HERO ───────────────────────────────────────────────── */
@@ -1645,9 +1672,9 @@ export default function HomeRefonte({ onUploadClick, lang = "fr", t = (k) => k }
       <div className={`hrf-nav ${scrolled ? "scrolled" : ""}`}>
         <div className="hrf-nav-left">
           <span className="hrf-lang">
-            <span style={{ opacity: fr ? 0.4 : 1 }}>EN</span>
+            <button type="button" className="hrf-lang-btn" style={{ opacity: fr ? 0.4 : 1 }} onClick={() => setLang("en")} aria-label="English">EN</button>
             <span className="sep">|</span>
-            <span style={{ opacity: fr ? 1 : 0.4, color: "#2C2416" }}>FR</span>
+            <button type="button" className="hrf-lang-btn" style={{ opacity: fr ? 1 : 0.4, color: "#2C2416" }} onClick={() => setLang("fr")} aria-label="Français">FR</button>
           </span>
         </div>
         <div className="hrf-logo">
@@ -1822,6 +1849,16 @@ export default function HomeRefonte({ onUploadClick, lang = "fr", t = (k) => k }
         <a href="/mes-rapports" className="hrf-menu-item">
           <span className="hrf-menu-body"><span className="hrf-menu-title">{fr ? "Mes rapports" : "My reports"}</span></span>
         </a>
+        <a href="/compte" className="hrf-menu-item">
+          <span className="hrf-menu-body"><span className="hrf-menu-title">{fr ? "Mon compte" : "My account"}</span></span>
+        </a>
+        <div className="hrf-drawer-lang">
+          <span className="hrf-drawer-lang-label">{fr ? "Langue" : "Language"}</span>
+          <div className="hrf-drawer-lang-toggle">
+            <button type="button" className={`hrf-drawer-lang-opt ${!fr ? "active" : ""}`} onClick={() => setLang("en")}>EN</button>
+            <button type="button" className={`hrf-drawer-lang-opt ${fr ? "active" : ""}`} onClick={() => setLang("fr")}>FR</button>
+          </div>
+        </div>
         <div style={{ marginTop: "auto", paddingTop: 16 }}>
           <button className="hrf-nav-cta" onClick={() => { setMobileNavOpen(false); onUploadClick(); }} style={{ display: "flex", width: "100%", justifyContent: "center", padding: "14px" }}>
             <span className="star">✦</span>

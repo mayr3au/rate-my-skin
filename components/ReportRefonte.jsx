@@ -635,41 +635,52 @@ function HeatmapPaid({ metrics, lang }) {
 /* Anatomically correct hotspot positions on the face SVG
    Face SVG viewBox 0 0 200 260, container height 260px.
    y references: forehead 30-90, eyes 100, nose 110-145, lips 168, chin 200-225 */
+// Coordinates are % within the framed face-mesh image (.rfn-face-svg box).
+// Zones sit in distinct height bands with a diagonal X stagger so paired pins
+// never stack (top→bottom: forehead, under-eye, temple, cheekbone, nose,
+// lower-cheek, jaw, chin).
 const ZONE_BY_METRIC = {
-  // Pores: tip of nose (T-zone)
-  pores: { top: "52%", left: "50%" },
+  // Radiance: forehead center
+  radiance: { top: "18%", left: "50%" },
 
   // Dark circles: directly under each eye
-  dark_circles_l: { top: "44%", left: "37%" },
-  dark_circles_r: { top: "44%", left: "59%" },
+  dark_circles_l: { top: "39%", left: "39%" },
+  dark_circles_r: { top: "39%", left: "61%" },
 
-  // Hydration: mid-cheeks (lower)
-  hydration_l: { top: "62%", left: "30%" },
-  hydration_r: { top: "62%", left: "66%" },
-
-  // Texture: between eye and cheekbone
-  texture_l: { top: "55%", left: "32%" },
-  texture_r: { top: "55%", left: "64%" },
-
-  // Acne: chin
-  acne: { top: "82%", left: "50%" },
+  // Dark spots: temples / upper cheeks (wide)
+  dark_spots_l: { top: "45%", left: "26%" },
+  dark_spots_r: { top: "45%", left: "74%" },
 
   // Redness: cheekbones
-  redness_l: { top: "50%", left: "34%" },
-  redness_r: { top: "50%", left: "62%" },
+  redness_l: { top: "53%", left: "33%" },
+  redness_r: { top: "53%", left: "67%" },
 
-  // Dark spots: upper cheeks / under temples
-  dark_spots_l: { top: "38%", left: "28%" },
-  dark_spots_r: { top: "38%", left: "68%" },
+  // Pores: tip of nose (T-zone)
+  pores: { top: "57%", left: "50%" },
 
-  // Radiance: forehead center
-  radiance: { top: "24%", left: "50%" },
+  // Texture: lower cheeks (outward)
+  texture_l: { top: "61%", left: "27%" },
+  texture_r: { top: "61%", left: "73%" },
+
+  // Hydration: along the jaw
+  hydration_l: { top: "67%", left: "38%" },
+  hydration_r: { top: "67%", left: "62%" },
+
+  // Acne: chin
+  acne: { top: "85%", left: "50%" },
 };
 
 function FaceMap({ metrics, lang, limitTo3 }) {
   // Get top-priority metrics (lowest scores) and map to face zones
   const sortedByImpact = [...metrics].sort((a, b) => a.score - b.score);
-  const toShow = limitTo3 ? sortedByImpact.slice(0, 3) : sortedByImpact;
+  const byId = Object.fromEntries(metrics.map((m) => [m.id, m]));
+  // Free teaser pins the 3 worst zones; the paid map shows a clean full-face
+  // set (forehead → chin, incl. redness) so the whole face is covered without
+  // stacking pins. Per-criterion scores live elsewhere in the report.
+  const MAP_ORDER = ["radiance", "dark_circles", "dark_spots", "redness", "pores", "hydration", "acne"];
+  const toShow = limitTo3
+    ? sortedByImpact.slice(0, 3)
+    : MAP_ORDER.map((id) => byId[id]).filter(Boolean);
   const labels = lang === "fr" ? METRIC_LABELS_FR : METRIC_LABELS_EN;
 
   const hotspots = [];
@@ -702,56 +713,17 @@ function FaceMap({ metrics, lang, limitTo3 }) {
         <h2 className="rfn-section-title">
           {limitTo3
             ? (lang === "fr" ? "Là où ça se joue" : "Where it happens")
-            : (lang === "fr" ? "Cartographie complète" : "Complete map")}
+            : (lang === "fr" ? "Tes zones prioritaires" : "Your priority zones")}
         </h2>
       </div>
       <div className="rfn-face-card">
         <div className="rfn-face-svg">
-          <svg viewBox="0 0 200 260" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet">
-            <defs>
-              <radialGradient id="rfn-face-shade" cx="50%" cy="42%" r="58%">
-                <stop offset="0%" stopColor="#FFFFFF" stopOpacity="0.65" />
-                <stop offset="70%" stopColor="#FBF6EE" stopOpacity="0.28" />
-                <stop offset="100%" stopColor="#F5EBDB" stopOpacity="0" />
-              </radialGradient>
-            </defs>
-            {/* Face — oval doux, mâchoire affinée */}
-            <path
-              d="M 100 32
-                 C 82 32, 66 50, 62 78
-                 C 58 108, 62 138, 72 165
-                 C 80 188, 90 210, 100 224
-                 C 110 210, 120 188, 128 165
-                 C 138 138, 142 108, 138 78
-                 C 134 50, 118 32, 100 32 Z"
-              fill="url(#rfn-face-shade)"
-              stroke="#C9A961" strokeWidth="1.2" opacity="0.9"
-            />
-
-            {/* Sourcils — arcs fins */}
-            <path d="M 70 86 Q 78 82 86 86" stroke="#C9A961" strokeWidth="1.1" fill="none" opacity="0.4" strokeLinecap="round" />
-            <path d="M 114 86 Q 122 82 130 86" stroke="#C9A961" strokeWidth="1.1" fill="none" opacity="0.4" strokeLinecap="round" />
-
-            {/* Yeux — amande */}
-            <path d="M 70 100 Q 78 95 86 100 Q 78 105 70 100 Z" fill="#C9A961" opacity="0.5" />
-            <path d="M 114 100 Q 122 95 130 100 Q 122 105 114 100 Z" fill="#C9A961" opacity="0.5" />
-            <circle cx="78" cy="100" r="1.3" fill="#5C4A3A" opacity="0.6" />
-            <circle cx="122" cy="100" r="1.3" fill="#5C4A3A" opacity="0.6" />
-
-            {/* Nez */}
-            <path d="M 100 110 L 100 130 Q 100 140 95 142 M 100 142 Q 105 140 105 142"
-              fill="none" stroke="#C9A961" strokeWidth="1" opacity="0.42" strokeLinecap="round" strokeLinejoin="round" />
-            <path d="M 95 142 Q 100 145 105 142" stroke="#C9A961" strokeWidth="0.9" fill="none" opacity="0.32" strokeLinecap="round" />
-
-            {/* Lèvres — courbe douce avec ombre subtile */}
-            <path d="M 86 168 Q 100 162 114 168 Q 100 172 86 168 Z"
-              fill="#C9A961" opacity="0.18" />
-            <path d="M 86 168 Q 93 165 100 167 Q 107 165 114 168" stroke="#C9A961" strokeWidth="0.9" fill="none" opacity="0.45" strokeLinecap="round" />
-            <path d="M 88 168 Q 100 175 112 168" stroke="#C9A961" strokeWidth="0.7" fill="none" opacity="0.28" strokeLinecap="round" />
-
-            {/* Menton — ombre légère */}
-            <path d="M 92 200 Q 100 206 108 200" stroke="#C9A961" strokeWidth="0.6" fill="none" opacity="0.16" strokeLinecap="round" />
-          </svg>
+          <img
+            className="rfn-face-img"
+            src="/images/face-mesh.png"
+            alt={lang === "fr" ? "Maillage du visage" : "Face mesh"}
+            draggable="false"
+          />
           {hotspots.map((h, i) => (
             <div key={i} className={`rfn-hotspot rfn-hot-${h.cat}`} style={{ top: h.top, left: h.left }}>
               {h.num}
@@ -2285,25 +2257,40 @@ export default function ReportRefonte({
           background: linear-gradient(90deg, transparent, #C9A961, transparent);
         }
         .rfn-face-svg {
-          width: 100%;
-          height: 260px;
           position: relative;
+          width: 100%;
+          max-width: 236px;
+          margin: 0 auto;
         }
-        .rfn-face-svg svg { width: 100%; height: 100%; }
+        .rfn-face-svg::before {
+          content: "";
+          display: block;
+          padding-bottom: 132.2%; /* 1812 / 1371 — match the cropped image */
+        }
+        .rfn-face-img {
+          position: absolute;
+          inset: 0;
+          width: 100%;
+          height: 100%;
+          object-fit: contain;
+          user-select: none;
+          -webkit-user-drag: none;
+        }
         .rfn-hotspot {
           position: absolute;
-          width: 26px;
-          height: 26px;
+          width: 22px;
+          height: 22px;
+          transform: translate(-50%, -50%);
           border-radius: 50%;
           background: #FFFFFF;
           border: 2px solid;
           display: flex;
           align-items: center;
           justify-content: center;
-          font-size: 11px;
+          font-size: 10px;
           font-weight: 700;
           font-family: 'Cormorant Garamond', serif;
-          box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+          box-shadow: 0 4px 12px rgba(0,0,0,0.12);
         }
         .rfn-hot-good { border-color: #7AAE98; color: #7AAE98; }
         .rfn-hot-mid { border-color: #9AB5CE; color: #9AB5CE; }

@@ -440,7 +440,7 @@ function FAQ({ lang, t }) {
 
 export default function Home({ teaserProducts }) {
   const router = useRouter();
-  const { lang, t } = useLang();
+  const { lang, setLang, t } = useLang();
 
 
 
@@ -1138,6 +1138,7 @@ export default function Home({ teaserProducts }) {
           <HomeRefonte
             onUploadClick={() => setShowUploadSelector(true)}
             lang={lang}
+            setLang={setLang}
             t={t}
           />
         ) : false ? (
