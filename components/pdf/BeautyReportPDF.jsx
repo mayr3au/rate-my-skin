@@ -533,6 +533,29 @@ const styles = StyleSheet.create({
     color: '#C9A961',
     marginRight: 3,
   },
+  pdfRoutineStep: {
+    flexDirection: 'row',
+    marginBottom: '2.5mm',
+  },
+  pdfStepLabel: {
+    fontSize: 6,
+    fontWeight: 'bold',
+    color: '#C9A961',
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
+    marginBottom: 1,
+  },
+  pdfStepProduct: {
+    fontSize: 8.5,
+    fontWeight: 'bold',
+    color: '#2C2416',
+    lineHeight: 1.25,
+  },
+  pdfStepBrand: {
+    fontSize: 7.5,
+    color: '#9B9286',
+    marginTop: 0.5,
+  },
   productCard: {
     backgroundColor: '#FFFFFF',
     borderWidth: 0.5,
@@ -823,6 +846,28 @@ export default function BeautyReportPDF({ report, lang = 'fr' }) {
     return gradeMap[(grade || '').toUpperCase()] || '#B89968';
   };
 
+  const routineStepLabel = (stepType) => {
+    if (!stepType) return '';
+    const map = isFr
+      ? { cleanser: 'Nettoyage', oil_cleanser: 'Démaquillage', toner: 'Lotion', exfoliant: 'Exfoliant', serum: 'Sérum', treatment: 'Traitement', moisturizer: 'Hydratation', sunscreen: 'Protection SPF', mask: 'Masque', eye: 'Contour des yeux', eye_cream: 'Contour des yeux' }
+      : { cleanser: 'Cleanse', oil_cleanser: 'Oil cleanse', toner: 'Tone', exfoliant: 'Exfoliate', serum: 'Serum', treatment: 'Treat', moisturizer: 'Moisturize', sunscreen: 'SPF', mask: 'Mask', eye: 'Eye care', eye_cream: 'Eye care' };
+    return map[stepType] || String(stepType).replace(/_/g, ' ');
+  };
+  const extractRoutineStep = (step) => {
+    if (typeof step === 'string') return { text: step };
+    const pd = step.productData || {};
+    const rstep = pd.routine_step || step.routineStep || step.routine_step;
+    let price = pd.price || step.price || '';
+    if (price && !String(price).includes('€')) price = `${price} €`;
+    return {
+      label: routineStepLabel(rstep),
+      product: pd.product_name || step.productName || step.product_name || null,
+      brand: pd.brand || step.brand || '',
+      price,
+      text: step.stepText || step.text || '',
+    };
+  };
+
   const traits = [
     { label: isFr ? 'Type de peau' : 'Skin Type', val: getTranslatedValue(report.skinType) },
     { label: isFr ? 'Teinte' : 'Skin Tone', val: getTranslatedValue(report.skinTone) },
@@ -1020,12 +1065,21 @@ export default function BeautyReportPDF({ report, lang = 'fr' }) {
               <SunIcon />
               <Text style={{ fontSize: 11, fontWeight: 'bold', color: '#2C2416' }}>{isFr ? 'Matin' : 'Morning'}</Text>
             </View>
-            {morning.map((step, idx) => (
-              <View style={styles.routineStep} key={idx}>
-                <Text style={styles.routineStepNum}>{idx + 1}.</Text>
-                <Text style={{ flex: 1 }}>{typeof step === 'string' ? step : (step.text || step.stepText || step)}</Text>
-              </View>
-            ))}
+            {morning.map((step, idx) => {
+              const s = extractRoutineStep(step);
+              return (
+                <View style={styles.pdfRoutineStep} key={idx} wrap={false}>
+                  <Text style={styles.routineStepNum}>{idx + 1}.</Text>
+                  <View style={{ flex: 1 }}>
+                    {s.label ? <Text style={styles.pdfStepLabel}>{s.label}</Text> : null}
+                    <Text style={styles.pdfStepProduct}>{s.product || s.text}</Text>
+                    {(s.brand || s.price) ? (
+                      <Text style={styles.pdfStepBrand}>{s.brand}{s.brand && s.price ? ' · ' : ''}{s.price}</Text>
+                    ) : null}
+                  </View>
+                </View>
+              );
+            })}
           </View>
 
           <View style={[styles.routineCol, { borderTopColor: '#826EA5' }]}>
@@ -1033,12 +1087,21 @@ export default function BeautyReportPDF({ report, lang = 'fr' }) {
               <MoonIcon />
               <Text style={{ fontSize: 11, fontWeight: 'bold', color: '#2C2416' }}>{isFr ? 'Soir' : 'Evening'}</Text>
             </View>
-            {evening.map((step, idx) => (
-              <View style={styles.routineStep} key={idx}>
-                <Text style={styles.routineStepNum}>{idx + 1}.</Text>
-                <Text style={{ flex: 1 }}>{typeof step === 'string' ? step : (step.text || step.stepText || step)}</Text>
-              </View>
-            ))}
+            {evening.map((step, idx) => {
+              const s = extractRoutineStep(step);
+              return (
+                <View style={styles.pdfRoutineStep} key={idx} wrap={false}>
+                  <Text style={styles.routineStepNum}>{idx + 1}.</Text>
+                  <View style={{ flex: 1 }}>
+                    {s.label ? <Text style={styles.pdfStepLabel}>{s.label}</Text> : null}
+                    <Text style={styles.pdfStepProduct}>{s.product || s.text}</Text>
+                    {(s.brand || s.price) ? (
+                      <Text style={styles.pdfStepBrand}>{s.brand}{s.brand && s.price ? ' · ' : ''}{s.price}</Text>
+                    ) : null}
+                  </View>
+                </View>
+              );
+            })}
           </View>
 
           <View style={[styles.routineCol, { borderTopColor: '#C9A961' }]}>

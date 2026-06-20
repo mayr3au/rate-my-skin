@@ -966,9 +966,9 @@ function RoutineTimeline({ routine, lang }) {
   const stepLabel = (stepType, idx) => {
     if (!stepType) return lang === "fr" ? `Étape ${idx + 1}` : `Step ${idx + 1}`;
     const map = lang === "fr"
-      ? { cleanser: "Nettoyage", oil_cleanser: "Démaquillage", toner: "Lotion", exfoliant: "Exfoliant", serum: "Sérum", moisturizer: "Hydratation", sunscreen: "Protection SPF", mask: "Masque", treatment: "Traitement", eye: "Contour des yeux" }
-      : { cleanser: "Cleanse", oil_cleanser: "Oil cleanse", toner: "Tone", exfoliant: "Exfoliate", serum: "Serum", moisturizer: "Moisturize", sunscreen: "SPF", mask: "Mask", treatment: "Treat", eye: "Eye care" };
-    return map[stepType] || stepType;
+      ? { cleanser: "Nettoyage", oil_cleanser: "Démaquillage", toner: "Lotion", exfoliant: "Exfoliant", serum: "Sérum", treatment: "Traitement", moisturizer: "Hydratation", sunscreen: "Protection SPF", mask: "Masque", eye: "Contour des yeux", eye_cream: "Contour des yeux" }
+      : { cleanser: "Cleanse", oil_cleanser: "Oil cleanse", toner: "Tone", exfoliant: "Exfoliate", serum: "Serum", treatment: "Treat", moisturizer: "Moisturize", sunscreen: "SPF", mask: "Mask", eye: "Eye care", eye_cream: "Eye care" };
+    return map[stepType] || stepType.replace(/_/g, " ");
   };
 
   return (
@@ -1496,6 +1496,30 @@ export default function ReportRefonte({
   const [unlocking, setUnlocking] = useState(false);
   const [pdfLoading, setPdfLoading] = useState(false);
   const [showStickyCta, setShowStickyCta] = useState(false);
+  const [shareMsg, setShareMsg] = useState("");
+
+  const handleShare = async () => {
+    const data = {
+      title: "RateMySkin",
+      text: lang === "fr"
+        ? "J'ai analysé ma peau avec RateMySkin — fais ton diagnostic gratuit en 30 secondes !"
+        : "I analyzed my skin with RateMySkin — get your free 30-second diagnosis!",
+      url: "https://ratemyskin.co",
+    };
+    try {
+      if (typeof navigator !== "undefined" && navigator.share) {
+        await navigator.share(data);
+        return;
+      }
+    } catch (e) {
+      return; // user cancelled the native share sheet
+    }
+    try {
+      await navigator.clipboard.writeText(data.url);
+      setShareMsg(lang === "fr" ? "Lien copié !" : "Link copied!");
+      setTimeout(() => setShareMsg(""), 2200);
+    } catch (e) {}
+  };
 
   useEffect(() => {
     if (isPaid) return;
@@ -1571,8 +1595,8 @@ export default function ReportRefonte({
           padding: 24px 0 0;
         }
 
-        /* Dashboard access CTA */
-        .rfn-dash-cta { display: flex; justify-content: center; padding: 0 26px 10px; }
+        /* Dashboard access + share CTA */
+        .rfn-dash-cta { display: flex; justify-content: center; flex-wrap: wrap; gap: 10px; padding: 0 26px 10px; }
         .rfn-dash-btn {
           display: inline-flex; align-items: center; gap: 8px;
           background: rgba(255,255,255,0.7); border: 1px solid rgba(201,169,97,0.35);
@@ -1584,6 +1608,18 @@ export default function ReportRefonte({
         }
         .rfn-dash-btn:hover { background: #FFFFFF; color: #2C2416; transform: translateY(-1px); }
         .rfn-dash-btn svg { width: 15px; height: 15px; color: #B0885E; }
+        .rfn-share-btn {
+          display: inline-flex; align-items: center; gap: 8px;
+          background: linear-gradient(135deg, rgba(227,194,122,0.22), rgba(201,169,97,0.14));
+          border: 1px solid rgba(201,169,97,0.45);
+          color: #8B6E26; border-radius: 100px; padding: 10px 20px;
+          font-size: 12.5px; font-weight: 700; letter-spacing: 0.04em;
+          font-family: 'DM Sans', sans-serif; cursor: pointer;
+          box-shadow: 0 6px 16px rgba(201,169,97,0.12);
+          transition: background 0.2s, transform 0.2s;
+        }
+        .rfn-share-btn:hover { background: linear-gradient(135deg, rgba(227,194,122,0.32), rgba(201,169,97,0.2)); transform: translateY(-1px); }
+        .rfn-share-btn svg { width: 15px; height: 15px; }
 
         /* Score Hero */
         .rfn-score-hero {
@@ -3606,12 +3642,16 @@ export default function ReportRefonte({
       <div className="rfn-container">
         <ScoreHero score={score} lang={lang} firstName={firstName} isPaid={isPaid} />
 
-        {/* Dashboard access — shown on both free & paid reports */}
+        {/* Dashboard access + share — shown on both free & paid reports */}
         <div className="rfn-dash-cta">
           <a href="/compte" className="rfn-dash-btn">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="7" height="7" rx="1" /><rect x="14" y="3" width="7" height="7" rx="1" /><rect x="14" y="14" width="7" height="7" rx="1" /><rect x="3" y="14" width="7" height="7" rx="1" /></svg>
             {lang === "fr" ? "Accéder à mon espace" : "Go to my dashboard"}
           </a>
+          <button type="button" className="rfn-share-btn" onClick={handleShare} aria-label={lang === "fr" ? "Partager" : "Share"}>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="18" cy="5" r="3" /><circle cx="6" cy="12" r="3" /><circle cx="18" cy="19" r="3" /><line x1="8.6" y1="13.5" x2="15.4" y2="17.5" /><line x1="15.4" y1="6.5" x2="8.6" y2="10.5" /></svg>
+            {shareMsg || (lang === "fr" ? "Partager" : "Share")}
+          </button>
         </div>
 
         {/* Personal analysis (free only) */}
