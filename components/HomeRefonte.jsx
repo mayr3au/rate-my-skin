@@ -925,13 +925,24 @@ export default function HomeRefonte({ onUploadClick, lang = "fr", setLang = () =
           display: flex;
           justify-content: space-between;
           align-items: center;
-          padding: 8px 10px;
+          gap: 9px;
+          padding: 7px 10px;
           background: #fff;
           border: 1px solid rgba(201,169,97,0.18);
           border-left: 3px solid;
-          border-radius: 8px;
+          border-radius: 9px;
           box-shadow: 0 2px 6px rgba(168,116,73,0.04);
         }
+        .hrf-prio-chip-score {
+          width: 24px; height: 24px; border-radius: 50%; flex-shrink: 0;
+          display: flex; align-items: center; justify-content: center;
+          font-family: 'Cormorant Garamond', serif;
+          font-size: 11.5px; font-weight: 700;
+          border: 1.5px solid;
+        }
+        .hrf-prio-chip-score.bad { color: #C77E94; border-color: #D199AB; background: rgba(209,153,171,0.12); }
+        .hrf-prio-chip-score.mid { color: #6F92B0; border-color: #9AB5CE; background: rgba(154,181,206,0.12); }
+        .hrf-prio-chip-score.good { color: #5E9A7E; border-color: #7AAE98; background: rgba(122,174,152,0.12); }
         .hrf-prio-chip-l { flex: 1; min-width: 0; }
         .hrf-prio-chip-z {
           font-size: 7px;
@@ -1975,6 +1986,7 @@ export default function HomeRefonte({ onUploadClick, lang = "fr", setLang = () =
                 </div>
                 <div className="hrf-prio-mini">
                   <div className="hrf-prio-chip" style={{ borderLeftColor: "#D199AB" }}>
+                    <span className="hrf-prio-chip-score bad">56</span>
                     <div className="hrf-prio-chip-l">
                       <div className="hrf-prio-chip-z">{fr ? "Front · Nez" : "Forehead · Nose"}</div>
                       <div className="hrf-prio-chip-n">{fr ? "Pores dilatés" : "Enlarged pores"}</div>
@@ -1982,6 +1994,7 @@ export default function HomeRefonte({ onUploadClick, lang = "fr", setLang = () =
                     <span className="hrf-prio-chip-a">Niacinamide</span>
                   </div>
                   <div className="hrf-prio-chip" style={{ borderLeftColor: "#D199AB" }}>
+                    <span className="hrf-prio-chip-score bad">61</span>
                     <div className="hrf-prio-chip-l">
                       <div className="hrf-prio-chip-z">{fr ? "Contour œil" : "Eye area"}</div>
                       <div className="hrf-prio-chip-n">{fr ? "Cernes marqués" : "Dark circles"}</div>
@@ -1989,6 +2002,7 @@ export default function HomeRefonte({ onUploadClick, lang = "fr", setLang = () =
                     <span className="hrf-prio-chip-a">{fr ? "Caféine" : "Caffeine"}</span>
                   </div>
                   <div className="hrf-prio-chip" style={{ borderLeftColor: "#9AB5CE" }}>
+                    <span className="hrf-prio-chip-score mid">64</span>
                     <div className="hrf-prio-chip-l">
                       <div className="hrf-prio-chip-z">{fr ? "Joues" : "Cheeks"}</div>
                       <div className="hrf-prio-chip-n">{fr ? "Déshydratation" : "Dehydration"}</div>
