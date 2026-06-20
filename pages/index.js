@@ -1341,7 +1341,7 @@ export default function Home({ teaserProducts }) {
                         <div style={{ position: 'relative' }}>
                           <img
                             src={imageUrl} alt="Preview"
-                            style={{ width: '100%', maxHeight: 340, objectFit: 'cover', display: 'block', borderRadius: 16 }}
+                            style={{ width: '100%', maxHeight: 340, objectFit: 'cover', display: 'block', borderRadius: 16, transform: 'scaleX(-1)' }}
                           />
                           <button
                             onClick={(e) => { e.stopPropagation(); fileInputRef.current?.click(); }}
@@ -2138,7 +2138,7 @@ export default function Home({ teaserProducts }) {
                 <div style={{ borderRadius: 14, overflow: 'hidden', boxShadow: 'inset 0 0 0 1px rgba(201,169,97,0.18)' }}>
                   <img
                     src={imageUrl} alt="Preview"
-                    style={{ width: '100%', maxHeight: 360, objectFit: 'cover', display: 'block' }}
+                    style={{ width: '100%', maxHeight: 360, objectFit: 'cover', display: 'block', transform: 'scaleX(-1)' }}
                   />
                 </div>
               </div>
@@ -3040,6 +3040,10 @@ export default function Home({ teaserProducts }) {
               margin: '0 0 28px',
             }}>
               {lang === 'fr' ? 'Choisis ton mode de capture :' : 'Choose your capture mode:'}
+            </p>
+
+            <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 12.5, color: '#8C7A6B', margin: '0 0 20px', lineHeight: 1.45 }}>
+              {lang === 'fr' ? '💡 Cadre bien ton visage · lumière naturelle · sans lunettes' : '💡 Center your face · natural light · no glasses'}
             </p>
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
