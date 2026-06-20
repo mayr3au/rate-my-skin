@@ -279,35 +279,84 @@ function HeatmapFree({ metrics, lang }) {
   const visible = ordered.slice(0, 3);
   const locked = ordered.slice(3);
   const fr = lang === "fr";
+  const goPaywall = () => {
+    if (typeof document !== "undefined") {
+      document.querySelector(".rfn-paywall")?.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+  };
   return (
     <div className="rfn-section">
       <div className="rfn-section-head">
         <h2 className="rfn-section-title">{fr ? "Tes 8 dimensions" : "Your 8 dimensions"}</h2>
         <span className="rfn-section-count">{fr ? `${visible.length} / 8 visibles` : `${visible.length} / 8 visible`}</span>
       </div>
-      <div className="rfn-heatmap">
+      {/* Blurred (not hidden): the colours show through so weak/red zones spark curiosity */}
+      <div className="rfn-heatmap" onClick={goPaywall} style={locked.length ? { cursor: "pointer" } : undefined}>
         {visible.map((m) => (
           <MetricCard key={m.id} metric={m} lang={lang} locked={false} />
         ))}
-        {/* Desktop: show all 5 locked cards. Mobile: hidden via CSS. */}
-        <div className="rfn-locked-desktop" style={{ display: "contents" }}>
-          {locked.map((m) => (
-            <MetricCard key={m.id} metric={m} lang={lang} locked={true} />
-          ))}
-        </div>
+        {locked.map((m) => (
+          <MetricCard key={m.id} metric={m} lang={lang} locked={true} />
+        ))}
       </div>
-      {/* Mobile-only compact locked block */}
       {locked.length > 0 && (
-      <div className="rfn-locked-mobile">
-        <div className="rfn-locked-mobile-icon">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>
-        </div>
-        <div className="rfn-locked-mobile-text">
-          <strong>{fr ? `${locked.length} dimensions cachées` : `${locked.length} dimensions hidden`}</strong>
-          <span>{fr ? "Débloque pour voir Cernes, Taches, Pores, Texture, Hydratation…" : "Unlock to see all metrics…"}</span>
-        </div>
-      </div>
+        <button type="button" className="rfn-heat-unlock" onClick={goPaywall}>
+          <span className="rfn-heat-unlock-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><rect x="5" y="11" width="14" height="10" rx="2" /><path d="M8 11V7a4 4 0 0 1 8 0v4" /></svg>
+          </span>
+          <span className="rfn-heat-unlock-text">
+            <strong>{fr ? `Débloque tes ${locked.length} autres dimensions` : `Unlock your ${locked.length} other dimensions`}</strong>
+            <span>{fr ? "Cernes, Taches, Pores, Texture, Hydratation — vois où ça coince." : "Dark circles, spots, pores, texture, hydration — see where it lags."}</span>
+          </span>
+          <span className="rfn-heat-unlock-arrow">→</span>
+        </button>
       )}
+    </div>
+  );
+}
+
+/* Free teaser: the 3 weakest dimensions named, with a blurred "how to fix"
+   line so the user sees what's wrong but must unlock to see the solution. */
+function FixTeaser({ metrics, lang }) {
+  const fr = lang === "fr";
+  const worst = [...metrics].sort((a, b) => a.score - b.score).slice(0, 3);
+  if (worst.length === 0) return null;
+  const labels = fr ? METRIC_LABELS_FR : METRIC_LABELS_EN;
+  const goPaywall = () => {
+    if (typeof document !== "undefined") {
+      document.querySelector(".rfn-paywall")?.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+  };
+  return (
+    <div className="rfn-section">
+      <div className="rfn-section-head">
+        <h2 className="rfn-section-title">{fr ? "Tes points à régler" : "What to fix"}</h2>
+        <span className="rfn-section-count">{fr ? "Aperçu" : "Preview"}</span>
+      </div>
+      <div className="rfn-fix-list">
+        {worst.map((m, i) => (
+          <button type="button" key={m.id} className="rfn-fix" onClick={goPaywall}>
+            <div className="rfn-fix-rank">{i + 1}</div>
+            <div className="rfn-fix-body">
+              <div className="rfn-fix-top">
+                <span className="rfn-fix-label">{labels[m.id] || m.label}</span>
+                <span className="rfn-fix-score" style={{ color: COLORS[categorize(m.score)] }}>{m.score}/100</span>
+              </div>
+              <p className="rfn-fix-blur" aria-hidden="true">
+                {fr
+                  ? "Cause identifiée, l'actif ciblé et le geste exact pour corriger ce point en quelques semaines — sans produit inutile."
+                  : "Identified cause, the targeted active and the exact step to fix it within weeks — no useless product."}
+              </p>
+            </div>
+            <span className="rfn-fix-lock">
+              <svg viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.4" strokeLinecap="round"><rect x="5" y="11" width="14" height="10" rx="2" /><path d="M8 11V7a4 4 0 0 1 8 0v4" /></svg>
+            </span>
+          </button>
+        ))}
+      </div>
+      <button type="button" className="rfn-fix-cta" onClick={goPaywall}>
+        {fr ? "Voir comment corriger chaque point →" : "See how to fix each one →"}
+      </button>
     </div>
   );
 }
@@ -512,10 +561,52 @@ const CLEANSER_BY_CONCERN_EN = {
   dark_circles: { name: "Toleriane Caring Wash", brand: "La Roche-Posay", price: "€13.50", why: "Gently cleanses the eye area.", actives: "Glycerin · Niacinamide" },
 };
 
+const CLEANSER_IMG = {
+  cleanser: "https://images.unsplash.com/photo-1556228720-195a672e8a03?auto=format&fit=crop&w=260&q=70",
+  cream: "https://images.unsplash.com/photo-1556228453-efd6c1ff04f6?auto=format&fit=crop&w=260&q=70",
+  vitc: "https://images.unsplash.com/photo-1620916566398-39f1143ab7be?auto=format&fit=crop&w=260&q=70",
+};
+function cleanserImage(name = "") {
+  if (/cerave|smoothing/i.test(name)) return CLEANSER_IMG.cream;
+  if (/vitamin c|caudalie/i.test(name)) return CLEANSER_IMG.vitc;
+  return CLEANSER_IMG.cleanser;
+}
+
+function prettyActive(a = "") {
+  return a.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
+}
+
 function CleanserTeaser({ topConcern, lang }) {
   const fr = lang === "fr";
   const map = fr ? CLEANSER_BY_CONCERN_FR : CLEANSER_BY_CONCERN_EN;
-  const product = map[topConcern?.id] || map.hydration;
+  const fallback = map[topConcern?.id] || map.hydration;
+  const [dbProduct, setDbProduct] = useState(null);
+
+  // Pull a real product from the Supabase catalog that matches the need
+  useEffect(() => {
+    let cancelled = false;
+    fetch("/api/recommend-product", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ concern: topConcern?.id, step: "cleanser" }),
+    })
+      .then((r) => (r.ok ? r.json() : null))
+      .then((j) => { if (!cancelled && j?.product) setDbProduct(j.product); })
+      .catch(() => {});
+    return () => { cancelled = true; };
+  }, [topConcern?.id]);
+
+  const p = dbProduct;
+  const name = p?.product_name || fallback.name;
+  const brand = p?.brand || fallback.brand;
+  const price = p?.price || fallback.price;
+  const why = p?.product_description || fallback.why;
+  const actives = p && Array.isArray(p.actives) && p.actives.length
+    ? p.actives.map(prettyActive).join(" · ")
+    : fallback.actives;
+  const img = p?.product_image_url || cleanserImage(name);
+  const buy = p?.amazon_link || p?.sephora_link || null;
+
   return (
     <div className="rfn-section">
       <div className="rfn-section-head">
@@ -526,16 +617,24 @@ function CleanserTeaser({ topConcern, lang }) {
         <div className="rfn-cleanser-step">
           <span className="rfn-cleanser-step-num">01</span>
           <span className="rfn-cleanser-step-lbl">{fr ? "Nettoyage" : "Cleanse"}</span>
+          <div className="rfn-cleanser-img">
+            <ProductImage src={img} alt={name} />
+          </div>
         </div>
         <div className="rfn-cleanser-body">
           <div className="rfn-cleanser-tag">{fr ? "Adapté à ta peau" : "Tailored to your skin"}</div>
-          <h3 className="rfn-cleanser-name">{product.name}</h3>
-          <div className="rfn-cleanser-brand">{product.brand} · <span className="rfn-cleanser-price">{product.price}</span></div>
-          <p className="rfn-cleanser-why">{product.why}</p>
+          <h3 className="rfn-cleanser-name">{name}</h3>
+          <div className="rfn-cleanser-brand">{brand} · <span className="rfn-cleanser-price">{price}</span></div>
+          <p className="rfn-cleanser-why">{why}</p>
           <div className="rfn-cleanser-actives">
             <span className="rfn-cleanser-actives-lbl">{fr ? "Actifs clés" : "Key actives"}</span>
-            <span className="rfn-cleanser-actives-val">{product.actives}</span>
+            <span className="rfn-cleanser-actives-val">{actives}</span>
           </div>
+          {buy && (
+            <a className="rfn-cleanser-buy" href={buy} target="_blank" rel="noopener noreferrer sponsored">
+              {fr ? "Voir le produit" : "View product"} →
+            </a>
+          )}
         </div>
       </div>
       <div className="rfn-cleanser-locked">
@@ -1472,6 +1571,20 @@ export default function ReportRefonte({
           padding: 24px 0 0;
         }
 
+        /* Dashboard access CTA */
+        .rfn-dash-cta { display: flex; justify-content: center; padding: 0 26px 10px; }
+        .rfn-dash-btn {
+          display: inline-flex; align-items: center; gap: 8px;
+          background: rgba(255,255,255,0.7); border: 1px solid rgba(201,169,97,0.35);
+          color: #5C4A3A; border-radius: 100px; padding: 10px 20px;
+          font-size: 12.5px; font-weight: 700; letter-spacing: 0.04em;
+          text-decoration: none; font-family: 'DM Sans', sans-serif; cursor: pointer;
+          box-shadow: 0 6px 16px rgba(94,71,47,0.06);
+          transition: background 0.2s, color 0.2s, transform 0.2s;
+        }
+        .rfn-dash-btn:hover { background: #FFFFFF; color: #2C2416; transform: translateY(-1px); }
+        .rfn-dash-btn svg { width: 15px; height: 15px; color: #B0885E; }
+
         /* Score Hero */
         .rfn-score-hero {
           padding: 38px 26px 32px;
@@ -1938,7 +2051,23 @@ export default function ReportRefonte({
           color: #B0885E;
           margin-top: 4px;
         }
+        .rfn-cleanser-img {
+          width: 58px; height: 58px; flex-shrink: 0;
+          margin-top: 10px;
+          border-radius: 14px; overflow: hidden;
+          border: 1px solid rgba(201,169,97,0.25);
+          background: #F8F4ED;
+          box-shadow: 0 6px 16px rgba(168,116,73,0.08);
+        }
         .rfn-cleanser-body { flex: 1; min-width: 0; }
+        .rfn-cleanser-buy {
+          display: inline-flex; align-items: center; gap: 5px; margin-top: 12px;
+          background: rgba(44,36,22,0.05); border: 1px solid rgba(44,36,22,0.14);
+          color: #2C2416; border-radius: 100px; padding: 8px 16px;
+          font-size: 12px; font-weight: 700; text-decoration: none;
+          font-family: 'DM Sans', sans-serif; transition: background 0.2s;
+        }
+        .rfn-cleanser-buy:hover { background: rgba(44,36,22,0.1); }
         .rfn-cleanser-tag {
           display: inline-block;
           font-size: 9.5px;
@@ -2149,8 +2278,66 @@ export default function ReportRefonte({
         .rfn-locked {
           filter: blur(4px);
           pointer-events: none;
-          opacity: 0.85;
+          opacity: 0.9;
         }
+        /* Unlock bar under the blurred dimensions */
+        .rfn-heat-unlock {
+          display: flex; align-items: center; gap: 12px; width: 100%; text-align: left;
+          margin-top: 10px; padding: 13px 16px;
+          background: linear-gradient(135deg, rgba(44,36,22,0.92), rgba(58,47,34,0.92));
+          border: 1px solid rgba(201,169,97,0.4); border-radius: 16px;
+          cursor: pointer; font-family: 'DM Sans', sans-serif;
+          transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .rfn-heat-unlock:hover { transform: translateY(-1px); box-shadow: 0 10px 26px rgba(44,36,22,0.25); }
+        .rfn-heat-unlock-icon {
+          width: 34px; height: 34px; border-radius: 50%; flex-shrink: 0;
+          background: rgba(201,169,97,0.2); color: #E3C27A;
+          display: flex; align-items: center; justify-content: center;
+        }
+        .rfn-heat-unlock-icon svg { width: 16px; height: 16px; }
+        .rfn-heat-unlock-text { flex: 1; display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+        .rfn-heat-unlock-text strong { font-size: 13px; color: #fff; font-weight: 700; }
+        .rfn-heat-unlock-text span {
+          font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: 12px; color: rgba(255,255,255,0.72);
+        }
+        .rfn-heat-unlock-arrow { color: #E3C27A; font-size: 16px; flex-shrink: 0; }
+
+        /* What-to-fix teaser */
+        .rfn-fix-list { display: flex; flex-direction: column; gap: 10px; }
+        .rfn-fix {
+          display: flex; align-items: center; gap: 12px; width: 100%; text-align: left;
+          background: linear-gradient(135deg, rgba(255,255,255,0.85), rgba(255,253,247,0.7));
+          border: 1px solid rgba(201,169,97,0.22); border-radius: 16px;
+          padding: 14px 16px; cursor: pointer; font-family: 'DM Sans', sans-serif;
+          transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .rfn-fix:hover { transform: translateY(-1px); box-shadow: 0 10px 24px rgba(168,116,73,0.08); }
+        .rfn-fix-rank {
+          width: 24px; height: 24px; border-radius: 50%; flex-shrink: 0;
+          background: rgba(201,169,97,0.14); border: 1px solid rgba(201,169,97,0.3);
+          color: #A87449; font-family: 'Cormorant Garamond', serif; font-size: 13px; font-weight: 700;
+          display: flex; align-items: center; justify-content: center;
+        }
+        .rfn-fix-body { flex: 1; min-width: 0; }
+        .rfn-fix-top { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 5px; }
+        .rfn-fix-label { font-size: 14px; font-weight: 700; color: #2C2416; }
+        .rfn-fix-score { font-size: 12px; font-weight: 700; font-family: 'Cormorant Garamond', serif; flex-shrink: 0; }
+        .rfn-fix-blur { margin: 0; font-size: 12.5px; line-height: 1.45; color: #5C4A3A; filter: blur(4px); user-select: none; }
+        .rfn-fix-lock {
+          align-self: center; flex-shrink: 0;
+          width: 28px; height: 28px; border-radius: 50%;
+          background: rgba(44,36,22,0.85);
+          display: flex; align-items: center; justify-content: center;
+        }
+        .rfn-fix-lock svg { width: 14px; height: 14px; }
+        .rfn-fix-cta {
+          display: block; width: 100%; margin-top: 12px; padding: 13px;
+          background: none; border: 1px dashed rgba(201,169,97,0.45); border-radius: 100px;
+          color: #A87449; font-size: 12.5px; font-weight: 700; letter-spacing: 0.04em;
+          cursor: pointer; font-family: 'DM Sans', sans-serif; transition: background 0.2s;
+        }
+        .rfn-fix-cta:hover { background: rgba(201,169,97,0.08); }
         /* Compact mobile locked block — replaces 5 blurred cards on small screens */
         .rfn-locked-mobile {
           display: none;
@@ -3419,6 +3606,14 @@ export default function ReportRefonte({
       <div className="rfn-container">
         <ScoreHero score={score} lang={lang} firstName={firstName} isPaid={isPaid} />
 
+        {/* Dashboard access — shown on both free & paid reports */}
+        <div className="rfn-dash-cta">
+          <a href="/compte" className="rfn-dash-btn">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="7" height="7" rx="1" /><rect x="14" y="3" width="7" height="7" rx="1" /><rect x="14" y="14" width="7" height="7" rx="1" /><rect x="3" y="14" width="7" height="7" rx="1" /></svg>
+            {lang === "fr" ? "Accéder à mon espace" : "Go to my dashboard"}
+          </a>
+        </div>
+
         {/* Personal analysis (free only) */}
         {!isPaid && metrics.length > 0 && (
           <PersonalAnalysis
@@ -3438,6 +3633,11 @@ export default function ReportRefonte({
         {/* Face Map */}
         {metrics.length > 0 && (
           <FaceMap metrics={metrics} lang={lang} limitTo3={!isPaid} />
+        )}
+
+        {/* What to fix — teaser (free only) */}
+        {!isPaid && metrics.length > 0 && (
+          <FixTeaser metrics={metrics} lang={lang} />
         )}
 
         {/* Trajectory timeline (free only) */}
