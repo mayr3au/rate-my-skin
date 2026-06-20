@@ -146,19 +146,19 @@ Réponds UNIQUEMENT avec du JSON BRUT respectant EXACTEMENT cette structure :
     ],
     "routine": {
       "morning": [
-        { "stepText": "Nettoyer en douceur", "productId": "<ID du produit choisi parmi les candidats du slot morning.cleanser>" },
-        { "stepText": "Appliquer un sérum ciblé", "productId": "<ID du produit choisi parmi les candidats du slot morning.serum>" },
-        { "stepText": "Hydrater avec une crème adaptée", "productId": "<ID du produit choisi parmi les candidats du slot morning.moisturizer>" },
-        { "stepText": "Protéger avec un SPF50+", "productId": "<ID du produit choisi parmi les candidats du slot morning.sunscreen>" }
+        { "stepText": "Nettoyer en douceur", "productId": "<ID du produit choisi parmi les candidats du slot morning.cleanser>", "whyItHelps": "<1 phrase: en quoi CE produit répond au problème précis observé sur SA peau (cite l'actif ou la préoccupation)>", "applicationTip": "<1 phrase: comment l'appliquer concrètement (quantité, moment, geste)>" },
+        { "stepText": "Appliquer un sérum ciblé", "productId": "<ID du produit choisi parmi les candidats du slot morning.serum>", "whyItHelps": "<1 phrase personnalisée à sa peau>", "applicationTip": "<1 phrase concrète d'application>" },
+        { "stepText": "Hydrater avec une crème adaptée", "productId": "<ID du produit choisi parmi les candidats du slot morning.moisturizer>", "whyItHelps": "<1 phrase personnalisée à sa peau>", "applicationTip": "<1 phrase concrète d'application>" },
+        { "stepText": "Protéger avec un SPF50+", "productId": "<ID du produit choisi parmi les candidats du slot morning.sunscreen>", "whyItHelps": "<1 phrase personnalisée à sa peau>", "applicationTip": "<1 phrase concrète d'application>" }
       ],
       "evening": [
-        { "stepText": "Première étape : démaquillant huileux", "productId": "<ID du produit choisi parmi les candidats du slot evening.oil_cleanser ou null>" },
-        { "stepText": "Deuxième étape : nettoyant doux", "productId": "<ID du produit choisi parmi les candidats du slot evening.cleanser>" },
-        { "stepText": "Appliquer un traitement ciblé", "productId": "<ID du produit choisi parmi les candidats du slot evening.treatment>" },
-        { "stepText": "Crème hydratante nuit", "productId": "<ID du produit choisi parmi les candidats du slot evening.moisturizer>" }
+        { "stepText": "Première étape : démaquillant huileux", "productId": "<ID du produit choisi parmi les candidats du slot evening.oil_cleanser ou null>", "whyItHelps": "<1 phrase personnalisée à sa peau>", "applicationTip": "<1 phrase concrète d'application>" },
+        { "stepText": "Deuxième étape : nettoyant doux", "productId": "<ID du produit choisi parmi les candidats du slot evening.cleanser>", "whyItHelps": "<1 phrase personnalisée à sa peau>", "applicationTip": "<1 phrase concrète d'application>" },
+        { "stepText": "Appliquer un traitement ciblé", "productId": "<ID du produit choisi parmi les candidats du slot evening.treatment>", "whyItHelps": "<1 phrase personnalisée à sa peau>", "applicationTip": "<1 phrase concrète (fréquence, précautions)>" },
+        { "stepText": "Crème hydratante nuit", "productId": "<ID du produit choisi parmi les candidats du slot evening.moisturizer>", "whyItHelps": "<1 phrase personnalisée à sa peau>", "applicationTip": "<1 phrase concrète d'application>" }
       ],
       "weekly": [
-        { "stepText": "Exfolier 1-2x par semaine", "productId": "<ID du produit choisi parmi les candidats du slot weekly.exfoliant>" }
+        { "stepText": "Exfolier 1-2x par semaine", "productId": "<ID du produit choisi parmi les candidats du slot weekly.exfoliant>", "whyItHelps": "<1 phrase personnalisée à sa peau>", "applicationTip": "<1 phrase concrète (fréquence, jamais le même soir que le rétinol)>" }
       ]
     },
     "productRecommendations": [
@@ -192,6 +192,7 @@ RÈGLES CRUCIALES :
 - N'utilise JAMAIS de tiret cadratin (—) ni de tiret long (–). Remplace-les par des virgules, des points ou des parenthèses. Les traits d'union des mots composés restent autorisés.
 - SÉLECTION UNIQUE ET STRICTE DES PRODUITS : Pour chaque étape de la routine, tu DOIS choisir EXACTEMENT UN produit de la liste de candidats fournie pour ce slot précis, et mettre son ID dans le champ "productId". Ne modifie pas la valeur "stepText". Si la liste de candidats est vide (ou pour le slot optionnel si aucun ne convient), renvoie null pour "productId". Tu ne dois INVENTER aucun nom ou ID de produit.
 - productRecommendations doit comporter EXACTEMENT 3-4 éléments correspondant à des produits sélectionnés dans la routine ci-dessus, avec leur description.
+- Pour CHAQUE étape de routine, "whyItHelps" et "applicationTip" sont OBLIGATOIRES et doivent être PERSONNALISÉS à SA peau (la préoccupation/le score observé) et au produit choisi, jamais une phrase générique réutilisable. Maximum 18 mots chacun.
 - CONCISION ABSOLUE : Rédige des phrases extrêmement courtes. Supprime tout bavardage inutile, introduction ou explication longue.
 - Conseils cosmétiques uniquement. Aucune allégation médicale ni promesse de traitement. Pour une affection persistante ou sévère, recommander de consulter un professionnel de santé.
 - Ne pas envelopper la réponse dans des blocs de code markdown.`;
@@ -230,19 +231,19 @@ Respond ONLY with RAW JSON matching EXACTLY this structure:
     ],
     "routine": {
       "morning": [
-        { "stepText": "Cleanse gently", "productId": "<product ID chosen from morning.cleanser candidates>" },
-        { "stepText": "Apply a targeted serum", "productId": "<product ID chosen from morning.serum candidates>" },
-        { "stepText": "Hydrate with a suitable cream", "productId": "<product ID chosen from morning.moisturizer candidates>" },
-        { "stepText": "Protect with SPF50+", "productId": "<product ID chosen from morning.sunscreen candidates>" }
+        { "stepText": "Cleanse gently", "productId": "<product ID chosen from morning.cleanser candidates>", "whyItHelps": "<1 sentence: how THIS product addresses the specific concern seen on THEIR skin (name the active or concern)>", "applicationTip": "<1 sentence: how to apply it concretely (amount, timing, gesture)>" },
+        { "stepText": "Apply a targeted serum", "productId": "<product ID chosen from morning.serum candidates>", "whyItHelps": "<1 sentence personalized to their skin>", "applicationTip": "<1 concrete application sentence>" },
+        { "stepText": "Hydrate with a suitable cream", "productId": "<product ID chosen from morning.moisturizer candidates>", "whyItHelps": "<1 sentence personalized to their skin>", "applicationTip": "<1 concrete application sentence>" },
+        { "stepText": "Protect with SPF50+", "productId": "<product ID chosen from morning.sunscreen candidates>", "whyItHelps": "<1 sentence personalized to their skin>", "applicationTip": "<1 concrete application sentence>" }
       ],
       "evening": [
-        { "stepText": "Step one: oil-based makeup remover", "productId": "<product ID chosen from evening.oil_cleanser candidates or null>" },
-        { "stepText": "Step two: gentle cleanser", "productId": "<product ID chosen from evening.cleanser candidates>" },
-        { "stepText": "Apply a targeted treatment", "productId": "<product ID chosen from evening.treatment candidates>" },
-        { "stepText": "Overnight hydrating cream", "productId": "<product ID chosen from evening.moisturizer candidates>" }
+        { "stepText": "Step one: oil-based makeup remover", "productId": "<product ID chosen from evening.oil_cleanser candidates or null>", "whyItHelps": "<1 sentence personalized to their skin>", "applicationTip": "<1 concrete application sentence>" },
+        { "stepText": "Step two: gentle cleanser", "productId": "<product ID chosen from evening.cleanser candidates>", "whyItHelps": "<1 sentence personalized to their skin>", "applicationTip": "<1 concrete application sentence>" },
+        { "stepText": "Apply a targeted treatment", "productId": "<product ID chosen from evening.treatment candidates>", "whyItHelps": "<1 sentence personalized to their skin>", "applicationTip": "<1 concrete sentence (frequency, precautions)>" },
+        { "stepText": "Overnight hydrating cream", "productId": "<product ID chosen from evening.moisturizer candidates>", "whyItHelps": "<1 sentence personalized to their skin>", "applicationTip": "<1 concrete application sentence>" }
       ],
       "weekly": [
-        { "stepText": "Exfoliate 1-2x per week", "productId": "<product ID chosen from weekly.exfoliant candidates>" }
+        { "stepText": "Exfoliate 1-2x per week", "productId": "<product ID chosen from weekly.exfoliant candidates>", "whyItHelps": "<1 sentence personalized to their skin>", "applicationTip": "<1 concrete sentence (frequency, never same night as retinol)>" }
       ]
     },
     "productRecommendations": [
@@ -275,6 +276,7 @@ CRITICAL RULES:
 - NEVER use em-dashes (—) or en-dashes (–). Replace them with commas, periods, or parentheses. Hyphens in compound words remain allowed.
 - STRICT AND EXCLUSIVE PRODUCT MATCHING: For each routine step, you MUST choose EXACTLY ONE product from the candidates list provided for that slot and set its "productId". Do not modify "stepText". If the candidate list is empty (or for the optional slot if none is suitable), return null for "productId". Do NOT invent any product name or ID.
 - productRecommendations must contain EXACTLY 3-4 items matching products selected in the routine above, with their description.
+- For EVERY routine step, "whyItHelps" and "applicationTip" are MANDATORY and must be PERSONALIZED to their skin (the observed concern/score) and the chosen product, never a generic reusable sentence. Max 18 words each.
 - ABSOLUTE BREVITY: Write extremely short sentences. Remove any unnecessary explanations or fluff.
 - Cosmetic advice only. No medical claims or treatment promises. For persistent or severe conditions, recommend consulting a healthcare professional.
 - Do NOT wrap output in markdown code blocks.`;
@@ -581,6 +583,9 @@ export default async function handler(req, res) {
 
               validatedRoutine[timeOfDay].push({
                 stepText: slot.stepText,
+                // Carry the AI's per-step personalized advice through to the report
+                whyItHelps: stepData.whyItHelps || stepData.why_it_helps || null,
+                applicationTip: stepData.applicationTip || stepData.application_tip || null,
                 productId: finalId,
                 productName: finalName,
                 brand: finalBrand,
