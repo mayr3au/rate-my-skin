@@ -9,6 +9,13 @@ import Footer from "./Footer";
    Helpers
    ════════════════════════════════════════════════════════════════════════ */
 
+// Realistic 8-week projection — a believable gain capped well below 100,
+// so the promise stays credible (a 100/100 promise erodes trust).
+function projectedTarget(score) {
+  const base = Math.max(1, Math.min(100, Math.round(score || 0)));
+  return Math.min(97, base + Math.max(6, Math.round((100 - base) * 0.5)));
+}
+
 const COLORS = {
   good: "#7AAE98",
   mid: "#9AB5CE",
@@ -146,10 +153,10 @@ function ScoreHero({ score, lang, firstName, isPaid }) {
       : "Here is your skin today";
 
   const verdictFr = isPaid
-    ? <>Plan personnalisé prêt — <strong>objectif {Math.min(100, safeScore + 20)} en 8 semaines</strong></>
+    ? <>Plan personnalisé prêt — <strong>objectif {projectedTarget(safeScore)} en 8 semaines</strong></>
     : <>Ta peau a du <strong>potentiel</strong> — mais quelques choses la ralentissent.</>;
   const verdictEn = isPaid
-    ? <>Plan ready — <strong>target {Math.min(100, safeScore + 20)} in 8 weeks</strong></>
+    ? <>Plan ready — <strong>target {projectedTarget(safeScore)} in 8 weeks</strong></>
     : <>Your skin has <strong>potential</strong> — but a few things slow it down.</>;
 
   return (
@@ -461,7 +468,7 @@ function StrengthsShowcase({ metrics, lang }) {
 function TrajectoryTimeline({ score, lang }) {
   const fr = lang === "fr";
   const from = Math.max(1, Math.min(100, Math.round(score || 0)));
-  const to = Math.min(100, from + 20);
+  const to = projectedTarget(from);
   const diff = to - from;
   const diffStr = "+" + diff;
   const w2 = Math.round(from + diff * 0.25);
@@ -999,7 +1006,7 @@ function RoutineTimeline({ routine, lang }) {
 
 function ProgressionChart({ score, lang, locked }) {
   const from = Math.max(1, Math.min(100, Math.round(score || 0)));
-  const to = Math.min(100, from + 20);
+  const to = projectedTarget(from);
   return (
     <div className="rfn-section">
       <div className="rfn-section-head">
