@@ -23,46 +23,100 @@ function GoogleIcon() {
   );
 }
 
-function Sparkline({ values, w = 320, h = 78 }) {
-  if (!values || values.length < 2) return null;
-  const min = Math.min(...values);
-  const max = Math.max(...values);
-  const range = max - min || 1;
-  const pad = 10;
-  const innerW = w - pad * 2;
-  const innerH = h - pad * 2 - 4;
-  const pts = values.map((v, i) => {
-    const x = pad + (innerW * i) / (values.length - 1);
-    const y = pad + innerH * (1 - (v - min) / range);
-    return [x, y];
-  });
+/* Evolution chart with a real scale: score gridlines (Y), date labels (X),
+   the current value, and a dashed target line — so the user reads both
+   "where am I" and "over how long". */
+function EvoChart({ points, target, fr }) {
+  if (!points || points.length < 2) return null;
+  const W = 320, H = 158;
+  const padL = 30, padR = 16, padT = 16, padB = 28;
+  const iW = W - padL - padR, iH = H - padT - padB;
+  const scores = points.map((p) => p.score);
+  const lo = Math.min(...scores, target ?? 100);
+  const hi = Math.max(...scores, target ?? 0);
+  let yMin = Math.max(0, Math.floor((lo - 6) / 10) * 10);
+  let yMax = Math.min(100, Math.ceil((hi + 6) / 10) * 10);
+  if (yMax - yMin < 30) yMax = Math.min(100, yMin + 40);
+  if (yMax <= yMin) yMax = yMin + 10;
+  const xAt = (i) => padL + (iW * i) / (points.length - 1);
+  const yAt = (v) => padT + iH * (1 - (v - yMin) / (yMax - yMin));
+  const ticks = [yMin, Math.round((yMin + yMax) / 2), yMax];
+  const pts = points.map((p, i) => [xAt(i), yAt(p.score)]);
   const line = pts.map((p, i) => `${i ? 'L' : 'M'}${p[0].toFixed(1)} ${p[1].toFixed(1)}`).join(' ');
   const last = pts[pts.length - 1];
-  const area = `${line} L${last[0].toFixed(1)} ${h - pad} L${pts[0][0].toFixed(1)} ${h - pad} Z`;
+  const area = `${line} L${last[0].toFixed(1)} ${(padT + iH).toFixed(1)} L${pts[0][0].toFixed(1)} ${(padT + iH).toFixed(1)} Z`;
+  const showTarget = target != null && target > yMin && target < yMax;
+  const ty = showTarget ? yAt(target) : null;
+  const moShort = (d) => new Date(d).toLocaleDateString(fr ? 'fr-FR' : 'en-US', { day: 'numeric', month: 'short' });
   return (
-    <svg viewBox={`0 0 ${w} ${h}`} xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+    <svg viewBox={`0 0 ${W} ${H}`} xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
       <defs>
-        <linearGradient id="cmpSparkLine" x1="0" y1="0" x2="1" y2="0">
-          <stop offset="0%" stopColor="#C9A961" />
-          <stop offset="100%" stopColor="#4CAF7D" />
+        <linearGradient id="cmpEvoLine" x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0%" stopColor="#C9A961" /><stop offset="100%" stopColor="#4CAF7D" />
         </linearGradient>
-        <linearGradient id="cmpSparkFill" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stopColor="rgba(76,175,125,0.20)" />
-          <stop offset="100%" stopColor="rgba(76,175,125,0)" />
+        <linearGradient id="cmpEvoFill" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stopColor="rgba(76,175,125,0.18)" /><stop offset="100%" stopColor="rgba(76,175,125,0)" />
         </linearGradient>
       </defs>
-      <path d={area} fill="url(#cmpSparkFill)" />
-      <path d={line} fill="none" stroke="url(#cmpSparkLine)" strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round" />
+      {ticks.map((t, i) => (
+        <g key={'y' + i}>
+          <line x1={padL} y1={yAt(t)} x2={W - padR} y2={yAt(t)} stroke="rgba(94,71,47,0.10)" strokeWidth="1" strokeDasharray={i === 0 ? '0' : '3 3'} />
+          <text x={padL - 7} y={yAt(t) + 3} textAnchor="end" fontSize="9" fill="#A8997F" fontFamily="'DM Sans',sans-serif">{t}</text>
+        </g>
+      ))}
+      {showTarget && (
+        <g>
+          <line x1={padL} y1={ty} x2={W - padR} y2={ty} stroke="#B0885E" strokeWidth="1" strokeDasharray="4 3" opacity="0.65" />
+          <text x={W - padR} y={ty - 4} textAnchor="end" fontSize="8.5" fontWeight="700" fill="#B0885E" fontFamily="'DM Sans',sans-serif">{fr ? `Objectif ${target}` : `Goal ${target}`}</text>
+        </g>
+      )}
+      <path d={area} fill="url(#cmpEvoFill)" />
+      <path d={line} fill="none" stroke="url(#cmpEvoLine)" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" />
       {pts.map((p, i) => {
         const isLast = i === pts.length - 1;
-        return (
-          <circle key={i} cx={p[0]} cy={p[1]} r={isLast ? 4.5 : 3}
-            fill={isLast ? '#4CAF7D' : '#FFFFFF'}
-            stroke={isLast ? '#FFFFFF' : '#C9A961'} strokeWidth="1.6" />
-        );
+        return <circle key={'p' + i} cx={p[0]} cy={p[1]} r={isLast ? 4.5 : 3} fill={isLast ? '#4CAF7D' : '#FFFFFF'} stroke={isLast ? '#FFFFFF' : '#C9A961'} strokeWidth="1.6" />;
+      })}
+      <text x={last[0]} y={last[1] - 9} textAnchor="middle" fontSize="11" fontWeight="700" fill="#2C2416" fontFamily="'Cormorant Garamond',serif">{scores[scores.length - 1]}</text>
+      {points.map((p, i) => {
+        const show = i === 0 || i === points.length - 1 || points.length <= 3;
+        if (!show) return null;
+        const anchor = i === 0 ? 'start' : i === points.length - 1 ? 'end' : 'middle';
+        return <text key={'x' + i} x={xAt(i)} y={H - 9} textAnchor={anchor} fontSize="9" fill="#A8997F" fontFamily="'DM Sans',sans-serif">{moShort(p.date)}</text>;
       })}
     </svg>
   );
+}
+
+/* Constant per-skin-type advice — stable value that's always shown,
+   independent of the score, to make the dashboard useful between scans. */
+const SKIN_TYPE_LABEL = {
+  fr: { mixte: 'Peau mixte', seche: 'Peau sèche', grasse: 'Peau grasse', sensible: 'Peau sensible', normale: 'Peau normale' },
+  en: { mixte: 'Combination', seche: 'Dry skin', grasse: 'Oily skin', sensible: 'Sensitive skin', normale: 'Normal skin' },
+};
+const SKIN_TIPS = {
+  fr: {
+    mixte: ['Nettoie matin et soir avec un gel doux, sans décaper.', 'Hydrate la zone T en gel léger, les joues en crème plus riche.', 'Exfolie 1 à 2 fois/semaine pour garder les pores nets.'],
+    seche: ['Choisis un nettoyant sans savon et rince à l’eau tiède.', 'Applique ta crème sur peau encore humide pour sceller l’eau.', 'Ajoute un sérum à l’acide hyaluronique le soir.'],
+    grasse: ['Nettoyant moussant doux, 2 fois par jour maximum.', 'Intègre la niacinamide pour réguler le sébum.', 'SPF fluide non comédogène chaque matin.'],
+    sensible: ['Garde une routine minimaliste, peu d’actifs à la fois.', 'Évite parfums et alcool dans tes produits.', 'Teste tout nouveau produit avant de l’appliquer sur le visage.'],
+    normale: ['Maintiens une routine simple et régulière.', 'SPF tous les matins, sans exception.', 'Vitamine C le matin pour protéger ton éclat.'],
+  },
+  en: {
+    mixte: ['Cleanse morning and night with a gentle gel, no stripping.', 'Hydrate the T-zone with a light gel, cheeks with a richer cream.', 'Exfoliate 1–2×/week to keep pores clear.'],
+    seche: ['Use a soap-free cleanser and rinse with lukewarm water.', 'Apply moisturizer on still-damp skin to seal in water.', 'Add a hyaluronic acid serum at night.'],
+    grasse: ['Gentle foaming cleanser, twice a day maximum.', 'Add niacinamide to regulate sebum.', 'Lightweight non-comedogenic SPF every morning.'],
+    sensible: ['Keep a minimal routine, few actives at a time.', 'Avoid fragrance and alcohol in your products.', 'Patch-test any new product before using it on your face.'],
+    normale: ['Keep a simple, consistent routine.', 'SPF every morning, no exception.', 'Vitamin C in the morning to protect your glow.'],
+  },
+};
+function normSkinType(s = '') {
+  const t = s.toLowerCase();
+  if (/(mixte|combinat)/.test(t)) return 'mixte';
+  if (/(s[èe]che|\bdry\b)/.test(t)) return 'seche';
+  if (/(grasse|oily)/.test(t)) return 'grasse';
+  if (/(sensible|sensitive)/.test(t)) return 'sensible';
+  if (/(normale|normal)/.test(t)) return 'normale';
+  return 'mixte';
 }
 
 function ScoreRing({ score, size = 52 }) {
@@ -190,6 +244,25 @@ export default function ComptePage() {
     ? rescanTarget.toLocaleDateString(fr ? 'fr-FR' : 'en-US', { month: 'long', year: 'numeric' })
     : null;
   const rescanDue = rescanTarget ? Date.now() >= rescanTarget.getTime() : false;
+
+  // Time span covered by the journey (for the chart caption)
+  const spanDays = hasJourney
+    ? Math.round((new Date(scoredAsc[scoredAsc.length - 1].createdAt) - new Date(scoredAsc[0].createdAt)) / 86400000)
+    : 0;
+  const spanLabel = spanDays >= 55
+    ? `${Math.round(spanDays / 30)} ${fr ? 'mois' : 'months'}`
+    : `${Math.max(1, Math.round(spanDays / 7))} ${fr ? 'sem.' : 'wks'}`;
+
+  // Constant skin profile + advice (stable between scans), from the latest report
+  const latest = reports?.find((r) => r.score != null) || null;
+  const skinTypeRaw = latest?.faceShape || latest?.reportJson?.skinType || '';
+  const skinToneRaw = latest?.skinTone || latest?.reportJson?.skinTone || '';
+  const concernRaw = latest?.skinConcern || latest?.reportJson?.mainConcern || '';
+  const skinKey = normSkinType(skinTypeRaw || concernRaw);
+  const skinTypeLabel = skinTypeRaw || SKIN_TYPE_LABEL[fr ? 'fr' : 'en'][skinKey];
+  const skinTips = SKIN_TIPS[fr ? 'fr' : 'en'][skinKey] || SKIN_TIPS[fr ? 'fr' : 'en'].mixte;
+  const hasPremium = paidCount > 0;
+  const evoPoints = scoredAsc.map((r) => ({ score: r.score, date: r.createdAt }));
 
   return (
     <>
@@ -327,18 +400,12 @@ export default function ComptePage() {
 
                   {hasJourney ? (
                     <>
-                      <div className="cmp-evo-chart"><Sparkline values={evoScores} /></div>
-                      <div className="cmp-evo-axis">
-                        <span>{shortDate(scoredAsc[0].createdAt)} · {firstScore}</span>
-                        <span>{shortDate(scoredAsc[scoredAsc.length - 1].createdAt)} · {lastScore}</span>
-                      </div>
-                      {nextMilestone > lastScore && (
-                        <p className="cmp-evo-foot">
-                          {fr
-                            ? <>Prochain palier : <strong>{nextMilestone}/100</strong>. Garde ta routine et confirme-le à ton prochain rescan.</>
-                            : <>Next milestone: <strong>{nextMilestone}/100</strong>. Keep your routine and confirm it at your next rescan.</>}
-                        </p>
-                      )}
+                      <div className="cmp-evo-chart"><EvoChart points={evoPoints} target={nextMilestone} fr={fr} /></div>
+                      <p className="cmp-evo-foot">
+                        {fr
+                          ? <>Sur <strong>{spanLabel}</strong>{nextMilestone > lastScore ? <> · prochain palier <strong>{nextMilestone}/100</strong>. Garde ta routine et confirme-le à ton prochain rescan.</> : <>. Continue ta routine pour tenir ce niveau.</>}</>
+                          : <>Over <strong>{spanLabel}</strong>{nextMilestone > lastScore ? <> · next milestone <strong>{nextMilestone}/100</strong>. Keep your routine and confirm it at your next rescan.</> : <>. Keep your routine to hold this level.</>}</>}
+                      </p>
                     </>
                   ) : (
                     <div className="cmp-evo-goal">
@@ -353,6 +420,75 @@ export default function ComptePage() {
                       </p>
                     </div>
                   )}
+                </div>
+              )}
+
+              {/* Constant skin profile + advice — value between scans */}
+              {latest && (
+                <div className="cmp-profile">
+                  <div className="cmp-profile-head">
+                    <span className="cmp-profile-eyebrow">{fr ? 'Ton profil peau' : 'Your skin profile'}</span>
+                    <span className="cmp-profile-note">{fr ? 'Constant · ta routine s’y adapte' : 'Constant · your routine adapts to it'}</span>
+                  </div>
+                  <div className="cmp-profile-grid">
+                    <div className="cmp-profile-item">
+                      <span className="cmp-profile-lab">{fr ? 'Type de peau' : 'Skin type'}</span>
+                      <span className="cmp-profile-val">{skinTypeLabel}</span>
+                    </div>
+                    {skinToneRaw && (
+                      <div className="cmp-profile-item">
+                        <span className="cmp-profile-lab">{fr ? 'Carnation' : 'Skin tone'}</span>
+                        <span className="cmp-profile-val">{skinToneRaw}</span>
+                      </div>
+                    )}
+                    {concernRaw && (
+                      <div className="cmp-profile-item">
+                        <span className="cmp-profile-lab">{fr ? 'Préoccupation' : 'Main concern'}</span>
+                        <span className="cmp-profile-val">{concernRaw}</span>
+                      </div>
+                    )}
+                  </div>
+                  <div className="cmp-tips">
+                    <p className="cmp-tips-title">
+                      {fr ? <>3 réflexes pour ta <em>{skinTypeLabel.toLowerCase()}</em></> : <>3 habits for your <em>{skinTypeLabel.toLowerCase()}</em></>}
+                    </p>
+                    <ul className="cmp-tips-list">
+                      {skinTips.map((tip, i) => (
+                        <li key={i}><span className="cmp-tips-num">{i + 1}</span><span>{tip}</span></li>
+                      ))}
+                    </ul>
+                  </div>
+                </div>
+              )}
+
+              {/* Smart CTA — push free users to premium, premium users to rescan */}
+              {latest && (
+                <div className={`cmp-cta ${!hasPremium ? 'unlock' : rescanDue ? 'due' : 'rescan'}`}>
+                  <div className="cmp-cta-icon">
+                    {!hasPremium ? (
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="11" width="18" height="10" rx="2" /><path d="M7 11V7a5 5 0 0 1 10 0" /></svg>
+                    ) : (
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M21 12a9 9 0 1 1-2.64-6.36" /><path d="M21 4v5h-5" /></svg>
+                    )}
+                  </div>
+                  <div className="cmp-cta-body">
+                    <p className="cmp-cta-title">
+                      {!hasPremium
+                        ? (fr ? 'Débloque ta routine sur-mesure' : 'Unlock your tailored routine')
+                        : rescanDue
+                          ? (fr ? "C'est le moment de ton rescan" : 'Time for your rescan')
+                          : (fr ? (rescanLabel ? `Prochain rescan : ${rescanLabel}` : 'Programme ton prochain rescan') : (rescanLabel ? `Next rescan: ${rescanLabel}` : 'Schedule your next rescan'))}
+                    </p>
+                    <p className="cmp-cta-text">
+                      {!hasPremium
+                        ? (fr ? 'Routine matin & soir, tes 5 zones prioritaires et le suivi de ton évolution — dès 7,99 €.' : 'Morning & evening routine, your 5 priority zones and progress tracking — from €7.99.')
+                        : (fr ? 'Refais une analyse pour mesurer ton évolution réelle, score par score.' : 'Run a new analysis to measure your real progress, score by score.')}
+                    </p>
+                  </div>
+                  <button className="cmp-cta-btn" onClick={() => (!hasPremium ? openReport(latest) : router.push('/'))}>
+                    <span className="star">✦</span>
+                    {!hasPremium ? (fr ? 'Voir mon plan' : 'See my plan') : (fr ? 'Faire mon rescan' : 'Do my rescan')}
+                  </button>
                 </div>
               )}
 
@@ -371,34 +507,6 @@ export default function ComptePage() {
                   <span>{fr ? 'Analyse IA dermatologique' : 'Dermatology-grade AI'}</span>
                 </div>
               </div>
-
-              {/* Rescan reminder */}
-              {rescanTarget && (
-                <div className={`cmp-rescan${rescanDue ? ' due' : ''}`}>
-                  <div className="cmp-rescan-icon">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-                      <path d="M21 12a9 9 0 1 1-2.64-6.36" /><path d="M21 4v5h-5" />
-                    </svg>
-                  </div>
-                  <div className="cmp-rescan-body">
-                    <p className="cmp-rescan-title">
-                      {rescanDue
-                        ? (fr ? "C'est le moment de ton rescan !" : 'Time for your rescan!')
-                        : (fr ? `Ton rescan est prévu pour ${rescanLabel}` : `Your rescan is set for ${rescanLabel}`)}
-                    </p>
-                    <p className="cmp-rescan-text">
-                      {fr
-                        ? 'Refais une analyse pour mesurer ton évolution réelle, score par score.'
-                        : 'Run a new analysis to measure your real progress, score by score.'}
-                    </p>
-                  </div>
-                  {rescanDue && (
-                    <button className="cmp-rescan-cta" onClick={() => router.push('/')}>
-                      {fr ? 'Faire mon rescan' : 'Do my rescan'}
-                    </button>
-                  )}
-                </div>
-              )}
 
               {/* Reports */}
               <div className="cmp-section-head">
@@ -627,6 +735,98 @@ export default function ComptePage() {
         }
         .cmp-evo-goal-text { font-size: 12.5px; color: #6F5A44; margin: 16px 0 0; line-height: 1.45; }
         .cmp-evo-goal-text strong { color: #2C2416; font-weight: 700; }
+
+        /* ── Skin profile + tips (constant) ── */
+        .cmp-profile {
+          background: linear-gradient(165deg, #FFFFFF 0%, #FDFAF3 100%);
+          border: 1px solid rgba(201,169,97,0.24); border-radius: 22px;
+          padding: 18px 20px; margin-bottom: 14px;
+          box-shadow: 0 10px 28px rgba(94,71,47,0.05), inset 0 1px 0 rgba(255,255,255,0.9);
+        }
+        .cmp-profile-head {
+          display: flex; align-items: baseline; justify-content: space-between;
+          gap: 10px; flex-wrap: wrap; margin-bottom: 12px;
+        }
+        .cmp-profile-eyebrow {
+          font-size: 10px; letter-spacing: 0.22em; text-transform: uppercase;
+          color: #C9A961; font-weight: 700;
+        }
+        .cmp-profile-note {
+          font-size: 13px; color: #A8997F; font-style: italic;
+          font-family: 'Cormorant Garamond', serif;
+        }
+        .cmp-profile-grid { display: flex; flex-wrap: wrap; gap: 10px; }
+        .cmp-profile-item {
+          flex: 1; min-width: 110px;
+          background: rgba(201,169,97,0.06); border: 1px solid rgba(201,169,97,0.16);
+          border-radius: 14px; padding: 11px 14px;
+        }
+        .cmp-profile-lab {
+          display: block; font-size: 9.5px; letter-spacing: 0.12em; text-transform: uppercase;
+          color: #B0885E; font-weight: 700; margin-bottom: 4px;
+        }
+        .cmp-profile-val {
+          display: block; font-family: 'Cormorant Garamond', serif; font-size: 18px;
+          color: #2C2416; line-height: 1.1;
+        }
+        .cmp-tips { margin-top: 16px; padding-top: 14px; border-top: 1px solid rgba(201,169,97,0.16); }
+        .cmp-tips-title {
+          font-family: 'Cormorant Garamond', serif; font-size: 17px; color: #2C2416; margin: 0 0 10px;
+        }
+        .cmp-tips-title em { font-style: italic; color: #B0885E; }
+        .cmp-tips-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 9px; }
+        .cmp-tips-list li { display: flex; align-items: flex-start; gap: 10px; font-size: 13px; color: #4A3C32; line-height: 1.45; }
+        .cmp-tips-num {
+          flex-shrink: 0; width: 20px; height: 20px; border-radius: 50%;
+          background: rgba(201,169,97,0.14); border: 1px solid rgba(201,169,97,0.3);
+          color: #A87449; font-size: 11px; font-weight: 700; font-family: 'Cormorant Garamond', serif;
+          display: flex; align-items: center; justify-content: center; margin-top: 1px;
+        }
+
+        /* ── Smart CTA ── */
+        .cmp-cta {
+          display: flex; align-items: center; gap: 14px; flex-wrap: wrap;
+          border-radius: 20px; padding: 18px 20px; margin-bottom: 24px;
+        }
+        .cmp-cta.unlock {
+          background: linear-gradient(135deg, #2C2416 0%, #3A2F22 100%);
+          border: 1px solid rgba(201,169,97,0.4);
+        }
+        .cmp-cta.rescan {
+          background: linear-gradient(135deg, rgba(196,154,170,0.12), rgba(201,169,97,0.08));
+          border: 1px solid rgba(196,154,170,0.3);
+        }
+        .cmp-cta.due {
+          border: 1px solid rgba(201,169,97,0.5);
+          background: linear-gradient(135deg, rgba(201,169,97,0.16), rgba(227,194,122,0.1));
+        }
+        .cmp-cta-icon {
+          width: 42px; height: 42px; border-radius: 50%; flex-shrink: 0;
+          display: flex; align-items: center; justify-content: center;
+        }
+        .cmp-cta-icon svg { width: 20px; height: 20px; }
+        .cmp-cta.unlock .cmp-cta-icon { background: rgba(201,169,97,0.18); color: #E3C27A; }
+        .cmp-cta.rescan .cmp-cta-icon, .cmp-cta.due .cmp-cta-icon { background: rgba(255,255,255,0.6); border: 1px solid rgba(201,169,97,0.3); color: #B0885E; }
+        .cmp-cta-body { flex: 1; min-width: 180px; }
+        .cmp-cta-title { font-size: 15px; font-weight: 700; margin: 0 0 3px; }
+        .cmp-cta-text { font-size: 12.5px; margin: 0; line-height: 1.45; }
+        .cmp-cta.unlock .cmp-cta-title { color: #FFFFFF; }
+        .cmp-cta.unlock .cmp-cta-text { color: rgba(255,255,255,0.82); }
+        .cmp-cta.rescan .cmp-cta-title, .cmp-cta.due .cmp-cta-title { color: #2C2416; }
+        .cmp-cta.rescan .cmp-cta-text, .cmp-cta.due .cmp-cta-text { color: #6F5A44; }
+        .cmp-cta-btn {
+          display: inline-flex; align-items: center; gap: 7px; flex-shrink: 0;
+          border: none; border-radius: 100px; padding: 12px 20px;
+          font-size: 12px; font-weight: 700; letter-spacing: 0.04em; cursor: pointer; font-family: inherit;
+        }
+        .cmp-cta.unlock .cmp-cta-btn {
+          background: linear-gradient(135deg, #E3C27A, #C9A961); color: #2C2416;
+          box-shadow: 0 8px 20px rgba(201,169,97,0.3);
+        }
+        .cmp-cta.rescan .cmp-cta-btn, .cmp-cta.due .cmp-cta-btn {
+          background: linear-gradient(135deg, #C9A961, #B0885E); color: #fff;
+        }
+        .cmp-cta-btn .star { font-size: 10px; }
 
         /* ── Trust strip ── */
         .cmp-trust {

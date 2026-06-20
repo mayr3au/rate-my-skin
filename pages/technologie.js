@@ -47,7 +47,7 @@ const COPY = {
     scienceTitle: "Une méthode ",
     scienceTitleEm: "transparente",
     scienceItems: [
-      { title: "Référentiel dermatologique", desc: "Notre IA est entraînée sur un dataset de plus de 200 000 visages annotés par des dermatologues, reflétant la diversité des phototypes Fitzpatrick I à VI." },
+      { title: "Référentiel dermatologique", desc: "Notre IA s'appuie sur des critères dermatologiques reconnus et reste pertinente sur l'ensemble des phototypes Fitzpatrick I à VI." },
       { title: "Pas une boîte noire", desc: "Chaque score est justifié par les observations visuelles (« forte densité de pores zone nasale ») et reliable à une action concrète." },
       { title: "Photos jamais stockées", desc: "Ton image transite uniquement pour l'analyse. Aucune donnée biométrique n'est conservée sur nos serveurs après le diagnostic." },
       { title: "Calibré dans le temps", desc: "Le modèle est ré-évalué chaque trimestre avec un comité dermato pour éviter les dérives et garder une précision constante." },
@@ -101,7 +101,7 @@ const COPY = {
     scienceTitle: "A ",
     scienceTitleEm: "transparent",
     scienceItems: [
-      { title: "Dermatology benchmark", desc: "Our AI is trained on a dataset of 200,000+ faces annotated by dermatologists, covering Fitzpatrick phototypes I to VI." },
+      { title: "Dermatology benchmark", desc: "Our AI relies on recognized dermatological criteria and stays relevant across Fitzpatrick phototypes I to VI." },
       { title: "Not a black box", desc: "Every score is justified by visual observations (\"high pore density in nose area\") and tied to a concrete action." },
       { title: "Photos never stored", desc: "Your image is only processed for analysis. No biometric data is kept on our servers afterwards." },
       { title: "Continuously calibrated", desc: "The model is re-evaluated every quarter with a dermatology panel to prevent drift and maintain precision." },
@@ -430,12 +430,25 @@ export default function Technologie() {
 
         /* Face visual */
         .tech-face-visual {
-          width: 280px;
-          height: 320px;
+          width: 100%;
+          max-width: 270px;
           margin: 0 auto 40px;
           position: relative;
         }
-        .tech-face-visual svg { width: 100%; height: 100%; }
+        .tech-face-visual::before {
+          content: "";
+          display: block;
+          padding-bottom: 132.2%; /* 1812 / 1371 — match the mesh image */
+        }
+        .tech-face-img {
+          position: absolute;
+          inset: 0;
+          width: 100%;
+          height: 100%;
+          object-fit: contain;
+          user-select: none;
+          -webkit-user-drag: none;
+        }
         .tech-face-pulse {
           position: absolute;
           width: 14px; height: 14px;
@@ -447,6 +460,95 @@ export default function Technologie() {
         @keyframes tech-pulse {
           0%, 100% { transform: scale(1); opacity: 0.6; box-shadow: 0 0 0 0 rgba(201,169,97,0.4); }
           50% { transform: scale(1.15); opacity: 0.9; box-shadow: 0 0 0 12px rgba(201,169,97,0); }
+        }
+        /* Scan sweep */
+        .tech-scan {
+          position: absolute;
+          left: 9%; right: 9%;
+          top: 6%;
+          height: 2px;
+          border-radius: 2px;
+          background: linear-gradient(90deg, transparent, rgba(201,169,97,0.85), transparent);
+          box-shadow: 0 0 14px 2px rgba(201,169,97,0.4);
+          pointer-events: none;
+          animation: tech-scanmove 3.6s cubic-bezier(0.45,0,0.55,1) infinite;
+        }
+        @keyframes tech-scanmove {
+          0% { top: 6%; opacity: 0; }
+          14% { opacity: 1; }
+          86% { opacity: 1; }
+          100% { top: 92%; opacity: 0; }
+        }
+        /* Floating dimension callouts */
+        .tech-tag {
+          position: absolute;
+          display: inline-flex;
+          align-items: center;
+          gap: 6px;
+          padding: 5px 11px;
+          background: rgba(255,255,255,0.92);
+          border: 1px solid rgba(201,169,97,0.28);
+          border-radius: 100px;
+          font-family: 'DM Sans', sans-serif;
+          font-size: 11px;
+          font-weight: 600;
+          color: #5C4A3A;
+          white-space: nowrap;
+          box-shadow: 0 6px 18px rgba(94,71,47,0.08);
+          -webkit-backdrop-filter: blur(4px);
+          backdrop-filter: blur(4px);
+          animation: tech-tagfloat 4.5s ease-in-out infinite;
+        }
+        .tech-tag i {
+          width: 6px; height: 6px; border-radius: 50%;
+          background: #C9A961; flex-shrink: 0;
+          box-shadow: 0 0 0 3px rgba(201,169,97,0.18);
+        }
+        .tech-tag.tl { left: -8px; }
+        .tech-tag.tr { right: -8px; }
+        .tech-tag.tr i { order: 2; }
+        @keyframes tech-tagfloat {
+          0%, 100% { transform: translateY(0); }
+          50% { transform: translateY(-4px); }
+        }
+        @media (max-width: 420px) {
+          .tech-tag { font-size: 10px; padding: 4px 9px; }
+          .tech-tag.tl { left: -4px; }
+          .tech-tag.tr { right: -4px; }
+        }
+        /* Credibility stats */
+        .tech-stats {
+          display: flex;
+          flex-wrap: wrap;
+          justify-content: center;
+          gap: 10px 14px;
+          max-width: 470px;
+          margin: 0 auto;
+        }
+        .tech-stat {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          min-width: 96px;
+          padding: 14px 16px;
+          background: linear-gradient(135deg, #FFFFFF 0%, #FDFAF4 100%);
+          border: 1px solid rgba(201,169,97,0.2);
+          border-radius: 16px;
+          box-shadow: 0 1px 0 rgba(255,255,255,0.9) inset, 0 10px 24px rgba(168,116,73,0.04);
+        }
+        .tech-stat strong {
+          font-family: 'Cormorant Garamond', serif;
+          font-size: 28px;
+          font-weight: 600;
+          color: #2C2416;
+          line-height: 1;
+        }
+        .tech-stat span {
+          font-size: 10.5px;
+          color: #8A7A6B;
+          margin-top: 6px;
+          text-align: center;
+          letter-spacing: 0.02em;
         }
       `}</style>
 
@@ -462,36 +564,27 @@ export default function Technologie() {
             </h1>
             <p className="tech-lede">{t.sub}</p>
 
-            {/* Face visual with pulsing scan points */}
+            {/* Face mesh (same asset as the report) — live-scan visual */}
             <div className="tech-face-visual">
-              <svg viewBox="0 0 200 240" xmlns="http://www.w3.org/2000/svg">
-                <defs>
-                  <radialGradient id="tech-face-shade" cx="50%" cy="42%" r="58%">
-                    <stop offset="0%" stopColor="#FFFFFF" stopOpacity="0.7" />
-                    <stop offset="100%" stopColor="#F5EBDB" stopOpacity="0" />
-                  </radialGradient>
-                </defs>
-                <path
-                  d="M 100 28 C 80 28, 64 48, 60 76 C 56 106, 60 136, 70 162 C 78 184, 88 206, 100 218 C 112 206, 122 184, 130 162 C 140 136, 144 106, 140 76 C 136 48, 120 28, 100 28 Z"
-                  fill="url(#tech-face-shade)" stroke="#C9A961" strokeWidth="1.3" opacity="0.9"
-                />
-                <path d="M 68 84 Q 76 80 84 84" stroke="#C9A961" strokeWidth="1" fill="none" opacity="0.4" strokeLinecap="round" />
-                <path d="M 116 84 Q 124 80 132 84" stroke="#C9A961" strokeWidth="1" fill="none" opacity="0.4" strokeLinecap="round" />
-                <path d="M 68 98 Q 76 93 84 98 Q 76 103 68 98 Z" fill="#C9A961" opacity="0.45" />
-                <path d="M 116 98 Q 124 93 132 98 Q 124 103 116 98 Z" fill="#C9A961" opacity="0.45" />
-                <circle cx="76" cy="98" r="1.2" fill="#5C4A3A" opacity="0.6" />
-                <circle cx="124" cy="98" r="1.2" fill="#5C4A3A" opacity="0.6" />
-                <path d="M 100 108 L 100 132 Q 100 138 96 140 M 100 140 Q 104 138 104 140" fill="none" stroke="#C9A961" strokeWidth="0.9" opacity="0.42" strokeLinecap="round" />
-                <path d="M 86 158 Q 100 154 114 158" stroke="#C9A961" strokeWidth="0.9" fill="none" opacity="0.45" strokeLinecap="round" />
-                <path d="M 88 158 Q 100 165 112 158" stroke="#C9A961" strokeWidth="0.7" fill="none" opacity="0.28" strokeLinecap="round" />
-              </svg>
-              {/* Pulsing scan dots */}
-              <div className="tech-face-pulse" style={{ top: "24%", left: "47%", animationDelay: "0s" }}></div>
-              <div className="tech-face-pulse" style={{ top: "42%", left: "32%", animationDelay: "0.4s" }}></div>
-              <div className="tech-face-pulse" style={{ top: "42%", left: "62%", animationDelay: "0.8s" }}></div>
-              <div className="tech-face-pulse" style={{ top: "55%", left: "30%", animationDelay: "1.2s" }}></div>
-              <div className="tech-face-pulse" style={{ top: "55%", left: "65%", animationDelay: "1.6s" }}></div>
-              <div className="tech-face-pulse" style={{ top: "76%", left: "47%", animationDelay: "2s" }}></div>
+              <img className="tech-face-img" src="/images/face-mesh.png" alt={t.eyebrow} draggable="false" />
+              <div className="tech-scan"></div>
+              {/* Scan points on the mesh */}
+              <div className="tech-face-pulse" style={{ top: "20%", left: "50%", animationDelay: "0s" }}></div>
+              <div className="tech-face-pulse" style={{ top: "40%", left: "38%", animationDelay: "0.6s" }}></div>
+              <div className="tech-face-pulse" style={{ top: "40%", left: "62%", animationDelay: "1.2s" }}></div>
+              <div className="tech-face-pulse" style={{ top: "82%", left: "50%", animationDelay: "1.8s" }}></div>
+              {/* Floating dimension callouts */}
+              <span className="tech-tag tl" style={{ top: "29%", animationDelay: "0s" }}><i></i>{fr ? "Hydratation" : "Hydration"}</span>
+              <span className="tech-tag tr" style={{ top: "37%", animationDelay: "0.8s" }}><i></i>{fr ? "Éclat" : "Radiance"}</span>
+              <span className="tech-tag tl" style={{ top: "60%", animationDelay: "1.4s" }}><i></i>{fr ? "Rougeurs" : "Redness"}</span>
+              <span className="tech-tag tr" style={{ top: "69%", animationDelay: "2s" }}><i></i>{fr ? "Texture" : "Texture"}</span>
+            </div>
+
+            {/* Credibility stats */}
+            <div className="tech-stats">
+              <div className="tech-stat"><strong>8</strong><span>{fr ? "dimensions analysées" : "dimensions analyzed"}</span></div>
+              <div className="tech-stat"><strong>~30s</strong><span>{fr ? "par diagnostic" : "per diagnosis"}</span></div>
+              <div className="tech-stat"><strong>I–VI</strong><span>{fr ? "phototypes couverts" : "phototypes covered"}</span></div>
             </div>
           </div>
         </div>

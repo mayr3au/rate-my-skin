@@ -574,10 +574,12 @@ export default function HomeRefonte({ onUploadClick, lang = "fr", setLang = () =
           .hrf-nav-left, .hrf-nav-right { gap: 8px; }
           .hrf-logo { font-size: 20px; padding: 0; gap: 4px; }
           .hrf-logo .star { font-size: 12px; }
-          /* Declutter: language switch lives in the drawer, account is in the menu */
+          /* Declutter: language switch lives in the drawer; the header CTA is
+             dropped on phones (still in hero + drawer) and replaced by the
+             account access. */
           .hrf-lang { display: none; }
-          .hrf-account { display: none; }
-          .hrf-nav-cta { margin-left: 0; padding: 9px 15px; font-size: 10px; }
+          .hrf-nav-cta { display: none; }
+          .hrf-account { display: inline-flex; }
           .hrf-burger { padding: 6px 8px; }
           .hrf-burger svg { width: 18px; height: 18px; }
         }
@@ -1712,7 +1714,7 @@ export default function HomeRefonte({ onUploadClick, lang = "fr", setLang = () =
                   </span>
                   <span className="hrf-menu-body">
                     <span className="hrf-menu-title">{fr ? "Résultats" : "Results"}</span>
-                    <span className="hrf-menu-desc">{fr ? "15 000+ analyses, témoignages" : "15,000+ analyses, testimonials"}</span>
+                    <span className="hrf-menu-desc">{fr ? "Témoignages & avant / après" : "Testimonials & before / after"}</span>
                   </span>
                 </a>
                 <a href="#pricing" className="hrf-menu-item" onClick={() => setOpenMenu(null)}>
@@ -1891,8 +1893,7 @@ export default function HomeRefonte({ onUploadClick, lang = "fr", setLang = () =
               </button>
             </div>
             <div className="hrf-trust-mini">
-              <span className="stars">★★★★★</span>
-              <span><strong>4,9 / 5</strong> · 15 000+ {fr ? "analyses" : "analyses"}</span>
+              <span>{fr ? "Gratuit · 30 secondes" : "Free · 30 seconds"}</span>
               <span className="sep">·</span>
               <span>{fr ? "Sans inscription" : "No signup"}</span>
               <span className="sep">·</span>
@@ -2307,20 +2308,6 @@ export default function HomeRefonte({ onUploadClick, lang = "fr", setLang = () =
         <div className="hrf-section hrf-center" id="results">
           <div className="hrf-eyebrow">{fr ? "Résultats" : "Results"}</div>
           <h2 className="hrf-h2">{fr ? <>Elles ont essayé. <em>Voici ce qui a changé.</em></> : <>They tried. <em>Here's what changed.</em></>}</h2>
-          <div className="hrf-stats">
-            <div className="hrf-stat">
-              <div className="hrf-stat-num">15<em>k+</em></div>
-              <div className="hrf-stat-lbl">{fr ? "Analyses réalisées" : "Analyses run"}</div>
-            </div>
-            <div className="hrf-stat">
-              <div className="hrf-stat-num">4,9<em>/5</em></div>
-              <div className="hrf-stat-lbl">{fr ? "Note moyenne · 1 200 avis" : "Avg rating · 1,200 reviews"}</div>
-            </div>
-            <div className="hrf-stat">
-              <div className="hrf-stat-num">82<em>%</em></div>
-              <div className="hrf-stat-lbl">{fr ? "Amélioration visible en 8 sem." : "Visible improvement in 8 wks"}</div>
-            </div>
-          </div>
           <div className="hrf-testimonials">
             <div className="hrf-tcard">
               <div className="hrf-tcard-stars">★★★★★</div>

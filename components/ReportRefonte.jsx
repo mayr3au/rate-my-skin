@@ -1029,7 +1029,6 @@ function TestimonialBlock({ lang }) {
     <div className="rfn-section">
       <div className="rfn-section-head">
         <h2 className="rfn-section-title">{fr ? "Ce qu'elles disent" : "What they say"}</h2>
-        <span className="rfn-section-count">★★★★★ 4,9 / 5</span>
       </div>
       <div className="rfn-testi-list">
         {list.map((t, i) => (

@@ -339,7 +339,7 @@ export default function NavBar({ ctaLabel, ctaHref = "/", ctaOnClick }) {
                 </a>
                 <a href="/#results" className="nbr-menu-item">
                   <span className="nbr-menu-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 17 9 11 13 15 21 7" /><polyline points="14 7 21 7 21 14" /></svg></span>
-                  <span className="nbr-menu-body"><span className="nbr-menu-title">{fr ? "Résultats" : "Results"}</span><span className="nbr-menu-desc">{fr ? "15 000+ analyses, témoignages" : "15,000+ analyses, testimonials"}</span></span>
+                  <span className="nbr-menu-body"><span className="nbr-menu-title">{fr ? "Résultats" : "Results"}</span><span className="nbr-menu-desc">{fr ? "Témoignages & avant / après" : "Testimonials & before / after"}</span></span>
                 </a>
                 <a href="/#pricing" className="nbr-menu-item">
                   <span className="nbr-menu-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10" /><line x1="12" y1="4" x2="12" y2="20" /></svg></span>
