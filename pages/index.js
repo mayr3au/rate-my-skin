@@ -655,7 +655,7 @@ export default function Home({ teaserProducts }) {
         if (pendingAction === 'file') {
           fileInputRef.current?.click();
         } else if (pendingAction === 'camera') {
-          setShowMultiAngle(true);
+          openCamera();
         } else {
           handleAnalyse(true);
         }
@@ -664,12 +664,26 @@ export default function Home({ teaserProducts }) {
     }, 650);
   };
 
+  /* ── Ouvre la caméra : input natif sur mobile / in-app browsers (getUserMedia y est
+     bloqué, notamment dans le navigateur intégré Facebook/Instagram sur Android),
+     caméra custom getUserMedia uniquement sur desktop. ── */
+  const openCamera = () => {
+    const ua = typeof navigator !== 'undefined' ? navigator.userAgent || '' : '';
+    const isMobile = /Android|iPhone|iPad|iPod|Mobile/i.test(ua);
+    const noGetUserMedia = typeof navigator === 'undefined' || !navigator.mediaDevices?.getUserMedia;
+    if (isMobile || noGetUserMedia) {
+      cameraInputRef.current?.click();
+    } else {
+      setShowMultiAngle(true);
+    }
+  };
+
   /* ── Email gate guard: show overlay or proceed directly ── */
   const requireEmail = (action, e) => {
     if (e) e.stopPropagation();
     if (emailCaptured) {
       if (action === 'file') fileInputRef.current?.click();
-      else if (action === 'camera') setShowMultiAngle(true);
+      else if (action === 'camera') openCamera();
     } else {
       setPendingAction(action);
       setOverlayVisible(true);
@@ -1789,7 +1803,7 @@ export default function Home({ teaserProducts }) {
                           {lang === 'fr' ? 'Matin & soir, étapes complètes et conseils.' : 'AM & PM, full steps and tips.'}
                         </p>
                         <button
-                          onClick={() => setShowMultiAngle(true)}
+                          onClick={() => openCamera()}
                           style={{
                             background: '#2C2416', color: '#fff', border: 'none', padding: '14px 24px', borderRadius: 100, fontFamily: "'DM Sans', sans-serif", fontSize: 14, fontWeight: 700, cursor: 'pointer', transition: 'all 0.3s ease', boxShadow: '0 8px 24px rgba(44,36,22,0.15)', width: '100%',
                           }}
@@ -3033,7 +3047,7 @@ export default function Home({ teaserProducts }) {
               <button
                 onClick={() => {
                   setShowUploadSelector(false);
-                  setShowMultiAngle(true);
+                  openCamera();
                 }}
                 style={{
                   display: 'flex',
