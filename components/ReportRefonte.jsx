@@ -1497,6 +1497,13 @@ export default function ReportRefonte({
   isPaid,
   onUnlock,
   firstName,
+  emailCaptured = true,
+  emailSkipped = false,
+  email = "",
+  setEmail = () => {},
+  emailLoading = false,
+  handleEmailSubmit = (e) => { if (e) e.preventDefault(); },
+  handleEmailSkip = () => {},
 }) {
   const { lang } = useLang();
   const data = useMemo(() => sanitizeReport(rawData, lang), [rawData, lang]);
@@ -1540,6 +1547,18 @@ export default function ReportRefonte({
     return () => window.removeEventListener('scroll', onScroll);
   }, [isPaid]);
 
+  // Funnel tracking: paywall_viewed (une fois par session, quand le rapport gratuit + paywall sont affichés)
+  useEffect(() => {
+    if (isPaid || !data) return;
+    if (typeof window === "undefined" || !window.gtag) return;
+    if (sessionStorage.getItem('rms_sent_paywall_viewed') === '1') return;
+    window.gtag('event', 'paywall_viewed', {
+      event_category: 'conversion_funnel',
+      event_label: 'free_report_paywall',
+    });
+    sessionStorage.setItem('rms_sent_paywall_viewed', '1');
+  }, [isPaid, data]);
+
   const metrics = useMemo(() => {
     if (!data) return [];
     const paid = data.paid_version || {};
@@ -1564,6 +1583,14 @@ export default function ReportRefonte({
   const mainProblems = freeData.mainProblems || [];
 
   const handleUnlock = async (planId = "single") => {
+    if (typeof window !== "undefined" && window.gtag) {
+      window.gtag('event', 'checkout_clicked', {
+        event_category: 'conversion_funnel',
+        event_label: 'paywall_cta',
+        value: planId === 'pack' ? 19.99 : 7.99,
+        currency: 'EUR',
+      });
+    }
     setUnlocking(true);
     try {
       await onUnlock(planId);
@@ -3738,10 +3765,33 @@ export default function ReportRefonte({
           <ImprovementSpace lang={lang} firstName={firstName} />
         )}
 
-        {/* Testimonials + Paywall (free) */}
+        {/* Testimonials + Email capture + Paywall (free) */}
         {!isPaid && (
           <>
             <TestimonialBlock lang={lang} />
+            {!emailCaptured && !emailSkipped && (
+              <form onSubmit={(e) => { e.preventDefault(); handleEmailSubmit(e); }} style={{ margin: "28px 26px 0", background: "#FFFDFA", border: "1px solid rgba(201,169,97,0.25)", borderRadius: 20, padding: "26px 22px", textAlign: "center", boxShadow: "0 12px 32px rgba(168,116,73,0.06)" }}>
+                <div style={{ fontSize: 30, marginBottom: 8 }}>📩</div>
+                <h3 style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: 24, color: "#2C2416", margin: "0 0 6px", fontWeight: 600 }}>
+                  {lang === "fr" ? "Reçois ton rapport et tes conseils" : "Get your report & tips"}
+                </h3>
+                <p style={{ fontSize: 14, color: "#7d735f", margin: "0 0 18px", lineHeight: 1.5 }}>
+                  {lang === "fr" ? "On t'envoie ton score et tes conseils peau par email. Gratuit, zéro spam." : "We'll email your score and skin tips. Free, no spam."}
+                </p>
+                <input
+                  type="email" required inputMode="email" autoComplete="email"
+                  placeholder={lang === "fr" ? "Ton email" : "Your email"}
+                  value={email} onChange={(e) => setEmail(e.target.value)}
+                  style={{ width: "100%", maxWidth: 320, padding: "13px 16px", borderRadius: 12, border: "1px solid rgba(201,169,97,0.4)", fontSize: 15, fontFamily: "'DM Sans', sans-serif", marginBottom: 12, outline: "none", boxSizing: "border-box" }}
+                />
+                <button type="submit" disabled={emailLoading} style={{ display: "block", width: "100%", maxWidth: 320, margin: "0 auto", background: "linear-gradient(135deg,#2C2416,#1A150C)", color: "#fff", border: "none", borderRadius: 100, padding: "14px 24px", fontSize: 15, fontWeight: 700, fontFamily: "'DM Sans', sans-serif", cursor: "pointer" }}>
+                  {emailLoading ? "…" : (lang === "fr" ? "Recevoir mes conseils" : "Get my tips")}
+                </button>
+                <button type="button" onClick={handleEmailSkip} style={{ background: "none", border: "none", color: "#9a8f7a", fontSize: 12.5, marginTop: 12, cursor: "pointer", fontFamily: "'DM Sans', sans-serif", textDecoration: "underline" }}>
+                  {lang === "fr" ? "Continuer sans" : "Continue without"}
+                </button>
+              </form>
+            )}
             <Paywall onUnlock={handleUnlock} unlocking={unlocking} lang={lang} score={score} />
           </>
         )}
