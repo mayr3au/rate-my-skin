@@ -99,6 +99,7 @@ export default function Report() {
   const [paidUnlocks, setPaidUnlocks] = useState(0);
   const [notFound, setNotFound] = useState(false);
   const [checkingPayment, setCheckingPayment] = useState(false);
+  const [checkoutError, setCheckoutError] = useState(null);
 
   const [progress, setProgress] = useState(0);
   const [analysisStep, setAnalysisStep] = useState(0);
@@ -568,7 +569,17 @@ export default function Report() {
 
   // 4. handleUnlock: calls checkout, redirects to Stripe
   const handleUnlock = async (planId) => {
-    if (!userId || !analysisId) return;
+    setCheckoutError(null);
+
+    if (!userId || !analysisId) {
+      setCheckoutError(
+        lang === 'fr'
+          ? 'Session en cours de chargement. Patientez quelques secondes puis réessayez.'
+          : 'Session still loading. Please wait a moment and try again.'
+      );
+      return;
+    }
+
     const email = typeof window !== 'undefined'
       ? (localStorage.getItem('rms_user_email') || localStorage.getItem('rms_email') || '')
       : '';
@@ -583,9 +594,7 @@ export default function Report() {
         body: JSON.stringify({ userId, analysisId, planId, email }),
       });
 
-      if (!res.ok) {
-        throw new Error('Server error');
-      }
+      if (!res.ok) throw new Error('Server error');
 
       let json;
       try {
@@ -602,7 +611,11 @@ export default function Report() {
         window.rms_is_redirecting_to_stripe = false;
         sessionStorage.removeItem('rms_pending_plan_id');
       }
-      console.error('Checkout error:', err.message);
+      setCheckoutError(
+        lang === 'fr'
+          ? 'Une erreur est survenue. Merci de réessayer ou de nous contacter.'
+          : 'Something went wrong. Please try again or contact us.'
+      );
     }
   };
 
@@ -1000,6 +1013,7 @@ export default function Report() {
           data={data}
           isPaid={isPaid}
           onUnlock={handleUnlock}
+          checkoutError={checkoutError}
           analysesCount={analysesCount}
           emailCaptured={emailCaptured}
           setEmailCaptured={setEmailCaptured}

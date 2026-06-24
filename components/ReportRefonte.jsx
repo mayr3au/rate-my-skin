@@ -1183,7 +1183,7 @@ const PAYWALL_FEATURES_EN = [
   "Full face map · Downloadable PDF report",
 ];
 
-function Paywall({ onUnlock, unlocking, lang, score = 0 }) {
+function Paywall({ onUnlock, unlocking, lang, score = 0, checkoutError = null }) {
   const fr = lang === "fr";
   const features = fr ? PAYWALL_FEATURES_FR : PAYWALL_FEATURES_EN;
   const base = Math.max(1, Math.round(score || 0));
@@ -1281,6 +1281,23 @@ function Paywall({ onUnlock, unlocking, lang, score = 0 }) {
               ? `Débloquer — ${selected === "pack" ? "19,99 €" : "7,99 €"}`
               : `Unlock — ${selected === "pack" ? "€19.99" : "€7.99"}`)}
       </button>
+
+      {checkoutError && (
+        <p style={{
+          margin: "10px 0 0",
+          padding: "10px 14px",
+          background: "rgba(220, 38, 38, 0.07)",
+          border: "1px solid rgba(220, 38, 38, 0.2)",
+          borderRadius: "10px",
+          fontSize: "13px",
+          color: "#b91c1c",
+          textAlign: "center",
+          fontFamily: "'DM Sans', sans-serif",
+          lineHeight: 1.5,
+        }}>
+          {checkoutError}
+        </p>
+      )}
 
       {/* Trust row */}
       <div className="rfn-pw-trust">
@@ -1496,6 +1513,7 @@ export default function ReportRefonte({
   data: rawData,
   isPaid,
   onUnlock,
+  checkoutError = null,
   firstName,
   emailCaptured = true,
   emailSkipped = false,
@@ -3792,7 +3810,7 @@ export default function ReportRefonte({
                 </button>
               </form>
             )}
-            <Paywall onUnlock={handleUnlock} unlocking={unlocking} lang={lang} score={score} />
+            <Paywall onUnlock={handleUnlock} unlocking={unlocking} lang={lang} score={score} checkoutError={checkoutError} />
           </>
         )}
 
