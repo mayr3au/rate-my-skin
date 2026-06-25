@@ -5,7 +5,7 @@ import Footer from "./Footer";
    HomeRefonte — landing en 7 actes éditoriaux
    ════════════════════════════════════════════════════════════════════════ */
 
-export default function HomeRefonte({ onUploadClick, lang = "fr", setLang = () => {}, t = (k) => k }) {
+export default function HomeRefonte({ onUploadClick, onPickFile, onPickCamera, lang = "fr", setLang = () => {}, t = (k) => k }) {
   const [scrolled, setScrolled] = useState(false);
   const [scoreAnim, setScoreAnim] = useState(0);
   const [openFaq, setOpenFaq] = useState(0);
@@ -630,11 +630,28 @@ export default function HomeRefonte({ onUploadClick, lang = "fr", setLang = () =
           font-size: clamp(18px, 2vw, 22px);
           color: #5C4A3A;
           line-height: 1.5;
-          margin: 0 0 32px;
+          margin: 0 0 26px;
           max-width: 460px;
         }
         @media (max-width: 880px) {
           .hrf-h1-sub { margin-left: auto; margin-right: auto; }
+        }
+        .hrf-step1 {
+          display: inline-flex;
+          align-items: center;
+          gap: 7px;
+          font-family: 'DM Sans', sans-serif;
+          font-size: 10px;
+          letter-spacing: 0.24em;
+          text-transform: uppercase;
+          color: #B0885E;
+          font-weight: 700;
+          margin-bottom: 11px;
+        }
+        .hrf-step1::before {
+          content: "";
+          width: 18px; height: 1px;
+          background: linear-gradient(90deg, transparent, #C9A961);
         }
         .hrf-cta-row {
           display: flex;
@@ -646,6 +663,55 @@ export default function HomeRefonte({ onUploadClick, lang = "fr", setLang = () =
         @media (max-width: 880px) {
           .hrf-cta-row { justify-content: center; }
         }
+        /* Inline upload box — the analysis starts right here */
+        .hrf-upload-box {
+          max-width: 430px;
+          margin-bottom: 22px;
+          padding: 18px 18px 16px;
+          background: linear-gradient(180deg, rgba(255,255,255,0.72), rgba(253,250,244,0.5));
+          border: 1.5px dashed rgba(201,169,97,0.45);
+          border-radius: 22px;
+          box-shadow: 0 1px 0 rgba(255,255,255,0.9) inset, 0 14px 34px rgba(168,116,73,0.06);
+        }
+        @media (max-width: 880px) { .hrf-upload-box { margin-left: auto; margin-right: auto; } }
+        .hrf-upload-head {
+          display: flex; align-items: center; justify-content: center; gap: 9px;
+          text-align: center;
+          font-family: 'DM Sans', sans-serif; font-size: 12.5px; font-weight: 600;
+          color: #6F5A44; margin-bottom: 14px;
+        }
+        .hrf-upload-head svg { width: 18px; height: 18px; color: #B0885E; flex-shrink: 0; }
+        .hrf-upload-actions { display: flex; gap: 10px; }
+        @media (max-width: 420px) { .hrf-upload-actions { flex-direction: column; } }
+        .hrf-upload-btn {
+          flex: 1; display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+          border-radius: 100px; padding: 14px 18px; cursor: pointer;
+          font-family: 'DM Sans', sans-serif; font-size: 12.5px; font-weight: 700;
+          letter-spacing: 0.03em; white-space: nowrap; border: none;
+          transition: transform 0.22s, box-shadow 0.22s, background 0.22s, color 0.22s;
+        }
+        .hrf-upload-btn svg { width: 16px; height: 16px; flex-shrink: 0; }
+        .hrf-upload-btn.primary {
+          background: linear-gradient(180deg, #3A2F22 0%, #2C2416 50%, #1A1410 100%);
+          color: #fff; box-shadow: 0 8px 20px rgba(44,36,22,0.22);
+        }
+        .hrf-upload-btn.primary:hover { transform: translateY(-1px); box-shadow: 0 12px 26px rgba(44,36,22,0.28); }
+        .hrf-upload-btn.ghost {
+          background: rgba(255,255,255,0.7); color: #5C4A3A;
+          border: 1px solid rgba(201,169,97,0.4);
+        }
+        .hrf-upload-btn.ghost:hover { background: #fff; color: #2C2416; transform: translateY(-1px); }
+        .hrf-upload-privacy {
+          display: flex; align-items: center; gap: 10px;
+          margin-top: 12px; padding: 10px 13px;
+          background: rgba(122,174,152,0.1);
+          border: 1px solid rgba(122,174,152,0.3);
+          border-radius: 13px;
+          font-family: 'DM Sans', sans-serif; font-size: 11.5px; line-height: 1.4;
+          color: #4A6B5A;
+        }
+        .hrf-upload-privacy svg { width: 17px; height: 17px; color: #5E9A7E; flex-shrink: 0; }
+        .hrf-upload-privacy strong { color: #3E7A5E; font-weight: 700; }
         .hrf-cta-primary {
           background: linear-gradient(180deg, #3A2F22 0%, #2C2416 50%, #1A1410 100%);
           color: #fff;
@@ -1886,29 +1952,46 @@ export default function HomeRefonte({ onUploadClick, lang = "fr", setLang = () =
           <div>
             <span className="hrf-hero-pill">
               <span style={{ color: "#C9A961" }}>✦</span>
-              {fr ? "Analyse IA · 30 secondes" : "AI analysis · 30 seconds"}
+              {fr ? "Diagnostic IA dermatologique" : "Dermatology-grade AI"}
             </span>
             <h1 className="hrf-h1">
-              {fr ? "Ta peau," : "Your skin,"}
-              <em>{fr ? "comprise." : "understood."}</em>
+              {fr ? "Analyse ta peau " : "Analyze your skin "}
+              <em>{fr ? "en 30 secondes." : "in 30 seconds."}</em>
             </h1>
             <p className="hrf-h1-sub">
-              {fr
-                ? "Le vrai problème de ta peau n'est peut-être pas celui que tu crois. Découvre-le en 30 secondes."
-                : "The real issue with your skin might not be what you think. Find out in 30 seconds."}
+              {fr ? "Le vrai problème de ta peau n'est peut-être pas celui que tu crois." : "The real issue with your skin might not be what you think."}
             </p>
-            <div className="hrf-cta-row">
-              <button className="hrf-cta-primary" onClick={onUploadClick}>
-                <span className="star">✦</span>
-                {fr ? "Analyser ma peau gratuitement" : "Analyze my skin for free"}
-              </button>
+            <span className="hrf-step1">{fr ? "Étape 1 — Ta photo" : "Step 1 — Your photo"}</span>
+            <div className="hrf-upload-box">
+              <div className="hrf-upload-head">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z" /><circle cx="12" cy="13" r="4" /></svg>
+                <span>{fr ? "Dépose ta photo — ton analyse démarre ici" : "Drop your photo — your analysis starts here"}</span>
+              </div>
+              <div className="hrf-upload-actions">
+                <button className="hrf-upload-btn primary" onClick={(e) => (onPickFile ? onPickFile(e) : onUploadClick(e))}>
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" /><polyline points="17 8 12 3 7 8" /><line x1="12" y1="3" x2="12" y2="15" /></svg>
+                  {fr ? "Choisir une photo" : "Choose a photo"}
+                </button>
+                <button className="hrf-upload-btn ghost" onClick={(e) => (onPickCamera ? onPickCamera(e) : onUploadClick(e))}>
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z" /><circle cx="12" cy="13" r="4" /></svg>
+                  {fr ? "Prendre une photo" : "Take a photo"}
+                </button>
+              </div>
+              <div className="hrf-upload-privacy">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="4" y="11" width="16" height="10" rx="2" /><path d="M8 11V7a4 4 0 0 1 8 0v4" /></svg>
+                <span>
+                  {fr
+                    ? <><strong>Personne ne voit ta photo, à part l'IA.</strong> Jamais stockée, jamais partagée — supprimée juste après l'analyse.</>
+                    : <><strong>No one sees your photo but the AI.</strong> Never stored, never shared — deleted right after the analysis.</>}
+                </span>
+              </div>
             </div>
             <div className="hrf-trust-mini">
-              <span>{fr ? "Gratuit · 30 secondes" : "Free · 30 seconds"}</span>
+              <span>{fr ? "Gratuit" : "Free"}</span>
               <span className="sep">·</span>
               <span>{fr ? "Sans inscription" : "No signup"}</span>
               <span className="sep">·</span>
-              <span>{fr ? "Photos jamais stockées" : "Photos never stored"}</span>
+              <span>{fr ? "Résultat en ~30s" : "Results in ~30s"}</span>
             </div>
           </div>
 

@@ -508,7 +508,6 @@ export default function Home({ teaserProducts }) {
   const [paidUnlocks, setPaidUnlocks] = useState(0);
 
   const [showStickyCta, setShowStickyCta] = useState(false);
-  const [showInAppWarning, setShowInAppWarning] = useState(false);
   const heroCtaRef = useRef(null);
 
   useEffect(() => {
@@ -520,16 +519,6 @@ export default function Home({ teaserProducts }) {
     };
     window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
-
-  // Détecte le navigateur intégré Android (Facebook/Instagram/etc.) où la caméra/upload
-  // est bloquée par le webview. iOS in-app fonctionne → on cible Android uniquement.
-  useEffect(() => {
-    if (typeof navigator === 'undefined') return;
-    const ua = navigator.userAgent || '';
-    const inApp = /FBAN|FBAV|FB_IAB|Instagram|Line\/|Snapchat|TikTok|musical_ly/i.test(ua);
-    const isAndroid = /Android/i.test(ua);
-    if (inApp && isAndroid) setShowInAppWarning(true);
   }, []);
 
   const [progress, setProgress] = useState(0);
@@ -690,15 +679,12 @@ export default function Home({ teaserProducts }) {
   };
 
   /* ── Email gate guard: show overlay or proceed directly ── */
+  // Email is no longer asked before the analysis — it's captured as a pop-up
+  // AFTER the report is generated (on the report page). Go straight to capture.
   const requireEmail = (action, e) => {
     if (e) e.stopPropagation();
-    if (emailCaptured) {
-      if (action === 'file') fileInputRef.current?.click();
-      else if (action === 'camera') openCamera();
-    } else {
-      setPendingAction(action);
-      setOverlayVisible(true);
-    }
+    if (action === 'file') fileInputRef.current?.click();
+    else if (action === 'camera') openCamera();
   };
 
   /* ── Handle multi-angle captures ── */
@@ -831,15 +817,9 @@ export default function Home({ teaserProducts }) {
 
   const handleAnalyse = async () => {
     if (!image) return;
-    if (!firstName.trim()) {
-      setError('firstName');
-      const el = document.querySelector('input[placeholder*="L"][placeholder*="éa"], input[placeholder*="Lea"]');
-      if (el) { el.focus(); el.scrollIntoView({ behavior: 'smooth', block: 'center' }); }
-      return;
-    }
 
-    // Persist first name for the report greeting
-    localStorage.setItem('rms_first_name', firstName.trim());
+    // Persist first name (optional) for the report greeting
+    if (firstName.trim()) localStorage.setItem('rms_first_name', firstName.trim());
 
     setLoading(true);
     setError('');
@@ -960,32 +940,6 @@ export default function Home({ teaserProducts }) {
           })
         }} />
       </Head>
-
-      {/* ── In-app browser warning (le webview Android FB/IG bloque la caméra) ── */}
-      {showInAppWarning && (
-        <div style={{
-          position: 'sticky', top: 0, zIndex: 300,
-          background: 'linear-gradient(90deg, #2C2416, #3D2914)',
-          color: '#F8F4ED', padding: '12px 16px',
-          display: 'flex', alignItems: 'center', gap: 12,
-          fontFamily: "'DM Sans', sans-serif", fontSize: 13, lineHeight: 1.4,
-        }}>
-          <span style={{ fontSize: 22, flexShrink: 0 }}>📱</span>
-          <div style={{ flex: 1 }}>
-            <strong>Pour analyser ta peau, ouvre cette page dans ton navigateur.</strong><br />
-            Menu <strong>⋮</strong> en haut à droite → <strong>« Ouvrir dans Chrome / le navigateur »</strong>.
-          </div>
-          <a
-            href="intent://ratemyskin.co/#Intent;scheme=https;package=com.android.chrome;end"
-            style={{
-              flexShrink: 0, background: '#C5A028', color: '#fff', textDecoration: 'none',
-              padding: '9px 14px', borderRadius: 100, fontWeight: 700, fontSize: 12.5, whiteSpace: 'nowrap',
-            }}
-          >
-            Ouvrir dans Chrome
-          </a>
-        </div>
-      )}
 
       {/* ── Welcoming Banner (legacy, always hidden) ── */}
       <div className="welcome-banner" style={{
@@ -1188,6 +1142,8 @@ export default function Home({ teaserProducts }) {
         {currentStep === 'landing' ? (
           <HomeRefonte
             onUploadClick={() => setShowUploadSelector(true)}
+            onPickFile={(e) => requireEmail('file', e)}
+            onPickCamera={(e) => requireEmail('camera', e)}
             lang={lang}
             setLang={setLang}
             t={t}
@@ -2078,7 +2034,7 @@ export default function Home({ teaserProducts }) {
                 color: '#2C2416', lineHeight: 1.1, margin: '0 0 10px',
                 letterSpacing: '-0.01em',
               }}>
-                {lang === 'fr' ? (<>Affine ton <em style={{ color: '#B0885E', fontStyle: 'italic' }}>diagnostic</em></>) : (<>Refine your <em style={{ color: '#B0885E', fontStyle: 'italic' }}>diagnosis</em></>)}
+                {lang === 'fr' ? (<>Presque <em style={{ color: '#B0885E', fontStyle: 'italic' }}>prêt</em></>) : (<>Almost <em style={{ color: '#B0885E', fontStyle: 'italic' }}>ready</em></>)}
               </h1>
               <p style={{
                 fontFamily: "'Cormorant Garamond', serif",
@@ -2086,7 +2042,7 @@ export default function Home({ teaserProducts }) {
                 fontSize: 16, color: '#5C4A3A', lineHeight: 1.5,
                 margin: '0',
               }}>
-                {lang === 'fr' ? 'Quelques questions optionnelles pour une analyse plus précise' : 'A few optional questions for a more precise analysis'}
+                {lang === 'fr' ? 'Ajoute ton prénom si tu veux personnaliser ton rapport, puis lance ton analyse.' : 'Add your first name to personalize your report if you like, then start your analysis.'}
               </p>
             </div>
 
@@ -2105,7 +2061,7 @@ export default function Home({ teaserProducts }) {
                   letterSpacing: '-0.005em',
                 }}>
                   {lang === 'fr' ? 'Comment t\'appelles-tu ?' : "What's your name?"}
-                  <span style={{ color: '#D199AB', marginLeft: 6, fontStyle: 'italic' }}>*</span>
+                  <span style={{ color: '#8A7A6B', marginLeft: 8, fontStyle: 'italic', fontSize: 13 }}>{lang === 'fr' ? '(optionnel)' : '(optional)'}</span>
                 </label>
                 <div style={{
                   fontSize: 11.5, color: '#8A7A6B', fontFamily: "'Cormorant Garamond', serif",
@@ -2131,8 +2087,8 @@ export default function Home({ teaserProducts }) {
               />
             </div>
 
-            {/* Photo preview — card premium */}
-            {imageUrl && (
+            {/* Photo preview removed from the questions step */}
+            {false && imageUrl && (
               <div style={{
                 marginBottom: 36,
                 background: 'linear-gradient(180deg, #FBF6EE 0%, #F5EBDB 100%)',
@@ -2181,7 +2137,8 @@ export default function Home({ teaserProducts }) {
               </div>
             )}
 
-            {/* Skin concern */}
+            {/* Extra questions (concern, age, refine) removed from this step */}
+            {false && (
             <div style={{ marginTop: 8 }}>
               <div style={{ marginBottom: 14 }}>
                 <span style={{
@@ -2390,6 +2347,7 @@ export default function Home({ teaserProducts }) {
                 )}
               </div>
             </div>
+            )}
 
             {/* Error */}
             {error && (
@@ -2402,11 +2360,11 @@ export default function Home({ teaserProducts }) {
               disabled={!image || loading}
               style={{
                 width: '100%',
-                marginTop: 20,
-                padding: '16px 28px',
-                fontSize: 16,
+                marginTop: 10,
+                padding: '20px 28px',
+                fontSize: 15,
                 fontWeight: 700,
-                letterSpacing: '0.05em',
+                letterSpacing: '0.06em',
                 textTransform: 'uppercase',
                 display: 'flex',
                 alignItems: 'center',
@@ -2420,18 +2378,10 @@ export default function Home({ teaserProducts }) {
                 position: 'relative',
                 overflow: 'hidden',
                 ...(image && !loading ? {
-                  background: 'rgba(255, 255, 255, 0.85)',
-                  backdropFilter: 'blur(20px) saturate(150%)',
-                  WebkitBackdropFilter: 'blur(20px) saturate(150%)',
-                  border: '1px solid rgba(255, 255, 255, 0.95)',
-                  boxShadow: [
-                    '0 2px 0 0 rgba(255,255,255,0.95) inset',
-                    '0 -2px 0 0 rgba(168,116,73,0.15) inset',
-                    'inset 0 1px 0 rgba(255,255,255,0.98)',
-                    '0 12px 32px rgba(168, 116, 73, 0.08)',
-                    '0 4px 12px rgba(168, 116, 73, 0.04)',
-                  ].join(','),
-                  color: '#2C2416',
+                  background: 'linear-gradient(135deg, #3A2F22 0%, #2C2416 50%, #1A1410 100%)',
+                  border: '1px solid rgba(201,169,97,0.4)',
+                  boxShadow: '0 1px 0 rgba(255,255,255,0.12) inset, 0 16px 38px rgba(44,36,22,0.32)',
+                  color: '#FFFFFF',
                   transform: 'translateY(-2px)',
                 } : {
                   background: 'linear-gradient(135deg, rgba(255,255,255,0.15) 0%, rgba(255,255,255,0.08) 100%)',
@@ -2472,7 +2422,7 @@ export default function Home({ teaserProducts }) {
                   {t('analysingFeatures')}
                 </span>
               ) : (
-                t('analyseNow')
+                <><span style={{ color: '#E8C988', marginRight: 8 }}>✦</span>{t('analyseNow')}</>
               )}
             </button>
 

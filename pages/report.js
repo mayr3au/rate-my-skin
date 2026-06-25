@@ -116,12 +116,21 @@ export default function Report() {
   const [emailLoading, setEmailLoading] = useState(false);
   const [newsletterConsent, setNewsletterConsent] = useState(false);
   const [emailSkipped, setEmailSkipped] = useState(false);
+  const [showEmailPopup, setShowEmailPopup] = useState(false);
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
       window.scrollTo(0, 0);
     }
   }, []);
+
+  // Show the email capture as a pop-up shortly AFTER the report is shown
+  // (free users only, who haven't given their email or skipped).
+  useEffect(() => {
+    if (!data || isPaid || emailCaptured || emailSkipped) { setShowEmailPopup(false); return; }
+    const tmr = setTimeout(() => setShowEmailPopup(true), 1800);
+    return () => clearTimeout(tmr);
+  }, [data, isPaid, emailCaptured, emailSkipped]);
 
   useEffect(() => {
     // 1. Read from sessionStorage
@@ -1031,6 +1040,39 @@ export default function Report() {
           handleEmailSkip={handleEmailSkip}
         />
       </div>
+
+      {/* Email capture pop-up — appears after the report is generated */}
+      {showEmailPopup && !emailCaptured && !emailSkipped && (
+        <div
+          onClick={() => { handleEmailSkip(); setShowEmailPopup(false); }}
+          style={{ position: 'fixed', inset: 0, zIndex: 400, background: 'rgba(44,36,22,0.45)', backdropFilter: 'blur(4px)', WebkitBackdropFilter: 'blur(4px)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20, animation: 'fadeIn 0.3s ease' }}
+        >
+          <div onClick={(e) => e.stopPropagation()} style={{ width: '100%', maxWidth: 380, background: '#FFFDFA', borderRadius: 24, padding: '30px 26px', textAlign: 'center', boxShadow: '0 30px 70px rgba(44,36,22,0.3)', position: 'relative' }}>
+            <button onClick={() => { handleEmailSkip(); setShowEmailPopup(false); }} aria-label={lang === 'fr' ? 'Fermer' : 'Close'} style={{ position: 'absolute', top: 12, right: 16, background: 'none', border: 'none', fontSize: 18, color: '#B9AC9E', cursor: 'pointer', lineHeight: 1 }}>✕</button>
+            <div style={{ fontSize: 34, marginBottom: 8 }}>📩</div>
+            <h3 style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: 26, color: '#2C2416', margin: '0 0 8px', fontWeight: 600 }}>
+              {lang === 'fr' ? 'Garde ton rapport' : 'Keep your report'}
+            </h3>
+            <p style={{ fontSize: 14, color: '#7d735f', margin: '0 0 20px', lineHeight: 1.5, fontFamily: "'DM Sans', sans-serif" }}>
+              {lang === 'fr' ? "On t'envoie ton score et tes conseils peau par email. Gratuit, zéro spam." : "We'll email your score and skin tips. Free, no spam."}
+            </p>
+            <form onSubmit={(e) => { e.preventDefault(); handleEmailSubmit(e); }}>
+              <input
+                type="email" required inputMode="email" autoComplete="email"
+                placeholder={lang === 'fr' ? 'Ton email' : 'Your email'}
+                value={email} onChange={(e) => setEmail(e.target.value)}
+                style={{ width: '100%', boxSizing: 'border-box', padding: '14px 16px', borderRadius: 12, border: '1px solid rgba(201,169,97,0.4)', fontSize: 15, fontFamily: "'DM Sans', sans-serif", marginBottom: 12, outline: 'none' }}
+              />
+              <button type="submit" disabled={emailLoading} style={{ width: '100%', background: 'linear-gradient(135deg,#2C2416,#1A150C)', color: '#fff', border: 'none', borderRadius: 100, padding: '15px 24px', fontSize: 15, fontWeight: 700, fontFamily: "'DM Sans', sans-serif", cursor: 'pointer' }}>
+                {emailLoading ? '…' : (lang === 'fr' ? 'Recevoir mes conseils' : 'Get my tips')}
+              </button>
+            </form>
+            <button type="button" onClick={() => { handleEmailSkip(); setShowEmailPopup(false); }} style={{ background: 'none', border: 'none', color: '#9a8f7a', fontSize: 12.5, marginTop: 14, cursor: 'pointer', fontFamily: "'DM Sans', sans-serif", textDecoration: 'underline' }}>
+              {lang === 'fr' ? 'Non merci, continuer' : 'No thanks, continue'}
+            </button>
+          </div>
+        </div>
+      )}
       </>
       )}
 
