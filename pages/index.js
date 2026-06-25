@@ -508,6 +508,7 @@ export default function Home({ teaserProducts }) {
   const [paidUnlocks, setPaidUnlocks] = useState(0);
 
   const [showStickyCta, setShowStickyCta] = useState(false);
+  const [showInAppWarning, setShowInAppWarning] = useState(false);
   const heroCtaRef = useRef(null);
 
   useEffect(() => {
@@ -519,6 +520,16 @@ export default function Home({ teaserProducts }) {
     };
     window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  // Détecte le navigateur intégré Android (Facebook/Instagram/etc.) où la caméra/upload
+  // est bloquée par le webview. iOS in-app fonctionne → on cible Android uniquement.
+  useEffect(() => {
+    if (typeof navigator === 'undefined') return;
+    const ua = navigator.userAgent || '';
+    const inApp = /FBAN|FBAV|FB_IAB|Instagram|Line\/|Snapchat|TikTok|musical_ly/i.test(ua);
+    const isAndroid = /Android/i.test(ua);
+    if (inApp && isAndroid) setShowInAppWarning(true);
   }, []);
 
   const [progress, setProgress] = useState(0);
@@ -949,6 +960,32 @@ export default function Home({ teaserProducts }) {
           })
         }} />
       </Head>
+
+      {/* ── In-app browser warning (le webview Android FB/IG bloque la caméra) ── */}
+      {showInAppWarning && (
+        <div style={{
+          position: 'sticky', top: 0, zIndex: 300,
+          background: 'linear-gradient(90deg, #2C2416, #3D2914)',
+          color: '#F8F4ED', padding: '12px 16px',
+          display: 'flex', alignItems: 'center', gap: 12,
+          fontFamily: "'DM Sans', sans-serif", fontSize: 13, lineHeight: 1.4,
+        }}>
+          <span style={{ fontSize: 22, flexShrink: 0 }}>📱</span>
+          <div style={{ flex: 1 }}>
+            <strong>Pour analyser ta peau, ouvre cette page dans ton navigateur.</strong><br />
+            Menu <strong>⋮</strong> en haut à droite → <strong>« Ouvrir dans Chrome / le navigateur »</strong>.
+          </div>
+          <a
+            href="intent://ratemyskin.co/#Intent;scheme=https;package=com.android.chrome;end"
+            style={{
+              flexShrink: 0, background: '#C5A028', color: '#fff', textDecoration: 'none',
+              padding: '9px 14px', borderRadius: 100, fontWeight: 700, fontSize: 12.5, whiteSpace: 'nowrap',
+            }}
+          >
+            Ouvrir dans Chrome
+          </a>
+        </div>
+      )}
 
       {/* ── Welcoming Banner (legacy, always hidden) ── */}
       <div className="welcome-banner" style={{
