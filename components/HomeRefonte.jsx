@@ -211,6 +211,7 @@ export default function HomeRefonte({ onUploadClick, onPickFile, onPickCamera, l
           font-size: 14px;
           color: #5C4A3A;
           line-height: 1.65;
+          text-align: left;
         }
         .hrf-eyebrow {
           font-size: 11px;
