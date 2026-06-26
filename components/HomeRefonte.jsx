@@ -589,12 +589,12 @@ export default function HomeRefonte({ onUploadClick, onPickFile, onPickCamera, l
         .hrf-hero {
           padding: clamp(24px, 4vw, 56px) 0 clamp(64px, 8vw, 96px);
           display: grid;
-          grid-template-columns: 1fr 1fr;
+          grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
           gap: clamp(40px, 6vw, 80px);
           align-items: center;
         }
         @media (max-width: 880px) {
-          .hrf-hero { grid-template-columns: 1fr; text-align: center; }
+          .hrf-hero { grid-template-columns: minmax(0, 1fr); text-align: center; }
         }
         .hrf-hero-pill {
           display: inline-flex;
