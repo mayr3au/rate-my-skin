@@ -1315,13 +1315,13 @@ export default function HomeRefonte({ onUploadClick, onPickFile, onPickCamera, l
         /* ── 4. WHAT YOU GET ────────────────────────────────────── */
         .hrf-get-grid {
           display: grid;
-          grid-template-columns: 1.1fr 1fr;
+          grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
           gap: clamp(40px, 6vw, 80px);
           margin-top: 56px;
           align-items: center;
         }
         @media (max-width: 880px) {
-          .hrf-get-grid { grid-template-columns: 1fr; }
+          .hrf-get-grid { grid-template-columns: minmax(0, 1fr); }
         }
         .hrf-features-list {
           display: flex;
