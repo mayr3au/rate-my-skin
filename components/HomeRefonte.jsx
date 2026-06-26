@@ -683,7 +683,7 @@ export default function HomeRefonte({ onUploadClick, onPickFile, onPickCamera, l
         }
         .hrf-upload-head svg { width: 18px; height: 18px; color: #B0885E; flex-shrink: 0; }
         .hrf-upload-actions { display: flex; gap: 10px; }
-        @media (max-width: 420px) { .hrf-upload-actions { flex-direction: column; } }
+        @media (max-width: 480px) { .hrf-upload-actions { flex-direction: column; } }
         .hrf-upload-btn {
           flex: 1; display: inline-flex; align-items: center; justify-content: center; gap: 8px;
           border-radius: 100px; padding: 14px 18px; cursor: pointer;
